@@ -1,0 +1,4 @@
+broadcaster = {
+  'global': {
+  },
+}

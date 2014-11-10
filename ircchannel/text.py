@@ -1,4 +1,5 @@
 from . import textOwner
+from . import textBroadcaster
 from . import textMods
 from . import textPublic
 import ircbot.irc
@@ -10,11 +11,21 @@ def customCommands(channelThread, nick, message, msgParts, permissions):
         owner = textOwner.owner
         if channel in owner and command in owner[channel]:
             channelThread.sendMessage(
-                               owner[channel][command].replace('\n', ''))
+                owner[channel][command].replace('\n', ''))
             return True
         if command in owner['global']:
             channelThread.sendMessage(
-                               owner['global'][command].replace('\n', ''))
+                owner['global'][command].replace('\n', ''))
+            return True
+    if permissions['broadcaster']:
+        broadcaster = textBroadcaster.broadcaster
+        if channel in broadcaster and command in broadcaster[channel]:
+            channelThread.sendMessage(
+                               broadcaster[channel][command].replace('\n', ''))
+            return True
+        if command in broadcaster['global']:
+            channelThread.sendMessage(
+                broadcaster['global'][command].replace('\n', ''))
             return True
     if permissions['moderator']:
         mods = textMods.mods
@@ -24,7 +35,7 @@ def customCommands(channelThread, nick, message, msgParts, permissions):
             return True
         if command in mods['global']:
             channelThread.sendMessage(
-                               mods['global'][command].replace('\n', ''))
+                mods['global'][command].replace('\n', ''))
             return True
     public = textPublic.public
     if channel in public and command in public[channel]:
