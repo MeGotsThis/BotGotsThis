@@ -11,7 +11,8 @@ from . import test
 commands = {
     '!exit': (owner.commandExit, 'owner+ownerChan'),
     '!reload': (reload.commandReload, 'owner+ownerChan'),
-    '!reloadCommands': (reload.commandReloadCommands, 'owner+ownerChan'),
+    '!reloadcommands': (reload.commandReloadCommands, 'owner+ownerChan'),
+    '!reloadconfig': (reload.commandReloadConfig, 'owner+ownerChan'),
     '!join': (owner.commandJoin, 'owner+ownerChan'),
     '!part': (owner.commandPart, 'owner+ownerChan'),
     '!emptyall': (owner.commandEmptyAll, 'owner+ownerChan'),
