@@ -10,7 +10,7 @@ def commandHello(channelThread, nick, message, msgParts, permissions):
 def commandLeave(channelThread, nick, message, msgParts, permissions):
     if channelThread.channel == '#' + config.botnick:
         return False
-    ircbot.irc.sendMsg(ircsock, channel, 'Bye ' + channelThread.channel[1:])
+    channelThread.sendMessage('Bye ' + channelThread.channel[1:])
     time.sleep(1)
     ircbot.irc.partChannel(channelThread.channel)
     return True
