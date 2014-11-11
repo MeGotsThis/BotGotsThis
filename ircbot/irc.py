@@ -34,6 +34,8 @@ class ChannelSocketThread(threading.Thread):
     def __init__(self, channel, **args):
         threading.Thread.__init__(self, **args)
         self.channel = channel
+        self.twitchStaff = []
+        self.twitchAdmin = []
         self.mods = []
         self.users = []
         self.running = True

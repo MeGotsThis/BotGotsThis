@@ -5,3 +5,9 @@ def parse(channelThread, nick, message):
             mods = message[l:]
             for mod in mods.split(', '):
                 channelThread.mods.append(mod)
+        if message.startswith('SPECIALUSER'):
+            _, user, type = message.split(' ')
+            if type == 'staff' and user not in channelThread.twitchStaff:
+                channelThread.twitchStaff.append(mod)
+            if type == 'admin' and user not in channelThread.twitchAdmin:
+                channelThread.twitchAdmin.append(mod)

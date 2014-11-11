@@ -18,14 +18,17 @@ def parse(channelThread, nick, message):
     else:
         isOwner = False
         isOwnerChan = False
-    isBroadcaster = '#' + nick == channelThread.channel
-    isMod = isBroadcaster or isOwner
-    isMod = isMod or nick in channelThread.mods
+    isStaff = nick in channelThread.twitchStaff
+    isAdmin = isStaff or nick in channelThread.twitchAdmin
+    isBroadcaster = isStaff or isAdmin or '#' + nick == channelThread.channel
+    isMod = isBroadcaster or nick in channelThread.mods
     isChanMod = config.botnick in channelThread.mods
     permissions = {
         'owner': isOwner,
         'ownerChan': isOwnerChan,
-        'broadcaster': isOwner,
+        'staff': isStaff,
+        'admin': isAdmin,
+        'broadcaster': isBroadcaster,
         'moderator': isMod,
         'channelModerator': isChanMod,
         }
