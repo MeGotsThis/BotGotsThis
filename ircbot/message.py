@@ -119,7 +119,7 @@ class MessgeQueue(threading.Thread):
         for j in [0, 1, 2]:
             queue = self.queues[j]
             for msg in queue[:]:
-                if msg[1] == channel:
+                if msg[0].channel == channel:
                     queue.remove(msg)
         self.lock.release()
     
