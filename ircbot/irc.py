@@ -132,6 +132,15 @@ class ChannelSocketThread(threading.Thread):
                 ircuser.user.parse(self, nick, msg)
             return
         
+        if ircmsg.find(' 353 ') != -1:
+            parts = ircmsg.split(' ', 5)
+            channel = parts[2]
+            nicks = parts[5][1:].split(' ')
+            if channel == self.channel:
+                for nick in nicks:
+                    self.users.append(nick)
+            return
+        
         if ircmsg.find(' JOIN ') != -1:
             parts = ircmsg.split(' ', 2)
             nick = parts[0].split('!')[0][1:]
