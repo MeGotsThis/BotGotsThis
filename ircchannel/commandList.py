@@ -16,7 +16,7 @@ commands = {
     '!join': (owner.commandJoin, 'owner+ownerChan'),
     '!part': (owner.commandPart, 'owner+ownerChan'),
     '!emptyall': (owner.commandEmptyAll, 'owner+ownerChan'),
-    '!emptychan': (owner.commandEmpty, 'owner+ownerChan'),
+    '!emptychat': (owner.commandEmpty, 'owner+ownerChan'),
     '!listchats': (owner.commandListChats, 'owner+ownerChan'),
     '!full': (full.commandFull, 'owner'),
     '!say': (owner.commandSay, 'owner'),
