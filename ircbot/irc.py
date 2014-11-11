@@ -54,8 +54,8 @@ class ChannelSocketThread(threading.Thread):
                         if not ircmsg:
                             continue
                         msg = ircmsg.decode(sys.stdout.encoding, 'replace')
-                        now = datetime.datetime.now().strftime('%H:%M:%S.%f ')
-                        print(now + msg)
+                        now = datetime.datetime.now().strftime(' %H:%M:%S.%f ')
+                        print(self.channel + now + msg)
                         ircmsg = ircmsg.decode('utf-8')
                         self._parseMsg(ircmsg)
                 except socket.error as e:
