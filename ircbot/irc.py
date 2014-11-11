@@ -1,5 +1,6 @@
 ﻿from config import config
 import ircchannel.commands
+import ircuser.user
 import ircbot.message
 import threading
 import traceback
@@ -91,6 +92,8 @@ class ChannelSocketThread(threading.Thread):
                  ]
         for comm in comms:
             self.sendIrcCommand(comm)
+        
+        self.sendMessage('.mods')
     
     def part(self):
         self.sendIrcCommand('PART ' + self.channel + '\n')
@@ -107,10 +110,12 @@ class ChannelSocketThread(threading.Thread):
         if ircmsg.find(' PRIVMSG ') != -1:
             parts = ircmsg.split(' ', 3)
             nick = parts[0].split('!')[0][1:]
-            channel = parts[2]
+            where = parts[2]
             msg = parts[3][1:]
-            if channel == self.channel:
+            if where == self.channel:
                 ircchannel.commands.parse(self, nick, msg)
+            if where == config.botnick:
+                ircuser.user.parse(self, nick, msg)
             return
         
         if ircmsg.find(' JOIN ') != -1:
@@ -129,19 +134,6 @@ class ChannelSocketThread(threading.Thread):
                 self.users.remove(nick)
             return
         
-        if ircmsg.find(' MODE ') != -1:
-            parts = ircmsg.split(' ', 4)
-            nick = parts[4]
-            channel = parts[2]
-            mode = parts[3]
-            if channel == self.channel:
-                if mode == '+o':
-                    self.mods.append(nick)
-                elif mode == '-o':
-                    if nick in self.mods:
-                        self.mods.remove(nick)
-            return
-      
         if ircmsg.find('PING :') != -1:
             self.ping()
             return
