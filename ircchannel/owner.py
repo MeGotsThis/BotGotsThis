@@ -57,3 +57,7 @@ def commandEmpty(channelThread, nick, message, msgParts, permissions):
         'Cleared all queued messages for ' + msgParts[1][1:])
     return True
 
+def commandListChats(channelThread, nick, message, msgParts, permissions):
+    channels = [c[1:] for c in ircbot.irc.channels.keys()]
+    channelThread.sendMessage('Twitch Chats: ' + ', '.join(channels))
+    return True
