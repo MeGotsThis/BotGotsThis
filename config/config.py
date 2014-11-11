@@ -13,6 +13,7 @@ modLimit = int(ini['BOT']['modLimit'])
 modSpamLimit = int(ini['BOT']['modSpamLimit'])
 publicLimit = int(ini['BOT']['publicLimit'])
 publicDelay = float(ini['BOT']['publicDelay'])
+messagePerSecond = float(ini['BOT']['messagePerSecond'])
 
 exceptionLog = ini['BOT']['exceptionLog']
 
