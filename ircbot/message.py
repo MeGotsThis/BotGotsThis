@@ -24,6 +24,7 @@ class MessgeQueue(threading.Thread):
         self.lock.release()
     
     def run(self):
+        print('Starting MessageQueue')
         try:
             while self.running:
                 msg = self._getMessage()
@@ -43,6 +44,8 @@ class MessgeQueue(threading.Thread):
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                     file.write(' ' + ''.join(_))
             raise
+        finally:
+            print('Ending MessageQueue')
     
     def _getMessage(self):
         msgDuration = datetime.timedelta(seconds=30.1)

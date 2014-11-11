@@ -5,6 +5,7 @@ import ircbot.message
 import threading
 import traceback
 import datetime
+import os.path
 import socket
 import time
 import sys
@@ -41,6 +42,7 @@ class ChannelSocketThread(threading.Thread):
         self.running = True
     
     def run(self):
+        print('Starting ' + self.channel)
         self.ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ircsock.settimeout(5)
         self._connect()
@@ -56,10 +58,14 @@ class ChannelSocketThread(threading.Thread):
                     for ircmsg in ircmsgs.split(b'\r\n'):
                         if not ircmsg:
                             continue
-                        msg = ircmsg.decode(sys.stdout.encoding, 'replace')
-                        now = datetime.datetime.now().strftime(' %H:%M:%S.%f ')
-                        print(self.channel + now + msg)
                         ircmsg = ircmsg.decode('utf-8')
+                        if config.ircLogFolder:
+                            fileName = self.channel + '.log'
+                            pathArgs = config.ircLogFolder, fileName
+                            dtnow = datetime.datetime.now()
+                            now = dtnow.strftime('%Y-%m-%d %H:%M:%S.%f ')
+                            with open(os.path.join(*pathArgs), 'a') as file:
+                                file.write(now + ircmsg + '\n')
                         self._parseMsg(ircmsg)
                 except socket.error as e:
                     pass
@@ -72,9 +78,15 @@ class ChannelSocketThread(threading.Thread):
                 with open(config.exceptionLog, 'a') as file:
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                     file.write(' ' + ''.join(_))
+            if config.ircLogFolder:
+                fileName = self.channel + '.log'
+                pathArgs = config.ircLogFolder, fileName
+                with open(os.path.join(*pathArgs), 'a') as file:
+                    file.write(' ' + ''.join(_))
             raise
         finally:
             partChannel(self.channel)
+            print('Ending ' + self.channel)
     
     def sendIrcCommand(self, command):
         # Makes an IRC command over to the server

@@ -1,5 +1,7 @@
 ﻿import configparser
+import os.path
 import json
+import os
 
 server = 'irc.twitch.tv'
 eventServer = '199.9.252.26'
@@ -15,7 +17,10 @@ publicLimit = int(ini['BOT']['publicLimit'])
 publicDelay = float(ini['BOT']['publicDelay'])
 messagePerSecond = float(ini['BOT']['messagePerSecond'])
 
+ircLogFolder = ini['BOT']['ircLogFolder']
 exceptionLog = ini['BOT']['exceptionLog']
+if ircLogFolder and not os.path.isdir(ircLogFolder):
+    os.mkdir(ircLogFolder)
 
 autoJoin = []
 autoJoin.append('#' + botnick)

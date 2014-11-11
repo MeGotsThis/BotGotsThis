@@ -11,7 +11,6 @@ ircbot.irc.messaging.start()
 
 try:
     for channel in config.autoJoin:
-        print(channel)
         ircbot.irc.joinChannel(channel)
     
     ircbot.irc.messaging.join()
@@ -26,3 +25,5 @@ except:
             file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
             file.write(' ' + ''.join(_))
     raise
+finally:
+    print('Ended')

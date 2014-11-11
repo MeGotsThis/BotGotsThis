@@ -1,5 +1,7 @@
 ﻿from . import statExpTable
+from config import config
 import ircbot.irc
+import os.path
 import math
 import re
 
@@ -41,6 +43,11 @@ def commandNidoranRed(channelThread, nick, message, msgParts, permissions):
             return True
         if msgParts[1] == 'print':
             if channel in nidoranStats:
+                if config.ircLogFolder:
+                    fileName = channelThread.channel + '.log'
+                    pathArgs = config.ircLogFolder, fileName
+                    with open(os.path.join(*pathArgs), 'a') as file:
+                        file.write(repr(nidoranStats[channel]) + '\n')
                 print(channel, repr(nidoranStats[channel]))
             return True
     if len(msgParts) >= 2 and msgParts[1] == 'stats':
