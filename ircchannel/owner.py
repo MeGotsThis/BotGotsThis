@@ -5,7 +5,7 @@ import time
 import sys
 
 def commandExit(channelThread, nick, message, msgParts, permissions):
-    channelThread.sendMessage('Goodbye Keepo')
+    channelThread.sendMessage('Goodbye Keepo', 0)
     time.sleep(0.5)
     for channel in set(ircbot.irc.channels.keys()):
         ircbot.irc.partChannel(channel)
