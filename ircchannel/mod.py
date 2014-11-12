@@ -48,8 +48,7 @@ def commandPurge(channelThread, nick, message, msgParts, permissions):
     return False
 
 def commandReloadMods(channelThread, nick, message, msgParts, permissions):
-    ircbot.irc.channels[channel].mods.clear()
-    ircbot.irc.channels[channel].sendMessage('.mods', 0)
-    ircbot.irc.channels[channel].sendMessage(
-        'Reloaded mods for ' + channelThread.channel[1:])
+    channelThread.mods.clear()
+    channelThread.sendMessage('.mods', 0)
+    channelThread.sendMessage('Reloaded mods for ' + channelThread.channel[1:])
     return True
