@@ -63,7 +63,7 @@ class ChannelSocketThread(threading.Thread):
                             fileName = self.channel + '.log'
                             pathArgs = config.ircLogFolder, fileName
                             dtnow = datetime.datetime.now()
-                            now = dtnow.strftime('%Y-%m-%d %H:%M:%S.%f ')
+                            now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
                             with open(os.path.join(*pathArgs), 'a') as file:
                                 file.write(now + ircmsg + '\n')
                         self._parseMsg(ircmsg)
@@ -94,6 +94,13 @@ class ChannelSocketThread(threading.Thread):
         if type(command) is str:
             command = command.encode('utf-8')
         self.ircsock.send(command[:2048])
+        if config.ircLogFolder:
+            fileName = self.channel + '.log'
+            pathArgs = config.ircLogFolder, fileName
+            dtnow = datetime.datetime.now()
+            now = dtnow.strftime('> %Y-%m-%d %H:%M:%S.%f ')
+            with open(os.path.join(*pathArgs), 'a') as file:
+                file.write(now + command.decode('utf-8'))
     
     def _connect(self):
         # Connect to IRC server
