@@ -3,6 +3,8 @@ import ircbot.irc
 import datetime
 
 def commandWall(channelThread, nick, message, msgParts, permissions):
+    if len(msgParts) < 2:
+        return False
     rep = msgParts[1] + ' '
     try:
         if len(msgParts) == 3:
@@ -24,6 +26,8 @@ def commandWall(channelThread, nick, message, msgParts, permissions):
 
 def commandWallLong(channelThread, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
+    if len(msgParts) < 2:
+        return False
     try:
         rows = int(msgParts[0].split('-')[1])
     except:

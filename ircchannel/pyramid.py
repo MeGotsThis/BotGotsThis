@@ -45,6 +45,8 @@ def commandRPyramid(channelThread, nick, message, msgParts, permissions):
 
 def commandPyramidLong(channelThread, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
+    if len(msgParts) < 2:
+        return False
     rep = msgParts[1] + ' '
     try:
         count = int(msgParts[0].split('-')[1])
