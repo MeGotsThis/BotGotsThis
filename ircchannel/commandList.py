@@ -7,6 +7,7 @@ from . import pyramid
 from . import wall
 from . import mod
 from . import test
+import privatechannel.commandList
 
 commands = {
     '!exit': (owner.commandExit, 'owner+ownerChan'),
@@ -45,3 +46,9 @@ commandsStartWith = {
     '!pyramid-': (pyramid.commandPyramidLong, 'broadcaster'),
     '!wall-': (wall.commandWallLong, 'broadcaster'),
 }
+
+commands = dict(
+    list(commands.items()) + list(privatechannel.commandList.commands.items()))
+commandsStartWith = dict(
+    list(commandsStartWith.items()) +
+    list(privatechannel.commandList.commandsStartWith.items()))
