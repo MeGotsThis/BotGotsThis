@@ -26,5 +26,5 @@ autoJoin = []
 autoJoin.append('#' + botnick)
 if owner:
     autoJoin.append('#' + owner)
-with open('autoJoin.json') as file:
+with open('autoJoin.json', encoding='utf-8') as file:
     autoJoin += json.load(file)
