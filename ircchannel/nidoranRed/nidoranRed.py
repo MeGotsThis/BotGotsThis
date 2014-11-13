@@ -46,7 +46,8 @@ def commandNidoranRed(channelThread, nick, message, msgParts, permissions):
                 if config.ircLogFolder:
                     fileName = channelThread.channel + '.log'
                     pathArgs = config.ircLogFolder, fileName
-                    with open(os.path.join(*pathArgs), 'a') as file:
+                    with open(os.path.join(*pathArgs), 'a',
+                              encoding='utf-8') as file:
                         file.write(repr(nidoranStats[channel]) + '\n')
                 print(channel, repr(nidoranStats[channel]))
             return True

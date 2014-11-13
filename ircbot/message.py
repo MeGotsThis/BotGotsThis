@@ -40,7 +40,7 @@ class MessgeQueue(threading.Thread):
             exc_type, exc_value, exc_traceback = sys.exc_info()
             _ = traceback.format_exception(exc_type, exc_value, exc_traceback)
             if config.exceptionLog is not None:
-                with open(config.exceptionLog, 'a') as file:
+                with open(config.exceptionLog, 'a', encoding='utf-8') as file:
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                     file.write(' ' + ''.join(_))
             raise

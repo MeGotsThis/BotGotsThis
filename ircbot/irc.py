@@ -64,7 +64,8 @@ class ChannelSocketThread(threading.Thread):
                             pathArgs = config.ircLogFolder, fileName
                             dtnow = datetime.datetime.now()
                             now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
-                            with open(os.path.join(*pathArgs), 'a') as file:
+                            with open(os.path.join(*pathArgs), 'a',
+                                      encoding='utf-8') as file:
                                 file.write(now + ircmsg + '\n')
                         self._parseMsg(ircmsg)
                 except socket.error as e:
@@ -75,13 +76,14 @@ class ChannelSocketThread(threading.Thread):
             exc_type, exc_value, exc_traceback = sys.exc_info()
             _ = traceback.format_exception(exc_type, exc_value, exc_traceback)
             if config.exceptionLog is not None:
-                with open(config.exceptionLog, 'a') as file:
+                with open(config.exceptionLog, 'a', encoding='utf-8') as file:
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                     file.write(' ' + ''.join(_))
             if config.ircLogFolder:
                 fileName = self.channel + '.log'
                 pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a') as file:
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
                     file.write(' ' + ''.join(_))
             raise
         finally:
@@ -99,7 +101,7 @@ class ChannelSocketThread(threading.Thread):
             pathArgs = config.ircLogFolder, fileName
             dtnow = datetime.datetime.now()
             now = dtnow.strftime('> %Y-%m-%d %H:%M:%S.%f ')
-            with open(os.path.join(*pathArgs), 'a') as file:
+            with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
                 file.write(now + command.decode('utf-8'))
     
     def _connect(self):

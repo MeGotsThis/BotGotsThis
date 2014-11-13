@@ -21,7 +21,7 @@ except:
     traceback.print_exception(exc_type, exc_value, exc_traceback)
     _ = traceback.format_exception(exc_type, exc_value, exc_traceback)
     if config.exceptionLog is not None:
-        with open(config.exceptionLog, 'a') as file:
+        with open(config.exceptionLog, 'a', encoding='utf-8') as file:
             file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
             file.write(' ' + ''.join(_))
     raise
