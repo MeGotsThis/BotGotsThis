@@ -6,7 +6,6 @@ from . import owner
 from . import pyramid
 from . import wall
 from . import mod
-from . import test
 import privatechannel.commandList
 
 commands = {
@@ -22,9 +21,6 @@ commands = {
     '!emptyall': (owner.commandEmptyAll, 'admin+ownerChan'),
     '!full': (full.commandFull, 'owner'),
     '!say': (owner.commandSay, 'owner'),
-    '!e': (test.commandE, 'owner'),
-    '!x': (test.commandX, 'owner'),
-    '!y': (test.commandY, 'owner'),
     '!hello': (broadcaster.commandHello, 'broadcaster'),
     '!leave': (broadcaster.commandLeave, 'broadcaster'),
     '!empty': (broadcaster.commandEmpty, 'broadcaster'),

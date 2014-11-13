@@ -44,7 +44,7 @@ def parse(channelThread, nick, message):
             permissionSet = commandInfo[1].split('+')
             for perm in permissionSet:
                 hasPermission = hasPermission and permissions[perm]
-        if hasPermission:
+        if hasPermission and commandInfo[0] is not None:
             complete = commandInfo[0](*arguments)
     if not complete:
         for comm in ircchannel.commandList.commandsStartWith:
@@ -55,7 +55,7 @@ def parse(channelThread, nick, message):
                     permissionSet = commandInfo[1].split('+')
                     for perm in permissionSet:
                         hasPermission = hasPermission and permissions[perm]
-                if hasPermission:
+                if hasPermission and commandInfo[0] is not None:
                     complete = commandInfo[0](*arguments)
     if not complete:
         ircchannel.text.customCommands(*arguments)
