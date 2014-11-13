@@ -4,6 +4,10 @@ import time
 import sys
 import imp
 
+def loadThisModule(module):
+    _ = module.startswith('ircchannel') or module.startswith('privatechannel')
+    return  _ and module != 'ircchannel.reload'
+
 def commandReload(channelThread, nick, message, msgParts, permissions):
     channelThread.sendMessage('Reloading', 0)
     
@@ -17,8 +21,7 @@ def commandReload(channelThread, nick, message, msgParts, permissions):
 def commandReloadCommands(channelThread, nick, message, msgParts, permissions):
     channelThread.sendMessage('Reloading Commands', 0)
     
-    modules = [m for m in sys.modules.keys()
-               if m.startswith('ircchannel') and m != 'ircchannel.reload']
+    modules = [m for m in sys.modules.keys() if loadThisModule(m)]
     for moduleString in modules:
         imp.reload(sys.modules[moduleString])
     
