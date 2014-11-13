@@ -12,7 +12,7 @@ def commandCome(channelThread, nick, message, msgParts, permissions):
         channelThread.sendMessage('I am already in ' + nick)
         return True
     channelThread.sendMessage('Joining ' + nick)
-    ircbot.irc.joinChannel(channelThread.channel)
+    ircbot.irc.joinChannel(nick)
     return True
 
 def commandLeave(channelThread, nick, message, msgParts, permissions):
