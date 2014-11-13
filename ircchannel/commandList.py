@@ -38,6 +38,7 @@ commands = {
     '!setgame': (mod.commandGame, 'moderator'),
     '!purge': (mod.commandPurge, 'moderator'),
     '!rekt': (mod.commandPurge, 'moderator'),
+    '!come': (broadcaster.commandCome, 'ownerChan'),
     '!dvs': (nidoranRed.commandDvs, None),
 }
 commandsStartWith = {

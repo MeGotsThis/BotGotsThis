@@ -7,6 +7,14 @@ def commandHello(channelThread, nick, message, msgParts, permissions):
     channelThread.sendMessage('Hello Kappa')
     return True
 
+def commandCome(channelThread, nick, message, msgParts, permissions):
+    if ('#' + nick) in ircbot.irc.channels:
+        channelThread.sendMessage('I am already in ' + nick)
+        return True
+    channelThread.sendMessage('Joining ' + nick)
+    ircbot.irc.joinChannel(channelThread.channel)
+    return True
+
 def commandLeave(channelThread, nick, message, msgParts, permissions):
     if channelThread.channel == '#' + config.botnick:
         return False
