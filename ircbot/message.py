@@ -43,6 +43,8 @@ class MessgeQueue(threading.Thread):
                 with open(config.exceptionLog, 'a', encoding='utf-8') as file:
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                     file.write(' ' + ''.join(_))
+            for channel in set(ircbot.irc.channels.keys()):
+                ircbot.irc.partChannel(channel)
             raise
         finally:
             print('Ending MessageQueue')
