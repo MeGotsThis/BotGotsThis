@@ -22,7 +22,7 @@ def commandStatus(channelThread, nick, message, msgParts, permissions):
 def commandGame(channelThread, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
-        return False
+        msgParts.append('')
     if config.oauth.getOAuthToken(channelThread.channel) is None:
         return False
     if msgParts[0].lower() == '!game':
@@ -36,7 +36,10 @@ def commandGame(channelThread, nick, message, msgParts, permissions):
         headers = {'Content-Type': 'application/x-www-form-urlencoded'},
         data = {'channel[game]': msgParts[1]})
     if response.status == 200:
-        channelThread.sendMessage('Channel Game set as: ' + msgParts[1])
+        if msgParts[1]:
+            channelThread.sendMessage('Channel Game set as: ' + msgParts[1])
+        else:
+            channelThread.sendMessage('Channel Game has been unset')
     else:
         channelThread.sendMessage('Channel Game failed to set')
     return True
