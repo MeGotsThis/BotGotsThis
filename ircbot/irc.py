@@ -143,7 +143,7 @@ class ChannelSocketThread(threading.Thread):
         
         if ircmsg.find(' 353 ') != -1:
             parts = ircmsg.split(' ', 5)
-            channel = parts[2]
+            channel = parts[4]
             nicks = parts[5][1:].split(' ')
             if channel == self.channel:
                 for nick in nicks:
