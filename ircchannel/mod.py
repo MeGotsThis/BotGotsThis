@@ -11,7 +11,10 @@ def commandStatus(channelThread, nick, message, msgParts, permissions):
     chan = channelThread.channel[1:]
     response = ircbot.twitchApi.twitchCall(
         channelThread.channel, 'PUT', '/kraken/channels/' + chan,
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/vnd.twitchtv.v2+json',
+            },
         data = {'channel[status]': msgParts[1]})
     if response.status == 200:
         channelThread.sendMessage('Channel Status set as: ' + msgParts[1])
@@ -33,7 +36,10 @@ def commandGame(channelThread, nick, message, msgParts, permissions):
     chan = channelThread.channel[1:]
     response = ircbot.twitchApi.twitchCall(
         channelThread.channel, 'PUT', '/kraken/channels/' + chan,
-        headers = {'Content-Type': 'application/x-www-form-urlencoded'},
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/vnd.twitchtv.v2+json',
+            },
         data = {'channel[game]': msgParts[1]})
     if response.status == 200:
         if msgParts[1]:
