@@ -43,52 +43,69 @@ class ChannelSocketThread(threading.Thread):
     
     def run(self):
         print('Starting ' + self.channel)
-        self.ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.ircsock.settimeout(5)
-        self._connect()
-
-        try:
-            while self.running:
-                try:
-                    ircmsgs = lastRecv = self.ircsock.recv(2048)
-                    while lastRecv[-2:] != b'\r\n':
-                        lastRecv = self.ircsock.recv(2048)
-                        ircmsgs += lastRecv
-                    
-                    for ircmsg in ircmsgs.split(b'\r\n'):
-                        if not ircmsg:
-                            continue
-                        ircmsg = ircmsg.decode('utf-8')
-                        if config.ircLogFolder:
-                            fileName = self.channel + '.log'
-                            pathArgs = config.ircLogFolder, fileName
-                            dtnow = datetime.datetime.now()
-                            now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
-                            with open(os.path.join(*pathArgs), 'a',
-                                      encoding='utf-8') as file:
-                                file.write(now + ircmsg + '\n')
-                        self._parseMsg(ircmsg)
-                except socket.error as e:
-                    pass
-        except Exception as e:
-            now = datetime.datetime.now()
-            messaging.clearQueue(self.channel)
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            _ = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            if config.exceptionLog is not None:
-                with open(config.exceptionLog, 'a', encoding='utf-8') as file:
-                    file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                    file.write(' ' + ''.join(_))
-            if config.ircLogFolder:
-                fileName = self.channel + '.log'
-                pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write(' ' + ''.join(_))
-            raise
-        finally:
-            partChannel(self.channel)
-            print('Ending ' + self.channel)
+        
+        while self.running:
+            self.ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.ircsock.settimeout(5)
+            try:
+                self._connect()
+            except socket.error as e:
+                print(e)
+                time.sleep(5)
+                continue
+            self.lastPing = datetime.datetime.now()
+            print('Connected ' + self.channel)
+            
+            try:
+                while self.running:
+                    try:
+                        ircmsgs = lastRecv = self.ircsock.recv(2048)
+                        while lastRecv[-2:] != b'\r\n':
+                            lastRecv = self.ircsock.recv(2048)
+                            ircmsgs += lastRecv
+                        
+                        for ircmsg in ircmsgs.split(b'\r\n'):
+                            if not ircmsg:
+                                continue
+                            ircmsg = ircmsg.decode('utf-8')
+                            if config.ircLogFolder:
+                                fileName = self.channel + '.log'
+                                pathArgs = config.ircLogFolder, fileName
+                                dtnow = datetime.datetime.now()
+                                now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
+                                with open(os.path.join(*pathArgs), 'a',
+                                          encoding='utf-8') as file:
+                                    file.write(now + ircmsg + '\n')
+                            self._parseMsg(ircmsg)
+                    except socket.timeout as e:
+                        pass
+                    sinceLast = datetime.datetime.now() - self.lastPing
+                    if sinceLast >= datetime.timedelta(minutes=6):
+                        raise NoPingException()
+            except NoPingException:
+                pass
+            except Exception as e:
+                now = datetime.datetime.now()
+                messaging.clearQueue(self.channel)
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                _ = traceback.format_exception(
+                    exc_type, exc_value, exc_traceback)
+                if config.exceptionLog is not None:
+                    with open(config.exceptionLog, 'a',
+                              encoding='utf-8') as file:
+                        file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
+                        file.write(' ' + ''.join(_))
+                if config.ircLogFolder:
+                    fileName = self.channel + '.log'
+                    pathArgs = config.ircLogFolder, fileName
+                    with open(os.path.join(*pathArgs), 'a',
+                              encoding='utf-8') as file:
+                        file.write(' ' + ''.join(_))
+            finally:
+                self.ircsock.close()
+            print('Disconnected ' + self.channel)
+            time.sleep(5)
+        print('Ending ' + self.channel)
     
     def sendIrcCommand(self, command):
         # Makes an IRC command over to the server
@@ -124,7 +141,8 @@ class ChannelSocketThread(threading.Thread):
         self.running = False
     
     def ping(self):
-        self.sendIrcCommand('PONG :pingis\n')  
+        self.sendIrcCommand('PONG :pingis\n')
+        self.lastPing = datetime.datetime.now()
 
     def sendMessage(self, msg, priority=1):
         messaging.queueMessage(self, msg, priority)
@@ -169,3 +187,6 @@ class ChannelSocketThread(threading.Thread):
         if ircmsg.find('PING :') != -1:
             self.ping()
             return
+
+class NoPingException(Exception):
+    pass
