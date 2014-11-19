@@ -22,7 +22,7 @@ def commandReloadCommands(channelThread, nick, message, msgParts, permissions):
     channelThread.sendMessage('Reloading Commands', 0)
     
     modules = [m for m in sys.modules.keys() if loadThisModule(m)]
-    for moduleString in modules:
+    for moduleString in sorted(modules, reverse=True):
         imp.reload(sys.modules[moduleString])
     
     channelThread.sendMessage('Complete Commands', 0)
