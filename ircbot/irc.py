@@ -53,6 +53,7 @@ class ChannelSocketThread(threading.Thread):
                 print(e)
                 time.sleep(5)
                 continue
+            self.lastPing = datetime.datetime.now()
             print('Connected ' + self.channel)
             
             try:
@@ -78,13 +79,20 @@ class ChannelSocketThread(threading.Thread):
                             self._parseMsg(ircmsg)
                     except socket.timeout as e:
                         pass
+                    sinceLast = datetime.datetime.now() - self.lastPing
+                    if sinceLast >= datetime.timedelta(minutes=6):
+                        raise NoPingException()
+            except NoPingException:
+                pass
             except Exception as e:
                 now = datetime.datetime.now()
                 messaging.clearQueue(self.channel)
                 exc_type, exc_value, exc_traceback = sys.exc_info()
-                _ = traceback.format_exception(exc_type, exc_value, exc_traceback)
+                _ = traceback.format_exception(
+                    exc_type, exc_value, exc_traceback)
                 if config.exceptionLog is not None:
-                    with open(config.exceptionLog, 'a', encoding='utf-8') as file:
+                    with open(config.exceptionLog, 'a',
+                              encoding='utf-8') as file:
                         file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                         file.write(' ' + ''.join(_))
                 if config.ircLogFolder:
@@ -133,7 +141,8 @@ class ChannelSocketThread(threading.Thread):
         self.running = False
     
     def ping(self):
-        self.sendIrcCommand('PONG :pingis\n')  
+        self.sendIrcCommand('PONG :pingis\n')
+        self.lastPing = datetime.datetime.now()
 
     def sendMessage(self, msg, priority=1):
         messaging.queueMessage(self, msg, priority)
@@ -178,3 +187,6 @@ class ChannelSocketThread(threading.Thread):
         if ircmsg.find('PING :') != -1:
             self.ping()
             return
+
+class NoPingException(Exception):
+    pass
