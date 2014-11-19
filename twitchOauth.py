@@ -4,7 +4,7 @@ import configparser
 ini = configparser.ConfigParser()
 ini.read('twitchApi.ini')
 
-response = ircbot.twitchApi.twitchCall(
+response, data = ircbot.twitchApi.twitchCall(
     None, 'POST', '/kraken/oauth2/token/',
     headers = {'Content-Type': 'application/x-www-form-urlencoded'},
     data = {
@@ -15,5 +15,5 @@ response = ircbot.twitchApi.twitchCall(
         'code': '',
         })
 
-print(response.read())
+print(data)
 input()

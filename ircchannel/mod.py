@@ -9,7 +9,7 @@ def commandStatus(channelThread, nick, message, msgParts, permissions):
     if config.oauth.getOAuthToken(channelThread.channel) is None:
         return False
     chan = channelThread.channel[1:]
-    response = ircbot.twitchApi.twitchCall(
+    response, data = ircbot.twitchApi.twitchCall(
         channelThread.channel, 'PUT', '/kraken/channels/' + chan,
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -34,7 +34,7 @@ def commandGame(channelThread, nick, message, msgParts, permissions):
         msgParts[1] = msgParts[1].replace('Pokemon', 'Pokémon')
         msgParts[1] = msgParts[1].replace('Pokepark', 'Poképark')
     chan = channelThread.channel[1:]
-    response = ircbot.twitchApi.twitchCall(
+    response, data = ircbot.twitchApi.twitchCall(
         channelThread.channel, 'PUT', '/kraken/channels/' + chan,
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',

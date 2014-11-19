@@ -16,7 +16,8 @@ def twitchCall(channel, method, uri, headers={}, data=None):
     
     conn.request(method, uri, data, headers)
     response = conn.getresponse()
+    responseData = response.read()
     
     conn.close()
     
-    return response
+    return (response, responseData)
