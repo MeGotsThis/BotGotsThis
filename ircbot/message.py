@@ -39,7 +39,10 @@ class MessgeQueue(threading.Thread):
                         self.publicTime = datetime.datetime.utcnow()
                     self.timesSent.append(datetime.datetime.utcnow())
                     _ = 'PRIVMSG ' + msg[0].channel + ' :' + msg[1] + '\n'
-                    msg[0].sendIrcCommand(_)
+                    try:
+                        msg[0].sendIrcCommand(_)
+                    except OSError:
+                        pass
                 time.sleep(1 / config.messagePerSecond)
         except Exception as e:
             now = datetime.datetime.now()
