@@ -85,6 +85,8 @@ class ChannelSocketThread(threading.Thread):
                         raise NoPingException()
             except NoPingException:
                 pass
+            except LoginUnsuccessfulException:
+                pass
             except Exception as e:
                 now = datetime.datetime.now()
                 messaging.clearQueue(self.channel)
