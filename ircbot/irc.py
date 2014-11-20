@@ -1,5 +1,6 @@
 ﻿from config import config
 import ircchannel.commands
+import ircuser.notice
 import ircuser.user
 import ircbot.message
 import threading
@@ -162,6 +163,14 @@ class ChannelSocketThread(threading.Thread):
                 ircuser.user.parse(self, nick, msg)
             return
         
+        if ircmsg.find(' NOTICE ') != -1:
+            parts = ircmsg.split(' ', 3)
+            nick = parts[0].split('!')[0][1:]
+            msg = parts[3][1:]
+            if msg == 'Login unsuccessful':
+                ircuser.notice.parse(self, nick, msg)
+            return
+        
         if ircmsg.find(' 353 ') != -1:
             parts = ircmsg.split(' ', 5)
             channel = parts[4]
@@ -192,4 +201,7 @@ class ChannelSocketThread(threading.Thread):
             return
 
 class NoPingException(Exception):
+    pass
+
+class LoginUnsuccessfulException(Exception):
     pass
