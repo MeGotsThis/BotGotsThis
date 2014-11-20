@@ -147,6 +147,9 @@ class ChannelSocketThread(threading.Thread):
     def sendMessage(self, msg, priority=1):
         messaging.queueMessage(self, msg, priority)
     
+    def sendMulipleMessages(self, messages, priority=1):
+        messaging.queueMultipleMessages(self, messages, priority)
+    
     def _parseMsg(self, ircmsg):
         if ircmsg.find(' PRIVMSG ') != -1:
             parts = ircmsg.split(' ', 3)

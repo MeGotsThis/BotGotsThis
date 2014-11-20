@@ -11,10 +11,9 @@ def commandPyramid(channelThread, nick, message, msgParts, permissions):
     except:
         count = 5
     count = min(count, (2048 - 11 - len(channelThread.channel)) // len(rep))
-    for i in range(1, count + 1):
-        channelThread.sendMessage(rep * i, 2)
-    for i in range(count - 1, 0, -1):
-        channelThread.sendMessage(rep * i, 2)
+    messages = [rep * i for i in range(1, count)]
+    messages += [rep * i for i in range(count, 0, -1)]
+    channelThread.sendMulipleMessages(messages, 2)
     return True
 
 def commandRPyramid(channelThread, nick, message, msgParts, permissions):
@@ -37,10 +36,9 @@ def commandRPyramid(channelThread, nick, message, msgParts, permissions):
         if len(' '.join(rep)) >= (2048 - 11 - len(channelThread.channel)):
             del rep[-1]
             break
-    for i in range(1, count + 1):
-        channelThread.sendMessage(' '.join(rep[0:i]), 2)
-    for i in range(count - 1, 0, -1):
-        channelThread.sendMessage(' '.join(rep[0:i]), 2)
+    messages = [' '.join(rep[0:i]) for i in range(1, count)]
+    messages += [' '.join(rep[0:i]) for i in range(count, 0, -1)]
+    channelThread.sendMulipleMessages(messages, 2)
     return True
 
 def commandPyramidLong(channelThread, nick, message, msgParts, permissions):
@@ -53,8 +51,7 @@ def commandPyramidLong(channelThread, nick, message, msgParts, permissions):
     except:
         count = 5
     count = min(count, (2048 - 11 - len(channelThread.channel)) // len(rep))
-    for i in range(1, count + 1):
-        channelThread.sendMessage(rep * i, 2)
-    for i in range(count - 1, 0, -1):
-        channelThread.sendMessage(rep * i, 2)
+    messages = [rep * i for i in range(1, count)]
+    messages += [rep * i for i in range(count, 0, -1)]
+    channelThread.sendMulipleMessages(messages, 2)
     return True
