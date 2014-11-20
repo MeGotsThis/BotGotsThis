@@ -36,10 +36,10 @@ class ChannelSocketThread(threading.Thread):
     def __init__(self, channel, **args):
         threading.Thread.__init__(self, **args)
         self.channel = channel
-        self.twitchStaff = []
-        self.twitchAdmin = []
-        self.mods = []
-        self.users = []
+        self.twitchStaff = set()
+        self.twitchAdmin = set()
+        self.mods = set()
+        self.users = set()
         self.running = True
     
     def run(self):
@@ -179,7 +179,7 @@ class ChannelSocketThread(threading.Thread):
             nicks = parts[5][1:].split(' ')
             if channel == self.channel:
                 for nick in nicks:
-                    self.users.append(nick)
+                    self.users.add(nick)
             return
         
         if ircmsg.find(' JOIN ') != -1:
@@ -187,7 +187,7 @@ class ChannelSocketThread(threading.Thread):
             nick = parts[0].split('!')[0][1:]
             channel = parts[2]
             if channel == self.channel:
-                self.users.append(nick)
+                self.users.add(nick)
             return
         
         if ircmsg.find(' PART ') != -1:
