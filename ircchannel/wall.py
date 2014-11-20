@@ -17,11 +17,9 @@ def commandWall(channelThread, nick, message, msgParts, permissions):
         rows = 20
         length = 5
     length = min(length, (2048 - 11 - len(channelThread.channel)) // len(rep))
-    for i in range(rows):
-        if i % 2 == 0:
-            channelThread.sendMessage(rep * length, 2)
-        else:
-            channelThread.sendMessage(rep * length + ' ', 2)
+    messages = [rep * length + (' ' if i % 2 == 0 else '')
+                for i in range(rows)]
+    channelThread.sendMulipleMessages(messages, 2)
     return True
 
 def commandWallLong(channelThread, nick, message, msgParts, permissions):
@@ -32,9 +30,6 @@ def commandWallLong(channelThread, nick, message, msgParts, permissions):
         rows = int(msgParts[0].split('-')[1])
     except:
         rows = 20
-    for i in range(rows):
-        if i % 2 == 0:
-            channelThread.sendMessage(msgParts[1], 2)
-        else:
-            channelThread.sendMessage(msgParts[1] + ' ', 2)
+    messages = [msgParts[1] + (' ' if i % 2 == 0 else '') for i in range(rows)]
+    channelThread.sendMulipleMessages(messages, 2)
     return True

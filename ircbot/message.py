@@ -23,6 +23,12 @@ class MessgeQueue(threading.Thread):
         self.queues[priority].append((channelThread, message))
         self.lock.release()
     
+    def queueMultipleMessages(self, channelThread, messages, priority):
+        self.lock.acquire()
+        for message in messages:
+            self.queues[priority].append((channelThread, message))
+        self.lock.release()
+    
     def run(self):
         print('Starting MessageQueue')
         try:
