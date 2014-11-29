@@ -1,5 +1,6 @@
 ﻿# Import some necessary libraries.
 from config import config
+import database.factory
 import ircbot.irc
 import traceback
 import datetime
@@ -10,8 +11,12 @@ print('Starting')
 ircbot.irc.messaging.start()
 
 try:
-    for channel in config.autoJoin:
-        ircbot.irc.joinChannel(channel)
+    ircbot.irc.joinChannel(config.botnick)
+    if config.owner:
+        ircbot.irc.joinChannel(config.owner)
+    with database.factory.getDatabase() as db:
+        for channel in db.getAutoJoinsChats():
+            ircbot.irc.joinChannel(channel)
     
     ircbot.irc.messaging.join()
 except:

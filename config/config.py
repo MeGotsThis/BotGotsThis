@@ -21,10 +21,3 @@ ircLogFolder = ini['BOT']['ircLogFolder']
 exceptionLog = ini['BOT']['exceptionLog']
 if ircLogFolder and not os.path.isdir(ircLogFolder):
     os.mkdir(ircLogFolder)
-
-autoJoin = []
-autoJoin.append('#' + botnick)
-if owner:
-    autoJoin.append('#' + owner)
-with open('autoJoin.json', encoding='utf-8') as file:
-    autoJoin += json.load(file)

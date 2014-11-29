@@ -1,4 +1,4 @@
-from . import modGames
+import database.factory
 import config.oauth
 import ircbot.twitchApi
 
@@ -29,8 +29,10 @@ def commandGame(channelThread, nick, message, msgParts, permissions):
     if config.oauth.getOAuthToken(channelThread.channel) is None:
         return False
     if msgParts[0].lower() == '!game':
-        if msgParts[1] in modGames.games:
-            msgParts[1] = modGames.games[msgParts[1]]
+        with database.factory.getDatabase() as db:
+            fullGame = db.getFullGameTitle(msgParts[1])
+            if fullGame is not None:
+                msgParts[1] = fullGame
         msgParts[1] = msgParts[1].replace('Pokemon', 'Pokémon')
         msgParts[1] = msgParts[1].replace('Pokepark', 'Poképark')
     chan = channelThread.channel[1:]

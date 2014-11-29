@@ -1,4 +1,0 @@
-broadcaster = {
-  'global': {
-  },
-}

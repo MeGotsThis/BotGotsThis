@@ -1,8 +1,11 @@
+import database.factory
 import json
 
-def getOAuthToken(channel):
-    with open('oauth.json', encoding='utf-8') as file:
-        oauth = json.load(file)
-    if channel in oauth:
-        return oauth[channel]
-    return None
+def getOAuthToken(broadcaster):
+    if broadcaster is None:
+        return None
+    
+    if broadcaster[0] == '#':
+        broadcaster = broadcaster[1:]
+    with database.factory.getDatabase() as db:
+        return db.getOAuthToken(broadcaster)
