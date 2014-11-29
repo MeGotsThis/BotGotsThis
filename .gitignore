@@ -1,1 +1,7 @@
 *.pyc
+privatechannel/*
+nohup.out
+*.log
+
+# Ignoring sqlite databases
+*.sqlite*
