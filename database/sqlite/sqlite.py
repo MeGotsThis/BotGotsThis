@@ -50,7 +50,7 @@ class SQLiteDatabase(database.database.DatabaseBase):
         cursor = self.connection.cursor()
         query = 'SELECT twitchGame FROM game_abbreviations '
         query += 'WHERE abbreviation=?'
-        cursor.execute(query, abbreviation)
+        cursor.execute(query, (abbreviation,))
         gameRow = cursor.fetchone()
         game = gameRow[0] if gameRow is not None else None
         cursor.close()
