@@ -1,4 +1,6 @@
 class DatabaseBase:
+    __slots__ = ('_engine', '_connection')
+    
     def __init__(self):
         self._engine = 'None'
         self._connection = None

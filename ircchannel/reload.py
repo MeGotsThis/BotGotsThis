@@ -62,7 +62,7 @@ def commandReloadConfig(channelThread, nick, message, msgParts, permissions):
 def commandReloadAllMods(channelThread, nick, message, msgParts, permissions):
     channelThread.sendMessage('Reloading Mods', 0)
     for channel in set(ircbot.irc.channels.keys()):
-        ircbot.irc.channels[channel].mods.clear()
+        ircbot.irc.channels[channel].clearMods()
         ircbot.irc.channels[channel].sendMessage('.mods', 0)
     channelThread.sendMessage('Complete Mods', 0)
     return True

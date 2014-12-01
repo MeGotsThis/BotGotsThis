@@ -59,7 +59,7 @@ def commandPurge(channelThread, nick, message, msgParts, permissions):
     return False
 
 def commandReloadMods(channelThread, nick, message, msgParts, permissions):
-    channelThread.mods.clear()
+    channelThread.clearMods()
     channelThread.sendMessage('.mods', 0)
     channelThread.sendMessage('Reloaded mods for ' + channelThread.channel[1:])
     return True

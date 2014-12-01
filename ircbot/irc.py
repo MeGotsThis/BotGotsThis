@@ -12,7 +12,7 @@ import time
 import sys
 
 # Import some necessary libraries.
-messaging = ircbot.message.MessgeQueue()
+messaging = ircbot.message.MessageQueue()
 channels = {}
 
 def joinChannel(channel):
@@ -35,19 +35,47 @@ def partChannel(channel):
 class ChannelSocketThread(threading.Thread):
     def __init__(self, channel, **args):
         threading.Thread.__init__(self, **args)
-        self.channel = channel
-        self.twitchStaff = set()
-        self.twitchAdmin = set()
-        self.mods = set()
-        self.users = set()
-        self.running = True
+        self._channel = channel
+        self._twitchStaff = set()
+        self._twitchAdmin = set()
+        self._mods = set()
+        self._users = set()
+        self._running = True
+    
+    @property
+    def channel(self):
+        return self._channel
+    
+    @property
+    def twitchStaff(self):
+        return frozenset(self._twitchStaff)
+    
+    @property
+    def twitchAdmin(self):
+        return frozenset(self._twitchAdmin)
+    
+    @property
+    def mods(self):
+        return frozenset(self._mods)
+    
+    @property
+    def users(self):
+        return frozenset(self._users)
+    
+    @property
+    def running(self):
+        return self._running
+    
+    @running.setter
+    def running(self, value):
+        self._running = value
     
     def run(self):
         print('Starting ' + self.channel)
         
         while self.running:
-            self.ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.ircsock.settimeout(5)
+            self._ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._ircsock.settimeout(5)
             try:
                 self._connect()
             except socket.error as e:
@@ -60,9 +88,9 @@ class ChannelSocketThread(threading.Thread):
             try:
                 while self.running:
                     try:
-                        ircmsgs = lastRecv = self.ircsock.recv(2048)
+                        ircmsgs = lastRecv = self._ircsock.recv(2048)
                         while lastRecv[-2:] != b'\r\n':
-                            lastRecv = self.ircsock.recv(2048)
+                            lastRecv = self._ircsock.recv(2048)
                             ircmsgs += lastRecv
                         
                         for ircmsg in ircmsgs.split(b'\r\n'):
@@ -105,7 +133,7 @@ class ChannelSocketThread(threading.Thread):
                               encoding='utf-8') as file:
                         file.write(' ' + ''.join(_))
             finally:
-                self.ircsock.close()
+                self._ircsock.close()
             print('Disconnected ' + self.channel)
             time.sleep(5)
         print('Ending ' + self.channel)
@@ -115,7 +143,7 @@ class ChannelSocketThread(threading.Thread):
         
         if type(command) is str:
             command = command.encode('utf-8')
-        self.ircsock.send(command[:2048])
+        self._ircsock.send(command[:2048])
         if config.ircLogFolder:
             fileName = self.channel + '.log'
             pathArgs = config.ircLogFolder, fileName
@@ -127,7 +155,7 @@ class ChannelSocketThread(threading.Thread):
     def _connect(self):
         # Connect to IRC server
         
-        self.ircsock.connect((config.server, 6667))
+        self._ircsock.connect((config.server, 6667))
         comms = ['PASS ' + config.password + '\n',
                  'NICK ' + config.botnick + '\n',
                  'USER ' + config.botnick + ' 0 * :' + config.botnick + '\n',
@@ -179,7 +207,7 @@ class ChannelSocketThread(threading.Thread):
             nicks = parts[5][1:].split(' ')
             if channel == self.channel:
                 for nick in nicks:
-                    self.users.add(nick)
+                    self._users.add(nick)
             return
         
         if ircmsg.find(' JOIN ') != -1:
@@ -187,20 +215,32 @@ class ChannelSocketThread(threading.Thread):
             nick = parts[0].split('!')[0][1:]
             channel = parts[2]
             if channel == self.channel:
-                self.users.add(nick)
+                self._users.add(nick)
             return
         
         if ircmsg.find(' PART ') != -1:
             parts = ircmsg.split(' ', 2)
             nick = parts[0].split('!')[0][1:]
             channel = parts[2]
-            if channel == self.channel and nick in self.users:
-                self.users.remove(nick)
+            if channel == self.channel:
+                self._users.discard(nick)
             return
         
         if ircmsg.find('PING :') != -1:
             self.ping()
             return
+    
+    def clearMods(self):
+        self._mods.clear()
+    
+    def addMod(self, mod):
+        self._mods.add(mod)
+    
+    def addTwitchAdmin(self, admin):
+        self._twitchAdmin.add(admin)
+    
+    def addTwitchStaff(self, staff):
+        self._twitchStaff.add(staff)
 
 class NoPingException(Exception):
     pass

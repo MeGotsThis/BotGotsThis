@@ -23,3 +23,47 @@ def customCommands(channelThread, nick, message, msgParts, permissions):
         return True
     
     return False
+
+def commandCommand(channelThread, nick, message, msgParts, permissions):
+    if len(msgParts) < 3:
+        return False
+    
+    allowPermissions = {
+        None: '',
+        '': '',
+        'any': '',
+        'all': '',
+        'public': '',
+        'moderator': 'moderator',
+        'mod': 'moderator',
+        'broadcaster': 'broadcaster',
+        'streamer': 'broadcaster',
+        'admin': 'admin',
+        'twitchadmin': 'admin',
+        'staff': 'staff',
+        'twitchstaff': 'staff',
+        'owner': 'owner',
+        'bot': 'owner',
+        }
+    
+    action = msgParts[1]
+    if action == 'add':
+        if msgParts[2].startswith('level='):
+            commandMessage = msgParts.split(None, 4)[4]
+        else:
+            commandMessage = msgParts.split(None, 3)[3]
+    elif action == 'edit':
+        if msgParts[2].startswith('level='):
+            commandMessage = msgParts.split(None, 4)[4]
+        else:
+            commandMessage = msgParts.split(None, 3)[3]
+    elif action in ['del', 'delete', 'rem', 'remove',]:
+        pass
+    
+    return False
+
+def parseCommandMessageInput(message):
+    msgParts = message.split()
+    action = msgParts[1]
+    
+    return (action, )

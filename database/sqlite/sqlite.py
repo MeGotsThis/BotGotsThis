@@ -2,6 +2,8 @@ import database.database
 import sqlite3
 
 class SQLiteDatabase(database.database.DatabaseBase):
+    __slots__ = database.database.DatabaseBase.__slots__ + ('_dbfile',)
+    
     def __init__(self, ini, *args):
         super().__init__(*args)
         self._engine = 'SQLite'
