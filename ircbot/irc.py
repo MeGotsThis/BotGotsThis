@@ -40,6 +40,7 @@ class ChannelSocketThread(threading.Thread):
         self._twitchAdmin = set()
         self._mods = set()
         self._users = set()
+        self._sessionData = {}
         self._running = True
     
     @property
@@ -61,6 +62,10 @@ class ChannelSocketThread(threading.Thread):
     @property
     def users(self):
         return frozenset(self._users)
+    
+    @property
+    def sessionData(self):
+        return self._sessionData
     
     @property
     def running(self):
