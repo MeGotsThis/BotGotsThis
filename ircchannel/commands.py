@@ -6,7 +6,7 @@ import datetime
 
 # Set up our commands function
 def parse(channelThread, nick, message):
-    if len(message) == 0 or message[0] != '!':
+    if len(message) == 0:
         return
     
     msgParts = message.split(None)
