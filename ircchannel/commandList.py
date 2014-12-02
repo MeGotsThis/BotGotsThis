@@ -39,7 +39,7 @@ commands = {
     '!come': (broadcaster.commandCome, 'ownerChan'),
     '!dvs': (nidoranRed.commandDvs, None),
     '!command': (text.commandCommand, 'moderator'),
-    '!global': (text.commandCommand, 'admin'),
+    '!global': (text.commandCommand, 'admin+ownerChan'),
 }
 commandsStartWith = {
     '!pyramid-': (pyramid.commandPyramidLong, 'broadcaster'),
