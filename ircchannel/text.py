@@ -28,7 +28,11 @@ def commandCommand(channelThread, nick, message, msgParts, permissions):
     if len(msgParts) < 3:
         return False
     
-    action, level, command, fullText = parseCommandMessageInput(message)
+    com, action, level, command, fullText = parseCommandMessageInput(message)
+    broadcaster = channelThread.channel[1:]
+    if com == '!global':
+        broadcaster = '#global'
+    
     if level == False:
         channelThread.sendMessage(nick + ' -> Invalid level, command ignored')
         return True
@@ -50,7 +54,7 @@ def commandCommand(channelThread, nick, message, msgParts, permissions):
         
         with database.factory.getDatabase() as db:
             result = db.insertCustomCommand(
-                channelThread.channel[1:], level, command, fullText)
+                broadcaster, level, command, fullText)
             if result:
                 channelThread.sendMessage(command + ' was added successfully')
             else:
@@ -66,7 +70,7 @@ def commandCommand(channelThread, nick, message, msgParts, permissions):
         
         with database.factory.getDatabase() as db:
             result = db.updateCustomCommand(
-                channelThread.channel[1:], level, command, fullText)
+                broadcaster, level, command, fullText)
             if result:
                 channelThread.sendMessage(
                     command + ' was updated successfully')
@@ -78,7 +82,7 @@ def commandCommand(channelThread, nick, message, msgParts, permissions):
     elif action in ['replace', 'override']:
         with database.factory.getDatabase() as db:
             result = db.replaceCustomCommand(
-                channelThread.channel[1:], level, command, fullText)
+                broadcaster, level, command, fullText)
             if result:
                 channelThread.sendMessage(
                     command + ' was updated successfully')
@@ -89,8 +93,7 @@ def commandCommand(channelThread, nick, message, msgParts, permissions):
         return True
     elif action in ['del', 'delete', 'rem', 'remove',]:
         with database.factory.getDatabase() as db:
-            result = db.deleteCustomCommand(
-                channelThread.channel[1:], level, command)
+            result = db.deleteCustomCommand(broadcaster, level, command)
             if result:
                 channelThread.sendMessage(
                     command + ' was removed successfully')
@@ -137,6 +140,6 @@ def parseCommandMessageInput(message):
             mparts.append(None)
         command, fullText = mparts
         
-        return (action.lower(), level, command, fullText)
+        return (originalCommand, action.lower(), level, command, fullText)
     except Exception:
         return None
