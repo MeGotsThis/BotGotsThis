@@ -57,4 +57,74 @@ class SQLiteDatabase(database.database.DatabaseBase):
         game = gameRow[0] if gameRow is not None else None
         cursor.close()
         return game
-
+    
+    def insertCustomCommand(self, broadcaster, permission, command, fullText):
+        cursor = self.connection.cursor()
+        try:
+            query = 'INSERT INTO custom_commands '
+            query += '(broadcaster, permission, command, '
+            query += 'commandDisplay, fullText) '
+            query += 'VALUES (?, ?, ?, ?, ?)'
+            display = None if command.lower() == command else command
+            params = broadcaster, permission, command.lower()
+            params += display, fullText
+            cursor.execute(query, params)
+            self.connection.commit()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+        finally:
+            cursor.close()
+    
+    def updateCustomCommand(self, broadcaster, permission, command, fullText):
+        cursor = self.connection.cursor()
+        try:
+            query = 'UPDATE custom_commands SET commandDisplay=?, fullText=? '
+            query += 'WHERE broadcaster=? AND permission=? AND command=?'
+            display = None if command.lower() == command else command
+            params = display, fullText
+            params += broadcaster, permission, command.lower()
+            cursor.execute(query, params)
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def replaceCustomCommand(self, broadcaster, permission, command, fullText):
+        cursor = self.connection.cursor()
+        try:
+            query = 'REPLACE INTO custom_commands '
+            query += '(broadcaster, permission, command, '
+            query += 'commandDisplay, fullText) '
+            query += 'VALUES (?, ?, ?, ?, ?)'
+            display = None if command.lower() == command else command
+            params = broadcaster, permission, command.lower()
+            params += display, fullText
+            cursor.execute(query, params)
+            self.connection.commit()
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def deleteCustomCommand(self, broadcaster, permission, command):
+        cursor = self.connection.cursor()
+        try:
+            query = 'DELETE FROM custom_commands WHERE '
+            query += 'broadcaster=? AND permission=? AND command=?'
+            params = broadcaster, permission, command.lower()
+            cursor.execute(query, params)
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()

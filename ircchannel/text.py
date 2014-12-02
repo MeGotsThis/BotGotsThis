@@ -28,6 +28,81 @@ def commandCommand(channelThread, nick, message, msgParts, permissions):
     if len(msgParts) < 3:
         return False
     
+    action, level, command, fullText = parseCommandMessageInput(message)
+    if level == False:
+        channelThread.sendMessage(nick + ' -> Invalid level, command ignored')
+        return True
+    if level:
+        if level not in permissions:
+            channelThread.sendMessage(
+                nick + ' -> Invalid level, command ignored')
+            return True
+        elif not permissions[level]:
+            channelThread.sendMessage(
+                nick + ' -> You do not have permission to set that level')
+            return True
+    
+    if action in ['add', 'insert', 'new']:
+        if not fullText:
+            channelThread.sendMessage(
+                'You need to specify some text for that command')
+            return True
+        
+        with database.factory.getDatabase() as db:
+            result = db.insertCustomCommand(
+                channelThread.channel[1:], level, command, fullText)
+            if result:
+                channelThread.sendMessage(command + ' was added successfully')
+            else:
+                channelThread.sendMessage(
+                    command + ' was not added successfully. There might be '
+                    'an existing command')
+        return True
+    elif action in ['edit', 'update']:
+        if not fullText:
+            channelThread.sendMessage(
+                'You need to specify some text for that command')
+            return True
+        
+        with database.factory.getDatabase() as db:
+            result = db.updateCustomCommand(
+                channelThread.channel[1:], level, command, fullText)
+            if result:
+                channelThread.sendMessage(
+                    command + ' was updated successfully')
+            else:
+                channelThread.sendMessage(
+                    command + ' was not updated successfully. The command '
+                    'might not exist')
+        return True
+    elif action in ['replace', 'override']:
+        with database.factory.getDatabase() as db:
+            result = db.replaceCustomCommand(
+                channelThread.channel[1:], level, command, fullText)
+            if result:
+                channelThread.sendMessage(
+                    command + ' was updated successfully')
+            else:
+                channelThread.sendMessage(
+                    command + ' was not updated successfully. The command '
+                    'might not exist')
+        return True
+    elif action in ['del', 'delete', 'rem', 'remove',]:
+        with database.factory.getDatabase() as db:
+            result = db.deleteCustomCommand(
+                channelThread.channel[1:], level, command)
+            if result:
+                channelThread.sendMessage(
+                    command + ' was removed successfully')
+            else:
+                channelThread.sendMessage(
+                    command + ' was not removed successfully. The command '
+                    'might not exist')
+        return True
+    
+    return False
+
+def parseCommandMessageInput(message):
     allowPermissions = {
         None: '',
         '': '',
@@ -46,24 +121,22 @@ def commandCommand(channelThread, nick, message, msgParts, permissions):
         'bot': 'owner',
         }
     
-    action = msgParts[1]
-    if action == 'add':
-        if msgParts[2].startswith('level='):
-            commandMessage = msgParts.split(None, 4)[4]
+    try:
+        m = message
+        originalCommand, action, m = m.split(None, 2)
+        level = None
+        if m.startswith('level='):
+            parseLevel, m = m.split(None, 1)
+            level = parseLevel[len('level='):]
+        if level in allowPermissions:
+            level = allowPermissions[level]
         else:
-            commandMessage = msgParts.split(None, 3)[3]
-    elif action == 'edit':
-        if msgParts[2].startswith('level='):
-            commandMessage = msgParts.split(None, 4)[4]
-        else:
-            commandMessage = msgParts.split(None, 3)[3]
-    elif action in ['del', 'delete', 'rem', 'remove',]:
-        pass
-    
-    return False
-
-def parseCommandMessageInput(message):
-    msgParts = message.split()
-    action = msgParts[1]
-    
-    return (action, )
+            level = False
+        mparts = m.split(None, 1)
+        while len(mparts) < 2:
+            mparts.append(None)
+        command, fullText = mparts
+        
+        return (action.lower(), level, command, fullText)
+    except Exception:
+        return None

@@ -6,6 +6,7 @@ from . import owner
 from . import pyramid
 from . import wall
 from . import mod
+from . import text
 import privatechannel.commandList
 
 commands = {
@@ -37,6 +38,7 @@ commands = {
     '!rekt': (mod.commandPurge, 'moderator'),
     '!come': (broadcaster.commandCome, 'ownerChan'),
     '!dvs': (nidoranRed.commandDvs, None),
+    '!command': (text.commandCommand, 'moderator'),
 }
 commandsStartWith = {
     '!pyramid-': (pyramid.commandPyramidLong, 'broadcaster'),

@@ -35,4 +35,15 @@ class DatabaseBase:
     
     def getFullGameTitle(self, abbreviation):
         return None
-
+    
+    def insertCustomCommand(self, broadcaster, permission, command, fullText):
+        return False
+    
+    def updateCustomCommand(self, broadcaster, permission, command, fullText):
+        return False
+    
+    def replaceCustomCommand(self, broadcaster, permission, command, fullText):
+        return False
+    
+    def deleteCustomCommand(self, broadcaster, permission, command):
+        return True
