@@ -71,8 +71,7 @@ class SQLiteDatabase(database.database.DatabaseBase):
             cursor.execute(query, params)
             self.connection.commit()
             return True
-        except Exception as e:
-            print(e)
+        except Exception:
             return False
         finally:
             cursor.close()
