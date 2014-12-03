@@ -31,38 +31,38 @@ def moduleKey(module):
     
     return (0, module)
 
-def commandReload(channelThread, nick, message, msgParts, permissions):
-    channelThread.sendMessage('Reloading', 0)
+def commandReload(channelData, nick, message, msgParts, permissions):
+    channelData.sendMessage('Reloading', 0)
     
-    commandReloadAllMods(channelThread, nick, message, msgParts, permissions)
-    commandReloadCommands(channelThread, nick, message, msgParts, permissions)
-    commandReloadConfig(channelThread, nick, message, msgParts, permissions)
+    commandReloadAllMods(channelData, nick, message, msgParts, permissions)
+    commandReloadCommands(channelData, nick, message, msgParts, permissions)
+    commandReloadConfig(channelData, nick, message, msgParts, permissions)
     
-    channelThread.sendMessage('Complete', 0)
+    channelData.sendMessage('Complete', 0)
     return True
 
-def commandReloadCommands(channelThread, nick, message, msgParts, permissions):
-    channelThread.sendMessage('Reloading Commands', 0)
+def commandReloadCommands(channelData, nick, message, msgParts, permissions):
+    channelData.sendMessage('Reloading Commands', 0)
     
     modules = [m for m in sys.modules.keys() if loadThisModule(m)]
     for moduleString in sorted(modules, key=moduleKey, reverse=True):
         imp.reload(sys.modules[moduleString])
     
-    channelThread.sendMessage('Complete Commands', 0)
+    channelData.sendMessage('Complete Commands', 0)
     return True
 
-def commandReloadConfig(channelThread, nick, message, msgParts, permissions):
-    channelThread.sendMessage('Reloading Config', 0)
+def commandReloadConfig(channelData, nick, message, msgParts, permissions):
+    channelData.sendMessage('Reloading Config', 0)
     
     imp.reload(sys.modules['config.config'])
     
-    channelThread.sendMessage('Complete Config', 0)
+    channelData.sendMessage('Complete Config', 0)
     return True
 
-def commandReloadAllMods(channelThread, nick, message, msgParts, permissions):
-    channelThread.sendMessage('Reloading Mods', 0)
+def commandReloadAllMods(channelData, nick, message, msgParts, permissions):
+    channelData.sendMessage('Reloading Mods', 0)
     for channel in set(ircbot.irc.channels.keys()):
         ircbot.irc.channels[channel].clearMods()
         ircbot.irc.channels[channel].sendMessage('.mods', 0)
-    channelThread.sendMessage('Complete Mods', 0)
+    channelData.sendMessage('Complete Mods', 0)
     return True

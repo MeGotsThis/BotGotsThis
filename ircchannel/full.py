@@ -15,7 +15,7 @@ wide = ('''　！＂＃＄％＆＇（）＊＋，ー．／'''
         'ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ'
         '｛｜｝～')
 
-def commandFull(channelThread, nick, message, msgParts, permissions):
+def commandFull(channelData, nick, message, msgParts, permissions):
     msg = message.split(None, 1)[1]
     fullMsg = []
     for i in range(len(msg)):
@@ -24,4 +24,4 @@ def commandFull(channelThread, nick, message, msgParts, permissions):
             fullMsg.append(wide[j])
         else:
             fullMsg.append(msg[i])
-    return channelThread.sendMessage(''.join(fullMsg))
+    return channelData.sendMessage(''.join(fullMsg))

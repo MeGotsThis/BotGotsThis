@@ -2,7 +2,7 @@ from config import config
 import ircbot.irc
 import datetime
 
-def commandWall(channelThread, nick, message, msgParts, permissions):
+def commandWall(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
     rep = msgParts[1] + ' '
@@ -16,13 +16,13 @@ def commandWall(channelThread, nick, message, msgParts, permissions):
     except:
         rows = 20
         length = 5
-    length = min(length, (2048 - 11 - len(channelThread.channel)) // len(rep))
+    length = min(length, (2048 - 11 - len(channelData.channel)) // len(rep))
     messages = [rep * length + ('' if i % 2 == 0 else ' ')
                 for i in range(rows)]
-    channelThread.sendMulipleMessages(messages, 2)
+    channelData.sendMulipleMessages(messages, 2)
     return True
 
-def commandWallLong(channelThread, nick, message, msgParts, permissions):
+def commandWallLong(channelData, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
     if len(msgParts) < 2:
         return False
@@ -31,5 +31,5 @@ def commandWallLong(channelThread, nick, message, msgParts, permissions):
     except:
         rows = 20
     messages = [msgParts[1] + ('' if i % 2 == 0 else ' ') for i in range(rows)]
-    channelThread.sendMulipleMessages(messages, 2)
+    channelData.sendMulipleMessages(messages, 2)
     return True

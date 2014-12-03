@@ -29,8 +29,8 @@ nidokingBase = {
 
 nidoranStats = {}
 
-def commandNidoranRed(channelThread, nick, message, msgParts, permissions):
-    channel = channelThread.channel
+def commandNidoranRed(channelData, nick, message, msgParts, permissions):
+    channel = channelData.channel
     if (channel not in nidoranStats or
         (len(msgParts) >= 2 and msgParts[1] == 'reset')):
         resetNidoran(channel)
@@ -39,12 +39,12 @@ def commandNidoranRed(channelThread, nick, message, msgParts, permissions):
     if permissions['owner'] and len(msgParts) >= 2:
         if msgParts[1] == 'log':
             if channel in nidoranStats:
-                channelThread.sendMessage(repr(nidoranStats[channel]))
+                channelData.sendMessage(repr(nidoranStats[channel]))
             return True
         if msgParts[1] == 'print':
             if channel in nidoranStats:
                 if config.ircLogFolder:
-                    fileName = channelThread.channel + '.log'
+                    fileName = channelData.channel + '.log'
                     pathArgs = config.ircLogFolder, fileName
                     with open(os.path.join(*pathArgs), 'a',
                               encoding='utf-8') as file:
@@ -58,7 +58,7 @@ def commandNidoranRed(channelThread, nick, message, msgParts, permissions):
             level = None
         
         if level is not None:
-            channelThread.sendMessage(printStatsLevel(channel, level))
+            channelData.sendMessage(printStatsLevel(channel, level))
             return True
         
         return False
@@ -92,8 +92,8 @@ def commandNidoranRed(channelThread, nick, message, msgParts, permissions):
                      message)
     return False
 
-def commandDvs(channelThread, nick, message, msgParts, permissions):
-    channelThread.sendMessage(printNidoran(channelThread.channel))
+def commandDvs(channelData, nick, message, msgParts, permissions):
+    channelData.sendMessage(printNidoran(channelData.channel))
 
 def printNidoran(channel):
     if (channel not in nidoranStats or

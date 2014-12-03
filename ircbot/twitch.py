@@ -8,6 +8,7 @@ import sys
 import time
 
 print('Starting')
+ircbot.irc.socket.start()
 ircbot.irc.messaging.start()
 
 try:

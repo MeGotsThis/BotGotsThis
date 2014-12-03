@@ -25,14 +25,14 @@ class MessageQueue(threading.Thread):
     def running(self, value):
         self._running = value
     
-    def queueMessage(self, channelThread, message, priority):
+    def queueMessage(self, channelData, message, priority):
         with self._queueLock:
-            self._queues[priority].append((channelThread, message))
+            self._queues[priority].append((channelData, message))
     
-    def queueMultipleMessages(self, channelThread, messages, priority):
+    def queueMultipleMessages(self, channelData, messages, priority):
         with self._queueLock:
             for message in messages:
-                self._queues[priority].append((channelThread, message))
+                self._queues[priority].append((channelData, message))
     
     def run(self):
         print('Starting MessageQueue')
@@ -45,7 +45,7 @@ class MessageQueue(threading.Thread):
                     self._timesSent.append(datetime.datetime.utcnow())
                     _ = 'PRIVMSG ' + msg[0].channel + ' :' + msg[1] + '\n'
                     try:
-                        msg[0].sendIrcCommand(_)
+                        msg[0].socket.sendIrcCommand(_, msg[0].channel)
                     except OSError:
                         pass
                 time.sleep(1 / config.messagePerSecond)
@@ -57,8 +57,7 @@ class MessageQueue(threading.Thread):
                 with open(config.exceptionLog, 'a', encoding='utf-8') as file:
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                     file.write(' ' + ''.join(_))
-            for channel in set(ircbot.irc.channels.keys()):
-                ircbot.irc.partChannel(channel)
+            ircbot.irc.socket.running = False
             raise
         finally:
             print('Ending MessageQueue')
@@ -81,14 +80,16 @@ class MessageQueue(threading.Thread):
                     if msg is None:
                         queue = self._queues[j]
                         for i in range(len(queue)):
-                            if botnick not in queue[i][0].mods:
+                            if (botnick not in queue[i][0].mods and
+                                queue[i][0].socket.isConnected):
                                 msg = queue[i]
                                 del queue[i]
                                 break
                 if msg is None:
                     queue = self._queues[2]
                     for i in range(len(queue)):
-                        if botnick not in queue[i][0].mods:
+                        if (botnick not in queue[i][0].mods and
+                            queue[i][0].socket.isConnected):
                             msg = queue[i]
                             del queue[i]
                             break
@@ -97,7 +98,8 @@ class MessageQueue(threading.Thread):
                     if msg is None:
                         queue = self._queues[j]
                         for i in range(len(queue)):
-                            if botnick in queue[i][0].mods:
+                            if (botnick in queue[i][0].mods and
+                                queue[i][0].socket.isConnected):
                                 msg = queue[i]
                                 del queue[i]
                                 break
@@ -105,7 +107,8 @@ class MessageQueue(threading.Thread):
                     queue = self._queues[2]
                     for i in range(len(queue)):
                         if (queue[i][0].channel not in self._lowQueueRecent and
-                            botnick in queue[i][0].mods):
+                            botnick in queue[i][0].mods and
+                            queue[i][0].socket.isConnected):
                             msg = queue[i]
                             del queue[i]
                             self._lowQueueRecent.append(msg[0].channel)
@@ -116,7 +119,8 @@ class MessageQueue(threading.Thread):
                     for channel in self._lowQueueRecent:
                         for i in range(len(queue)):
                             if (queue[i][0].channel == channel and
-                                botnick in queue[i][0].mods):
+                                botnick in queue[i][0].mods and
+                                queue[i][0].socket.isConnected):
                                 msg = queue[i]
                                 del queue[i]
                                 self._lowQueueRecent.remove(msg[0].channel)

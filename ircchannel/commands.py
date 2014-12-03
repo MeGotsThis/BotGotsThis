@@ -1,28 +1,32 @@
 ﻿from config import config
 import ircchannel.commandList
 import ircchannel.text
+import ircuser.jtv
 import ircbot.irc
 import datetime
 
 # Set up our commands function
-def parse(channelThread, nick, message):
+def parse(channelData, nick, message):
     if len(message) == 0:
         return
+    
+    if nick == 'jtv':
+        ircuser.jtv.parse(channelData, message)
     
     msgParts = message.split(None)
     
     if config.owner is not None:
         isOwner = nick == config.owner.lower()
-        _ = channelThread.channel == '#' + config.botnick
-        isOwnerChan = channelThread.channel == '#' + config.owner or _
+        _ = channelData.channel == '#' + config.botnick
+        isOwnerChan = channelData.channel == '#' + config.owner or _
     else:
         isOwner = False
         isOwnerChan = False
-    isStaff = isOwner or nick in channelThread.twitchStaff
-    isAdmin = isStaff or nick in channelThread.twitchAdmin
-    isBroadcaster = isStaff or isAdmin or '#' + nick == channelThread.channel
-    isMod = isBroadcaster or nick in channelThread.mods
-    isChanMod = config.botnick in channelThread.mods
+    isStaff = isOwner or nick in channelData.twitchStaff
+    isAdmin = isStaff or nick in channelData.twitchAdmin
+    isBroadcaster = isStaff or isAdmin or '#' + nick == channelData.channel
+    isMod = isBroadcaster or nick in channelData.mods
+    isChanMod = config.botnick in channelData.mods
     permissions = {
         'owner': isOwner,
         'ownerChan': isOwnerChan,
@@ -36,7 +40,7 @@ def parse(channelThread, nick, message):
     command = msgParts[0].lower()
     
     complete = False
-    arguments = channelThread, nick, message, msgParts, permissions
+    arguments = channelData, nick, message, msgParts, permissions
     if command in ircchannel.commandList.commands:
         commandInfo = ircchannel.commandList.commands[command]
         hasPermission = True

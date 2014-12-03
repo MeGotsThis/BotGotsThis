@@ -1,5 +1,5 @@
-import ircbot.irc
+import ircbot.socket
 
-def parse(channelThread, nick, message):
+def parse(channelData, nick, message):
     if message == 'Login unsuccessful':
-        raise ircbot.irc.LoginUnsuccessfulException()
+        raise ircbot.socket.LoginUnsuccessfulException()

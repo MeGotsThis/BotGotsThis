@@ -3,29 +3,29 @@ import ircbot.twitchApi
 import ircbot.irc
 import time
 
-def commandHello(channelThread, nick, message, msgParts, permissions):
-    channelThread.sendMessage('Hello Kappa')
+def commandHello(channelData, nick, message, msgParts, permissions):
+    channelData.sendMessage('Hello Kappa')
     return True
 
-def commandCome(channelThread, nick, message, msgParts, permissions):
+def commandCome(channelData, nick, message, msgParts, permissions):
     if ('#' + nick) in ircbot.irc.channels:
-        channelThread.sendMessage('I am already in ' + nick)
+        channelData.sendMessage('I am already in ' + nick)
         return True
-    channelThread.sendMessage('Joining ' + nick)
+    channelData.sendMessage('Joining ' + nick)
     ircbot.irc.joinChannel(nick)
     return True
 
-def commandLeave(channelThread, nick, message, msgParts, permissions):
-    if channelThread.channel == '#' + config.botnick:
+def commandLeave(channelData, nick, message, msgParts, permissions):
+    if channelData.channel == '#' + config.botnick:
         return False
-    channelThread.sendMessage('Bye ' + channelThread.channel[1:])
+    channelData.sendMessage('Bye ' + channelData.channel[1:])
     time.sleep(1)
-    ircbot.irc.partChannel(channelThread.channel)
+    ircbot.irc.partChannel(channelData.channel)
     return True
 
-def commandEmpty(channelThread, nick, message, msgParts, permissions):
-    ircbot.irc.messaging.clearQueue(channelThread.channel)
-    channelThread.sendMessage(
-        'Cleared all queued messages for ' + channelThread.channel[1:])
+def commandEmpty(channelData, nick, message, msgParts, permissions):
+    ircbot.irc.messaging.clearQueue(channelData.channel)
+    channelData.sendMessage(
+        'Cleared all queued messages for ' + channelData.channel[1:])
     return True
 
