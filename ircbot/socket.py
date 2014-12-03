@@ -144,7 +144,7 @@ class SocketThread(threading.Thread):
         fileName = channelData.channel + '.log'
         pathArgs = config.ircLogFolder, fileName
         with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
-            file.write(now + ircCommand.decode('utf-8'))
+            file.write(now + ircCommand)
         
         channelData.sendMessage('.mods')
         print('Joined ' + channelData.channel)
