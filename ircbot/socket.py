@@ -137,21 +137,15 @@ class SocketThread(threading.Thread):
     def _join(self, channelData):
         assert(self.isConnected)
         ircCommand = 'JOIN ' + channelData.channel + '\n'
-        self.sendIrcCommand(ircCommand)
-        
-        dtnow = datetime.datetime.now()
-        now = dtnow.strftime('> %Y-%m-%d %H:%M:%S.%f ')
-        fileName = channelData.channel + '.log'
-        pathArgs = config.ircLogFolder, fileName
-        with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
-            file.write(now + ircCommand)
+        self.sendIrcCommand(ircCommand, channelData.channel)
         
         channelData.sendMessage('.mods')
         print('Joined ' + channelData.channel)
     
     def part(self, channelData):
         with self._channelsLock:
-            self.sendIrcCommand('PART ' + channelData.channel + '\n')
+            self.sendIrcCommand('PART ' + channelData.channel + '\n',
+                                channelData.channel)
             del self._channels[channelData.channel]
             print('Parted ' + channelData.channel)
     
