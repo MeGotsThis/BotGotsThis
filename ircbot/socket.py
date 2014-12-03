@@ -138,10 +138,14 @@ class SocketThread(threading.Thread):
         assert(self.isConnected)
         ircCommand = 'JOIN ' + channelData.channel + '\n'
         self.sendIrcCommand(ircCommand)
+        
+        dtnow = datetime.datetime.now()
+        now = dtnow.strftime('> %Y-%m-%d %H:%M:%S.%f ')
         fileName = channelData.channel + '.log'
         pathArgs = config.ircLogFolder, fileName
         with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
             file.write(now + ircCommand.decode('utf-8'))
+        
         channelData.sendMessage('.mods')
         print('Joined ' + channelData.channel)
     
