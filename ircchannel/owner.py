@@ -58,11 +58,6 @@ def commandEmpty(channelData, nick, message, msgParts, permissions):
         'Cleared all queued messages for ' + msgParts[1][1:])
     return True
 
-def commandListChats(channelData, nick, message, msgParts, permissions):
-    channels = [c[1:] for c in ircbot.irc.channels.keys()]
-    channelData.sendMessage('Twitch Chats: ' + ', '.join(channels))
-    return True
-
 def commandManageBot(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
@@ -119,4 +114,7 @@ def commandManageBot(channelData, nick, message, msgParts, permissions):
                     channelData.sendMessage(
                         'Auto join for ' + msgParts[3] + ' was never enabled')
             return True
+    if msgParts[1] == 'listchats':
+        channels = [c[1:] for c in ircbot.irc.channels.keys()]
+        channelData.sendMessage('Twitch Chats: ' + ', '.join(channels))
     return True

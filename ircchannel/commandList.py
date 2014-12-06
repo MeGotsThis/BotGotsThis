@@ -16,7 +16,6 @@ commands = {
     '!reloadcommands': (reload.commandReloadCommands, 'owner+ownerChan'),
     '!reloadconfig': (reload.commandReloadConfig, 'owner+ownerChan'),
     '!reloadallmods': (reload.commandReloadAllMods, 'owner+ownerChan'),
-    '!listchats': (owner.commandListChats, 'owner+ownerChan'),
     '!join': (owner.commandJoin, 'admin+ownerChan'),
     '!part': (owner.commandPart, 'admin+ownerChan'),
     '!emptychat': (owner.commandEmpty, 'admin+ownerChan'),
