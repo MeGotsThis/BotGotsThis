@@ -40,7 +40,8 @@ class MessageQueue(threading.Thread):
             while self.running:
                 msg = self._getMessage()
                 if msg is not None:
-                    if config.botnick not in msg[0].mods:
+                    if (config.botnick not in msg[0].mods and
+                        '#' + config.botnick != msg[0].channel):
                         self._publicTime = datetime.datetime.utcnow()
                     self._timesSent.append(datetime.datetime.utcnow())
                     _ = 'PRIVMSG ' + msg[0].channel + ' :' + msg[1] + '\n'
@@ -80,16 +81,19 @@ class MessageQueue(threading.Thread):
                     if msg is None:
                         queue = self._queues[j]
                         for i in range(len(queue)):
-                            if (botnick not in queue[i][0].mods and
-                                queue[i][0].socket.isConnected):
+                            isMod = (
+                                botnick in queue[i][0].mods or
+                                 '#' + config.botnick == queue[i][0].channel)
+                            if not isMod and queue[i][0].socket.isConnected:
                                 msg = queue[i]
                                 del queue[i]
                                 break
                 if msg is None:
                     queue = self._queues[2]
                     for i in range(len(queue)):
-                        if (botnick not in queue[i][0].mods and
-                            queue[i][0].socket.isConnected):
+                        isMod = (botnick in queue[i][0].mods or
+                                 '#' + config.botnick == queue[i][0].channel)
+                        if not isMod and queue[i][0].socket.isConnected:
                             msg = queue[i]
                             del queue[i]
                             break
@@ -98,17 +102,20 @@ class MessageQueue(threading.Thread):
                     if msg is None:
                         queue = self._queues[j]
                         for i in range(len(queue)):
-                            if (botnick in queue[i][0].mods and
-                                queue[i][0].socket.isConnected):
+                            isMod = (
+                                botnick in queue[i][0].mods or
+                                 '#' + config.botnick == queue[i][0].channel)
+                            if isMod and queue[i][0].socket.isConnected:
                                 msg = queue[i]
                                 del queue[i]
                                 break
                 if msg is None:
                     queue = self._queues[2]
                     for i in range(len(queue)):
+                        isMod = (botnick in queue[i][0].mods or
+                                 '#' + config.botnick == queue[i][0].channel)
                         if (queue[i][0].channel not in self._lowQueueRecent and
-                            botnick in queue[i][0].mods and
-                            queue[i][0].socket.isConnected):
+                            isMod and queue[i][0].socket.isConnected):
                             msg = queue[i]
                             del queue[i]
                             self._lowQueueRecent.append(msg[0].channel)
@@ -118,9 +125,11 @@ class MessageQueue(threading.Thread):
                     queue = self._queues[2]
                     for channel in self._lowQueueRecent:
                         for i in range(len(queue)):
+                            isMod = (
+                                botnick in queue[i][0].mods or
+                                '#' + config.botnick == queue[i][0].channel)
                             if (queue[i][0].channel == channel and
-                                botnick in queue[i][0].mods and
-                                queue[i][0].socket.isConnected):
+                                isMod and queue[i][0].socket.isConnected):
                                 msg = queue[i]
                                 del queue[i]
                                 self._lowQueueRecent.remove(msg[0].channel)
