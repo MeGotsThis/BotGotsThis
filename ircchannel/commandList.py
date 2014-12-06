@@ -21,6 +21,7 @@ commands = {
     '!part': (owner.commandPart, 'admin+ownerChan'),
     '!emptychat': (owner.commandEmpty, 'admin+ownerChan'),
     '!emptyall': (owner.commandEmptyAll, 'admin+ownerChan'),
+    '!global': (text.commandCommand, 'admin+ownerChan'),
     '!full': (full.commandFull, 'owner'),
     '!say': (owner.commandSay, 'owner'),
     '!hello': (broadcaster.commandHello, 'broadcaster'),
@@ -37,11 +38,10 @@ commands = {
     '!setgame': (mod.commandGame, 'moderator'),
     '!purge': (mod.commandPurge, 'moderator'),
     '!rekt': (mod.commandPurge, 'moderator'),
+    '!command': (text.commandCommand, 'moderator'),
     '!come': (broadcaster.commandCome, 'ownerChan'),
     '!autojoin': (broadcaster.commandAutoJoin, 'ownerChan'),
     '!dvs': (nidoranRed.commandDvs, None),
-    '!command': (text.commandCommand, 'moderator'),
-    '!global': (text.commandCommand, 'admin+ownerChan'),
 }
 commandsStartWith = {
     '!pyramid-': (pyramid.commandPyramidLong, 'broadcaster'),
