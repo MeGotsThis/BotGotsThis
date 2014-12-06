@@ -21,6 +21,50 @@ class SQLiteDatabase(database.database.DatabaseBase):
         cursor.close()
         return list(chats)
     
+    def saveAutoJoin(self, broadcaster, priority=0):
+        cursor = self.connection.cursor()
+        try:
+            query = 'INSERT INTO auto_join (broadcaster, priority) '
+            query += 'VALUES (?, ?)'
+            params = broadcaster, priority
+            cursor.execute(query, params)
+            self.connection.commit()
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def discardAutoJoin(self, broadcaster):
+        cursor = self.connection.cursor()
+        try:
+            query = 'DELETE FROM auto_join WHERE broadcaster=?'
+            params = broadcaster,
+            cursor.execute(query, params)
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def setAutoJoinPriority(self, broadcaster, priority):
+        cursor = self.connection.cursor()
+        try:
+            query = 'UPDATE auto_join SET priority=? WHERE broadcaster=?'
+            params = priority, broadcaster
+            cursor.execute(query, params)
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
     def getOAuthToken(self, broadcaster):
         cursor = self.connection.cursor()
         query = 'SELECT token FROM oauth_tokens WHERE broadcaster=?'

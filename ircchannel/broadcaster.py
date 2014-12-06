@@ -1,4 +1,5 @@
 from config import config
+import database.factory
 import ircbot.twitchApi
 import ircbot.irc
 import time
@@ -27,5 +28,42 @@ def commandEmpty(channelData, nick, message, msgParts, permissions):
     ircbot.irc.messaging.clearQueue(channelData.channel)
     channelData.sendMessage(
         'Cleared all queued messages for ' + channelData.channel[1:])
+    return True
+
+def commandAutoJoin(channelData, nick, message, msgParts, permissions):
+    if len(msgParts) >= 2:
+        removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
+                      'leave', 'part']
+        if msgParts[1].lower() in removeMsgs:
+            with database.factory.getDatabase() as db:
+                result = db.discardAutoJoin(nick)
+                if result:
+                    channelData.sendMessage(
+                        'Auto join for ' + nick + ' is now disabled')
+                else:
+                    channelData.sendMessage(
+                        'Auto join for ' + nick + ' was never enabled')
+            return True
+    with database.factory.getDatabase() as db:
+        result = db.saveAutoJoin(nick)
+    
+    wasInChat = ('#' + nick) in ircbot.irc.channels
+    if not wasInChat:
+        ircbot.irc.joinChannel(nick)
+    
+    if result and not wasInChat:
+        channelData.sendMessage(
+            'Auto join for ' + nick + ' is now enabled and joined ' +
+            nick + ' chat')
+    elif result:
+        channelData.sendMessage('Auto join for ' + nick + ' is now enabled')
+    elif not wasInChat:
+        channelData.sendMessage(
+            'Auto join for ' + nick + ' is already enabled but now joined ' +
+            nick + ' chat')
+    else:
+        channelData.sendMessage(
+            'Auto join for ' + nick + ' is already enabled and already in '
+            'chat')
     return True
 

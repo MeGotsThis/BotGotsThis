@@ -11,6 +11,7 @@ import privatechannel.commandList
 
 commands = {
     '!exit': (owner.commandExit, 'owner+ownerChan'),
+    '!managebot': (owner.commandManageBot, 'owner+ownerChan'),
     '!reload': (reload.commandReload, 'owner+ownerChan'),
     '!reloadcommands': (reload.commandReloadCommands, 'owner+ownerChan'),
     '!reloadconfig': (reload.commandReloadConfig, 'owner+ownerChan'),
@@ -37,6 +38,7 @@ commands = {
     '!purge': (mod.commandPurge, 'moderator'),
     '!rekt': (mod.commandPurge, 'moderator'),
     '!come': (broadcaster.commandCome, 'ownerChan'),
+    '!autojoin': (broadcaster.commandAutoJoin, 'ownerChan'),
     '!dvs': (nidoranRed.commandDvs, None),
     '!command': (text.commandCommand, 'moderator'),
     '!global': (text.commandCommand, 'admin+ownerChan'),

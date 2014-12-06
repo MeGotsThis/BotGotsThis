@@ -24,6 +24,15 @@ class DatabaseBase:
     def getAutoJoinsChats(self):
         return []
     
+    def saveAutoJoin(self, broadcaster, priority=0):
+        return False
+    
+    def discardAutoJoin(self, broadcaster):
+        return False
+    
+    def setAutoJoinPriority(self, broadcaster, priority):
+        return False
+    
     def getOAuthToken(self, broadcaster):
         return None
     
