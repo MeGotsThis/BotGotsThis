@@ -77,70 +77,64 @@ class MessageQueue(threading.Thread):
         msg = None
         with self._queueLock:
             if isPublicGood:
-                for j in [0, 1]:
-                    if msg is None:
-                        queue = self._queues[j]
-                        for i in range(len(queue)):
-                            isMod = (
-                                botnick in queue[i][0].mods or
-                                 '#' + config.botnick == queue[i][0].channel)
-                            if not isMod and queue[i][0].socket.isConnected:
-                                msg = queue[i]
-                                del queue[i]
-                                break
-                if msg is None:
-                    queue = self._queues[2]
-                    for i in range(len(queue)):
-                        isMod = (botnick in queue[i][0].mods or
-                                 '#' + config.botnick == queue[i][0].channel)
-                        if not isMod and queue[i][0].socket.isConnected:
-                            msg = queue[i]
-                            del queue[i]
-                            break
+                for j in [0, 1, 2]:
+                    if msg is not None:
+                        continue
+                    queue = self._queues[j]
+                    condition = lambda i: (
+                        not self._isModInChannel(queue[i]) and
+                        queue[i][0].socket.isConnected)
+                    msg = self._selectMsg(queue, condition)
             if isModGood:
                 for j in [0, 1]:
-                    if msg is None:
-                        queue = self._queues[j]
-                        for i in range(len(queue)):
-                            isMod = (
-                                botnick in queue[i][0].mods or
-                                 '#' + config.botnick == queue[i][0].channel)
-                            if isMod and queue[i][0].socket.isConnected:
-                                msg = queue[i]
-                                del queue[i]
-                                break
+                    if msg is not None:
+                        continue
+                    queue = self._queues[j]
+                    condition = lambda i: (
+                        self._isModInChannel(queue[i]) and
+                        queue[i][0].socket.isConnected)
+                    msg = self._selectMsg(queue, condition)
                 if msg is None:
                     queue = self._queues[2]
-                    for i in range(len(queue)):
-                        isMod = (botnick in queue[i][0].mods or
-                                 '#' + config.botnick == queue[i][0].channel)
-                        if (queue[i][0].channel not in self._lowQueueRecent and
-                            isMod and queue[i][0].socket.isConnected):
-                            msg = queue[i]
-                            del queue[i]
-                            self._lowQueueRecent.append(msg[0].channel)
-                            break
+                    condition = lambda i: (
+                        queue[i][0].channel not in self._lowQueueRecent and
+                        self._isModInChannel(queue[i]) and
+                        queue[i][0].socket.isConnected)
+                    msg = self._selectMsg(queue, condition)
+                    if msg is not None:
+                        self._lowQueueRecent.append(msg[0].channel)
             if isModSpamGood:
                 if msg is None:
                     queue = self._queues[2]
                     for channel in self._lowQueueRecent:
-                        for i in range(len(queue)):
-                            isMod = (
-                                botnick in queue[i][0].mods or
-                                '#' + config.botnick == queue[i][0].channel)
-                            if (queue[i][0].channel == channel and
-                                isMod and queue[i][0].socket.isConnected):
-                                msg = queue[i]
-                                del queue[i]
-                                self._lowQueueRecent.remove(msg[0].channel)
-                                self._lowQueueRecent.append(msg[0].channel)
-                                break
+                        condition = lambda i: (
+                            queue[i][0].channel == channel and
+                            self._isModInChannel(queue[i]) and
+                            queue[i][0].socket.isConnected)
+                        msg = self._selectMsg(queue, condition)
                         if msg is not None:
+                            self._lowQueueRecent.remove(msg[0].channel)
+                            self._lowQueueRecent.append(msg[0].channel)
                             break
                 if msg is None:
                     if len(self._queues[2]) == 0:
                         self._lowQueueRecent.clear()
         return msg
+    
+    @staticmethod
+    def _selectMsg(queue, condition):
+        for i in range(len(queue)):
+            if condition(i):
+                msg = queue[i]
+                del queue[i]
+                return msg
+        return None
+    
+    @staticmethod
+    def _isModInChannel(msgQueue):
+        isMod = config.botnick in msgQueue[0].mods
+        isMod = isMod or '#' + config.botnick == msgQueue[0].channel
+        return isMod
     
     def clearQueue(self, channel):
         with self._queueLock:
