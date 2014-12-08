@@ -1,8 +1,14 @@
 import database.factory
 import ircbot.irc
+import threading
 
 def customCommands(channelData, nick, message, msgParts, permissions):
     command = msgParts[0].lower()
+    params = channelData, command, nick, permissions
+    threading.Thread(target=threadCustomCommand, args=params).start()
+    return True
+
+def threadCustomCommand(channelData, command, nick, permissions):
     channel = channelData.channel[1:]
     message = None
     
@@ -20,9 +26,6 @@ def customCommands(channelData, nick, message, msgParts, permissions):
     
     if message:
         channelData.sendMessage(message)
-        return True
-    
-    return False
 
 def commandCommand(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 3:
@@ -33,24 +36,30 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
     if com == '!global':
         broadcaster = '#global'
     
+    params = [channelData, broadcaster, nick, permissions,
+              action, level, command, fullText]
+    threading.Thread(target=threadCommand, args=params).start()
+
+def threadCommand(channelData, broadcaster, nick, permissions,
+                  action, level, command, fullText):
     if level == False:
         channelData.sendMessage(nick + ' -> Invalid level, command ignored')
-        return True
+        return
     if level:
         if level not in permissions:
             channelData.sendMessage(
                 nick + ' -> Invalid level, command ignored')
-            return True
+            return
         elif not permissions[level]:
             channelData.sendMessage(
                 nick + ' -> You do not have permission to set that level')
-            return True
+            return
     
     if action in ['add', 'insert', 'new']:
         if not fullText:
             channelData.sendMessage(
                 'You need to specify some text for that command')
-            return True
+            return
         
         with database.factory.getDatabase() as db:
             result = db.insertCustomCommand(
@@ -61,12 +70,11 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
                 channelData.sendMessage(
                     command + ' was not added successfully. There might be '
                     'an existing command')
-        return True
     elif action in ['edit', 'update']:
         if not fullText:
             channelData.sendMessage(
                 'You need to specify some text for that command')
-            return True
+            return
         
         with database.factory.getDatabase() as db:
             result = db.updateCustomCommand(
@@ -78,7 +86,6 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
                 channelData.sendMessage(
                     command + ' was not updated successfully. The command '
                     'might not exist')
-        return True
     elif action in ['replace', 'override']:
         with database.factory.getDatabase() as db:
             result = db.replaceCustomCommand(
@@ -90,7 +97,6 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
                 channelData.sendMessage(
                     command + ' was not updated successfully. The command '
                     'might not exist')
-        return True
     elif action in ['del', 'delete', 'rem', 'remove',]:
         with database.factory.getDatabase() as db:
             result = db.deleteCustomCommand(broadcaster, level, command)
@@ -101,9 +107,6 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
                 channelData.sendMessage(
                     command + ' was not removed successfully. The command '
                     'might not exist')
-        return True
-    
-    return False
 
 def parseCommandMessageInput(message):
     allowPermissions = {

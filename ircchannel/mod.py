@@ -1,11 +1,16 @@
 import database.factory
 import config.oauth
 import ircbot.twitchApi
+import threading
 
 def commandStatus(channelData, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         return False
+    params = channelData, msgParts
+    threading.Thread(target=threadStatus, args=params).start()
+
+def threadStatus(channelData, msgParts):
     if config.oauth.getOAuthToken(channelData.channel) is None:
         return False
     chan = channelData.channel[1:]
@@ -26,6 +31,9 @@ def commandGame(channelData, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         msgParts.append('')
+    return True
+
+def threadGame(channelData, msgParts):
     if config.oauth.getOAuthToken(channelData.channel) is None:
         return False
     if msgParts[0].lower() == '!game':
@@ -50,7 +58,6 @@ def commandGame(channelData, nick, message, msgParts, permissions):
             channelData.sendMessage('Channel Game has been unset')
     else:
         channelData.sendMessage('Channel Game failed to set')
-    return True
 
 def commandPurge(channelData, nick, message, msgParts, permissions):
     if permissions['channelModerator'] and len(msgParts) > 1:

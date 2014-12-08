@@ -2,6 +2,7 @@ from config import config
 import database.factory
 import ircbot.twitchApi
 import ircbot.irc
+import threading
 import time
 
 def commandHello(channelData, nick, message, msgParts, permissions):
@@ -35,15 +36,14 @@ def commandAutoJoin(channelData, nick, message, msgParts, permissions):
         removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
                       'leave', 'part']
         if msgParts[1].lower() in removeMsgs:
-            with database.factory.getDatabase() as db:
-                result = db.discardAutoJoin(nick)
-                if result:
-                    channelData.sendMessage(
-                        'Auto join for ' + nick + ' is now disabled')
-                else:
-                    channelData.sendMessage(
-                        'Auto join for ' + nick + ' was never enabled')
+            params = channelData, nick
+            threading.Thread(target=threadDeleteAutoJoin, args=params).start()
             return True
+    params = channelData, nick
+    threading.Thread(target=threadInsertAutoJoin, args=params).start()
+    return True
+
+def threadInsertAutoJoin(channelData, nick):
     with database.factory.getDatabase() as db:
         result = db.saveAutoJoin(nick)
     
@@ -65,5 +65,13 @@ def commandAutoJoin(channelData, nick, message, msgParts, permissions):
         channelData.sendMessage(
             'Auto join for ' + nick + ' is already enabled and already in '
             'chat')
-    return True
 
+def threadDeleteAutoJoin(channelData, nick):
+    with database.factory.getDatabase() as db:
+        result = db.discardAutoJoin(nick)
+        if result:
+            channelData.sendMessage(
+                'Auto join for ' + nick + ' is now disabled')
+        else:
+            channelData.sendMessage(
+                'Auto join for ' + nick + ' was never enabled')

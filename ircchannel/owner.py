@@ -1,6 +1,7 @@
 from config import config
 import database.factory
 import ircbot.irc
+import threading
 import datetime
 import time
 import sys
@@ -61,60 +62,74 @@ def commandEmpty(channelData, nick, message, msgParts, permissions):
 def commandManageBot(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
-    if msgParts[1] == 'autojoin':
-        if len(msgParts) < 4:
-            return False
-        msgParts[3] = msgParts[3].lower()
-        if msgParts[2] in ['add', 'insert', 'join']:
-            with database.factory.getDatabase() as db:
-                result = db.saveAutoJoin(msgParts[3])
-                
-            wasInChat = ('#' + msgParts[3]) in ircbot.irc.channels
-            if not wasInChat:
-                ircbot.irc.joinChannel(msgParts[3])
+    
+    methods = {
+        'listchats': manageListChats,
+        }
+    threadMethods = {
+        'autojoin': threadManageAutoJoin,
+        }
+    params = channelData, message, msgParts
+    
+    if msgParts[1].lower() in methods:
+        methods[msgParts[1].lower()](*params)
+    elif msgParts[1].lower() in threadMethods:
+        threading.Thread(
+            target=threadMethods[msgParts[1].lower()], args=params).start()
+    
+    return True
+
+def manageListChats(channelData, message, msgParts):
+    channels = [c[1:] for c in ircbot.irc.channels.keys()]
+    channelData.sendMessage('Twitch Chats: ' + ', '.join(channels))
+
+def threadManageAutoJoin(channelData, message, msgParts):
+    if len(msgParts) < 4:
+        return
+    msgParts[3] = msgParts[3].lower()
+    if msgParts[2] in ['add', 'insert', 'join']:
+        with database.factory.getDatabase() as db:
+            result = db.saveAutoJoin(msgParts[3])
             
-            if result and not wasInChat:
+        wasInChat = ('#' + msgParts[3]) in ircbot.irc.channels
+        if not wasInChat:
+            ircbot.irc.joinChannel(msgParts[3])
+        
+        if result and not wasInChat:
+            channelData.sendMessage(
+                'Auto join for ' + msgParts[3] + ' is now enabled and '
+                'joined ' + msgParts[3] + ' chat')
+        elif result:
+            channelData.sendMessage(
+                'Auto join for ' + msgParts[3] + ' is now enabled')
+        elif not wasInChat:
+            channelData.sendMessage(
+                'Auto join for ' + msgParts[3] + ' is already enabled but '
+                'now joined ' + msgParts[3] + ' chat')
+        else:
+            channelData.sendMessage(
+                'Auto join for ' + msgParts[3] + ' is already enabled and '
+                'already in chat')
+    if msgParts[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
+        with database.factory.getDatabase() as db:
+            result = db.discardAutoJoin(msgParts[3])
+            if result:
                 channelData.sendMessage(
-                    'Auto join for ' + msgParts[3] + ' is now enabled and '
-                    'joined ' + msgParts[3] + ' chat')
-            elif result:
-                channelData.sendMessage(
-                    'Auto join for ' + msgParts[3] + ' is now enabled')
-            elif not wasInChat:
-                channelData.sendMessage(
-                    'Auto join for ' + msgParts[3] + ' is already enabled but '
-                    'now joined ' + msgParts[3] + ' chat')
+                    'Auto join for ' + msgParts[3] + ' is now disabled')
             else:
                 channelData.sendMessage(
-                    'Auto join for ' + nick + ' is already enabled and '
-                    'already in chat')
-            return True
-        if msgParts[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
-            with database.factory.getDatabase() as db:
-                result = db.discardAutoJoin(msgParts[3])
-                if result:
-                    channelData.sendMessage(
-                        'Auto join for ' + msgParts[3] + ' is now disabled')
-                else:
-                    channelData.sendMessage(
-                        'Auto join for ' + msgParts[3] + ' was never enabled')
-            return True
-        if msgParts[2] in ['pri', 'priority']:
-            try:
-                priority = int(msgParts[4])
-            except Exception:
-                priority = 0
-            with database.factory.getDatabase() as db:
-                result = db.setAutoJoinPriority(msgParts[3], priority)
-                if result:
-                    channelData.sendMessage(
-                        'Auto join for ' + msgParts[3] + ' is set to '
-                        'priority ' + str(priority))
-                else:
-                    channelData.sendMessage(
-                        'Auto join for ' + msgParts[3] + ' was never enabled')
-            return True
-    if msgParts[1] == 'listchats':
-        channels = [c[1:] for c in ircbot.irc.channels.keys()]
-        channelData.sendMessage('Twitch Chats: ' + ', '.join(channels))
-    return True
+                    'Auto join for ' + msgParts[3] + ' was never enabled')
+    if msgParts[2] in ['pri', 'priority']:
+        try:
+            priority = int(msgParts[4])
+        except Exception:
+            priority = 0
+        with database.factory.getDatabase() as db:
+            result = db.setAutoJoinPriority(msgParts[3], priority)
+            if result:
+                channelData.sendMessage(
+                    'Auto join for ' + msgParts[3] + ' is set to '
+                    'priority ' + str(priority))
+            else:
+                channelData.sendMessage(
+                    'Auto join for ' + msgParts[3] + ' was never enabled')
