@@ -1,6 +1,7 @@
 from config import config
 import ircchannel.commands
 import ircuser.notice
+import ircbot.irc
 import threading
 import traceback
 import datetime
@@ -49,10 +50,8 @@ class SocketThread(threading.Thread):
             self.lastPing = datetime.datetime.now()
             print('Connected ' + config.server)
             
+            ircbot.irc.join.connected(self)
             self._isConnected = True
-            with self._channelsLock:
-                for channelData in self._channels.values():
-                    self._join(channelData)
             try:
                 while self.running:
                     try:
@@ -96,6 +95,7 @@ class SocketThread(threading.Thread):
             finally:
                 self._ircsock.close()
             self._isConnected = False
+            ircbot.irc.join.disconnected(self)
             print('Disconnected ' + config.server)
             time.sleep(5)
         print('Ending ' + config.server)
@@ -129,24 +129,15 @@ class SocketThread(threading.Thread):
             self.sendIrcCommand(comm)
     
     def join(self, channelData):
-        if self.isConnected:
-            self._join(channelData)
         with self._channelsLock:
             self._channels[channelData.channel] = channelData
-    
-    def _join(self, channelData):
-        assert(self.isConnected)
-        ircCommand = 'JOIN ' + channelData.channel + '\n'
-        self.sendIrcCommand(ircCommand, channelData.channel)
-        
-        channelData.sendMessage('.mods')
-        print('Joined ' + channelData.channel)
     
     def part(self, channelData):
         with self._channelsLock:
             self.sendIrcCommand('PART ' + channelData.channel + '\n',
                                 channelData.channel)
             del self._channels[channelData.channel]
+            ircbot.irc.join.part(channelData.channel)
             print('Parted ' + channelData.channel)
     
     def ping(self):

@@ -10,6 +10,7 @@ import time
 print('Starting')
 ircbot.irc.socket.start()
 ircbot.irc.messaging.start()
+ircbot.irc.join.start()
 
 try:
     ircbot.irc.joinChannel(config.botnick)

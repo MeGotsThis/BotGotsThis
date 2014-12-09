@@ -1,9 +1,12 @@
 ﻿import ircbot.message
 import ircbot.socket
+import ircbot.join
 
 # Import some necessary libraries.
 messaging = ircbot.message.MessageQueue()
 socket = ircbot.socket.SocketThread()
+join = ircbot.join.JoinThread()
+join.add(socket)
 channels = {}
 
 def joinChannel(channel):
