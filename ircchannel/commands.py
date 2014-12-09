@@ -14,6 +14,8 @@ def parse(channelData, nick, message):
         ircuser.jtv.parse(channelData, message)
     
     msgParts = message.split(None)
+    if len(msgParts) == 0:
+        return
     
     if config.owner is not None:
         isOwner = nick == config.owner.lower()
