@@ -11,11 +11,16 @@ botnick = ini['BOT']['botnick'].lower()
 password = ini['BOT']['password']
 owner = ini['BOT']['owner'].lower()
 
-modLimit = int(ini['BOT']['modLimit'])
-modSpamLimit = int(ini['BOT']['modSpamLimit'])
-publicLimit = int(ini['BOT']['publicLimit'])
+modLimit = min(int(ini['BOT']['modLimit']), 100)
+modSpamLimit = min(int(ini['BOT']['modSpamLimit']), 100)
+publicLimit = min(int(ini['BOT']['publicLimit']), 20)
 publicDelay = float(ini['BOT']['publicDelay'])
 messagePerSecond = float(ini['BOT']['messagePerSecond'])
+messagePerSecond = messagePerSecond if messagePerSecond > 0 else 20
+
+joinLimit = min(int(ini['BOT']['joinLimit']), 50)
+joinPerSecond = float(ini['BOT']['joinPerSecond'])
+joinPerSecond = joinPerSecond if joinPerSecond > 0 else 20
 
 ircLogFolder = ini['BOT']['ircLogFolder']
 exceptionLog = ini['BOT']['exceptionLog']
