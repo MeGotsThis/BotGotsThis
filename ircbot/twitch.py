@@ -13,12 +13,13 @@ ircbot.irc.messaging.start()
 ircbot.irc.join.start()
 
 try:
-    ircbot.irc.joinChannel(config.botnick)
+    ircbot.irc.joinChannel(config.botnick, float('-inf'))
     if config.owner:
-        ircbot.irc.joinChannel(config.owner)
+        ircbot.irc.joinChannel(config.owner, float('-inf'))
     with database.factory.getDatabase() as db:
-        for channel in db.getAutoJoinsChats():
-            ircbot.irc.joinChannel(channel)
+        for channelRow in db.getAutoJoinsChats():
+            ircbot.irc.joinChannel(
+                channelRow['broadcaster'], channelRow['priority'])
     
     ircbot.irc.messaging.join()
 except:

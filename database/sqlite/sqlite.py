@@ -15,11 +15,25 @@ class SQLiteDatabase(database.database.DatabaseBase):
     
     def getAutoJoinsChats(self):
         cursor = self.connection.cursor()
-        query = 'SELECT broadcaster FROM auto_join ORDER BY priority ASC'
+        query = 'SELECT broadcaster, priority FROM auto_join '
+        query += 'ORDER BY priority ASC'
         cursor.execute(query)
-        chats = map(lambda r: r[0], cursor.fetchall())
+        rowMap = lambda r: {
+            'broadcaster': r[0],
+            'priority': r[1],
+            }
+        chats = map(rowMap, cursor.fetchall())
         cursor.close()
         return list(chats)
+    
+    def getAutoJoinsPriority(self, broadcaster):
+        cursor = self.connection.cursor()
+        query = 'SELECT priority FROM auto_join WHERE broadcaster=?'
+        cursor.execute(query, (broadcaster,))
+        autoJoinRow = cursor.fetchone()
+        priority = autoJoinRow[0] if autoJoinRow is not None else None
+        cursor.close()
+        return priority
     
     def saveAutoJoin(self, broadcaster, priority=0):
         cursor = self.connection.cursor()

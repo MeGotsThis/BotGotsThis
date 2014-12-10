@@ -42,7 +42,9 @@ class JoinThread(threading.Thread):
                         time.sleep(1 / config.joinPerSecond)
                         continue
                     
-                    channelData = channels[next(iter(notJoined))]
+                    params = channels, notJoined
+                    channel = self._getChannelWithLowestPriority(*params)
+                    channelData = channels[channel]
                     ircCommand = 'JOIN ' + channelData.channel + '\n'
                     params = ircCommand, channelData.channel
                     channelData.socket.sendIrcCommand(*params)
@@ -81,4 +83,10 @@ class JoinThread(threading.Thread):
     def part(self, channel):
         with self._channelsLock:
             self._channelJoined.discard(channel)
-
+    
+    @staticmethod
+    def _getChannelWithLowestPriority(channelsData, notJoinedChannels):
+        priority = min([channelsData[c].joinPriority
+                        for c in notJoinedChannels])
+        return [c for c in notJoinedChannels
+                if channelsData[c].joinPriority == priority][0]

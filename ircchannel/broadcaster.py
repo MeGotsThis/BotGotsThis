@@ -13,8 +13,17 @@ def commandCome(channelData, nick, message, msgParts, permissions):
     if ('#' + nick) in ircbot.irc.channels:
         channelData.sendMessage('I am already in ' + nick)
         return True
+    params = channelData, nick
+    threading.Thread(target=threadCome, args=params).start()
+    return True
+
+def threadCome(channelData, nick):
+    with database.factory.getDatabase() as db:
+        priority = db.getAutoJoinsPriority(nick)
+    priority = priority if priority is not None else float('-inf')
+    
     channelData.sendMessage('Joining ' + nick)
-    ircbot.irc.joinChannel(nick)
+    ircbot.irc.joinChannel(nick, priority)
     return True
 
 def commandLeave(channelData, nick, message, msgParts, permissions):
@@ -45,11 +54,14 @@ def commandAutoJoin(channelData, nick, message, msgParts, permissions):
 
 def threadInsertAutoJoin(channelData, nick):
     with database.factory.getDatabase() as db:
-        result = db.saveAutoJoin(nick)
+        result = db.saveAutoJoin(nick, 0)
     
     wasInChat = ('#' + nick) in ircbot.irc.channels
     if not wasInChat:
-        ircbot.irc.joinChannel(nick)
+        ircbot.irc.joinChannel(nick, 0)
+    else:
+        chData = ircbot.irc.channels['#' + nick]
+        chData.joinPriority = min(chData.joinPriority, 0)
     
     if result and not wasInChat:
         channelData.sendMessage(

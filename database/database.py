@@ -24,6 +24,9 @@ class DatabaseBase:
     def getAutoJoinsChats(self):
         return []
     
+    def getAutoJoinsPriority(self, broadcaster):
+        return None
+    
     def saveAutoJoin(self, broadcaster, priority=0):
         return False
     

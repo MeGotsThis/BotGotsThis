@@ -9,13 +9,15 @@ join = ircbot.join.JoinThread()
 join.add(socket)
 channels = {}
 
-def joinChannel(channel):
+def joinChannel(channel, priority=float('inf')):
     if channel[0] != '#':
         channel = '#' + channel
     channel = channel.lower()
     if channel in channels:
+        channels[channel].joinPriority = min(
+            channels[channel].joinPriority, priority)
         return False
-    channels[channel] = ChannelData(channel, socket)
+    channels[channel] = ChannelData(channel, socket, priority)
     socket.join(channels[channel])
     return True
 
@@ -28,11 +30,12 @@ def partChannel(channel):
 
 class ChannelData:
     __slots__ = ['_channel', '_socket', '_twitchStaff', '_twitchAdmin',
-                 '_mods', '_users', '_sessionData']
+                 '_mods', '_users', '_sessionData', '_joinPriority']
     
-    def __init__(self, channel, socket):
+    def __init__(self, channel, socket, joinPriority=float('inf')):
         self._channel = channel
         self._socket = socket
+        self._joinPriority = joinPriority
         self._twitchStaff = set()
         self._twitchAdmin = set()
         self._mods = set()
@@ -46,6 +49,14 @@ class ChannelData:
     @property
     def socket(self):
         return self._socket
+    
+    @property
+    def joinPriority(self):
+        return self._joinPriority
+    
+    @joinPriority.setter
+    def joinPriority(self, value):
+        self._joinPriority = value
     
     @property
     def twitchStaff(self):
