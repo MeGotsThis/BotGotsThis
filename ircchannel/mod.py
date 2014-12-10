@@ -9,6 +9,7 @@ def commandStatus(channelData, nick, message, msgParts, permissions):
         return False
     params = channelData, msgParts
     threading.Thread(target=threadStatus, args=params).start()
+    return True
 
 def threadStatus(channelData, msgParts):
     if config.oauth.getOAuthToken(channelData.channel) is None:
@@ -31,6 +32,8 @@ def commandGame(channelData, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         msgParts.append('')
+    params = channelData, msgParts
+    threading.Thread(target=threadGame, args=params).start()
     return True
 
 def threadGame(channelData, msgParts):
