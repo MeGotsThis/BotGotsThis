@@ -22,7 +22,7 @@ def joinChannel(channel, priority=float('inf'), eventServer=False):
         return False
     socket = mainChat if not eventServer else eventChat
     channels[channel] = ChannelData(channel, socket, priority)
-    socket.join(channels[channel])
+    socket.joinChannel(channels[channel])
     return True
 
 def partChannel(channel):
@@ -102,7 +102,7 @@ class ChannelData:
         return self._sessionData
     
     def part(self):
-        self.socket.part(self)
+        self.socket.partChannel(self)
         messaging.clearQueue(self.channel)
         self._socket = None
     

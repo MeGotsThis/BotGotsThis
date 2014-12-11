@@ -130,11 +130,11 @@ class SocketThread(threading.Thread):
         for comm in comms:
             self.sendIrcCommand(comm)
     
-    def join(self, channelData):
+    def joinChannel(self, channelData):
         with self._channelsLock:
             self._channels[channelData.channel] = channelData
     
-    def part(self, channelData):
+    def partChannel(self, channelData):
         with self._channelsLock:
             self.sendIrcCommand('PART ' + channelData.channel + '\n',
                                 channelData.channel)
