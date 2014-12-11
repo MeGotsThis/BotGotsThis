@@ -3,7 +3,7 @@ import os.path
 import json
 import os
 
-server = 'irc.twitch.tv'
+mainServer = 'irc.twitch.tv'
 eventServer = '199.9.252.26'
 ini = configparser.ConfigParser()
 ini.read('config.ini')

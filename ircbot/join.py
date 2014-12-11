@@ -54,7 +54,8 @@ class JoinThread(threading.Thread):
                     
                     channelData.sendMessage('.mods')
                     
-                    print('Joined ' + channelData.channel)
+                    print('Joined ' + channelData.channel + ' on ' +
+                          channelData.socket.name)
                 
                 time.sleep(1 / config.joinPerSecond)
             except Exception as e:

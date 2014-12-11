@@ -1,6 +1,7 @@
 CREATE TABLE auto_join (
     broadcaster VARCHAR NOT NULL PRIMARY KEY,
-    priority INT NOT NULL DEFAULT 0
+    priority INT NOT NULL DEFAULT 0,
+    useEvent BOOL NOT NULL DEFAULT 0
 );
 
 CREATE TABLE oauth_tokens (

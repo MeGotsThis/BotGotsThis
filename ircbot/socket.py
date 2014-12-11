@@ -11,8 +11,9 @@ import time
 import sys
 
 class SocketThread(threading.Thread):
-    def __init__(self, **args):
+    def __init__(self, server, **args):
         threading.Thread.__init__(self, **args)
+        self._server = server
         self._channels = {}
         self._channelsLock = threading.Lock()
         self._isConnected = False
@@ -36,7 +37,7 @@ class SocketThread(threading.Thread):
         self._running = value
     
     def run(self):
-        print('Starting SocketThread')
+        print('Starting SocketThread ' + self.name)
         
         while self.running:
             self._ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,7 +49,7 @@ class SocketThread(threading.Thread):
                 time.sleep(5)
                 continue
             self.lastPing = datetime.datetime.now()
-            print('Connected ' + config.server)
+            print(self.name + ' Connected ' + self._server)
             
             ircbot.irc.join.connected(self)
             self._isConnected = True
@@ -65,7 +66,8 @@ class SocketThread(threading.Thread):
                                 continue
                             ircmsg = ircmsg.decode('utf-8')
                             if config.ircLogFolder:
-                                fileName = config.botnick + '.log'
+                                fileName = config.botnick + '-' + self.name
+                                fileName += '.log'
                                 pathArgs = config.ircLogFolder, fileName
                                 dtnow = datetime.datetime.now()
                                 now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
@@ -96,16 +98,16 @@ class SocketThread(threading.Thread):
                 self._ircsock.close()
             self._isConnected = False
             ircbot.irc.join.disconnected(self)
-            print('Disconnected ' + config.server)
+            print(self.name + ' Disconnected ' + self._server)
             time.sleep(5)
-        print('Ending ' + config.server)
+        print('Ending SocketThread ' + self.name)
     
     def sendIrcCommand(self, command, channel=None):
         if type(command) is str:
             command = command.encode('utf-8')
         self._ircsock.send(command[:2048])
         if config.ircLogFolder:
-            fileName = config.botnick + '.log'
+            fileName = config.botnick + '-' + self.name + '.log'
             pathArgs = config.ircLogFolder, fileName
             dtnow = datetime.datetime.now()
             now = dtnow.strftime('> %Y-%m-%d %H:%M:%S.%f ')
@@ -119,7 +121,7 @@ class SocketThread(threading.Thread):
                     file.write(now + command.decode('utf-8'))
     
     def _connect(self):
-        self._ircsock.connect((config.server, 6667))
+        self._ircsock.connect((self._server, 6667))
         comms = ['PASS ' + config.password + '\n',
                  'NICK ' + config.botnick + '\n',
                  'USER ' + config.botnick + ' 0 * :' + config.botnick + '\n',

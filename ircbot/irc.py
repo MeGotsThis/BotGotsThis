@@ -1,15 +1,18 @@
-﻿import ircbot.message
+﻿from config import config
+import ircbot.message
 import ircbot.socket
 import ircbot.join
 
 # Import some necessary libraries.
 messaging = ircbot.message.MessageQueue()
-socket = ircbot.socket.SocketThread()
+mainChat = ircbot.socket.SocketThread(config.mainServer, name='Main Chat')
+eventChat = ircbot.socket.SocketThread(config.eventServer, name='Event Chat')
 join = ircbot.join.JoinThread()
-join.add(socket)
+join.add(mainChat)
+join.add(eventChat)
 channels = {}
 
-def joinChannel(channel, priority=float('inf')):
+def joinChannel(channel, priority=float('inf'), eventServer=False):
     if channel[0] != '#':
         channel = '#' + channel
     channel = channel.lower()
@@ -17,6 +20,7 @@ def joinChannel(channel, priority=float('inf')):
         channels[channel].joinPriority = min(
             channels[channel].joinPriority, priority)
         return False
+    socket = mainChat if not eventServer else eventChat
     channels[channel] = ChannelData(channel, socket, priority)
     socket.join(channels[channel])
     return True
@@ -27,6 +31,25 @@ def partChannel(channel):
     if channel in channels:
         channels[channel].part()
         del channels[channel]
+
+ENSURE_REJOIN_TO_MAIN = -2
+ENSURE_REJOIN_TO_EVENT = -1
+ENSURE_CORRECT = 0
+ENSURE_NOT_JOINED = 1
+
+def ensureServer(channel, priority=float('inf'), eventServer=False):
+    if channel[0] != '#':
+        channel = '#' + channel
+    if channel not in channels:
+        return ENSURE_NOT_JOINED
+    socket = mainChat if not eventServer else eventChat
+    if socket is channels[channel].socket:
+        channels[channel].joinPriority = min(
+            channels[channel].joinPriority, priority)
+        return ENSURE_CORRECT
+    partChannel(channel)
+    joinChannel(channel, priority, eventServer)
+    return ENSURE_REJOIN_TO_EVENT if eventServer else ENSURE_REJOIN_TO_MAIN
 
 class ChannelData:
     __slots__ = ['_channel', '_socket', '_twitchStaff', '_twitchAdmin',

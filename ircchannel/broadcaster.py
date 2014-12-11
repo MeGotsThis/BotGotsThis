@@ -4,6 +4,7 @@ import ircbot.twitchApi
 import ircbot.irc
 import threading
 import time
+import json
 
 def commandHello(channelData, nick, message, msgParts, permissions):
     channelData.sendMessage('Hello Kappa')
@@ -22,8 +23,23 @@ def threadCome(channelData, nick):
         priority = db.getAutoJoinsPriority(nick)
     priority = priority if priority is not None else float('-inf')
     
-    channelData.sendMessage('Joining ' + nick)
-    ircbot.irc.joinChannel(nick, priority)
+    response, data = ircbot.twitchApi.twitchCall(
+        None, 'GET', '/api/channels/' + nick + '/chat_properties')
+    chatProperties = json.loads(data.decode('utf-8'))
+    
+    if ircbot.irc.joinChannel(nick, priority, chatProperties['eventchat']):
+        channelData.sendMessage('Joining ' + nick)
+    else:
+        params = nick, priority, chatProperties['eventchat']
+        result = ircbot.irc.ensureServer(*params)
+        if result == ircbot.irc.ENSURE_CORRECT:
+            channelData.sendMessage('Already joined ' + nick)
+        elif result == ircbot.irc.ENSURE_REJOIN_TO_MAIN:
+            msg = 'Moved ' + nick + ' to main chat server'
+            channelData.sendMessage(msg)
+        elif result == ircbot.irc.ENSURE_REJOIN_TO_EVENT:
+            msg = 'Moved ' + nick + ' to event chat server'
+            channelData.sendMessage(msg)
     return True
 
 def commandLeave(channelData, nick, message, msgParts, permissions):
@@ -53,30 +69,46 @@ def commandAutoJoin(channelData, nick, message, msgParts, permissions):
     return True
 
 def threadInsertAutoJoin(channelData, nick):
+    response, data = ircbot.twitchApi.twitchCall(
+        None, 'GET', '/api/channels/' + nick + '/chat_properties')
+    chatProperties = json.loads(data.decode('utf-8'))
+    
     with database.factory.getDatabase() as db:
-        result = db.saveAutoJoin(nick, 0)
+        result = db.saveAutoJoin(nick, 0, chatProperties['eventchat'])
+        priority = db.getAutoJoinsPriority(nick)
+        if result == False:
+            db.setAutoJoinServer(nick, chatProperties['eventchat'])
     
     wasInChat = ('#' + nick) in ircbot.irc.channels
     if not wasInChat:
-        ircbot.irc.joinChannel(nick, 0)
+        ircbot.irc.joinChannel(nick, priority, chatProperties['eventchat'])
     else:
-        chData = ircbot.irc.channels['#' + nick]
-        chData.joinPriority = min(chData.joinPriority, 0)
+        params = nick, priority, chatProperties['eventchat']
+        rejoin = ircbot.irc.ensureServer(*params)
     
     if result and not wasInChat:
         channelData.sendMessage(
             'Auto join for ' + nick + ' is now enabled and joined ' +
             nick + ' chat')
     elif result:
-        channelData.sendMessage('Auto join for ' + nick + ' is now enabled')
+        if rejoin < 0:
+            msg = 'Auto join for ' + nick
+            msg += ' is now enabled and moved to the correct server'
+        else:
+            msg = 'Auto join for ' + nick + ' is now enabled'
+        channelData.sendMessage(msg)
     elif not wasInChat:
         channelData.sendMessage(
             'Auto join for ' + nick + ' is already enabled but now joined ' +
             nick + ' chat')
     else:
-        channelData.sendMessage(
-            'Auto join for ' + nick + ' is already enabled and already in '
-            'chat')
+        if rejoin < 0:
+            msg = 'Auto join for ' + nick
+            msg += ' is already enabled and moved to the correct server'
+        else:
+            msg = 'Auto join for ' + nick
+            msg += ' is already enabled and already in chat'
+        channelData.sendMessage(msg)
 
 def threadDeleteAutoJoin(channelData, nick):
     with database.factory.getDatabase() as db:

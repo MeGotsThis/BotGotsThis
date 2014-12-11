@@ -15,12 +15,13 @@ class SQLiteDatabase(database.database.DatabaseBase):
     
     def getAutoJoinsChats(self):
         cursor = self.connection.cursor()
-        query = 'SELECT broadcaster, priority FROM auto_join '
+        query = 'SELECT broadcaster, priority, useEvent FROM auto_join '
         query += 'ORDER BY priority ASC'
         cursor.execute(query)
         rowMap = lambda r: {
             'broadcaster': r[0],
             'priority': r[1],
+            'eventServer': r[2],
             }
         chats = map(rowMap, cursor.fetchall())
         cursor.close()
@@ -35,12 +36,12 @@ class SQLiteDatabase(database.database.DatabaseBase):
         cursor.close()
         return priority
     
-    def saveAutoJoin(self, broadcaster, priority=0):
+    def saveAutoJoin(self, broadcaster, priority=0, useEvent=False):
         cursor = self.connection.cursor()
         try:
-            query = 'INSERT INTO auto_join (broadcaster, priority) '
-            query += 'VALUES (?, ?)'
-            params = broadcaster, priority
+            query = 'INSERT INTO auto_join (broadcaster, priority, useEvent) '
+            query += 'VALUES (?, ?, ?)'
+            params = broadcaster, priority, useEvent
             cursor.execute(query, params)
             self.connection.commit()
             return True
@@ -69,6 +70,21 @@ class SQLiteDatabase(database.database.DatabaseBase):
         try:
             query = 'UPDATE auto_join SET priority=? WHERE broadcaster=?'
             params = priority, broadcaster
+            cursor.execute(query, params)
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def setAutoJoinServer(self, broadcaster, useEvent=False):
+        cursor = self.connection.cursor()
+        try:
+            query = 'UPDATE auto_join SET useEvent=? WHERE broadcaster=?'
+            params = useEvent, broadcaster
             cursor.execute(query, params)
             self.connection.commit()
             if cursor.rowcount == 0:

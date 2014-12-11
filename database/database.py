@@ -27,13 +27,16 @@ class DatabaseBase:
     def getAutoJoinsPriority(self, broadcaster):
         return None
     
-    def saveAutoJoin(self, broadcaster, priority=0):
+    def saveAutoJoin(self, broadcaster, priority=0, useEvent=False):
         return False
     
     def discardAutoJoin(self, broadcaster):
         return False
     
     def setAutoJoinPriority(self, broadcaster, priority):
+        return False
+    
+    def setAutoJoinServer(self, broadcaster, useEvent=False):
         return False
     
     def getOAuthToken(self, broadcaster):
