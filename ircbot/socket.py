@@ -139,8 +139,8 @@ class SocketThread(threading.Thread):
             self.sendIrcCommand('PART ' + channelData.channel + '\n',
                                 channelData.channel)
             del self._channels[channelData.channel]
-            ircbot.irc.join.part(channelData.channel)
-            print('Parted ' + channelData.channel)
+        ircbot.irc.join.part(channelData.channel)
+        print('Parted ' + channelData.channel)
     
     def ping(self):
         self.sendIrcCommand('PONG :pingis\n')

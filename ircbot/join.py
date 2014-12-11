@@ -29,13 +29,13 @@ class JoinThread(threading.Thread):
                         time.sleep(1 / config.joinPerSecond)
                         continue
                 
+                channels = {}
+                for socketThread in self._socketThreads:
+                    if socketThread.isConnected:
+                        chans = socketThread.channels
+                        for chan in chans:
+                            channels[chan] = chans[chan]
                 with self._channelsLock:
-                    channels = {}
-                    for socketThread in self._socketThreads:
-                        if socketThread.isConnected:
-                            chans = socketThread.channels
-                            for chan in chans:
-                                channels[chan] = chans[chan]
                     notJoined = channels.keys() - self._channelJoined
                     
                     if not notJoined:
