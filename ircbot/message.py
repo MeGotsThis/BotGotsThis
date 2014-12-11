@@ -58,9 +58,11 @@ class MessageQueue(threading.Thread):
                 with open(config.exceptionLog, 'a', encoding='utf-8') as file:
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                     file.write(' ' + ''.join(_))
-            ircbot.irc.socket.running = False
             raise
         finally:
+            ircbot.irc.mainChat.running = False
+            ircbot.irc.eventChat.running = False
+            ircbot.irc.join.running = False
             print('Ending MessageQueue')
     
     def _getMessage(self):
