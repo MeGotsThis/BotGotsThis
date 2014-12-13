@@ -53,7 +53,8 @@ def ensureServer(channel, priority=float('inf'), eventServer=False):
 
 class ChannelData:
     __slots__ = ['_channel', '_socket', '_twitchStaff', '_twitchAdmin',
-                 '_mods', '_users', '_sessionData', '_joinPriority']
+                 '_mods', '_subscribers', '_turboUsers', '_users',
+                 '_sessionData', '_joinPriority']
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
         self._channel = channel
@@ -62,6 +63,8 @@ class ChannelData:
         self._twitchStaff = set()
         self._twitchAdmin = set()
         self._mods = set()
+        self._subscribers = set()
+        self._turboUsers = set()
         self._users = set()
         self._sessionData = {}
     
@@ -94,6 +97,14 @@ class ChannelData:
         return frozenset(self._mods)
     
     @property
+    def subscribers(self):
+        return frozenset(self._subscribers)
+    
+    @property
+    def turboUsers(self):
+        return frozenset(self._turboUsers)
+    
+    @property
     def users(self):
         return frozenset(self._users)
     
@@ -111,6 +122,18 @@ class ChannelData:
     
     def sendMulipleMessages(self, messages, priority=1):
         messaging.queueMultipleMessages(self, messages, priority)
+    
+    def clearTurboUsers(self):
+        self._turboUsers.clear()
+    
+    def addTurboUser(self, user):
+        self._turboUsers.add(user)
+    
+    def clearSubscribers(self):
+        self._subscribers.clear()
+    
+    def addSubscriber(self, subscriber):
+        self._subscribers.add(subscriber)
     
     def clearMods(self):
         self._mods.clear()

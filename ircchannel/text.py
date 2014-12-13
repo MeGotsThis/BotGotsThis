@@ -15,7 +15,7 @@ def threadCustomCommand(channelData, command, nick, permissions):
     with database.factory.getDatabase() as db:
         commands = db.getChatCommands(channel, command)
     
-    permissionsSet = ['', 'moderator', 'broadcaster',
+    permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
                       'admin', 'staff', 'owner',]
     for perm in permissionsSet:
         if not perm or permissions[perm]:
@@ -115,6 +115,10 @@ def parseCommandMessageInput(message):
         'any': '',
         'all': '',
         'public': '',
+        'turbo': 'turbo',
+        'twitchturbo': 'turbo',
+        'subscriber': 'subscriber',
+        'sub': 'subscriber',
         'moderator': 'moderator',
         'mod': 'moderator',
         'broadcaster': 'broadcaster',

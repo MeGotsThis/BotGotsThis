@@ -28,6 +28,8 @@ def parse(channelData, nick, message):
     isAdmin = isStaff or nick in channelData.twitchAdmin
     isBroadcaster = isStaff or isAdmin or '#' + nick == channelData.channel
     isMod = isBroadcaster or nick in channelData.mods
+    isSubscriber = isBroadcaster or nick in channelData.subscribers
+    isTurbo = isBroadcaster or nick in channelData.turboUsers
     isChanMod = config.botnick in channelData.mods
     permissions = {
         'owner': isOwner,
@@ -36,6 +38,8 @@ def parse(channelData, nick, message):
         'admin': isAdmin,
         'broadcaster': isBroadcaster,
         'moderator': isMod,
+        'subscriber': isMod,
+        'turbo': isMod,
         'channelModerator': isChanMod,
         }
     
