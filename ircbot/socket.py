@@ -147,20 +147,19 @@ class SocketThread(threading.Thread):
         self.lastPing = datetime.datetime.now()
 
     def _parseMsg(self, ircmsg):
-        if config.ircLogFolder:
-            fileName = where + '.log'
-            pathArgs = config.ircLogFolder, fileName
-            dtnow = datetime.datetime.now()
-            now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
-            with open(os.path.join(*pathArgs), 'a',
-                      encoding='utf-8') as file:
-                file.write(now + ircmsg + '\n')
-        
         if ircmsg.find(' PRIVMSG ') != -1:
             parts = ircmsg.split(' ', 3)
             nick = parts[0].split('!')[0][1:]
             where = parts[2]
             msg = parts[3][1:]
+            if where[0] == '#' and config.ircLogFolder:
+                fileName = where + '.log'
+                pathArgs = config.ircLogFolder, fileName
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write(now + ircmsg + '\n')
             if where in self._channels:
                 ircchannel.commands.parse(self._channels[where], nick, msg)
             return
