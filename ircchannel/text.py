@@ -1,14 +1,15 @@
 import database.factory
 import ircbot.irc
 import threading
+import re
 
 def customCommands(channelData, nick, message, msgParts, permissions):
     command = msgParts[0].lower()
-    params = channelData, command, nick, permissions
+    params = channelData, command, nick, permissions, message
     threading.Thread(target=threadCustomCommand, args=params).start()
     return True
 
-def threadCustomCommand(channelData, command, nick, permissions):
+def threadCustomCommand(channelData, command, nick, permissions, originalMsg):
     channel = channelData.channel[1:]
     message = None
     
@@ -25,6 +26,48 @@ def threadCustomCommand(channelData, command, nick, permissions):
                 message = commands[channel][perm]
     
     if message:
+        message.replace('{user}', nick)
+        message.replace('{query}', originalMsg)
+        def paramReplace(matchobj):
+            matchParts = matchobj.groups()
+            if matchParts[1] is not None:
+                msgParts = originalMsg.split()
+                i = int(matchParts[1])
+                if i >= len(msgParts):
+                    return ''
+                if matchParts[2] is None:
+                    return msgParts[i]
+                else:
+                    s = originalMsg.split(None, i)[i]
+                    j = int(matchParts[3])
+                    if len(msgParts) <= j:
+                        return s.rsplit(None, len(msgParts) - j - 1)[0]
+                    else:
+                        return s
+            if matchParts[4] is not None:
+                i = int(matchParts[5])
+                msgParts = originalMsg.split(None, i)
+                if i < len(msgParts):
+                    return msgParts[i]
+                else:
+                    return ''
+            if matchParts[6] is not None:
+                j = int(matchParts[7])
+                msgParts = originalMsg.split()
+                if j == 0:
+                    return originalMsg.split(None)[0]
+                elif len(msgParts) >= 2:
+                    if len(msgParts) <= j:
+                        return originalMsg.split(None, 1)[1]
+                    else:
+                        splits = len(msgParts) - j - 1
+                        msg = originalMsg.rsplit(None, splits)[0]
+                        return msg.split(None, 1)[1]
+                else:
+                    return ''
+            return ''
+        pattern = r'(\{(\d+)(-(\d+))?\})|(\{(\d+)-\})|(\{-(\d+)\})'
+        message = re.sub(pattern, paramReplace, message)
         channelData.sendMessage(message)
 
 def commandCommand(channelData, nick, message, msgParts, permissions):
