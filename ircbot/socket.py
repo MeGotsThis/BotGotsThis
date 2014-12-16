@@ -147,7 +147,7 @@ class SocketThread(threading.Thread):
         self.lastPing = datetime.datetime.now()
 
     def _parseMsg(self, ircmsg):
-        if where[0] == '#' and config.ircLogFolder:
+        if config.ircLogFolder:
             fileName = where + '.log'
             pathArgs = config.ircLogFolder, fileName
             dtnow = datetime.datetime.now()
