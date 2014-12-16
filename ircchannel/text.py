@@ -166,11 +166,13 @@ def parseCommandMessageInput(message):
         'mod': 'moderator',
         'broadcaster': 'broadcaster',
         'streamer': 'broadcaster',
+        'me': 'broadcaster',
         'admin': 'admin',
         'twitchadmin': 'admin',
         'staff': 'staff',
         'twitchstaff': 'staff',
         'owner': 'owner',
+        'self': 'owner',
         'bot': 'owner',
         }
     
