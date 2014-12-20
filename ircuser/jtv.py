@@ -10,6 +10,8 @@ def parse(channelData, message):
             channelData.addTwitchStaff(user)
         if type == 'admin':
             channelData.addTwitchAdmin(user)
+        if type == 'global_mod':
+            channelData.addGlobalMod(user)
         if type == 'subscriber':
             channelData.addSubscriber(user)
         if type == 'turbo':

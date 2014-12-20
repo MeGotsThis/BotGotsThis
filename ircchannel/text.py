@@ -17,7 +17,7 @@ def threadCustomCommand(channelData, command, nick, permissions, originalMsg):
         commands = db.getChatCommands(channel, command)
     
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
-                      'admin', 'staff', 'owner',]
+                      'globalMod', 'admin', 'staff', 'owner',]
     for perm in permissionsSet:
         if not perm or permissions[perm]:
             if perm in commands['#global']:
@@ -167,6 +167,10 @@ def parseCommandMessageInput(message):
         'broadcaster': 'broadcaster',
         'streamer': 'broadcaster',
         'me': 'broadcaster',
+        'globalMod': 'globalMod',
+        'globalmod': 'globalMod',
+        'global_mod': 'globalMod',
+        'gmod': 'globalMod',
         'admin': 'admin',
         'twitchadmin': 'admin',
         'staff': 'staff',

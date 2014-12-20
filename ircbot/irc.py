@@ -53,8 +53,8 @@ def ensureServer(channel, priority=float('inf'), eventServer=False):
 
 class ChannelData:
     __slots__ = ['_channel', '_socket', '_twitchStaff', '_twitchAdmin',
-                 '_mods', '_subscribers', '_turboUsers', '_users',
-                 '_sessionData', '_joinPriority']
+                 '_globalMods', '_mods', '_subscribers', '_turboUsers',
+                 '_users', '_sessionData', '_joinPriority']
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
         self._channel = channel
@@ -62,6 +62,7 @@ class ChannelData:
         self._joinPriority = joinPriority
         self._twitchStaff = set()
         self._twitchAdmin = set()
+        self._globalMods = set()
         self._mods = set()
         self._subscribers = set()
         self._turboUsers = set()
@@ -91,6 +92,10 @@ class ChannelData:
     @property
     def twitchAdmin(self):
         return frozenset(self._twitchAdmin)
+    
+    @property
+    def globalMods(self):
+        return frozenset(self._globalMods)
     
     @property
     def mods(self):
@@ -140,6 +145,9 @@ class ChannelData:
     
     def addMod(self, mod):
         self._mods.add(mod)
+    
+    def addGlobalMod(self, mod):
+        self._globalMods.add(mod)
     
     def addTwitchAdmin(self, admin):
         self._twitchAdmin.add(admin)
