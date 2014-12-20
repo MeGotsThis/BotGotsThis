@@ -7,9 +7,9 @@ mainServer = 'irc.twitch.tv'
 eventServer = '199.9.252.26'
 ini = configparser.ConfigParser()
 ini.read('config.ini')
-botnick = ini['BOT']['botnick'].lower()
-password = ini['BOT']['password']
-owner = ini['BOT']['owner'].lower()
+botnick = str(ini['BOT']['botnick']).lower()
+password = str(ini['BOT']['password'])
+owner = str(ini['BOT']['owner']).lower()
 
 modLimit = min(int(ini['BOT']['modLimit']), 100)
 modSpamLimit = min(int(ini['BOT']['modSpamLimit']), 100)
@@ -22,7 +22,7 @@ joinLimit = min(int(ini['BOT']['joinLimit']), 50)
 joinPerSecond = float(ini['BOT']['joinPerSecond'])
 joinPerSecond = joinPerSecond if joinPerSecond > 0 else 20
 
-ircLogFolder = ini['BOT']['ircLogFolder']
-exceptionLog = ini['BOT']['exceptionLog']
+ircLogFolder = str(ini['BOT']['ircLogFolder'])
+exceptionLog = str(ini['BOT']['exceptionLog'])
 if ircLogFolder and not os.path.isdir(ircLogFolder):
     os.mkdir(ircLogFolder)
