@@ -2,6 +2,7 @@
 privatechannel/*
 nohup.out
 *.log
+*.suo
 
 # Ignoring sqlite databases
 *.sqlite*
