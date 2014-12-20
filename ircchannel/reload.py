@@ -11,7 +11,7 @@ def loadThisModule(module):
     return  _ and module != 'ircchannel.reload'
 
 def moduleKey(module):
-    if module == 'database.database':
+    if module == 'database.databasebase':
         return (9, module)
     if module == 'database.factory':
         return (8, module)

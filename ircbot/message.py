@@ -1,6 +1,6 @@
 # Message Queue
 from config import config
-import ircbot.irc
+import ircbot.channeldata
 import threading
 import traceback
 import datetime
