@@ -47,9 +47,6 @@
     <Compile Include="ircchannel\commands.py" />
     <Compile Include="ircchannel\full.py" />
     <Compile Include="ircchannel\mod.py" />
-    <Compile Include="ircchannel\nidoranRed\nidoranRed.py" />
-    <Compile Include="ircchannel\nidoranRed\statExpTable.py" />
-    <Compile Include="ircchannel\nidoranRed\__init__.py" />
     <Compile Include="ircchannel\owner.py" />
     <Compile Include="ircchannel\pyramid.py" />
     <Compile Include="ircchannel\reload.py" />
@@ -70,7 +67,6 @@
     <Folder Include="database\sqlite" />
     <Folder Include="ircbot" />
     <Folder Include="ircchannel" />
-    <Folder Include="ircchannel\nidoranRed" />
     <Folder Include="ircuser" />
     <Folder Include="privatechannel" />
   </ItemGroup>

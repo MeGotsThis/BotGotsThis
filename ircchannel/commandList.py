@@ -1,4 +1,3 @@
-from .nidoranRed import nidoranRed
 from . import broadcaster
 from . import reload
 from . import full
@@ -29,7 +28,6 @@ commands = {
     '!pyramid': (pyramid.commandPyramid, 'broadcaster'),
     '!rpyramid': (pyramid.commandRPyramid, 'broadcaster'),
     '!wall': (wall.commandWall, 'broadcaster'),
-    '!nidoran': (nidoranRed.commandNidoranRed, 'moderator'),
     '!reloadmods': (mod.commandReloadMods, 'moderator'),
     '!status': (mod.commandStatus, 'moderator'),
     '!title': (mod.commandStatus, 'moderator'),
@@ -40,7 +38,6 @@ commands = {
     '!command': (text.commandCommand, 'moderator'),
     '!come': (broadcaster.commandCome, 'ownerChan'),
     '!autojoin': (broadcaster.commandAutoJoin, 'ownerChan'),
-    '!dvs': (nidoranRed.commandDvs, None),
 }
 commandsStartWith = {
     '!pyramid-': (pyramid.commandPyramidLong, 'broadcaster'),
