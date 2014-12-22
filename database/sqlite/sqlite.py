@@ -32,7 +32,10 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
         query = 'SELECT priority FROM auto_join WHERE broadcaster=?'
         cursor.execute(query, (broadcaster,))
         autoJoinRow = cursor.fetchone()
-        priority = autoJoinRow[0] if autoJoinRow is not None else None
+        if autoJoinRow is not None:
+            priority = int(autoJoinRow[0])
+        else:
+            priority = float('-inf')
         cursor.close()
         return priority
     

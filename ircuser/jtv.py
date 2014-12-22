@@ -3,16 +3,19 @@ def parse(channelData, message):
         l = len('The moderators of this room are: ')
         mods = message[l:]
         for mod in mods.split(', '):
+            mod = str(mod)
             channelData.addMod(mod)
     if message.startswith('SPECIALUSER'):
-        _, user, type = message.split(' ')
-        if type == 'staff':
+        user, usertype = message.split(' ')[1:3]
+        user = str(user)
+        usertype = str(usertype)
+        if usertype == 'staff':
             channelData.addTwitchStaff(user)
-        if type == 'admin':
+        if usertype == 'admin':
             channelData.addTwitchAdmin(user)
-        if type == 'global_mod':
+        if usertype == 'global_mod':
             channelData.addGlobalMod(user)
-        if type == 'subscriber':
+        if usertype == 'subscriber':
             channelData.addSubscriber(user)
-        if type == 'turbo':
+        if usertype == 'turbo':
             channelData.addTurboUser(user)

@@ -56,15 +56,15 @@ class SocketThread(threading.Thread):
             try:
                 while self.running:
                     try:
-                        ircmsgs = lastRecv = self._ircsock.recv(2048)
+                        ircmsgs = lastRecv = bytes(self._ircsock.recv(2048))
                         while lastRecv[-2:] != b'\r\n':
-                            lastRecv = self._ircsock.recv(2048)
+                            lastRecv = bytes(self._ircsock.recv(2048))
                             ircmsgs += lastRecv
                         
                         for ircmsg in ircmsgs.split(b'\r\n'):
                             if not ircmsg:
                                 continue
-                            ircmsg = ircmsg.decode('utf-8')
+                            ircmsg = bytes(ircmsg).decode('utf-8')
                             if config.ircLogFolder:
                                 fileName = config.botnick + '-' + self.name
                                 fileName += '.log'
@@ -149,9 +149,9 @@ class SocketThread(threading.Thread):
     def _parseMsg(self, ircmsg):
         if ircmsg.find(' PRIVMSG ') != -1:
             parts = ircmsg.split(' ', 3)
-            nick = parts[0].split('!')[0][1:]
-            where = parts[2]
-            msg = parts[3][1:]
+            nick = str(parts[0].split('!')[0])[1:]
+            where = str(parts[2])
+            msg = str(parts[3])[1:]
             if where[0] == '#' and config.ircLogFolder:
                 fileName = where + '.log'
                 pathArgs = config.ircLogFolder, fileName

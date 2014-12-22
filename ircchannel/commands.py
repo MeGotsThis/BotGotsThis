@@ -45,7 +45,7 @@ def parse(channelData, nick, message):
         'channelModerator': isChanMod,
         }
     
-    command = msgParts[0].lower()
+    command = str(msgParts[0]).lower()
     
     complete = False
     arguments = channelData, nick, message, msgParts, permissions

@@ -8,7 +8,7 @@ class ChannelData:
     def __init__(self, channel, socket, joinPriority=float('inf')):
         self._channel = channel
         self._socket = socket
-        self._joinPriority = joinPriority
+        self._joinPriority = float(joinPriority)
         self._twitchStaff = set()
         self._twitchAdmin = set()
         self._globalMods = set()
@@ -32,7 +32,7 @@ class ChannelData:
     
     @joinPriority.setter
     def joinPriority(self, value):
-        self._joinPriority = value
+        self._joinPriority = float(value)
     
     @property
     def twitchStaff(self):
@@ -68,7 +68,7 @@ class ChannelData:
     
     def part(self):
         self.socket.partChannel(self)
-        messaging.clearQueue(self.channel)
+        ircbot.irc.messaging.clearQueue(self.channel)
         self._socket = None
     
     def sendMessage(self, msg, priority=1):

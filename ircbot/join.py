@@ -36,7 +36,7 @@ class JoinThread(threading.Thread):
                         for chan in chans:
                             channels[chan] = chans[chan]
                 with self._channelsLock:
-                    notJoined = channels.keys() - self._channelJoined
+                    notJoined = set(channels.keys() - self._channelJoined)
                     
                     if not notJoined:
                         time.sleep(1 / config.joinPerSecond)
@@ -87,7 +87,7 @@ class JoinThread(threading.Thread):
     
     @staticmethod
     def _getChannelWithLowestPriority(channelsData, notJoinedChannels):
-        priority = min([channelsData[c].joinPriority
-                        for c in notJoinedChannels])
-        return [c for c in notJoinedChannels
+        priority = float(min([float(channelsData[c].joinPriority)
+                              for c in notJoinedChannels]))
+        return [str(c) for c in notJoinedChannels
                 if channelsData[c].joinPriority == priority][0]

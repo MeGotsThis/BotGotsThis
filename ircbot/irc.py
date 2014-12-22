@@ -34,10 +34,10 @@ def partChannel(channel):
         channels[channel].part()
         del channels[channel]
 
-ENSURE_REJOIN_TO_MAIN = -2
-ENSURE_REJOIN_TO_EVENT = -1
-ENSURE_CORRECT = 0
-ENSURE_NOT_JOINED = 1
+ENSURE_REJOIN_TO_MAIN = int(-2)
+ENSURE_REJOIN_TO_EVENT = int(-1)
+ENSURE_CORRECT = int(0)
+ENSURE_NOT_JOINED = int(1)
 
 def ensureServer(channel, priority=float('inf'), eventServer=False):
     if channel[0] != '#':

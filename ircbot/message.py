@@ -71,10 +71,10 @@ class MessageQueue(threading.Thread):
         botnick = config.botnick
         self._timesSent = [t for t in self._timesSent
                            if datetime.datetime.utcnow() - t <= msgDuration]
-        isModGood = len(self._timesSent) < config.modLimit
-        isModSpamGood = len(self._timesSent) < config.modSpamLimit
+        isModGood = int(len(self._timesSent)) < config.modLimit
+        isModSpamGood = int(len(self._timesSent)) < config.modSpamLimit
         _ = self._publicTime + publicDelay <= datetime.datetime.utcnow()
-        isPublicGood = _ and len(self._timesSent) < config.publicLimit
+        isPublicGood = _ and int(len(self._timesSent)) < config.publicLimit
         
         msg = None
         with self._queueLock:
@@ -134,7 +134,7 @@ class MessageQueue(threading.Thread):
     
     @staticmethod
     def _isModInChannel(msgQueue):
-        isMod = config.botnick in msgQueue[0].mods
+        isMod = bool(config.botnick in msgQueue[0].mods)
         isMod = isMod or '#' + config.botnick == msgQueue[0].channel
         return isMod
     

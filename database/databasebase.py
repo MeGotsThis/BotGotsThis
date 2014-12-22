@@ -23,9 +23,13 @@ class DatabaseBase:
     
     def getAutoJoinsChats(self):
         return []
+        # How to trick Intellisense
+        return [{'broadcaster': '',
+                 'priority': float('inf'),
+                 'eventserver': False}]
     
     def getAutoJoinsPriority(self, broadcaster):
-        return None
+        return float('inf')
     
     def saveAutoJoin(self, broadcaster, priority=0, useEvent=False):
         return False
