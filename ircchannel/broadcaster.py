@@ -21,7 +21,7 @@ def commandCome(channelData, nick, message, msgParts, permissions):
 def threadCome(channelData, nick):
     with database.factory.getDatabase() as db:
         priority = db.getAutoJoinsPriority(nick)
-    priority = priority if priority is not None else float('-inf')
+    priority = priority if priority is not None else float('inf')
     
     response, data = ircbot.twitchApi.twitchCall(
         None, 'GET', '/api/channels/' + nick + '/chat_properties')

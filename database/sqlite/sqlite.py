@@ -35,7 +35,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
         if autoJoinRow is not None:
             priority = int(autoJoinRow[0])
         else:
-            priority = float('-inf')
+            priority = float('inf')
         cursor.close()
         return priority
     

@@ -37,7 +37,7 @@ def threadJoin(channelData, msgParts):
     
     with database.factory.getDatabase() as db:
         priority = db.getAutoJoinsPriority(chan)
-    priority = priority if priority is not None else float('-inf')
+    priority = priority if priority is not None else float('inf')
     
     response, data = ircbot.twitchApi.twitchCall(
         None, 'GET', '/api/channels/' + chan + '/chat_properties')
