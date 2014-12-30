@@ -26,7 +26,6 @@ def threadStatus(channelData, msgParts):
         channelData.sendMessage('Channel Status set as: ' + msgParts[1])
     else:
         channelData.sendMessage('Channel Status failed to set')
-    return True
 
 def commandGame(channelData, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)

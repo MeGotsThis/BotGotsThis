@@ -58,7 +58,6 @@ def threadJoin(channelData, msgParts):
         elif result == ircbot.irc.ENSURE_REJOIN_TO_EVENT:
             msg = 'Moved ' + chan[1:] + ' to event chat server'
             channelData.sendMessage(msg)
-    return True
 
 def commandPart(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
