@@ -1,6 +1,8 @@
+from config import config
 import database.factory
 import ircbot.irc
 import threading
+import datetime
 import re
 
 def customCommands(channelData, nick, message, msgParts, permissions):
@@ -26,6 +28,26 @@ def threadCustomCommand(channelData, command, nick, permissions, originalMsg):
                 message = commands[channel][perm]
     
     if message:
+        currentTime = datetime.datetime.utcnow()
+        cooldown = datetime.timedelta(seconds=config.customMessageCooldown)
+        if (not permissions['moderator'] and
+            'customCommand' in channelData.sessionData):
+            since = currentTime - channelData.sessionData['customCommand']
+            if since < cooldown:
+                return
+        channelData.sessionData['customCommand'] = currentTime
+
+        cooldown = datetime.timedelta(seconds=config.customMessageUserCooldown)
+        if 'customUserCommand' not in channelData.sessionData:
+            channelData.sessionData['customUserCommand'] = {}
+        if (not permissions['moderator'] and
+            nick in channelData.sessionData['customUserCommand']):
+            oldTime = channelData.sessionData['customUserCommand'][nick]
+            since = currentTime - oldTime
+            if since < cooldown:
+                return
+        channelData.sessionData['customUserCommand'][nick] = currentTime
+        
         message.replace('{user}', nick)
         message.replace('{query}', originalMsg)
         def paramReplace(matchobj):

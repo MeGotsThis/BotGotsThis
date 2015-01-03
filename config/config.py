@@ -18,6 +18,13 @@ publicDelay = float(ini['BOT']['publicDelay'])
 messagePerSecond = float(ini['BOT']['messagePerSecond'])
 messagePerSecond = messagePerSecond if messagePerSecond > 0 else 20
 
+customMessageCooldown = float(ini['BOT']['customMessageCooldown'])
+if customMessageCooldown <= 0:
+    customMessageCooldown = 20
+customMessageUserCooldown = float(ini['BOT']['customMessageUserCooldown'])
+if customMessageUserCooldown <= 0:
+    customMessageUserCooldown = 20
+
 joinLimit = min(int(ini['BOT']['joinLimit']), 50)
 joinPerSecond = float(ini['BOT']['joinPerSecond'])
 joinPerSecond = joinPerSecond if joinPerSecond > 0 else 20
