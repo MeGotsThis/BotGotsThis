@@ -114,7 +114,12 @@ class SocketThread(threading.Thread):
             with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
                 file.write(now + command.decode('utf-8'))
             if channel:
-                fileName = channel + '.log'
+                fileName = channel + '#full.log'
+                pathArgs = config.ircLogFolder, fileName
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write(now + command.decode('utf-8'))
+                fileName = channel + '#msg.log'
                 pathArgs = config.ircLogFolder, fileName
                 with open(os.path.join(*pathArgs), 'a',
                           encoding='utf-8') as file:
@@ -153,7 +158,15 @@ class SocketThread(threading.Thread):
             where = str(parts[2])
             msg = str(parts[3])[1:]
             if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '.log'
+                fileName = where + '#full.log'
+                pathArgs = config.ircLogFolder, fileName
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write(now + ircmsg + '\n')
+            if where[0] == '#' and config.ircLogFolder and nick != 'jtv':
+                fileName = where + '#msg.log'
                 pathArgs = config.ircLogFolder, fileName
                 dtnow = datetime.datetime.now()
                 now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
