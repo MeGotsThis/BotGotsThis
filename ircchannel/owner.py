@@ -99,7 +99,7 @@ def commandManageBot(channelData, nick, message, msgParts, permissions):
         list(privatechannel.manageBot.methods.items()))
     threadMethods = dict(
         list(threadMethods.items()) +
-        list(privatechannel.commandList.threadMethods.items()))
+        list(privatechannel.manageBot.threadMethods.items()))
 
     params = channelData, message, msgParts
     
