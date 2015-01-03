@@ -1,4 +1,5 @@
 from config import config
+import privatechannel.manageBot
 import database.factory
 import ircbot.irc
 import threading
@@ -92,6 +93,14 @@ def commandManageBot(channelData, nick, message, msgParts, permissions):
     threadMethods = {
         'autojoin': threadManageAutoJoin,
         }
+
+    methods = dict(
+        list(methods.items()) + 
+        list(privatechannel.manageBot.methods.items()))
+    threadMethods = dict(
+        list(threadMethods.items()) +
+        list(privatechannel.commandList.threadMethods.items()))
+
     params = channelData, message, msgParts
     
     if msgParts[1].lower() in methods:
