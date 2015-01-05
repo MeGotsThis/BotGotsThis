@@ -57,7 +57,7 @@ class SocketThread(threading.Thread):
                 while self.running:
                     try:
                         ircmsgs = lastRecv = bytes(self._ircsock.recv(2048))
-                        while lastRecv[-2:] != b'\r\n':
+                        while lastRecv != b'' and lastRecv[-2:] != b'\r\n':
                             lastRecv = bytes(self._ircsock.recv(2048))
                             ircmsgs += lastRecv
                         
