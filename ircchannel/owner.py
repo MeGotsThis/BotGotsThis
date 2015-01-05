@@ -77,7 +77,7 @@ def commandEmptyAll(channelData, nick, message, msgParts, permissions):
 
 def commandEmpty(channelData, nick, message, msgParts, permissions):
     if msgParts[1][0] != '#':
-        msgParts[1] = '#' + msgParts[1]
+        msgParts[1] = '#' + msgParts[1].lower()
     ircbot.irc.messaging.clearQueue(msgParts[1])
     channelData.sendMessage(
         'Cleared all queued messages for ' + msgParts[1][1:])
