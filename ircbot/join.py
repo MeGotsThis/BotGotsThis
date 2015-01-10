@@ -16,7 +16,7 @@ class JoinThread(threading.Thread):
         self._channelsLock = threading.Lock()
     
     def run(self):
-        print('Starting SocketJoinThread')
+        print(str(datetime.datetime.now()) + ' Starting SocketJoinThread')
         joinDuration = datetime.timedelta(seconds=10.05)
         running = lambda st: st.running
         while any(map(running, self._socketThreads)):
@@ -54,7 +54,8 @@ class JoinThread(threading.Thread):
                     
                     channelData.sendMessage('.mods')
                     
-                    print('Joined ' + channelData.channel + ' on ' +
+                    print(str(datetime.datetime.now()) + ' Joined ' +
+                          channelData.channel + ' on ' +
                           channelData.socket.name)
                 
                 time.sleep(1 / config.joinPerSecond)
@@ -68,7 +69,7 @@ class JoinThread(threading.Thread):
                               encoding='utf-8') as file:
                         file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
                         file.write(' ' + ''.join(_))
-        print('Ending SocketJoinThread')
+        print(str(datetime.datetime.now()) + ' Ending SocketJoinThread')
     
     def add(self, socketThread):
         self._socketThreads.append(socketThread)

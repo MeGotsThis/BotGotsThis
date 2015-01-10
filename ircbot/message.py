@@ -35,7 +35,7 @@ class MessageQueue(threading.Thread):
                 self._queues[priority].append((channelData, message))
     
     def run(self):
-        print('Starting MessageQueue')
+        print(str(datetime.datetime.now()) + ' Starting MessageQueue')
         try:
             while self.running:
                 msg = self._getMessage()
@@ -63,7 +63,7 @@ class MessageQueue(threading.Thread):
             ircbot.irc.mainChat.running = False
             ircbot.irc.eventChat.running = False
             ircbot.irc.join.running = False
-            print('Ending MessageQueue')
+            print(str(datetime.datetime.now()) + ' Ending MessageQueue')
     
     def _getMessage(self):
         msgDuration = datetime.timedelta(seconds=30.1)

@@ -7,7 +7,7 @@ import datetime
 import sys
 import time
 
-print('Starting')
+print(str(datetime.datetime.now()) + ' Starting')
 ircbot.irc.mainChat.start()
 ircbot.irc.eventChat.start()
 ircbot.irc.messaging.start()
@@ -36,4 +36,4 @@ except:
             file.write(' ' + ''.join(_))
     raise
 finally:
-    print('Ended')
+    print(str(datetime.datetime.now()) + ' Ended')

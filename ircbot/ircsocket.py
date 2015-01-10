@@ -37,7 +37,8 @@ class SocketThread(threading.Thread):
         self._running = value
     
     def run(self):
-        print('Starting SocketThread ' + self.name)
+        print(str(datetime.datetime.now()) + ' Starting SocketThread ' +
+              self.name)
         
         while self.running:
             self._ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,11 +46,12 @@ class SocketThread(threading.Thread):
             try:
                 self._connect()
             except socket.error as e:
-                print(e)
+                print(str(datetime.datetime.now()) + ' ' + self.name + ' ' + e)
                 time.sleep(5)
                 continue
             self.lastPing = datetime.datetime.now()
-            print(self.name + ' Connected ' + self._server)
+            print(str(datetime.datetime.now()) + ' ' + self.name +
+                  ' Connected ' + self._server)
             
             ircbot.irc.join.connected(self)
             self._isConnected = True
@@ -98,9 +100,11 @@ class SocketThread(threading.Thread):
                 self._ircsock.close()
             self._isConnected = False
             ircbot.irc.join.disconnected(self)
-            print(self.name + ' Disconnected ' + self._server)
+            print(str(datetime.datetime.now()) + ' ' +  self.name +
+                  ' Disconnected ' + self._server)
             time.sleep(5)
-        print('Ending SocketThread ' + self.name)
+        print(str(datetime.datetime.now()) + ' Ending SocketThread ' +
+              self.name)
     
     def sendIrcCommand(self, command, channel=None):
         if type(command) is str:
@@ -145,7 +149,7 @@ class SocketThread(threading.Thread):
                                 channelData.channel)
             del self._channels[channelData.channel]
         ircbot.irc.join.part(channelData.channel)
-        print('Parted ' + channelData.channel)
+        print(str(datetime.datetime.now()) + ' Parted ' + channelData.channel)
     
     def ping(self):
         self.sendIrcCommand('PONG :pingis\n')

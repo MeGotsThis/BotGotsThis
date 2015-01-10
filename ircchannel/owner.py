@@ -137,7 +137,8 @@ def threadManageAutoJoin(channelData, message, msgParts):
                     params += chatProperties['eventchat'],
                     rejoin = ircbot.irc.ensureServer(*params)
                     
-                    print('Set Server for ' + channelRow['broadcaster'])
+                    print(str(datetime.datetime.now()) + ' Set Server for ' +
+                          channelRow['broadcaster'])
         channelData.sendMessage('Auto Join reload server complete')
     
     if len(msgParts) < 4:
