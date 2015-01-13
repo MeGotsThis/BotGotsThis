@@ -48,8 +48,8 @@ def threadCustomCommand(channelData, command, nick, permissions, originalMsg):
                 return
         channelData.sessionData['customUserCommand'][nick] = currentTime
         
-        message.replace('{user}', nick)
-        message.replace('{query}', originalMsg)
+        message = message.replace('{user}', nick)
+        message = message.replace('{query}', originalMsg.split(None, 1)[1])
         def paramReplace(matchobj):
             matchParts = matchobj.groups()
             if matchParts[1] is not None:
@@ -62,7 +62,7 @@ def threadCustomCommand(channelData, command, nick, permissions, originalMsg):
                 else:
                     s = originalMsg.split(None, i)[i]
                     j = int(matchParts[3])
-                    if len(msgParts) <= j:
+                    if len(msgParts) > j:
                         return s.rsplit(None, len(msgParts) - j - 1)[0]
                     else:
                         return s
