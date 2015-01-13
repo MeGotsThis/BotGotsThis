@@ -26,12 +26,16 @@ class MessageQueue(threading.Thread):
         self._running = value
     
     def queueMessage(self, channelData, message, priority):
+        if not message:
+            return
         with self._queueLock:
             self._queues[priority].append((channelData, message))
     
     def queueMultipleMessages(self, channelData, messages, priority):
         with self._queueLock:
             for message in messages:
+                if not message:
+                    continue
                 self._queues[priority].append((channelData, message))
     
     def run(self):
