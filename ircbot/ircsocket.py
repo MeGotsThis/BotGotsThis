@@ -49,6 +49,7 @@ class SocketThread(threading.Thread):
                 print(str(datetime.datetime.now()) + ' ' + self.name + ' ' + e)
                 time.sleep(5)
                 continue
+            self.lastSentPing = datetime.datetime.now()
             self.lastPing = datetime.datetime.now()
             print(str(datetime.datetime.now()) + ' ' + self.name +
                   ' Connected ' + self._server)
@@ -79,8 +80,12 @@ class SocketThread(threading.Thread):
                             self._parseMsg(ircmsg)
                     except socket.timeout as e:
                         pass
+                    sinceLastSend = datetime.datetime.now() - self.lastSentPing
                     sinceLast = datetime.datetime.now() - self.lastPing
-                    if sinceLast >= datetime.timedelta(minutes=6):
+                    if sinceLastSend >= datetime.timedelta(minutes=1):
+                        self.sendIrcCommand('PING ' + config.botnick + '\n')
+                        self.lastSentPing = datetime.datetime.now()
+                    elif sinceLast >= datetime.timedelta(minutes=1,seconds=15):
                         raise NoPingException()
             except NoPingException:
                 pass
@@ -191,6 +196,10 @@ class SocketThread(threading.Thread):
         
         if ircmsg.find('PING :') != -1:
             self.ping()
+            return
+        
+        if ircmsg.find(' PONG ') != -1:
+            self.lastPing = datetime.datetime.now()
             return
 
 
