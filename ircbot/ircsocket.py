@@ -145,7 +145,7 @@ class SocketThread(threading.Thread):
                           encoding='utf-8') as file:
                     file.write(now + command.decode('utf-8'))
                 if command.startswith(b'PRIVMSG'):
-                    now = dtnow.strftime('%Y-%m-%d %H:%M:%S.%f ')
+                    now = dtnow.strftime('[%Y-%m-%d %H:%M:%S.%f] ')
                     fileName = channel + '#msg.log'
                     pathArgs = config.ircLogFolder, fileName
                     with open(os.path.join(*pathArgs), 'a',
@@ -197,7 +197,7 @@ class SocketThread(threading.Thread):
                 fileName = where + '#msg.log'
                 pathArgs = config.ircLogFolder, fileName
                 dtnow = datetime.datetime.now()
-                now = dtnow.strftime('%Y-%m-%d %H:%M:%S.%f ')
+                now = dtnow.strftime('[%Y-%m-%d %H:%M:%S.%f] ')
                 with open(os.path.join(*pathArgs), 'a',
                           encoding='utf-8') as file:
                     file.write(now + nick + ': ' + msg + '\n')
