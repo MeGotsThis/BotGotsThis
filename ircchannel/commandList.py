@@ -1,47 +1,50 @@
-from . import broadcaster
-from . import reload
-from . import full
-from . import owner
-from . import pyramid
-from . import wall
-from . import mod
-from . import text
+import ircchannel.broadcaster
+import ircchannel.reload
+import ircchannel.full
+import ircchannel.owner
+import ircchannel.pyramid
+import ircchannel.wall
+import ircchannel.mod
+import ircchannel.text
 import privatechannel.commandList
 
 commands = {
-    '!exit': (owner.commandExit, 'owner+ownerChan'),
-    '!managebot': (owner.commandManageBot, 'owner+ownerChan'),
-    '!reload': (reload.commandReload, 'owner+ownerChan'),
-    '!reloadcommands': (reload.commandReloadCommands, 'owner+ownerChan'),
-    '!reloadconfig': (reload.commandReloadConfig, 'owner+ownerChan'),
-    '!reloadallmods': (reload.commandReloadAllMods, 'owner+ownerChan'),
-    '!join': (owner.commandJoin, 'admin+ownerChan'),
-    '!part': (owner.commandPart, 'admin+ownerChan'),
-    '!emptychat': (owner.commandEmpty, 'admin+ownerChan'),
-    '!emptyall': (owner.commandEmptyAll, 'admin+ownerChan'),
-    '!global': (text.commandCommand, 'admin+ownerChan'),
-    '!full': (full.commandFull, 'owner'),
-    '!say': (owner.commandSay, 'owner'),
-    '!hello': (broadcaster.commandHello, 'broadcaster'),
-    '!leave': (broadcaster.commandLeave, 'broadcaster'),
-    '!empty': (broadcaster.commandEmpty, 'broadcaster'),
-    '!pyramid': (pyramid.commandPyramid, 'broadcaster'),
-    '!rpyramid': (pyramid.commandRPyramid, 'broadcaster'),
-    '!wall': (wall.commandWall, 'broadcaster'),
-    '!reloadmods': (mod.commandReloadMods, 'moderator'),
-    '!status': (mod.commandStatus, 'moderator'),
-    '!title': (mod.commandStatus, 'moderator'),
-    '!game': (mod.commandGame, 'moderator'),
-    '!setgame': (mod.commandGame, 'moderator'),
-    '!purge': (mod.commandPurge, 'moderator'),
-    '!rekt': (mod.commandPurge, 'moderator'),
-    '!command': (text.commandCommand, 'moderator'),
-    '!come': (broadcaster.commandCome, 'ownerChan'),
-    '!autojoin': (broadcaster.commandAutoJoin, 'ownerChan'),
+    '!exit': (ircchannel.owner.commandExit, 'owner+ownerChan'),
+    '!managebot': (ircchannel.owner.commandManageBot, 'owner+ownerChan'),
+    '!reload': (ircchannel.reload.commandReload, 'owner+ownerChan'),
+    '!reloadcommands':
+    (ircchannel.reload.commandReloadCommands, 'owner+ownerChan'),
+    '!reloadconfig':
+    (ircchannel.reload.commandReloadConfig, 'owner+ownerChan'),
+    '!reloadallmods':
+    (ircchannel.reload.commandReloadAllMods, 'owner+ownerChan'),
+    '!join': (ircchannel.owner.commandJoin, 'admin+ownerChan'),
+    '!part': (ircchannel.owner.commandPart, 'admin+ownerChan'),
+    '!emptychat': (ircchannel.owner.commandEmpty, 'admin+ownerChan'),
+    '!emptyall': (ircchannel.owner.commandEmptyAll, 'admin+ownerChan'),
+    '!global': (ircchannel.text.commandCommand, 'admin+ownerChan'),
+    '!full': (ircchannel.full.commandFull, 'owner'),
+    '!say': (ircchannel.owner.commandSay, 'owner'),
+    '!hello': (ircchannel.broadcaster.commandHello, 'broadcaster'),
+    '!leave': (ircchannel.broadcaster.commandLeave, 'broadcaster'),
+    '!empty': (ircchannel.broadcaster.commandEmpty, 'broadcaster'),
+    '!pyramid': (ircchannel.pyramid.commandPyramid, 'broadcaster'),
+    '!rpyramid': (ircchannel.pyramid.commandRPyramid, 'broadcaster'),
+    '!wall': (ircchannel.wall.commandWall, 'broadcaster'),
+    '!reloadmods': (ircchannel.mod.commandReloadMods, 'moderator'),
+    '!status': (ircchannel.mod.commandStatus, 'moderator'),
+    '!title': (ircchannel.mod.commandStatus, 'moderator'),
+    '!game': (ircchannel.mod.commandGame, 'moderator'),
+    '!setgame': (ircchannel.mod.commandGame, 'moderator'),
+    '!purge': (ircchannel.mod.commandPurge, 'moderator'),
+    '!rekt': (ircchannel.mod.commandPurge, 'moderator'),
+    '!command': (ircchannel.text.commandCommand, 'moderator'),
+    '!come': (ircchannel.broadcaster.commandCome, 'ownerChan'),
+    '!autojoin': (ircchannel.broadcaster.commandAutoJoin, 'ownerChan'),
 }
 commandsStartWith = {
-    '!pyramid-': (pyramid.commandPyramidLong, 'broadcaster'),
-    '!wall-': (wall.commandWallLong, 'broadcaster'),
+    '!pyramid-': (ircchannel.pyramid.commandPyramidLong, 'broadcaster'),
+    '!wall-': (ircchannel.wall.commandWallLong, 'broadcaster'),
 }
 
 commands = dict(
