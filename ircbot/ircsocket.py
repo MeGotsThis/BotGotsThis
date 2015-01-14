@@ -114,7 +114,20 @@ class SocketThread(threading.Thread):
     def sendIrcCommand(self, command, channel=None):
         if type(command) is str:
             command = command.encode('utf-8')
-        self._ircsock.send(command[:2048])
+        try:
+            self._ircsock.send(command[:2048])
+        except socket.error:
+            now = datetime.datetime.now()
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            _ = traceback.format_exception(
+                exc_type, exc_value, exc_traceback)
+            if config.exceptionLog is not None:
+                with open(config.exceptionLog, 'a',
+                            encoding='utf-8') as file:
+                    file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
+                    file.write(' ' + ''.join(_))
+            self._isConnected = False
+        
         if config.ircLogFolder:
             fileName = config.botnick + '-' + self.name + '.log'
             pathArgs = config.ircLogFolder, fileName
