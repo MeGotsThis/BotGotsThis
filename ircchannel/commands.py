@@ -6,6 +6,7 @@ import ircuser.jtv
 import ircbot.irc
 import threading
 import datetime
+import time
 
 # Set up our commands function
 def parse(channelData, nick, message):
