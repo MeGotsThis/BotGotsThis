@@ -1,17 +1,11 @@
 from config import config
 import database.factory
 import ircbot.irc
-import threading
 import datetime
 import re
 
-def customCommands(channelData, nick, message, msgParts, permissions):
+def customCommands(channelData, nick, originalMsg, msgParts, permissions):
     command = msgParts[0].lower()
-    params = channelData, command, nick, permissions, message
-    threading.Thread(target=threadCustomCommand, args=params).start()
-    return True
-
-def threadCustomCommand(channelData, command, nick, permissions, originalMsg):
     channel = channelData.channel[1:]
     message = None
     
@@ -106,12 +100,6 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
     if com == '!global':
         broadcaster = '#global'
     
-    params = [channelData, broadcaster, nick, permissions,
-              action, level, command, fullText]
-    threading.Thread(target=threadCommand, args=params).start()
-
-def threadCommand(channelData, broadcaster, nick, permissions,
-                  action, level, command, fullText):
     if level == False:
         channelData.sendMessage(nick + ' -> Invalid level, command ignored')
         return

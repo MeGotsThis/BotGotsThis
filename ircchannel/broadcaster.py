@@ -2,7 +2,6 @@ from config import config
 import database.factory
 import ircbot.twitchApi
 import ircbot.irc
-import threading
 import time
 import json
 
@@ -14,11 +13,7 @@ def commandCome(channelData, nick, message, msgParts, permissions):
     if ('#' + nick) in ircbot.irc.channels:
         channelData.sendMessage('I am already in ' + nick)
         return True
-    params = channelData, nick
-    threading.Thread(target=threadCome, args=params).start()
-    return True
-
-def threadCome(channelData, nick):
+    
     with database.factory.getDatabase() as db:
         priority = db.getAutoJoinsPriority(nick)
     priority = priority if priority is not None else float('inf')
@@ -61,14 +56,16 @@ def commandAutoJoin(channelData, nick, message, msgParts, permissions):
         removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
                       'leave', 'part']
         if msgParts[1].lower() in removeMsgs:
-            params = channelData, nick
-            threading.Thread(target=threadDeleteAutoJoin, args=params).start()
+            with database.factory.getDatabase() as db:
+                result = db.discardAutoJoin(nick)
+                if result:
+                    channelData.sendMessage(
+                        'Auto join for ' + nick + ' is now disabled')
+                else:
+                    channelData.sendMessage(
+                        'Auto join for ' + nick + ' was never enabled')
             return True
-    params = channelData, nick
-    threading.Thread(target=threadInsertAutoJoin, args=params).start()
-    return True
-
-def threadInsertAutoJoin(channelData, nick):
+    
     response, data = ircbot.twitchApi.twitchCall(
         None, 'GET', '/api/channels/' + nick + '/chat_properties')
     chatProperties = json.loads(data.decode('utf-8'))
@@ -109,13 +106,4 @@ def threadInsertAutoJoin(channelData, nick):
             msg = 'Auto join for ' + nick
             msg += ' is already enabled and already in chat'
         channelData.sendMessage(msg)
-
-def threadDeleteAutoJoin(channelData, nick):
-    with database.factory.getDatabase() as db:
-        result = db.discardAutoJoin(nick)
-        if result:
-            channelData.sendMessage(
-                'Auto join for ' + nick + ' is now disabled')
-        else:
-            channelData.sendMessage(
-                'Auto join for ' + nick + ' was never enabled')
+    return True

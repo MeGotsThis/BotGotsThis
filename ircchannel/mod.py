@@ -7,11 +7,7 @@ def commandStatus(channelData, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         return False
-    params = channelData, msgParts
-    threading.Thread(target=threadStatus, args=params).start()
-    return True
-
-def threadStatus(channelData, msgParts):
+    
     if config.oauth.getOAuthToken(channelData.channel) is None:
         return False
     chan = channelData.channel[1:]
@@ -26,16 +22,13 @@ def threadStatus(channelData, msgParts):
         channelData.sendMessage('Channel Status set as: ' + msgParts[1])
     else:
         channelData.sendMessage('Channel Status failed to set')
+    return True
 
 def commandGame(channelData, nick, message, msgParts, permissions):
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         msgParts.append('')
-    params = channelData, msgParts
-    threading.Thread(target=threadGame, args=params).start()
-    return True
-
-def threadGame(channelData, msgParts):
+    
     if config.oauth.getOAuthToken(channelData.channel) is None:
         return False
     if msgParts[0].lower() == '!game':
@@ -60,6 +53,7 @@ def threadGame(channelData, msgParts):
             channelData.sendMessage('Channel Game has been unset')
     else:
         channelData.sendMessage('Channel Game failed to set')
+    return True
 
 def commandPurge(channelData, nick, message, msgParts, permissions):
     if permissions['channelModerator'] and len(msgParts) > 1:

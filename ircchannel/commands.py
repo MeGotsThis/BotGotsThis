@@ -1,8 +1,10 @@
 ﻿from config import config
 import ircchannel.commandList
+import ircbot.channeldata
 import ircchannel.text
 import ircuser.jtv
 import ircbot.irc
+import threading
 import datetime
 
 # Set up our commands function
@@ -17,6 +19,18 @@ def parse(channelData, nick, message):
     if len(msgParts) == 0:
         return
     
+    name = channelData.channel + '-' + str(msgParts[0]) + '-'
+    name += str(time.time())
+    params = channelData, nick, message, msgParts
+    threading.Thread(target=threadParse, args=params, name=name).start()
+    
+def threadParse(channelData, nick, message, msgParts):
+    if False: # Hints for Intellisense
+        channelData = ircbot.channeldata.ChannelData('', None)
+        nick = str()
+        message = str()
+        msgParts = [str(), str()]
+
     if config.owner is not None:
         isOwner = nick == config.owner.lower()
         _ = channelData.channel == '#' + config.botnick

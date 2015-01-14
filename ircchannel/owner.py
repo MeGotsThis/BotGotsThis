@@ -2,7 +2,6 @@ from config import config
 import privatechannel.manageBot
 import database.factory
 import ircbot.irc
-import threading
 import datetime
 import time
 import json
@@ -29,11 +28,7 @@ def commandSay(channelData, nick, message, msgParts, permissions):
 def commandJoin(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
-    params = channelData, msgParts
-    threading.Thread(target=threadJoin, args=params).start()
-    return True
 
-def threadJoin(channelData, msgParts):
     chan = msgParts[1].lower()
     
     with database.factory.getDatabase() as db:
@@ -89,35 +84,27 @@ def commandManageBot(channelData, nick, message, msgParts, permissions):
     
     methods = {
         'listchats': manageListChats,
-        }
-    threadMethods = {
-        'autojoin': threadManageAutoJoin,
+        'autojoin': manageAutoJoin,
         }
 
     methods = dict(
         list(methods.items()) + 
         list(privatechannel.manageBot.methods.items()))
-    threadMethods = dict(
-        list(threadMethods.items()) +
-        list(privatechannel.manageBot.threadMethods.items()))
 
     params = channelData, message, msgParts
     
     if msgParts[1].lower() in methods:
-        methods[msgParts[1].lower()](*params)
-    elif msgParts[1].lower() in threadMethods:
-        threading.Thread(
-            target=threadMethods[msgParts[1].lower()], args=params).start()
-    
-    return True
+        return methods[msgParts[1].lower()](*params)
+    return False
 
 def manageListChats(channelData, message, msgParts):
     channels = [c[1:] for c in ircbot.irc.channels.keys()]
     channelData.sendMessage('Twitch Chats: ' + ', '.join(channels))
+    return True
 
-def threadManageAutoJoin(channelData, message, msgParts):
+def manageAutoJoin(channelData, message, msgParts):
     if len(msgParts) < 3:
-        return
+        return False
     if msgParts[2] in ['reloadserver']:
         with database.factory.getDatabase() as db:
             for channelRow in db.getAutoJoinsChats():
@@ -140,9 +127,10 @@ def threadManageAutoJoin(channelData, message, msgParts):
                     print(str(datetime.datetime.now()) + ' Set Server for ' +
                           channelRow['broadcaster'])
         channelData.sendMessage('Auto Join reload server complete')
+        return True
     
     if len(msgParts) < 4:
-        return
+        return False
     msgParts[3] = msgParts[3].lower()
     if msgParts[2] in ['add', 'insert', 'join']:
         response, data = ircbot.twitchApi.twitchCall(
@@ -187,6 +175,7 @@ def threadManageAutoJoin(channelData, message, msgParts):
                 msg = 'Auto join for ' + msgParts[3]
                 msg += ' is already enabled and already in chat'
             channelData.sendMessage(msg)
+        return True
     if msgParts[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
         with database.factory.getDatabase() as db:
             result = db.discardAutoJoin(msgParts[3])
@@ -196,6 +185,7 @@ def threadManageAutoJoin(channelData, message, msgParts):
             else:
                 channelData.sendMessage(
                     'Auto join for ' + msgParts[3] + ' was never enabled')
+        return True
     if msgParts[2] in ['pri', 'priority']:
         try:
             priority = int(msgParts[4])
@@ -210,3 +200,5 @@ def threadManageAutoJoin(channelData, message, msgParts):
             else:
                 channelData.sendMessage(
                     'Auto join for ' + msgParts[3] + ' was never enabled')
+        return True
+    return False
