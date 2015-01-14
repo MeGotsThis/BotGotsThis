@@ -28,12 +28,13 @@ except:
     ircbot.irc.messaging.running = False
     now = datetime.datetime.now()
     exc_type, exc_value, exc_traceback = sys.exc_info()
-    traceback.print_exception(exc_type, exc_value, exc_traceback)
-    _ = traceback.format_exception(exc_type, exc_value, exc_traceback)
+    _ = traceback.format_exception(*sys.exc_info())
     if config.exceptionLog is not None:
         with open(config.exceptionLog, 'a', encoding='utf-8') as file:
             file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-            file.write(' ' + ''.join(_))
+            file.write('Exception in thread ')
+            file.write(threading.current_thread().name + ':\n')
+            file.write(''.join(_))
     raise
 finally:
     print(str(datetime.datetime.now()) + ' Ended')

@@ -5,10 +5,12 @@ import ircbot.message
 import ircbot.join
 
 # Import some necessary libraries.
-messaging = ircbot.message.MessageQueue()
-mainChat = ircbot.ircsocket.SocketThread(config.mainServer, name='Main Chat')
-eventChat = ircbot.ircsocket.SocketThread(config.eventServer, name='Event Chat')
-join = ircbot.join.JoinThread()
+messaging = ircbot.message.MessageQueue(name='Message Queue')
+mainChat = ircbot.ircsocket.SocketThread(config.mainServer,
+                                         name='Main Chat')
+eventChat = ircbot.ircsocket.SocketThread(config.eventServer,
+                                          name='Event Chat')
+join = ircbot.join.JoinThread(name='Join Thread')
 join.add(mainChat)
 join.add(eventChat)
 channels = {}

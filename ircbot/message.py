@@ -8,8 +8,8 @@ import time
 import sys
 
 class MessageQueue(threading.Thread):
-    def __init__(self, *args):
-        threading.Thread.__init__(self, *args)
+    def __init__(self, **args):
+        threading.Thread.__init__(self, **args)
         self._queues = [[], [], []]
         self._lowQueueRecent = []
         self._timesSent = []
@@ -56,12 +56,13 @@ class MessageQueue(threading.Thread):
                 time.sleep(1 / config.messagePerSecond)
         except Exception as e:
             now = datetime.datetime.now()
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            _ = traceback.format_exception(exc_type, exc_value, exc_traceback)
+            _ = traceback.format_exception(*sys.exc_info())
             if config.exceptionLog is not None:
                 with open(config.exceptionLog, 'a', encoding='utf-8') as file:
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                    file.write(' ' + ''.join(_))
+                    file.write('Exception in thread ')
+                    file.write(threading.current_thread().name + ':\n')
+                    file.write(''.join(_))
             raise
         finally:
             ircbot.irc.mainChat.running = False

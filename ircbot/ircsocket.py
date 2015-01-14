@@ -93,14 +93,14 @@ class SocketThread(threading.Thread):
                 pass
             except Exception as e:
                 now = datetime.datetime.now()
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                _ = traceback.format_exception(
-                    exc_type, exc_value, exc_traceback)
+                _ = traceback.format_exception(*sys.exc_info())
                 if config.exceptionLog is not None:
                     with open(config.exceptionLog, 'a',
                               encoding='utf-8') as file:
                         file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                        file.write(' ' + ''.join(_))
+                        file.write('Exception in thread ')
+                        file.write(threading.current_thread().name + ':\n')
+                        file.write(''.join(_))
             finally:
                 self._ircsock.close()
             self._isConnected = False
@@ -118,14 +118,17 @@ class SocketThread(threading.Thread):
             self._ircsock.send(command[:2048])
         except socket.error:
             now = datetime.datetime.now()
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            _ = traceback.format_exception(
-                exc_type, exc_value, exc_traceback)
+            _ = traceback.format_exception(*sys.exc_info())
             if config.exceptionLog is not None:
                 with open(config.exceptionLog, 'a',
                             encoding='utf-8') as file:
                     file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                    file.write(' ' + ''.join(_))
+                    file.write('Exception in thread ')
+                    file.write(threading.current_thread().name + ':\n')
+                    if channel:
+                        file.write('Channel: ' + channel + '\n')
+                    file.write('Command: ' + command.decode('utf-8') + '\n')
+                    file.write(''.join(_))
             self._isConnected = False
         
         if config.ircLogFolder:

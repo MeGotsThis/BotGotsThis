@@ -7,8 +7,8 @@ import time
 import sys
 
 class JoinThread(threading.Thread):
-    def __init__(self, *args):
-        threading.Thread.__init__(self, *args)
+    def __init__(self, **args):
+        threading.Thread.__init__(self, **args)
         self._socketThreads = []
         self._joinTimes = []
         self._joinTimesLock = threading.Lock()
@@ -61,14 +61,14 @@ class JoinThread(threading.Thread):
                 time.sleep(1 / config.joinPerSecond)
             except Exception as e:
                 now = datetime.datetime.now()
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                _ = traceback.format_exception(
-                    exc_type, exc_value, exc_traceback)
+                _ = traceback.format_exception(*sys.exc_info())
                 if config.exceptionLog is not None:
                     with open(config.exceptionLog, 'a',
                               encoding='utf-8') as file:
                         file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                        file.write(' ' + ''.join(_))
+                        file.write('Exception in thread ')
+                        file.write(threading.current_thread().name + ':\n')
+                        file.write(''.join(_))
         print(str(datetime.datetime.now()) + ' Ending SocketJoinThread')
     
     def add(self, socketThread):
