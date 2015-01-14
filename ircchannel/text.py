@@ -97,7 +97,11 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 3:
         return False
     
-    com, action, level, command, fullText = parseCommandMessageInput(message)
+    r = parseCommandMessageInput(message)
+    if r is None:
+        return
+    
+    com, action, level, command, fullText = r
     broadcaster = channelData.channel[1:]
     if com == '!global':
         broadcaster = '#global'
