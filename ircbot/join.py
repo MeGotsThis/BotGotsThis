@@ -45,18 +45,20 @@ class JoinThread(threading.Thread):
                     params = channels, notJoined
                     channel = self._getChannelWithLowestPriority(*params)
                     channelData = channels[channel]
-                    ircCommand = 'JOIN ' + channelData.channel + '\n'
-                    params = ircCommand, channelData.channel
-                    channelData.socket.sendIrcCommand(*params)
-                    self._channelJoined.add(channelData.channel)
-                    with self._joinTimesLock:
-                        self._joinTimes.append(datetime.datetime.utcnow())
-                    
-                    channelData.sendMessage('.mods')
-                    
-                    print(str(datetime.datetime.now()) + ' Joined ' +
-                          channelData.channel + ' on ' +
-                          channelData.socket.name)
+                    socket = channelData.socket
+                    if socket is not None:
+                        ircCommand = 'JOIN ' + channelData.channel + '\n'
+                        params = ircCommand, channelData.channel
+                        channelData.socket.sendIrcCommand(*params)
+                        self._channelJoined.add(channelData.channel)
+                        with self._joinTimesLock:
+                            self._joinTimes.append(datetime.datetime.utcnow())
+                        
+                        channelData.sendMessage('.mods')
+                        
+                        print(str(datetime.datetime.now()) + ' Joined ' +
+                              channelData.channel + ' on ' +
+                              channelData.socket.name)
                 
                 time.sleep(1 / config.joinPerSecond)
             except Exception as e:
