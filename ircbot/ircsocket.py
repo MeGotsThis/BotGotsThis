@@ -46,7 +46,8 @@ class SocketThread(threading.Thread):
             try:
                 self._connect()
             except socket.error as e:
-                print(str(datetime.datetime.now()) + ' ' + self.name + ' ' + e)
+                print(str(datetime.datetime.now()) + ' ' + self.name + ' ' +
+                      str(e))
                 time.sleep(5)
                 continue
             self.lastSentPing = datetime.datetime.now()
