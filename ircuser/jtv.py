@@ -1,6 +1,6 @@
 def parse(channelData, message):
-    if message.startswith('The moderators of this room are: '):
-        l = len('The moderators of this room are: ')
+    if message.startswith('The moderators of this channel are: '):
+        l = len('The moderators of this channel are: ')
         mods = message[l:]
         for mod in mods.split(', '):
             mod = str(mod)
