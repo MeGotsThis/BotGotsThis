@@ -51,7 +51,7 @@ def threadParse(channelData, nick, message, msgParts):
         isMod = isBroadcaster or nick in channelData.mods
         isSubscriber = isBroadcaster or nick in channelData.subscribers
         isTurbo = isBroadcaster or nick in channelData.turboUsers
-        isChanMod = config.botnick in channelData.mods
+        isChanMod = config.botnick.lower() in channelData.mods
         permissions = {
             'owner': isOwner,
             'ownerChan': isOwnerChan,
