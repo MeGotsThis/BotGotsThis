@@ -23,7 +23,6 @@ commands = {
     '!emptychat': (ircchannel.owner.commandEmpty, 'admin+ownerChan'),
     '!emptyall': (ircchannel.owner.commandEmptyAll, 'admin+ownerChan'),
     '!global': (ircchannel.text.commandCommand, 'admin+ownerChan'),
-    '!full': (ircchannel.full.commandFull, 'owner'),
     '!say': (ircchannel.owner.commandSay, 'owner'),
     '!hello': (ircchannel.broadcaster.commandHello, 'broadcaster'),
     '!leave': (ircchannel.broadcaster.commandLeave, 'broadcaster'),
@@ -39,6 +38,7 @@ commands = {
     '!purge': (ircchannel.mod.commandPurge, 'moderator'),
     '!rekt': (ircchannel.mod.commandPurge, 'moderator'),
     '!command': (ircchannel.text.commandCommand, 'moderator'),
+    '!full': (ircchannel.full.commandFull, 'moderator'),
     '!come': (ircchannel.broadcaster.commandCome, 'ownerChan'),
     '!autojoin': (ircchannel.broadcaster.commandAutoJoin, 'ownerChan'),
 }
