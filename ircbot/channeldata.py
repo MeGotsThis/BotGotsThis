@@ -95,6 +95,9 @@ class ChannelData:
     def addMod(self, mod):
         self._mods.add(mod)
     
+    def removeMod(self, mod):
+        self._mods.discard(mod)
+    
     def addGlobalMod(self, mod):
         self._globalMods.add(mod)
     
