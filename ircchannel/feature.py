@@ -4,8 +4,7 @@ import database.factory
 import ircbot.irc
 
 features = {
-    'helixfossil': 'Ask Helix Fossil',
-    'roll.exe': '!roll exe',
+
     }
 features = dict(
     list(features.items()) + list(privatechannel.feature.features.items()))
