@@ -20,6 +20,12 @@ CREATE TABLE custom_commands (
 
 CREATE INDEX command_broadcaster ON custom_commands (broadcaster, command);
 
+CREATE TABLE chat_features (
+    broadcaster VARCHAR NOT NULL,
+    feature VARCHAR NOT NULL,
+    PRIMARY KEY (broadcaster, feature)
+);
+
 CREATE TABLE game_abbreviations (
     abbreviation VARCHAR NOT NULL PRIMARY KEY,
     twitchGame VARCHAR NOT NULL

@@ -66,3 +66,12 @@ class DatabaseBase:
     
     def deleteCustomCommand(self, broadcaster, permission, command):
         return True
+    
+    def hasFeature(self, broadcaster, feature):
+        return False
+    
+    def addFeature(self, broadcaster, feature):
+        return False
+    
+    def removeFeature(self, broadcaster, feature):
+        return True

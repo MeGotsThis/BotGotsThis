@@ -45,6 +45,7 @@
     <Compile Include="ircchannel\broadcaster.py" />
     <Compile Include="ircchannel\commandList.py" />
     <Compile Include="ircchannel\commands.py" />
+    <Compile Include="ircchannel\feature.py" />
     <Compile Include="ircchannel\full.py" />
     <Compile Include="ircchannel\mod.py" />
     <Compile Include="ircchannel\owner.py" />
@@ -57,6 +58,7 @@
     <Compile Include="ircuser\notice.py" />
     <Compile Include="ircuser\__init__.py" />
     <Compile Include="privatechannel\commandList.py" />
+    <Compile Include="privatechannel\feature.py" />
     <Compile Include="privatechannel\manageBot.py">
       <SubType>Code</SubType>
     </Compile>

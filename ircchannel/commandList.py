@@ -1,4 +1,5 @@
 import ircchannel.broadcaster
+import ircchannel.feature
 import ircchannel.reload
 import ircchannel.full
 import ircchannel.owner
@@ -26,6 +27,7 @@ commands = {
     '!say': (ircchannel.owner.commandSay, 'owner'),
     '!hello': (ircchannel.broadcaster.commandHello, 'broadcaster'),
     '!leave': (ircchannel.broadcaster.commandLeave, 'broadcaster'),
+    '!feature': (ircchannel.feature.commandFeature, 'broadcaster'),
     '!empty': (ircchannel.broadcaster.commandEmpty, 'broadcaster'),
     '!pyramid': (ircchannel.pyramid.commandPyramid, 'broadcaster'),
     '!rpyramid': (ircchannel.pyramid.commandRPyramid, 'broadcaster'),

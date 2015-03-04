@@ -204,3 +204,46 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             return False
         finally:
             cursor.close()
+    
+    def hasFeature(self, broadcaster, feature):
+        cursor = self.connection.cursor()
+        try:
+            query = 'SELECT 1 FROM chat_features '
+            query += 'WHERE broadcaster=? AND feature=?'
+            params = broadcaster, feature
+            cursor.execute(query, params)
+            return bool(cursor.fetchone())
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def addFeature(self, broadcaster, feature):
+        cursor = self.connection.cursor()
+        try:
+            query = 'INSERT INTO chat_features (broadcaster, feature) '
+            query += 'VALUES (?, ?)'
+            params = broadcaster, feature
+            cursor.execute(query, params)
+            self.connection.commit()
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def removeFeature(self, broadcaster, feature):
+        cursor = self.connection.cursor()
+        try:
+            query = 'DELETE FROM chat_features '
+            query += 'WHERE broadcaster=? AND feature=?'
+            params = broadcaster, feature
+            cursor.execute(query, params)
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
