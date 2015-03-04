@@ -41,6 +41,11 @@ commands = {
     '!rekt': (ircchannel.mod.commandPurge, 'moderator'),
     '!command': (ircchannel.text.commandCommand, 'moderator'),
     '!full': (ircchannel.charConvert.commandFull, 'moderator'),
+    '!parenthesized':
+    (ircchannel.charConvert.commandParenthesized, 'moderator'),
+    '!circled': (ircchannel.charConvert.commandCircled, 'moderator'),
+    '!smallcaps': (ircchannel.charConvert.commandSmallCaps, 'moderator'),
+    '!upsidedown': (ircchannel.charConvert.commandUpsideDown, 'moderator'),
     '!come': (ircchannel.broadcaster.commandCome, 'ownerChan'),
     '!autojoin': (ircchannel.broadcaster.commandAutoJoin, 'ownerChan'),
 }
