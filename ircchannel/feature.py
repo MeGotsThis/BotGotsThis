@@ -40,21 +40,21 @@ def commandFeature(channelData, nick, message, msgParts, permissions):
     
     with database.factory.getDatabase() as db:
         hasFeature = db.hasFeature(channelData.channel[1:], msgParts[1])
-        if hasFeature is None and msgParts[2] in enable:
+        if not hasFeature and msgParts[2] in enable:
             db.addFeature(channelData.channel[1:], msgParts[1])
-        if hasFeature is not None and msgParts[2] in disable:
+        if hasFeature and msgParts[2] in disable:
             db.removeFeature(channelData.channel[1:], msgParts[1])
     msg = None
     if hasFeature:
-        if msgParts[2] in enable:
-            msg = 'The feature ' + features[msgParts[1]] + ' has been enabled'
-        if msgParts[2] in disable:
-            msg = 'The feature ' + features[msgParts[1]] + ' was not enabled'
-    else:
         if msgParts[2] in enable:
             msg = 'The feature ' + features[msgParts[1]]
             msg += ' has already been enabled'
         if msgParts[2] in disable:
             msg = 'The feature ' + features[msgParts[1]] + ' has been disabled'
+    else:
+        if msgParts[2] in enable:
+            msg = 'The feature ' + features[msgParts[1]] + ' has been enabled'
+        if msgParts[2] in disable:
+            msg = 'The feature ' + features[msgParts[1]] + ' was not enabled'
     channelData.sendMessage(msg)
     return True

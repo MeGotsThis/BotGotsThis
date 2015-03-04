@@ -212,7 +212,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             query += 'WHERE broadcaster=? AND feature=?'
             params = broadcaster, feature
             cursor.execute(query, params)
-            return bool(cursor.fetchone())
+            return cursor.fetchone() is not None
         except Exception:
             return False
         finally:
