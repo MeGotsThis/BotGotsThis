@@ -46,7 +46,7 @@
     <Compile Include="ircchannel\commandList.py" />
     <Compile Include="ircchannel\commands.py" />
     <Compile Include="ircchannel\feature.py" />
-    <Compile Include="ircchannel\full.py" />
+    <Compile Include="ircchannel\charConvert.py" />
     <Compile Include="ircchannel\mod.py" />
     <Compile Include="ircchannel\owner.py" />
     <Compile Include="ircchannel\pyramid.py" />

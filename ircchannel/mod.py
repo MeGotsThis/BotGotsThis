@@ -1,4 +1,4 @@
-import database.factory
+﻿import database.factory
 import config.oauth
 import ircbot.twitchApi
 import threading
@@ -15,7 +15,7 @@ def commandStatus(channelData, nick, message, msgParts, permissions):
         channelData.channel, 'PUT', '/kraken/channels/' + chan,
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/vnd.twitchtv.v2+json',
+            'Accept': 'application/vnd.twitchtv.v3+json',
             },
         data = {'channel[status]': msgParts[1]})
     if response.status == 200:
@@ -43,7 +43,7 @@ def commandGame(channelData, nick, message, msgParts, permissions):
         channelData.channel, 'PUT', '/kraken/channels/' + chan,
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/vnd.twitchtv.v2+json',
+            'Accept': 'application/vnd.twitchtv.v3+json',
             },
         data = {'channel[game]': msgParts[1]})
     if response.status == 200:

@@ -1,7 +1,7 @@
 import ircchannel.broadcaster
+import ircchannel.charConvert
 import ircchannel.feature
 import ircchannel.reload
-import ircchannel.full
 import ircchannel.owner
 import ircchannel.pyramid
 import ircchannel.wall
@@ -40,7 +40,7 @@ commands = {
     '!purge': (ircchannel.mod.commandPurge, 'moderator'),
     '!rekt': (ircchannel.mod.commandPurge, 'moderator'),
     '!command': (ircchannel.text.commandCommand, 'moderator'),
-    '!full': (ircchannel.full.commandFull, 'moderator'),
+    '!full': (ircchannel.charConvert.commandFull, 'moderator'),
     '!come': (ircchannel.broadcaster.commandCome, 'ownerChan'),
     '!autojoin': (ircchannel.broadcaster.commandAutoJoin, 'ownerChan'),
 }
