@@ -4,7 +4,7 @@ import database.factory
 import ircbot.irc
 
 features = {
-
+    
     }
 features = dict(
     list(features.items()) + list(privatechannel.feature.features.items()))
@@ -28,6 +28,7 @@ def commandFeature(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 3:
         msgParts.append('')
     
+    msgParts[1] = msgParts[1].lower()
     if msgParts[1] not in features:
         channelData.sendMessage('Unrecognized feature: ' + msgParts[1])
         return True
