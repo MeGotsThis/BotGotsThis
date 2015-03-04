@@ -4,7 +4,7 @@ import database.factory
 import ircbot.irc
 
 features = {
-    
+    'textconvert': 'Text Character Conversion',
     }
 features = dict(
     list(features.items()) + list(privatechannel.feature.features.items()))
