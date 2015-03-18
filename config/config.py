@@ -4,7 +4,7 @@ import json
 import os
 
 mainServer = 'irc.twitch.tv'
-eventServer = '199.9.252.26'
+eventServer = '192.16.71.236'
 ini = configparser.ConfigParser()
 ini.read('config.ini')
 botnick = str(ini['BOT']['botnick']).lower()
