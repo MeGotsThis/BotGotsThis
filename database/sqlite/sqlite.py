@@ -10,7 +10,11 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
         self._dbfile = ini['file']
     
     def __enter__(self):
-        self._connection = sqlite3.connect(self._dbfile)
+        kwargs = {
+            'database': self._dbfile,
+            'detect_types': sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+            }
+        self._connection = sqlite3.connect(**kwargs)
         return self
     
     def getAutoJoinsChats(self):
