@@ -66,7 +66,8 @@ def asciiToUpsideDown(text):
     return ''.join([_translate(c, ascii, upsidedown) for c in text[::-1]])
 
 def allToAscii(text):
-    return ''.join([_translateAsciiChain(c, ascii, upsidedown) for c in text[::-1]])
+    return ''.join([_translateAsciiChain(c, ascii, upsidedown)
+                    for c in text[::-1]])
 
 def _translateAsciiChain(c):
     c = _translate(c, full, ascii)
@@ -81,37 +82,47 @@ def commandFull(channelData, nick, message, msgParts, permissions):
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
-    msg = message.split(None, 1)[1]
-    return channelData.sendMessage(asciiToFullWidth(msg))
+    parts = message.split(None, 1)
+    if len(parts) < 2:
+        return False
+    return channelData.sendMessage(asciiToFullWidth(parts[1]))
 
 def commandParenthesized(channelData, nick, message, msgParts, permissions):
     with database.factory.getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
-    msg = message.split(None, 1)[1]
-    return channelData.sendMessage(asciiToParenthesized(msg))
+    parts = message.split(None, 1)
+    if len(parts) < 2:
+        return False
+    return channelData.sendMessage(asciiToParenthesized(parts[1]))
 
 def commandCircled(channelData, nick, message, msgParts, permissions):
     with database.factory.getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
-    msg = message.split(None, 1)[1]
-    return channelData.sendMessage(asciiToCircled(msg))
+    parts = message.split(None, 1)
+    if len(parts) < 2:
+        return False
+    return channelData.sendMessage(asciiToCircled(parts[1]))
 
 def commandSmallCaps(channelData, nick, message, msgParts, permissions):
     with database.factory.getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
-    msg = message.split(None, 1)[1]
-    return channelData.sendMessage(asciiToSmallCaps(msg))
+    parts = message.split(None, 1)
+    if len(parts) < 2:
+        return False
+    return channelData.sendMessage(asciiToSmallCaps(parts[1]))
 
 def commandUpsideDown(channelData, nick, message, msgParts, permissions):
     with database.factory.getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
-    msg = message.split(None, 1)[1]
-    return channelData.sendMessage(asciiToUpsideDown(msg))
+    parts = message.split(None, 1)
+    if len(parts) < 2:
+        return False
+    return channelData.sendMessage(asciiToUpsideDown(parts[1]))
