@@ -1,17 +1,36 @@
 from config import config
+import database.factory
 import ircbot.irc
+import datetime
 import random
 
 def commandPyramid(channelData, nick, message, msgParts, permissions):
+    with database.factory.getDatabase() as db:
+        if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
+            not permissions['broadcaster']):
+            return False
     if len(msgParts) < 2:
         return False
     rep = msgParts[1] + ' '
     try:
         count = int(msgParts[2])
     except:
-        count = 5
+        if permissions['broadcaster']:
+            count = 5
+        else:
+            count = 3
     count = min(count, (2048 - 11 - len(channelData.channel)) // len(rep))
-    if not permissions['globalMod']:
+    if not permissions['broadcaster']:
+        count = min(count, 5)
+        
+        currentTime = datetime.datetime.utcnow()
+        cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
+        if 'modPyramid' in channelData.sessionData:
+            since = currentTime - channelData.sessionData['modPyramid']
+            if since < cooldown:
+                return False
+        channelData.sessionData['modPyramid'] = currentTime
+    elif not permissions['globalMod']:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
@@ -28,12 +47,30 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
         ':)', ':(', ':o', ':z', 'B)', ':/', ';)', ';p', ':p', 'R)', 'o_O',
         ':D', '>(', '<3',
         ]
+    
+    with database.factory.getDatabase() as db:
+        if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
+            not permissions['broadcaster']):
+            return False
     try:
         count = int(msgParts[1])
     except:
-        count = 5
+        if permissions['broadcaster']:
+            count = 5
+        else:
+            count = 3
     rep = []
-    if not permissions['globalMod']:
+    if not permissions['broadcaster']:
+        count = min(count, 5)
+        
+        currentTime = datetime.datetime.utcnow()
+        cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
+        if 'modPyramid' in channelData.sessionData:
+            since = currentTime - channelData.sessionData['modPyramid']
+            if since < cooldown:
+                return False
+        channelData.sessionData['modPyramid'] = currentTime
+    elif not permissions['globalMod']:
         count = min(count, 20)
     for i in range(count):
         rep.append(emotes[random.randrange(len(emotes))])
@@ -46,6 +83,10 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandPyramidLong(channelData, nick, message, msgParts, permissions):
+    with database.factory.getDatabase() as db:
+        if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
+            not permissions['broadcaster']):
+            return False
     msgParts = message.split(None, 1)
     if len(msgParts) < 2:
         return False
@@ -53,9 +94,22 @@ def commandPyramidLong(channelData, nick, message, msgParts, permissions):
     try:
         count = int(msgParts[0].split('-')[1])
     except:
-        count = 5
+        if permissions['broadcaster']:
+            count = 5
+        else:
+            count = 3
     count = min(count, (2048 - 11 - len(channelData.channel)) // len(rep))
-    if not permissions['globalMod']:
+    if not permissions['broadcaster']:
+        count = min(count, 5)
+        
+        currentTime = datetime.datetime.utcnow()
+        cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
+        if 'modPyramid' in channelData.sessionData:
+            since = currentTime - channelData.sessionData['modPyramid']
+            if since < cooldown:
+                return False
+        channelData.sessionData['modPyramid'] = currentTime
+    elif not permissions['globalMod']:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]

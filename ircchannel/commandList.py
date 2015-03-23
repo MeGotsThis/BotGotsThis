@@ -29,8 +29,8 @@ commands = {
     '!leave': (ircchannel.broadcaster.commandLeave, 'broadcaster'),
     '!feature': (ircchannel.feature.commandFeature, 'broadcaster'),
     '!empty': (ircchannel.broadcaster.commandEmpty, 'broadcaster'),
-    '!pyramid': (ircchannel.pyramid.commandPyramid, 'broadcaster'),
-    '!rpyramid': (ircchannel.pyramid.commandRPyramid, 'broadcaster'),
+    '!pyramid': (ircchannel.pyramid.commandPyramid, 'moderator'),
+    '!rpyramid': (ircchannel.pyramid.commandRPyramid, 'moderator'),
     '!wall': (ircchannel.wall.commandWall, 'broadcaster'),
     '!reloadmods': (ircchannel.mod.commandReloadMods, 'moderator'),
     '!status': (ircchannel.mod.commandStatus, 'moderator'),
@@ -50,7 +50,7 @@ commands = {
     '!autojoin': (ircchannel.broadcaster.commandAutoJoin, 'ownerChan'),
 }
 commandsStartWith = {
-    '!pyramid-': (ircchannel.pyramid.commandPyramidLong, 'broadcaster'),
+    '!pyramid-': (ircchannel.pyramid.commandPyramidLong, 'moderator'),
     '!wall-': (ircchannel.wall.commandWallLong, 'broadcaster'),
 }
 

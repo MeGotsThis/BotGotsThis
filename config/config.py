@@ -25,6 +25,10 @@ customMessageUserCooldown = float(ini['BOT']['customMessageUserCooldown'])
 if customMessageUserCooldown <= 0:
     customMessageUserCooldown = 20
 
+spamModeratorCooldown = float(ini['BOT']['spamModeratorCooldown'])
+if spamModeratorCooldown <= 0:
+    spamModeratorCooldown = 20
+
 joinLimit = min(int(ini['BOT']['joinLimit']), 50)
 joinPerSecond = float(ini['BOT']['joinPerSecond'])
 joinPerSecond = joinPerSecond if joinPerSecond > 0 else 20
