@@ -11,6 +11,8 @@ def commandPyramid(channelData, nick, message, msgParts, permissions):
     except:
         count = 5
     count = min(count, (2048 - 11 - len(channelData.channel)) // len(rep))
+    if not permissions['globalMod']:
+        count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
     channelData.sendMulipleMessages(messages, 2)
@@ -31,6 +33,8 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
     except:
         count = 5
     rep = []
+    if not permissions['globalMod']:
+        count = min(count, 20)
     for i in range(count):
         rep.append(emotes[random.randrange(len(emotes))])
         if len(' '.join(rep)) >= (2048 - 11 - len(channelData.channel)):
@@ -51,6 +55,8 @@ def commandPyramidLong(channelData, nick, message, msgParts, permissions):
     except:
         count = 5
     count = min(count, (2048 - 11 - len(channelData.channel)) // len(rep))
+    if not permissions['globalMod']:
+        count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
     channelData.sendMulipleMessages(messages, 2)
