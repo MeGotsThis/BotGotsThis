@@ -17,6 +17,9 @@ def commandWall(channelData, nick, message, msgParts, permissions):
         rows = 20
         length = 5
     length = min(length, (2048 - 11 - len(channelData.channel)) // len(rep))
+    if not permissions['globalMod']:
+        length = min(length, 20)
+        rows = min(rows, 500)
     messages = [rep * length + ('' if i % 2 == 0 else '\ufeff')
                 for i in range(rows)]
     channelData.sendMulipleMessages(messages, 2)
@@ -30,6 +33,8 @@ def commandWallLong(channelData, nick, message, msgParts, permissions):
         rows = int(msgParts[0].split('-')[1])
     except:
         rows = 20
+    if not permissions['globalMod']:
+        rows = min(rows, 500)
     messages = [msgParts[1] + ('' if i % 2 == 0 else '\ufeff')
                 for i in range(rows)]
     channelData.sendMulipleMessages(messages, 2)
