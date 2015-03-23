@@ -31,7 +31,7 @@ commands = {
     '!empty': (ircchannel.broadcaster.commandEmpty, 'broadcaster'),
     '!pyramid': (ircchannel.pyramid.commandPyramid, 'moderator'),
     '!rpyramid': (ircchannel.pyramid.commandRPyramid, 'moderator'),
-    '!wall': (ircchannel.wall.commandWall, 'broadcaster'),
+    '!wall': (ircchannel.wall.commandWall, 'moderator'),
     '!reloadmods': (ircchannel.mod.commandReloadMods, 'moderator'),
     '!status': (ircchannel.mod.commandStatus, 'moderator'),
     '!title': (ircchannel.mod.commandStatus, 'moderator'),
@@ -51,7 +51,7 @@ commands = {
 }
 commandsStartWith = {
     '!pyramid-': (ircchannel.pyramid.commandPyramidLong, 'moderator'),
-    '!wall-': (ircchannel.wall.commandWallLong, 'broadcaster'),
+    '!wall-': (ircchannel.wall.commandWallLong, 'moderator'),
 }
 
 commands = dict(

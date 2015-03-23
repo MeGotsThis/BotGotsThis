@@ -6,6 +6,7 @@ import ircbot.irc
 features = {
     'textconvert': 'Text Character Conversion',
     'modpyramid': 'Mods Using !pyramid',
+    'modwall': 'Mods Using !wall',
     }
 features = dict(
     list(features.items()) + list(privatechannel.feature.features.items()))
