@@ -14,6 +14,7 @@ join = ircbot.join.JoinThread(name='Join Thread')
 join.add(mainChat)
 join.add(eventChat)
 channels = {}
+globalSessionData = {}
 
 def joinChannel(channel, priority=float('inf'), eventServer=False):
     if channel[0] != '#':
