@@ -5,11 +5,11 @@ import http.client
 def twitchCall(channel, method, uri, headers={}, data=None):
     conn = http.client.HTTPSConnection('api.twitch.tv')
     
-    if 'Authorization' not in headers:
+    if channel is not None and 'Authorization' not in headers:
         token = config.oauth.getOAuthToken(channel)
         if token is not None:
             headers['Authorization'] = 'OAuth ' + token
-        headers['Accept'] = 'application/vnd.twitchtv.v2+json'
+        headers['Accept'] = 'application/vnd.twitchtv.v3+json'
     
     if data is not None:
         if type(data) is dict:
