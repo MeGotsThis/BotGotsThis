@@ -1,4 +1,5 @@
 from config import config
+import ircbot.irc
 
 messageLimit = 'Your message was not sent because you are '
 messageLimit += 'sending messages too quickly.'
@@ -26,6 +27,26 @@ def parse(channelData, message):
             channelData.addSubscriber(user)
         if usertype == 'turbo':
             channelData.addTurboUser(user)
+    if message.startswith('EMOTESET'):
+        user, emoteset = message.split(' ')[1:3]
+        if user == config.botnick.lower():
+            emoteset = emoteset[1:-1].split(',')
+            emoteset = [int(i) for i in emoteset]
+            # This is to remove twitch turbo emotes that are shared with
+            # global emoticons
+            if 33 in emoteset:
+                emoteset.remove(33)
+            if 42 in emoteset:
+                emoteset.remove(42)
+            # Add global emoticons
+            emoteset.insert(0, 0)
+            if ('emoteset' not in ircbot.irc.globalSessionData or
+                ircbot.irc.globalSessionData['emoteset'] != emoteset):
+                ircbot.irc.globalSessionData['emoteset'] = emoteset
+                if 'globalEmotes' in ircbot.irc.globalSessionData:
+                    del ircbot.irc.globalSessionData['globalEmotes']
+                if 'globalEmotesCache' in ircbot.irc.globalSessionData:
+                    del ircbot.irc.globalSessionData['globalEmotesCache']
     if message.startswith('You are permanently banned from talking in '):
         channelData.removeMod(config.botnick.lower())
         channelData.sendMessage('.mods', 0)

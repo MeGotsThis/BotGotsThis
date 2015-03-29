@@ -1,6 +1,9 @@
 import config.oauth
 import urllib.parse
 import http.client
+import ircbot.irc
+import datetime
+import json
 
 def twitchCall(channel, method, uri, headers={}, data=None):
     conn = http.client.HTTPSConnection('api.twitch.tv')
@@ -22,3 +25,96 @@ def twitchCall(channel, method, uri, headers={}, data=None):
     conn.close()
     
     return (response, responseData)
+
+def getTwitchEmotes():
+    emotes = {
+        25: 'Kappa',
+        88: 'PogChamp',
+        1902: 'Keepo',
+        33: 'DansGame',
+        34: 'SwiftRage',
+        36: 'PJSalt',
+        356: 'OpieOP',
+        88: 'PogChamp',
+        41: 'Kreygasm',
+        86: 'BibleThump',
+        1906: 'SoBayed',
+        9803: 'KAPOW',
+        245: 'ResidentSleeper',
+        65: 'FrankerZ',
+        40: 'KevinTurtle',
+        27301: 'HumbleLife',
+        881: 'BrainSlug',
+        96: 'BloodTrail',
+        22998: 'panicBasket',
+        167: 'WinWaker',
+        171: 'TriHard',
+        66: 'OneHand',
+        9805: 'NightBat',
+        28: 'MrDestructoid',
+        1901: 'Kippa',
+        1900: 'RalpherZ', 
+        1: ':)',
+        2: ':(',
+        8: ':o',
+        5: ':z',
+        7: 'B)',
+        10: ':/',
+        11: ';)',
+        13: ';P',
+        12: ':P',
+        14: 'R)',
+        6: 'o_O',
+        3: ':D',
+        4: '>(',
+        9: '<3',
+        }
+    
+    currentTime = datetime.datetime.utcnow()
+    if 'globalEmotes' in ircbot.irc.globalSessionData:
+        emotes = ircbot.irc.globalSessionData['globalEmotes']
+    
+    cacheCooldown = datetime.timedelta(hours=1)
+    needUpdate = ('globalEmotesCache' not in ircbot.irc.globalSessionData or
+                  'globalEmotes' not in ircbot.irc.globalSessionData)
+    if 'globalEmotesCache' in ircbot.irc.globalSessionData:
+        since = ircbot.irc.globalSessionData['globalEmotesCache'] - currentTime
+        needUpdate = needUpdate or since > cacheCooldown
+    if needUpdate:
+        emoteset = ['0']
+        if 'emoteset' in ircbot.irc.globalSessionData:
+            emoteset = [str(i) for i in
+                        ircbot.irc.globalSessionData['emoteset']]
+        response, data = twitchCall(
+            None, 'GET',
+            '/kraken/chat/emoticon_images?emotesets=' + ','.join(emoteset),
+            headers = {
+                'Accept': 'application/vnd.twitchtv.v3+json',
+                })
+        globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']
+        emotes = {}
+        replaceGlobal = {
+            1: ':)',
+            2: ':(',
+            3: ':D',
+            4: '>(',
+            5: ':z',
+            6: 'o_O',
+            7: 'B)',
+            8: ':o',
+            9: '<3',
+            10: ':/',
+            11: ';)',
+            12: ':P',
+            13: ';P',
+            14: 'R)',
+            }
+        for emoteSetId in globalEmotes:
+            for emote in globalEmotes[emoteSetId]:
+                if emote['id'] in replaceGlobal:
+                    emotes[emote['id']] = replaceGlobal[emote['id']]
+                else:
+                    emotes[emote['id']] = emote['code']
+        ircbot.irc.globalSessionData['globalEmotes'] = emotes
+        ircbot.irc.globalSessionData['globalEmotesCache'] = currentTime
+    return emotes
