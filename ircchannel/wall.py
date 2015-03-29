@@ -39,7 +39,7 @@ def commandWall(channelData, nick, message, msgParts, permissions):
         channelData.sessionData['modWall'] = currentTime
     elif not permissions['globalMod']:
         length = min(length, 20)
-        rows = min(rows, 10)
+        rows = min(rows, 500)
     messages = [rep * length + ('' if i % 2 == 0 else '\ufeff')
                 for i in range(rows)]
     channelData.sendMulipleMessages(messages, 2)
