@@ -32,6 +32,9 @@ def commandJoin(channelData, nick, message, msgParts, permissions):
     chan = msgParts[1].lower()
     
     with database.factory.getDatabase() as db:
+        if db.isChannelBannedReason(chan):
+            channelData.sendMessage('Chat ' + chan + ' is banned from joining')
+            return True
         priority = db.getAutoJoinsPriority(chan)
     priority = priority if priority is not None else float('inf')
     
@@ -85,24 +88,25 @@ def commandManageBot(channelData, nick, message, msgParts, permissions):
     methods = {
         'listchats': manageListChats,
         'autojoin': manageAutoJoin,
+        'banned': manageBanned,
         }
 
     methods = dict(
         list(methods.items()) + 
         list(privatechannel.manageBot.methods.items()))
 
-    params = channelData, message, msgParts
+    params = channelData, nick, message, msgParts
     
     if msgParts[1].lower() in methods:
         return methods[msgParts[1].lower()](*params)
     return False
 
-def manageListChats(channelData, message, msgParts):
+def manageListChats(channelData, nick, message, msgParts):
     channels = [c[1:] for c in ircbot.irc.channels.keys()]
     channelData.sendMessage('Twitch Chats: ' + ', '.join(channels))
     return True
 
-def manageAutoJoin(channelData, message, msgParts):
+def manageAutoJoin(channelData, nick, message, msgParts):
     if len(msgParts) < 3:
         return False
     if msgParts[2] in ['reloadserver']:
@@ -138,6 +142,10 @@ def manageAutoJoin(channelData, message, msgParts):
         chatProperties = json.loads(data.decode('utf-8'))
         
         with database.factory.getDatabase() as db:
+            if db.isChannelBannedReason(msgParts[3]):
+                channelData.sendMessage('Chat ' + msgParts[3] +
+                                        ' is banned from joining')
+                return True
             params = msgParts[3], 0, chatProperties['eventchat']
             result = db.saveAutoJoin(*params)
             priority = db.getAutoJoinsPriority(msgParts[3])
@@ -200,5 +208,62 @@ def manageAutoJoin(channelData, message, msgParts):
             else:
                 channelData.sendMessage(
                     'Auto join for ' + msgParts[3] + ' was never enabled')
+        return True
+    return False
+
+def manageBanned(channelData, nick, message, msgParts):
+    if len(msgParts) < 3:
+        return False
+    if msgParts[2] in ['list']:
+        with database.factory.getDatabase() as db:
+            bannedChannels = db.listBannedChannels()
+            if bannedChannels:
+                msg = 'Banned Channels: ' + ', '.join(bannedChannels)
+                channelData.sendMessage(msg)
+            else:
+                channelData.sendMessage('There are no banned channels')
+        return True
+    
+    if len(msgParts) < 5:
+        if msgParts[2] in ['add', 'insert', 'del', 'delete',
+                           'rem', 'remove', 'remove']:
+            channelData.sendMessage(nick + ' -> Reason needs to be specified')
+        return False
+    msgParts = message.split(None, 4)
+    channel = msgParts[3].lower()
+    if msgParts[2] in ['add', 'insert']:
+        with database.factory.getDatabase() as db:
+            isBannedOrReason = db.isChannelBannedReason(channel)
+            if isBannedOrReason:
+                channelData.sendMessage(
+                    channel + ' is already banned for: ' + isBannedOrReason)
+                return False
+            params = channel, msgParts[4], nick
+            result = db.addBannedChannel(*params)
+            if result:
+                db.discardAutoJoin(channel)
+                ircbot.irc.partChannel(channel)
+            
+        if result:
+            channelData.sendMessage('Chat ' + channel + ' is now banned')
+        else:
+            channelData.sendMessage('Chat ' + channel + ' could not be '
+                                    'banned. Error has occured.')
+        return True
+    if msgParts[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
+        with database.factory.getDatabase() as db:
+            isBannedOrReason = db.isChannelBannedReason(channel)
+            if not isBannedOrReason:
+                channelData.sendMessage(
+                    channel + ' is not banned')
+                return False
+            params = channel, msgParts[4], nick
+            result = db.removeBannedChannel(*params)
+            
+        if result:
+            channelData.sendMessage(channel + ' is now unbanned')
+        else:
+            channelData.sendMessage(channel + ' could not be unbanned. '
+                                    'Error has occured.')
         return True
     return False

@@ -251,3 +251,79 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             return False
         finally:
             cursor.close()
+    
+    def listBannedChannels(self):
+        cursor = self.connection.cursor()
+        try:
+            query = 'SELECT broadcaster FROM banned_channels'
+            cursor.execute(query)
+            return [r[0] for r in cursor.fetchall()]
+        except Exception as e:
+            return []
+        finally:
+            cursor.close()
+    
+    def isChannelBannedReason(self, broadcaster):
+        cursor = self.connection.cursor()
+        try:
+            query = 'SELECT reason FROM banned_channels WHERE broadcaster=?'
+            params = broadcaster,
+            cursor.execute(query, params)
+            row = cursor.fetchone()
+            if row is not None:
+                return row[0]
+            return False
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def addBannedChannel(self, broadcaster, reason, nick):
+        cursor = self.connection.cursor()
+        try:
+            query = 'INSERT INTO banned_channels '
+            query += '(broadcaster, currentTime, reason, who) '
+            query += 'VALUES (?, CURRENT_TIMESTAMP, ?, ?)'
+            params = broadcaster, reason, nick
+            cursor.execute(query, params)
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+
+            query = 'INSERT INTO banned_channels_log '
+            query += '(broadcaster, currentTime, reason, who, actionLog) '
+            query += 'VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'
+            params = broadcaster, reason, nick, 'add'
+            cursor.execute(query, params)
+
+            self.connection.commit()
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()
+    
+    def removeBannedChannel(self, broadcaster, reason, nick):
+        cursor = self.connection.cursor()
+        try:
+            query = 'DELETE FROM banned_channels FROM broadcaster=?'
+            params = broadcaster,
+            cursor.execute(query, params)
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+
+            query = 'INSERT INTO banned_channels_log '
+            query += '(broadcaster, currentTime, reason, who, actionLog) '
+            query += 'VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'
+            params = broadcaster, reason, nick, 'remove'
+            cursor.execute(query, params)
+
+            self.connection.commit()
+            return True
+        except Exception:
+            return False
+        finally:
+            cursor.close()

@@ -20,6 +20,21 @@ CREATE TABLE custom_commands (
 
 CREATE INDEX command_broadcaster ON custom_commands (broadcaster, command);
 
+CREATE TABLE banned_channels (
+	broadcaster VARCHAR NOT NULL PRIMARY KEY,
+	currentTime TIMESTAMP NOT NULL,
+	reason VARCHAR NOT NULL,
+	who VARCHAR NOT NULL
+);
+
+CREATE TABLE banned_channels_log (
+	broadcaster VARCHAR NOT NULL,
+	currentTime TIMESTAMP NOT NULL,
+	reason VARCHAR NOT NULL,
+	who VARCHAR NOT NULL,
+	actionLog VARCHAR NOT NULL
+);
+
 CREATE TABLE chat_features (
     broadcaster VARCHAR NOT NULL,
     feature VARCHAR NOT NULL,

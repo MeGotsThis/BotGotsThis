@@ -10,13 +10,16 @@ def commandHello(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandCome(channelData, nick, message, msgParts, permissions):
+    with database.factory.getDatabase() as db:
+        if db.isChannelBannedReason(nick):
+            channelData.sendMessage('Chat ' + nick + ' is banned from joining')
+            return True
+        priority = db.getAutoJoinsPriority(nick)
+    priority = priority if priority is not None else float('inf')
+    
     if ('#' + nick) in ircbot.irc.channels:
         channelData.sendMessage('I am already in ' + nick)
         return True
-    
-    with database.factory.getDatabase() as db:
-        priority = db.getAutoJoinsPriority(nick)
-    priority = priority if priority is not None else float('inf')
     
     response, data = ircbot.twitchApi.twitchCall(
         None, 'GET', '/api/channels/' + nick + '/chat_properties')
@@ -52,6 +55,11 @@ def commandEmpty(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandAutoJoin(channelData, nick, message, msgParts, permissions):
+    with database.factory.getDatabase() as db:
+        if db.isChannelBannedReason(nick):
+            channelData.sendMessage('Chat ' + nick + ' is banned from joining')
+            return True
+
     if len(msgParts) >= 2:
         removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
                       'leave', 'part']

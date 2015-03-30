@@ -75,3 +75,15 @@ class DatabaseBase:
     
     def removeFeature(self, broadcaster, feature):
         return True
+    
+    def listBannedChannels(self):
+        return []
+    
+    def isChannelBannedReason(self, broadcaster):
+        return False
+    
+    def addBannedChannel(self, broadcaster, reason, nick):
+        return True
+    
+    def removeBannedChannel(self, broadcaster, reason, nick):
+        return True
