@@ -23,6 +23,9 @@
   <ItemGroup>
     <Content Include="config.ini" />
     <Content Include="database\sqlite\database.sql" />
+    <Content Include="database\sqlite\gamesabbreviation.sql">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="twitchApi.ini" />
   </ItemGroup>
   <ItemGroup>
