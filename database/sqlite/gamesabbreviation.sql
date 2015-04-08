@@ -1,4 +1,6 @@
-﻿DELETE FROM game_abbreviations;
+﻿BEGIN TRANSACTION;
+
+DELETE FROM game_abbreviations;
 
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gd', 'Game Development');
@@ -192,3 +194,5 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mk
 
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gdash', 'Geometry Dash');
+
+COMMIT TRANSACTION;
