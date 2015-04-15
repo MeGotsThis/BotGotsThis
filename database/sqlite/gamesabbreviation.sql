@@ -193,6 +193,40 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mk
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mk7', 'Mario Kart 7');
 
 
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tloz', 'The Legend of Zelda');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('zelda2', 'Zelda II: The Adventure of Link');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('alttp', 'The Legend of Zelda: A Link to the Past');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('lozla', 'The Legend of Zelda: Link''s Awakening');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('oot', 'The Legend of Zelda: Ocarina of Time');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mm', 'The Legend of Zelda: Majora''s Mask');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('oos', 'The Legend of Zelda: Oracle of Seasons');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ooa', 'The Legend of Zelda: Oracle of Ages');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tww', 'The Legend of Zelda: The Wind Waker');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tlozfsa', 'The Legend of Zelda: Four Swords Adventures');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tp', 'The Legend of Zelda: Twilight Princess');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tmc', 'The Legend of Zelda: The Minish Cap');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('skywardsword', 'The Legend of Zelda: Skyward Sword');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tlozss', 'The Legend of Zelda: Skyward Sword');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ph', 'The Legend of Zelda: Phantom Hourglass');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('spirittracks', 'The Legend of Zelda: Spirit Tracks');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tlozst', 'The Legend of Zelda: Spirit Tracks');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('albw', 'The Legend of Zelda: A Link Between Worlds');
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ladx', 'The Legend of Zelda: Link''s Awakening DX');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ootmq', 'The Legend of Zelda: Ocarina of Time / Master Quest');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tlozce', 'The Legend of Zelda: Collector''s Edition');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('alttpff', 'The Legend of Zelda: A Link to the Past & Four Swords');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('fourswords', 'The Legend Of Zelda: Four Swords Anniversary Edition');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tlozfsae', 'The Legend Of Zelda: Four Swords Anniversary Edition');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('oot3d', 'The Legend of Zelda: Ocarina of Time 3D');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mm3d', 'The Legend of Zelda: Majora''s Mask 3D');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('twwhd', 'The Legend of Zelda: The Wind Waker HD');
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('lct', 'Link''s Crossbow Training');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('hw', 'Hyrule Warriors');
+
+
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gdash', 'Geometry Dash');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('geometrydash', 'Geometry Dash');
 
 COMMIT TRANSACTION;
