@@ -97,7 +97,7 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
         
         with database.factory.getDatabase() as db:
             result = db.insertCustomCommand(
-                broadcaster, level, command, fullText)
+                broadcaster, level, command, fullText, nick)
             if result:
                 channelData.sendMessage(command + ' was added successfully')
             else:
@@ -112,7 +112,7 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
         
         with database.factory.getDatabase() as db:
             result = db.updateCustomCommand(
-                broadcaster, level, command, fullText)
+                broadcaster, level, command, fullText, nick)
             if result:
                 channelData.sendMessage(
                     command + ' was updated successfully')
@@ -123,7 +123,7 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
     elif action in ['replace', 'override']:
         with database.factory.getDatabase() as db:
             result = db.replaceCustomCommand(
-                broadcaster, level, command, fullText)
+                broadcaster, level, command, fullText, nick)
             if result:
                 channelData.sendMessage(
                     command + ' was updated successfully')
@@ -133,7 +133,7 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
                     'might not exist')
     elif action in ['del', 'delete', 'rem', 'remove',]:
         with database.factory.getDatabase() as db:
-            result = db.deleteCustomCommand(broadcaster, level, command)
+            result = db.deleteCustomCommand(broadcaster, level, command, nick)
             if result:
                 channelData.sendMessage(
                     command + ' was removed successfully')

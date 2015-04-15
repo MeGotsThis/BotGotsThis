@@ -55,16 +55,19 @@ class DatabaseBase:
     def getFullGameTitle(self, abbreviation):
         return None
     
-    def insertCustomCommand(self, broadcaster, permission, command, fullText):
+    def insertCustomCommand(self, broadcaster, permission, command,
+                            fullMessage, user):
         return False
     
-    def updateCustomCommand(self, broadcaster, permission, command, fullText):
+    def updateCustomCommand(self, broadcaster, permission, command,
+                            fullMessage, user):
         return False
     
-    def replaceCustomCommand(self, broadcaster, permission, command, fullText):
+    def replaceCustomCommand(self, broadcaster, permission, command,
+                             fullMessage, user):
         return False
     
-    def deleteCustomCommand(self, broadcaster, permission, command):
+    def deleteCustomCommand(self, broadcaster, permission, command, user):
         return True
     
     def hasFeature(self, broadcaster, feature):

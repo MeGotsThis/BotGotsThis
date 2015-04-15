@@ -14,11 +14,27 @@ CREATE TABLE custom_commands (
     permission VARCHAR NOT NULL,
     command VARCHAR NOT NULL,
     commandDisplay VARCHAR,
-    fullText VARCHAR NOT NULL,
+    fullMessage VARCHAR NOT NULL,
+    creator VARCHAR,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    lastEditor VARCHAR,
+    lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (broadcaster, permission, command)
 );
 
 CREATE INDEX command_broadcaster ON custom_commands (broadcaster, command);
+
+CREATE TABLE custom_commands_history (
+    broadcaster VARCHAR NOT NULL,
+    permission VARCHAR NOT NULL,
+    command VARCHAR NOT NULL,
+    commandDisplay VARCHAR,
+    fullMessage VARCHAR,
+    creator VARCHAR,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX custom_commands_history_broadcaster ON custom_commands_history (broadcaster, command);
 
 CREATE TABLE banned_channels (
 	broadcaster VARCHAR NOT NULL PRIMARY KEY,

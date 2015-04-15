@@ -120,7 +120,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
     
     def getChatCommands(self, broadcaster, command):
         cursor = self.connection.cursor()
-        query = 'SELECT broadcaster, permission, fullText '
+        query = 'SELECT broadcaster, permission, fullMessage '
         query += 'FROM custom_commands '
         query += 'WHERE broadcaster IN (?, \'#global\') AND command=?'
         commands = {broadcaster: {}, '#global': {}}
@@ -139,17 +139,30 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
         cursor.close()
         return game
     
-    def insertCustomCommand(self, broadcaster, permission, command, fullText):
+    def insertCustomCommand(self, broadcaster, permission, command,
+                            fullMessage, user):
         cursor = self.connection.cursor()
         try:
             query = 'INSERT INTO custom_commands '
             query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullText) '
-            query += 'VALUES (?, ?, ?, ?, ?)'
+            query += 'commandDisplay, fullMessage, creator, created, '
+            query += 'lastEditor, lastUpdated) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, '
+            query += 'CURRENT_TIMESTAMP)'
             display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower()
-            params += display, fullText
+            params = broadcaster, permission, command.lower(),
+            params += display, fullMessage, user, user
             cursor.execute(query, params)
+
+            query = 'INSERT INTO custom_commands_history '
+            query += '(broadcaster, permission, command, '
+            query += 'commandDisplay, fullMessage, creator, created) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
+            display = None if command.lower() == command else command
+            params = broadcaster, permission, command.lower(),
+            params += display, fullMessage, user
+            cursor.execute(query, params)
+
             self.connection.commit()
             return True
         except Exception:
@@ -157,15 +170,28 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
         finally:
             cursor.close()
     
-    def updateCustomCommand(self, broadcaster, permission, command, fullText):
+    def updateCustomCommand(self, broadcaster, permission, command,
+                            fullMessage, user):
         cursor = self.connection.cursor()
         try:
-            query = 'UPDATE custom_commands SET commandDisplay=?, fullText=? '
+            query = 'UPDATE custom_commands SET commandDisplay=?, '
+            query += 'fullMessage=?, lastEditor=?, '
+            query += 'lastUpdated=CURRENT_TIMESTAMP '
             query += 'WHERE broadcaster=? AND permission=? AND command=?'
             display = None if command.lower() == command else command
-            params = display, fullText
+            params = display, fullMessage, user,
             params += broadcaster, permission, command.lower()
             cursor.execute(query, params)
+
+            query = 'INSERT INTO custom_commands_history '
+            query += '(broadcaster, permission, command, '
+            query += 'commandDisplay, fullMessage, creator, created) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
+            display = None if command.lower() == command else command
+            params = broadcaster, permission, command.lower(),
+            params += display, fullMessage, user
+            cursor.execute(query, params)
+
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
@@ -175,17 +201,39 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
         finally:
             cursor.close()
     
-    def replaceCustomCommand(self, broadcaster, permission, command, fullText):
+    def replaceCustomCommand(self, broadcaster, permission, command,
+                             fullMessage, user):
         cursor = self.connection.cursor()
         try:
             query = 'REPLACE INTO custom_commands '
             query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullText) '
-            query += 'VALUES (?, ?, ?, ?, ?)'
+            query += 'commandDisplay, fullMessage, creator, created, '
+            query += 'lastEditor, lastUpdated) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, '
+            query += 'CURRENT_TIMESTAMP)'
             display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower()
-            params += display, fullText
+            params = broadcaster, permission, command.lower(),
+            params += display, fullMessage, user, user
             cursor.execute(query, params)
+
+            query = 'INSERT INTO custom_commands_history '
+            query += '(broadcaster, permission, command, '
+            query += 'commandDisplay, fullMessage, creator, created) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
+            display = None if command.lower() == command else command
+            params = broadcaster, permission, command.lower(),
+            params += display, None, user
+            cursor.execute(query, params)
+
+            query = 'INSERT INTO custom_commands_history '
+            query += '(broadcaster, permission, command, '
+            query += 'commandDisplay, fullMessage, creator, created) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
+            display = None if command.lower() == command else command
+            params = broadcaster, permission, command.lower(),
+            params += display, fullMessage, user
+            cursor.execute(query, params)
+
             self.connection.commit()
             return True
         except Exception:
@@ -193,13 +241,23 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
         finally:
             cursor.close()
     
-    def deleteCustomCommand(self, broadcaster, permission, command):
+    def deleteCustomCommand(self, broadcaster, permission, command, user):
         cursor = self.connection.cursor()
         try:
             query = 'DELETE FROM custom_commands WHERE '
             query += 'broadcaster=? AND permission=? AND command=?'
             params = broadcaster, permission, command.lower()
             cursor.execute(query, params)
+
+            query = 'INSERT INTO custom_commands_history '
+            query += '(broadcaster, permission, command, '
+            query += 'commandDisplay, fullMessage, creator, created) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
+            display = None if command.lower() == command else command
+            params = broadcaster, permission, command.lower(),
+            params += display, None, user
+            cursor.execute(query, params)
+
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
