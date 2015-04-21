@@ -85,7 +85,8 @@ def commandFull(channelData, nick, message, msgParts, permissions):
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    return channelData.sendMessage(asciiToFullWidth(parts[1]))
+    channelData.sendMessage(asciiToFullWidth(parts[1]))
+    return True
 
 def commandParenthesized(channelData, nick, message, msgParts, permissions):
     with database.factory.getDatabase() as db:
@@ -95,7 +96,8 @@ def commandParenthesized(channelData, nick, message, msgParts, permissions):
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    return channelData.sendMessage(asciiToParenthesized(parts[1]))
+    channelData.sendMessage(asciiToParenthesized(parts[1]))
+    return True
 
 def commandCircled(channelData, nick, message, msgParts, permissions):
     with database.factory.getDatabase() as db:
@@ -105,7 +107,8 @@ def commandCircled(channelData, nick, message, msgParts, permissions):
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    return channelData.sendMessage(asciiToCircled(parts[1]))
+    channelData.sendMessage(asciiToCircled(parts[1]))
+    return True
 
 def commandSmallCaps(channelData, nick, message, msgParts, permissions):
     with database.factory.getDatabase() as db:
@@ -115,7 +118,8 @@ def commandSmallCaps(channelData, nick, message, msgParts, permissions):
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    return channelData.sendMessage(asciiToSmallCaps(parts[1]))
+    channelData.sendMessage(asciiToSmallCaps(parts[1]))
+    return True
 
 def commandUpsideDown(channelData, nick, message, msgParts, permissions):
     with database.factory.getDatabase() as db:
@@ -125,4 +129,5 @@ def commandUpsideDown(channelData, nick, message, msgParts, permissions):
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    return channelData.sendMessage(asciiToUpsideDown(parts[1]))
+    channelData.sendMessage(asciiToUpsideDown(parts[1]))
+    return True
