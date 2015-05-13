@@ -25,6 +25,7 @@ CREATE TABLE custom_commands (
 CREATE INDEX command_broadcaster ON custom_commands (broadcaster, command);
 
 CREATE TABLE custom_commands_history (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     broadcaster VARCHAR NOT NULL,
     permission VARCHAR NOT NULL,
     command VARCHAR NOT NULL,
