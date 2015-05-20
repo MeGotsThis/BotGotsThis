@@ -27,60 +27,57 @@ def twitchCall(channel, method, uri, headers={}, data=None):
     return (response, responseData)
 
 def getTwitchEmotes():
-    emotes = {
-        25: 'Kappa',
-        88: 'PogChamp',
-        1902: 'Keepo',
-        33: 'DansGame',
-        34: 'SwiftRage',
-        36: 'PJSalt',
-        356: 'OpieOP',
-        88: 'PogChamp',
-        41: 'Kreygasm',
-        86: 'BibleThump',
-        1906: 'SoBayed',
-        9803: 'KAPOW',
-        245: 'ResidentSleeper',
-        65: 'FrankerZ',
-        40: 'KevinTurtle',
-        27301: 'HumbleLife',
-        881: 'BrainSlug',
-        96: 'BloodTrail',
-        22998: 'panicBasket',
-        167: 'WinWaker',
-        171: 'TriHard',
-        66: 'OneHand',
-        9805: 'NightBat',
-        28: 'MrDestructoid',
-        1901: 'Kippa',
-        1900: 'RalpherZ', 
-        1: ':)',
-        2: ':(',
-        8: ':o',
-        5: ':z',
-        7: 'B)',
-        10: ':\\',
-        11: ';)',
-        13: ';P',
-        12: ':P',
-        14: 'R)',
-        6: 'o_O',
-        3: ':D',
-        4: '>(',
-        9: '<3',
-        }
+    if 'globalEmotes' not in ircbot.irc.globalSessionData:
+        ircbot.irc.globalSessionData['globalEmotes'] = {
+            25: 'Kappa',
+            88: 'PogChamp',
+            1902: 'Keepo',
+            33: 'DansGame',
+            34: 'SwiftRage',
+            36: 'PJSalt',
+            356: 'OpieOP',
+            88: 'PogChamp',
+            41: 'Kreygasm',
+            86: 'BibleThump',
+            1906: 'SoBayed',
+            9803: 'KAPOW',
+            245: 'ResidentSleeper',
+            65: 'FrankerZ',
+            40: 'KevinTurtle',
+            27301: 'HumbleLife',
+            881: 'BrainSlug',
+            96: 'BloodTrail',
+            22998: 'panicBasket',
+            167: 'WinWaker',
+            171: 'TriHard',
+            66: 'OneHand',
+            9805: 'NightBat',
+            28: 'MrDestructoid',
+            1901: 'Kippa',
+            1900: 'RalpherZ', 
+            1: ':)',
+            2: ':(',
+            8: ':o',
+            5: ':z',
+            7: 'B)',
+            10: ':\\',
+            11: ';)',
+            13: ';P',
+            12: ':P',
+            14: 'R)',
+            6: 'o_O',
+            3: ':D',
+            4: '>(',
+            9: '<3',
+            }
+    if 'globalEmotesCache' not in ircbot.irc.globalSessionData:
+        dtmin = datetime.datetime.min
+        ircbot.irc.globalSessionData['globalEmotesCache'] = dtmin
     
     currentTime = datetime.datetime.utcnow()
-    if 'globalEmotes' in ircbot.irc.globalSessionData:
-        emotes = ircbot.irc.globalSessionData['globalEmotes']
-    
-    cacheCooldown = datetime.timedelta(hours=1)
-    needUpdate = ('globalEmotesCache' not in ircbot.irc.globalSessionData or
-                  'globalEmotes' not in ircbot.irc.globalSessionData)
-    if 'globalEmotesCache' in ircbot.irc.globalSessionData:
-        since = ircbot.irc.globalSessionData['globalEmotesCache'] - currentTime
-        needUpdate = needUpdate or since > cacheCooldown
-    if needUpdate:
+    emotes = ircbot.irc.globalSessionData['globalEmotes']
+    since = ircbot.irc.globalSessionData['globalEmotesCache'] - currentTime
+    if since > datetime.timedelta(hours=1):
         emoteset = ['0']
         if 'emoteset' in ircbot.irc.globalSessionData:
             emoteset = [str(i) for i in
