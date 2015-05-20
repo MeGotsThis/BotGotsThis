@@ -45,6 +45,7 @@ CREATE TABLE banned_channels (
 );
 
 CREATE TABLE banned_channels_log (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	broadcaster VARCHAR NOT NULL,
 	currentTime TIMESTAMP NOT NULL,
 	reason VARCHAR NOT NULL,
