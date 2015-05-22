@@ -76,7 +76,7 @@ def getTwitchEmotes():
     
     currentTime = datetime.datetime.utcnow()
     emotes = ircbot.irc.globalSessionData['globalEmotes']
-    since = ircbot.irc.globalSessionData['globalEmotesCache'] - currentTime
+    since = currentTime - ircbot.irc.globalSessionData['globalEmotesCache']
     if since > datetime.timedelta(hours=1):
         emoteset = ['0']
         if 'emoteset' in ircbot.irc.globalSessionData:
