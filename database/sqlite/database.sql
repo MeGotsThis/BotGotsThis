@@ -4,11 +4,6 @@ CREATE TABLE auto_join (
     useEvent BOOL NOT NULL DEFAULT 0
 );
 
-CREATE TABLE oauth_tokens (
-    broadcaster VARCHAR NOT NULL PRIMARY KEY,
-    token VARCHAR NOT NULL UNIQUE ON CONFLICT REPLACE
-);
-
 CREATE TABLE custom_commands (
     broadcaster VARCHAR NOT NULL,
     permission VARCHAR NOT NULL,

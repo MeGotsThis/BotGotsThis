@@ -2,12 +2,14 @@ import database.databasebase
 import sqlite3
 
 class SQLiteDatabase(database.databasebase.DatabaseBase):
-    __slots__ = database.databasebase.DatabaseBase.__slots__ + ('_dbfile',)
+    __slots__ = database.databasebase.DatabaseBase.__slots__ + (
+        '_dbfile', '_oauthfile',)
     
     def __init__(self, ini, *args):
         super().__init__(*args)
         self._engine = 'SQLite'
         self._dbfile = ini['file']
+        self._oauthfile = ini['oauth']
     
     def __enter__(self):
         kwargs = {
@@ -104,7 +106,9 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
     
     def getOAuthToken(self, broadcaster):
         cursor = self.connection.cursor()
-        query = 'SELECT token FROM oauth_tokens WHERE broadcaster=?'
+        query = 'ATTACH DATABASE ? AS oauth'
+        cursor.execute(query, (self._oauthfile,))
+        query = 'SELECT token FROM oauth.oauth_tokens WHERE broadcaster=?'
         cursor.execute(query, (broadcaster,))
         tokenRow = cursor.fetchone()
         token = tokenRow[0] if tokenRow is not None else None

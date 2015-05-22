@@ -26,6 +26,9 @@
     <Content Include="database\sqlite\gamesabbreviation.sql">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="database\sqlite\oauth.sql">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="twitchApi.ini" />
   </ItemGroup>
   <ItemGroup>
