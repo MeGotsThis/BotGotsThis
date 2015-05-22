@@ -21,6 +21,7 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="config.dist.ini" />
     <Content Include="config.ini" />
     <Content Include="database\sqlite\database.sql" />
     <Content Include="database\sqlite\gamesabbreviation.sql">
