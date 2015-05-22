@@ -1,7 +1,12 @@
 ﻿import configparser
 import os.path
 import json
+import sys
 import os
+
+if not os.path.isfile('config.ini'):
+    print('Missing config.ini')
+    sys.exit(0)
 
 mainServer = 'irc.twitch.tv'
 eventServer = '192.16.64.143'
