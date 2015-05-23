@@ -64,8 +64,14 @@
     <Compile Include="ircuser\jtv.py" />
     <Compile Include="ircuser\notice.py" />
     <Compile Include="ircuser\__init__.py" />
+    <Compile Include="privatechannel\commandList.dist.py" />
     <Compile Include="privatechannel\commandList.py" />
+    <Compile Include="privatechannel\default\commandList.py" />
+    <Compile Include="privatechannel\default\feature.py" />
+    <Compile Include="privatechannel\default\manageBot.py" />
+    <Compile Include="privatechannel\feature.dist.py" />
     <Compile Include="privatechannel\feature.py" />
+    <Compile Include="privatechannel\manageBot.dist.py">
     <Compile Include="privatechannel\manageBot.py">
       <SubType>Code</SubType>
     </Compile>
@@ -81,6 +87,7 @@
     <Folder Include="ircchannel" />
     <Folder Include="ircuser" />
     <Folder Include="privatechannel" />
+    <Folder Include="privatechannel\default\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.4" />
