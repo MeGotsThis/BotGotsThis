@@ -1,15 +1,18 @@
 from config import config
-import privatechannel.feature
 import database.factory
 import ircbot.irc
+try:
+    import privatechannel.feature as feature
+except:
+    import privatechannel.default.feature as feature
+
 
 features = {
     'textconvert': 'Text Character Conversion',
     'modpyramid': 'Mods Using !pyramid',
     'modwall': 'Mods Using !wall',
     }
-features = dict(
-    list(features.items()) + list(privatechannel.feature.features.items()))
+features = dict(list(features.items()) + list(feature.features.items()))
 
 enable = {
     '',

@@ -1,11 +1,14 @@
 from config import config
-import privatechannel.manageBot
 import database.factory
 import ircbot.irc
 import datetime
 import time
 import json
 import sys
+try:
+    import privatechannel.manageBot as manageBot
+except:
+    import privatechannel.default.manageBot as manageBot
 
 def commandExit(channelData, nick, message, msgParts, permissions):
     channelData.sendMessage('Goodbye Keepo', 0)
@@ -91,9 +94,7 @@ def commandManageBot(channelData, nick, message, msgParts, permissions):
         'banned': manageBanned,
         }
 
-    methods = dict(
-        list(methods.items()) + 
-        list(privatechannel.manageBot.methods.items()))
+    methods = dict(list(methods.items()) + list(manageBot.methods.items()))
 
     params = channelData, nick, message, msgParts
     

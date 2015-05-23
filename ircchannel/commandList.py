@@ -7,7 +7,10 @@ import ircchannel.pyramid
 import ircchannel.wall
 import ircchannel.mod
 import ircchannel.text
-import privatechannel.commandList
+try:
+    import privatechannel.commandList as commandList
+except:
+    import privatechannel.default.commandList as commandList
 
 commands = {
     '!exit': (ircchannel.owner.commandExit, 'owner+ownerChan'),
@@ -55,8 +58,7 @@ commandsStartWith = {
     '!wall-': (ircchannel.wall.commandWallLong, 'moderator'),
 }
 
-commands = dict(
-    list(commands.items()) + list(privatechannel.commandList.commands.items()))
+commands = dict(list(commands.items()) + list(commandList.commands.items()))
 commandsStartWith = dict(
     list(commandsStartWith.items()) +
-    list(privatechannel.commandList.commandsStartWith.items()))
+    list(commandList.commandsStartWith.items()))
