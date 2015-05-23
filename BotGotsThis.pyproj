@@ -59,6 +59,7 @@
     <Compile Include="ircchannel\owner.py" />
     <Compile Include="ircchannel\pyramid.py" />
     <Compile Include="ircchannel\reload.py" />
+    <Compile Include="ircchannel\repeat.py" />
     <Compile Include="ircchannel\text.py" />
     <Compile Include="ircchannel\wall.py" />
     <Compile Include="ircchannel\__init__.py" />
