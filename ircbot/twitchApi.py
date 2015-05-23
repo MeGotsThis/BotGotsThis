@@ -2,8 +2,18 @@ import config.oauth
 import urllib.parse
 import http.client
 import ircbot.irc
+import os.path
+import configparser
 import datetime
 import json
+
+def getTwitchClientId():
+    if os.path.isfile('config.ini'):
+        ini = configparser.ConfigParser()
+        ini.read('config.ini')
+        if 'twitch' in ini and 'twitchClientID' in ini['twitch']:
+            return ini['twitch']['twitchClientID']
+    return None
 
 def twitchCall(channel, method, uri, headers={}, data=None):
     conn = http.client.HTTPSConnection('api.twitch.tv')
@@ -13,6 +23,9 @@ def twitchCall(channel, method, uri, headers={}, data=None):
         if token is not None:
             headers['Authorization'] = 'OAuth ' + token
         headers['Accept'] = 'application/vnd.twitchtv.v3+json'
+        clientId = getTwitchClientId()
+        if clientId is not None:
+            headers['Client-ID'] = clientId
     
     if data is not None:
         if type(data) is dict:
