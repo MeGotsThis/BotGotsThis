@@ -30,6 +30,7 @@
     <Content Include="database\sqlite\oauth.sql">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="twitchApi.dist.ini" />
     <Content Include="twitchApi.ini" />
   </ItemGroup>
   <ItemGroup>
