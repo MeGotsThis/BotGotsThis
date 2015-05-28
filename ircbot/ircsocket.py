@@ -120,15 +120,12 @@ class SocketThread(threading.Thread):
         print(str(datetime.datetime.now()) + ' Ending SocketThread ' +
               self.name)
     
-    def sendIrcCommand(self, command, channel=None):
-        if isinstance(command, IrcMessage):
-            command = str(command)
+    def sendIrcCommand(self, message, channel=None):
+        if isinstance(message, IrcMessage):
+            pass
         else:
             raise TypeError()
-        if isinstance(command, str):
-            command = command.encode('utf-8')
-        if command[:-2] != b'\r\n':
-            command += b'\r\n'
+        command = (str(message) + '\r\n').encode('utf-8')
         try:
             self._ircsock.send(command[:2048])
         except socket.error:
@@ -142,7 +139,7 @@ class SocketThread(threading.Thread):
                     file.write(threading.current_thread().name + ':\n')
                     if channel:
                         file.write('Channel: ' + channel + '\n')
-                    file.write('Command: ' + command.decode('utf-8') + '\n')
+                    file.write('Command: ' + str(message) + '\n')
                     file.write(''.join(_))
             self._isConnected = False
         
@@ -152,21 +149,22 @@ class SocketThread(threading.Thread):
             dtnow = datetime.datetime.now()
             now = dtnow.strftime(_logDateFormat)
             with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
-                file.write('> ' + now + ' ' + command.decode('utf-8'))
+                file.write('> ' + now + ' ' + str(message))
             if channel:
                 fileName = channel + '#full.log'
                 pathArgs = config.ircLogFolder, fileName
                 with open(os.path.join(*pathArgs), 'a',
                           encoding='utf-8') as file:
-                    file.write(now + command.decode('utf-8'))
+                    file.write(now + str(message))
                 if command.startswith(b'PRIVMSG'):
                     now = dtnow.strftime(_logDateFormat)
                     fileName = channel + '#msg.log'
                     pathArgs = config.ircLogFolder, fileName
                     with open(os.path.join(*pathArgs), 'a',
                               encoding='utf-8') as file:
-                        file.write('[' + now + '] ' + config.botnick + ': ' +
-                                   command.decode('utf-8').split(':', 1)[1])
+                        line = '[' + now + '] ' + config.botnick + ': '
+                        line += message.params.trailing
+                        file.write(line)
     
     def _connect(self):
         self._ircsock.connect((self._server, 6667))
