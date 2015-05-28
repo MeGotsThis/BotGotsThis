@@ -79,6 +79,11 @@
     </Compile>
     <Compile Include="privatechannel\__init__.py" />
     <Compile Include="run.py" />
+    <Compile Include="twitchmessage\ircmessage.py" />
+    <Compile Include="twitchmessage\ircparams.py" />
+    <Compile Include="twitchmessage\ircprefix.py" />
+    <Compile Include="twitchmessage\irctags.py" />
+    <Compile Include="twitchmessage\__init__.py" />
     <Compile Include="twitchOauth.py" />
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +95,7 @@
     <Folder Include="ircuser" />
     <Folder Include="privatechannel" />
     <Folder Include="privatechannel\default\" />
+    <Folder Include="twitchmessage\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{9a7a9026-48c1-4688-9d5d-e5699d47d074}\3.4" />

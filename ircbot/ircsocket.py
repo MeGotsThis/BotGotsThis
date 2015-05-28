@@ -1,4 +1,6 @@
 from config import config
+from twitchmessage.ircmessage import IrcMessage
+from twitchmessage.ircparams import IrcMessageParams
 import ircchannel.commands
 import ircuser.notice
 import ircbot.irc
@@ -9,6 +11,8 @@ import os.path
 import socket
 import time
 import sys
+
+_logDateFormat = '%Y-%m-%d %H:%M:%S.%f'
 
 class SocketThread(threading.Thread):
     def __init__(self, server, **args):
@@ -74,17 +78,21 @@ class SocketThread(threading.Thread):
                                 fileName += '.log'
                                 pathArgs = config.ircLogFolder, fileName
                                 dtnow = datetime.datetime.now()
-                                now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
+                                now = dtnow.strftime(_logDateFormat)
                                 with open(os.path.join(*pathArgs), 'a',
                                           encoding='utf-8') as file:
-                                    file.write(now + ircmsg + '\n')
+                                    line = '< ' + now + ' ' + ircmsg + '\n'
+                                    file.write(line)
                             self._parseMsg(ircmsg)
                     except socket.timeout as e:
                         pass
                     sinceLastSend = datetime.datetime.now() - self.lastSentPing
                     sinceLast = datetime.datetime.now() - self.lastPing
                     if sinceLastSend >= datetime.timedelta(minutes=1):
-                        self.sendIrcCommand('PING ' + config.botnick + '\n')
+                        self.sendIrcCommand(
+                            IrcMessage(command='PING',
+                                       params=IrcMessageParams(
+                                           middle=config.botnick)))
                         self.lastSentPing = datetime.datetime.now()
                     elif sinceLast >= datetime.timedelta(minutes=1,seconds=15):
                         raise NoPingException()
@@ -98,8 +106,8 @@ class SocketThread(threading.Thread):
                 if config.exceptionLog is not None:
                     with open(config.exceptionLog, 'a',
                               encoding='utf-8') as file:
-                        file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                        file.write('Exception in thread ')
+                        file.write(now.strftime(_logDateFormat))
+                        file.write(' Exception in thread ')
                         file.write(threading.current_thread().name + ':\n')
                         file.write(''.join(_))
             finally:
@@ -113,8 +121,14 @@ class SocketThread(threading.Thread):
               self.name)
     
     def sendIrcCommand(self, command, channel=None):
-        if type(command) is str:
+        if isinstance(command, IrcMessage):
+            command = str(command)
+        else:
+            raise TypeError()
+        if isinstance(command, str):
             command = command.encode('utf-8')
+        if command[:-2] != b'\r\n':
+            command += b'\r\n'
         try:
             self._ircsock.send(command[:2048])
         except socket.error:
@@ -123,8 +137,8 @@ class SocketThread(threading.Thread):
             if config.exceptionLog is not None:
                 with open(config.exceptionLog, 'a',
                             encoding='utf-8') as file:
-                    file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                    file.write('Exception in thread ')
+                    file.write(now.strftime(_logDateFormat))
+                    file.write(' Exception in thread ')
                     file.write(threading.current_thread().name + ':\n')
                     if channel:
                         file.write('Channel: ' + channel + '\n')
@@ -136,9 +150,9 @@ class SocketThread(threading.Thread):
             fileName = config.botnick + '-' + self.name + '.log'
             pathArgs = config.ircLogFolder, fileName
             dtnow = datetime.datetime.now()
-            now = dtnow.strftime('> %Y-%m-%d %H:%M:%S.%f ')
+            now = dtnow.strftime(_logDateFormat)
             with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
-                file.write(now + command.decode('utf-8'))
+                file.write('> ' + now + ' ' + command.decode('utf-8'))
             if channel:
                 fileName = channel + '#full.log'
                 pathArgs = config.ircLogFolder, fileName
@@ -146,20 +160,34 @@ class SocketThread(threading.Thread):
                           encoding='utf-8') as file:
                     file.write(now + command.decode('utf-8'))
                 if command.startswith(b'PRIVMSG'):
-                    now = dtnow.strftime('[%Y-%m-%d %H:%M:%S.%f] ')
+                    now = dtnow.strftime(_logDateFormat)
                     fileName = channel + '#msg.log'
                     pathArgs = config.ircLogFolder, fileName
                     with open(os.path.join(*pathArgs), 'a',
                               encoding='utf-8') as file:
-                        file.write(now + config.botnick + ': ' +
+                        file.write('[' + now + '] ' + config.botnick + ': ' +
                                    command.decode('utf-8').split(':', 1)[1])
     
     def _connect(self):
         self._ircsock.connect((self._server, 6667))
-        comms = ['PASS ' + config.password + '\n',
-                 'NICK ' + config.botnick + '\n',
-                 'USER ' + config.botnick + ' 0 * :' + config.botnick + '\n',
-                 'TWITCHCLIENT 3\n',
+        comms = [
+            IrcMessage(command='PASS',
+                       params=IrcMessageParams(middle=config.password)),
+            IrcMessage(command='NICK',
+                       params=IrcMessageParams(middle=config.botnick)),
+            IrcMessage(command='USER',
+                       params=IrcMessageParams(
+                           middle=config.botnick + ' 0 *',
+                           trailing=config.botnick)),
+            IrcMessage(command='CAP',
+                       params=IrcMessageParams(
+                           middle='REQ', trailing='twitch.tv/membership')),
+            IrcMessage(command='CAP',
+                       params=IrcMessageParams(
+                           middle='REQ', trailing='twitch.tv/commands')),
+            IrcMessage(command='CAP',
+                       params=IrcMessageParams(
+                           middle='REQ', trailing='twitch.tv/tags')),
                  ]
         for comm in comms:
             self.sendIrcCommand(comm)
@@ -170,57 +198,61 @@ class SocketThread(threading.Thread):
     
     def partChannel(self, channelData):
         with self._channelsLock:
-            self.sendIrcCommand('PART ' + channelData.channel + '\n',
-                                channelData.channel)
+            self.sendIrcCommand(
+                IrcMessage(command='PART',
+                           params=IrcMessageParams(
+                               middle=channelData.channel)))
             del self._channels[channelData.channel]
         ircbot.irc.join.part(channelData.channel)
         print(str(datetime.datetime.now()) + ' Parted ' + channelData.channel)
     
-    def ping(self):
-        self.sendIrcCommand('PONG :pingis\n')
+    def ping(self, message='ping'):
+        self.sendIrcCommand(
+            IrcMessage(command='PONG',
+                       params=IrcMessageParams(trailing=message)))
         self.lastPing = datetime.datetime.now()
 
     def _parseMsg(self, ircmsg):
-        if ircmsg.find(' PRIVMSG ') != -1:
-            parts = ircmsg.split(' ', 3)
-            nick = str(parts[0].split('!')[0])[1:]
-            where = str(parts[2])
-            msg = str(parts[3])[1:]
+        message = IrcMessage(message=ircmsg)
+        if message.command == 'PRIVMSG':
+            nick = message.prefix.nick
+            where = message.params.middle
+            msg = message.params.trailing
             if where[0] == '#' and config.ircLogFolder:
                 fileName = where + '#full.log'
                 pathArgs = config.ircLogFolder, fileName
                 dtnow = datetime.datetime.now()
-                now = dtnow.strftime('< %Y-%m-%d %H:%M:%S.%f ')
+                now = dtnow.strftime(_logDateFormat)
                 with open(os.path.join(*pathArgs), 'a',
                           encoding='utf-8') as file:
-                    file.write(now + ircmsg + '\n')
+                    file.write('< ' + now + ' ' + ircmsg + '\n')
             if where[0] == '#' and config.ircLogFolder and nick != 'jtv':
                 fileName = where + '#msg.log'
                 pathArgs = config.ircLogFolder, fileName
                 dtnow = datetime.datetime.now()
-                now = dtnow.strftime('[%Y-%m-%d %H:%M:%S.%f] ')
+                now = dtnow.strftime(_logDateFormat)
                 with open(os.path.join(*pathArgs), 'a',
                           encoding='utf-8') as file:
-                    file.write(now + nick + ': ' + msg + '\n')
+                    file.write('[' + now + '] ' + nick + ': ' + msg + '\n')
             if where in self._channels:
                 ircchannel.commands.parse(self._channels[where], nick, msg)
-            return
         
-        if ircmsg.find(' NOTICE ') != -1:
-            parts = ircmsg.split(' ', 3)
-            nick = parts[0].split('!')[0][1:]
-            msg = parts[3][1:]
-            if msg == 'Login unsuccessful':
-                ircuser.notice.parse(self, nick, msg)
-            return
+        if (message.command == 'NOTICE' and message.prefix is not None and
+            message.prefix.nick is not None and
+            message.params.trailing is not None):
+            ircuser.notice.parse(self, message.prefix.nick,
+                                 message.params.trailing)
         
-        if ircmsg.find('PING :') != -1:
-            self.ping()
-            return
+        if message.command == 'PING' and message.params.trailing is not None:
+            self.ping(message.params.trailing)
         
-        if ircmsg.find(' PONG ') != -1:
+        if (message.command == 'PONG' and message.prefix is not None and
+            message.prefix.servername is not None and 
+            message.prefix.servername == 'tmi.twitch.tv' and
+            not message.params.isEmpty and
+            message.params.middle == 'tmi.twitch.tv' and
+            message.params.trailing == config.botnick):
             self.lastPing = datetime.datetime.now()
-            return
 
 
 class NoPingException(Exception):

@@ -1,4 +1,6 @@
 from config import config
+from twitchmessage.ircmessage import IrcMessage
+from twitchmessage.ircparams import IrcMessageParams
 import threading
 import traceback
 import datetime
@@ -47,7 +49,10 @@ class JoinThread(threading.Thread):
                     channelData = channels[channel]
                     socket = channelData.socket
                     if socket is not None:
-                        ircCommand = 'JOIN ' + channelData.channel + '\n'
+                        ircCommand = IrcMessage(
+                            command='JOIN',
+                            params=IrcMessageParams(
+                                middle=channelData.channel))
                         params = ircCommand, channelData.channel
                         channelData.socket.sendIrcCommand(*params)
                         self._channelJoined.add(channelData.channel)

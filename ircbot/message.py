@@ -1,5 +1,7 @@
 # Message Queue
 from config import config
+from twitchmessage.ircmessage import IrcMessage
+from twitchmessage.ircparams import IrcMessageParams
 import ircbot.channeldata
 import threading
 import traceback
@@ -48,7 +50,10 @@ class MessageQueue(threading.Thread):
                         '#' + config.botnick != msg[0].channel):
                         self._publicTime = datetime.datetime.utcnow()
                     self._timesSent.append(datetime.datetime.utcnow())
-                    _ = 'PRIVMSG ' + msg[0].channel + ' :' + msg[1] + '\n'
+                    _ = IrcMessage(command='PRIVMSG',
+                                   params=IrcMessageParams(
+                                       middle=msg[0].channel,
+                                       trailing=msg[1]))
                     try:
                         msg[0].socket.sendIrcCommand(_, msg[0].channel)
                     except OSError:
