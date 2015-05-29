@@ -36,7 +36,7 @@ def threadParse(channelData, tags, nick, message, msgParts):
         msgParts = [str(), str()]
     
     try:
-        if False and config.owner is not None:
+        if config.owner is not None:
             isOwner = nick == config.owner.lower()
             _ = channelData.channel == '#' + config.botnick
             isOwnerChan = channelData.channel == '#' + config.owner or _
