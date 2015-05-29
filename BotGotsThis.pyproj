@@ -72,6 +72,7 @@
     <Compile Include="privatechannel\default\commandList.py" />
     <Compile Include="privatechannel\default\feature.py" />
     <Compile Include="privatechannel\default\manageBot.py" />
+    <Compile Include="privatechannel\default\__init__.py" />
     <Compile Include="privatechannel\feature.dist.py" />
     <Compile Include="privatechannel\feature.py" />
     <Compile Include="privatechannel\manageBot.dist.py">
