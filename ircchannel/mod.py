@@ -60,9 +60,3 @@ def commandPurge(channelData, nick, message, msgParts, permissions):
         channelData.sendMessage('.timeout ' + msgParts[1] + ' 1')
         return True
     return False
-
-def commandReloadMods(channelData, nick, message, msgParts, permissions):
-    channelData.clearMods()
-    channelData.sendMessage('.mods', 0)
-    channelData.sendMessage('Reloaded mods for ' + channelData.channel[1:])
-    return True

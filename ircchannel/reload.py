@@ -39,7 +39,6 @@ def moduleKey(module):
 def commandReload(channelData, nick, message, msgParts, permissions):
     channelData.sendMessage('Reloading', 0)
     
-    commandReloadAllMods(channelData, nick, message, msgParts, permissions)
     commandReloadCommands(channelData, nick, message, msgParts, permissions)
     commandReloadConfig(channelData, nick, message, msgParts, permissions)
     
@@ -62,12 +61,4 @@ def commandReloadConfig(channelData, nick, message, msgParts, permissions):
     imp.reload(sys.modules['config.config'])
     
     channelData.sendMessage('Complete Config', 0)
-    return True
-
-def commandReloadAllMods(channelData, nick, message, msgParts, permissions):
-    channelData.sendMessage('Reloading Mods', 0)
-    for channel in set(ircbot.irc.channels.keys()):
-        ircbot.irc.channels[channel].clearMods()
-        ircbot.irc.channels[channel].sendMessage('.mods', 0)
-    channelData.sendMessage('Complete Mods', 0)
     return True

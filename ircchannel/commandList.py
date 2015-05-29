@@ -21,8 +21,6 @@ commands = {
     (ircchannel.reload.commandReloadCommands, 'owner+ownerChan'),
     '!reloadconfig':
     (ircchannel.reload.commandReloadConfig, 'owner+ownerChan'),
-    '!reloadallmods':
-    (ircchannel.reload.commandReloadAllMods, 'owner+ownerChan'),
     '!join': (ircchannel.owner.commandJoin, 'admin+ownerChan'),
     '!part': (ircchannel.owner.commandPart, 'admin+ownerChan'),
     '!emptychat': (ircchannel.owner.commandEmpty, 'admin+ownerChan'),
@@ -37,7 +35,6 @@ commands = {
     '!pyramid': (ircchannel.pyramid.commandPyramid, 'moderator'),
     '!rpyramid': (ircchannel.pyramid.commandRPyramid, 'moderator'),
     '!wall': (ircchannel.wall.commandWall, 'moderator'),
-    '!reloadmods': (ircchannel.mod.commandReloadMods, 'moderator'),
     '!status': (ircchannel.mod.commandStatus, 'moderator'),
     '!title': (ircchannel.mod.commandStatus, 'moderator'),
     '!game': (ircchannel.mod.commandGame, 'moderator'),
