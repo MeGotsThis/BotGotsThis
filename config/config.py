@@ -8,10 +8,12 @@ if not os.path.isfile('config.ini'):
     print('Missing config.ini')
     sys.exit(0)
 
-mainServer = 'irc.twitch.tv'
-eventServer = '192.16.64.143'
 ini = configparser.ConfigParser()
 ini.read('config.ini')
+
+mainServer = str(ini['TWITCH']['main'])
+eventServer = str(ini['TWITCH']['event'])
+
 botnick = str(ini['BOT']['botnick']).lower()
 password = str(ini['BOT']['password'])
 owner = str(ini['BOT']['owner']).lower()
