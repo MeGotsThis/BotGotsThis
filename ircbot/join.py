@@ -59,8 +59,6 @@ class JoinThread(threading.Thread):
                         with self._joinTimesLock:
                             self._joinTimes.append(datetime.datetime.utcnow())
                         
-                        channelData.sendMessage('.mods')
-                        
                         print(str(datetime.datetime.now()) + ' Joined ' +
                               channelData.channel + ' on ' +
                               channelData.socket.name)

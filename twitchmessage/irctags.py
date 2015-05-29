@@ -52,9 +52,21 @@ class IrcMessageTags:
         return len(self._items)
     
     def __getitem__(self, key):
+        if isinstance(key, str):
+            key = IrcMessageTagsKey(keyOrVendorKey=key)
+        elif isinstance(key, IrcMessageTagsKey):
+            pass
+        else:
+            raise TypeError()
         return self._items[key]
     
     def __setitem__(self, key, value):
+        if isinstance(key, str):
+            key = IrcMessageTagsKey(keyOrVendorKey=key)
+        elif isinstance(key, IrcMessageTagsKey):
+            pass
+        else:
+            raise TypeError()
         if value == True:
             self._items[key] = value
         elif isinstance(value, str):
@@ -122,6 +134,12 @@ class IrcMessageTagsReadOnly:
         return len(self._items)
     
     def __getitem__(self, key):
+        if isinstance(key, str):
+            key = IrcMessageTagsKey(keyOrVendorKey=key)
+        elif isinstance(key, IrcMessageTagsKey):
+            pass
+        else:
+            raise TypeError()
         return self._items[key]
     
     def __iter__(self):

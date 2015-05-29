@@ -46,7 +46,7 @@ class MessageQueue(threading.Thread):
             while self.running:
                 msg = self._getMessage()
                 if msg is not None:
-                    if (config.botnick not in msg[0].mods and
+                    if (not msg[0].isMod and
                         '#' + config.botnick != msg[0].channel):
                         self._publicTime = datetime.datetime.utcnow()
                     self._timesSent.append(datetime.datetime.utcnow())
@@ -144,9 +144,7 @@ class MessageQueue(threading.Thread):
     
     @staticmethod
     def _isModInChannel(msgQueue):
-        isMod = bool(config.botnick in msgQueue[0].mods)
-        isMod = isMod or '#' + config.botnick == msgQueue[0].channel
-        return isMod
+        return msgQueue[0].isMod or '#' + config.botnick == msgQueue[0].channel
     
     def clearQueue(self, channel):
         with self._queueLock:

@@ -3,6 +3,7 @@ from twitchmessage.ircmessage import IrcMessage
 from twitchmessage.ircparams import IrcMessageParams
 import ircchannel.commands
 import ircuser.notice
+import ircuser.userstate
 import ircbot.irc
 import threading
 import traceback
@@ -213,6 +214,7 @@ class SocketThread(threading.Thread):
     def _parseMsg(self, ircmsg):
         message = IrcMessage(message=ircmsg)
         if message.command == 'PRIVMSG':
+            tags = message.tags
             nick = message.prefix.nick
             where = message.params.middle
             msg = message.params.trailing
@@ -233,7 +235,8 @@ class SocketThread(threading.Thread):
                           encoding='utf-8') as file:
                     file.write('[' + now + '] ' + nick + ': ' + msg + '\n')
             if where in self._channels:
-                ircchannel.commands.parse(self._channels[where], nick, msg)
+                chan = self._channels[where]
+                ircchannel.commands.parse(chan, tags, nick, msg)
         
         if (message.command == 'NOTICE' and message.prefix is not None and
             message.prefix.nick is not None and
@@ -251,6 +254,13 @@ class SocketThread(threading.Thread):
             message.params.middle == 'tmi.twitch.tv' and
             message.params.trailing == config.botnick):
             self.lastPing = datetime.datetime.now()
+        
+        if message.command == 'USERSTATE':
+            where = message.params.middle
+            chan = self._channels[where]
+            tags = message.tags
+            ircuser.userstate.parse(chan, tags)
+            pass
 
 
 class NoPingException(Exception):

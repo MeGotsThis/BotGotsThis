@@ -11,7 +11,7 @@ import time
 import sys
 
 # Set up our commands function
-def parse(channelData, nick, message):
+def parse(channelData, tags, nick, message):
     if len(message) == 0:
         return
     
@@ -25,10 +25,10 @@ def parse(channelData, nick, message):
     
     name = channelData.channel + '-' + str(msgParts[0]) + '-'
     name += str(time.time())
-    params = channelData, nick, message, msgParts
+    params = channelData, tags, nick, message, msgParts
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(channelData, nick, message, msgParts):
+def threadParse(channelData, tags, nick, message, msgParts):
     if False: # Hints for Intellisense
         channelData = ircbot.channeldata.ChannelData('', None)
         nick = str()
@@ -36,22 +36,22 @@ def threadParse(channelData, nick, message, msgParts):
         msgParts = [str(), str()]
     
     try:
-        if config.owner is not None:
+        if False and config.owner is not None:
             isOwner = nick == config.owner.lower()
             _ = channelData.channel == '#' + config.botnick
             isOwnerChan = channelData.channel == '#' + config.owner or _
         else:
             isOwner = False
             isOwnerChan = False
-        isStaff = isOwner or nick in channelData.twitchStaff
-        isAdmin = isStaff or nick in channelData.twitchAdmin
-        isGlobalMod = isAdmin or nick in channelData.globalMods
-        isBroadcaster = '#' + nick == channelData.channel
+        isStaff = isOwner or tags['user-type'] in ['staff']
+        isAdmin = isStaff or tags['user-type'] in ['staff', 'admin']
+        isGlobalMod = isAdmin or tags['user-type'] == 'global_mod'
+        isBroadcaster = nick == channelData.channel[1:]
         isBroadcaster = isGlobalMod or isAdmin or isBroadcaster
-        isMod = isBroadcaster or nick in channelData.mods
-        isSubscriber = isBroadcaster or nick in channelData.subscribers
-        isTurbo = isBroadcaster or nick in channelData.turboUsers
-        isChanMod = config.botnick.lower() in channelData.mods
+        isMod = isBroadcaster or tags['user-type'] in ['staff', 'admin', 'mod']
+        isSubscriber = isBroadcaster or bool(int(tags['subscriber']))
+        isTurbo = isBroadcaster or bool(int(tags['turbo']))
+        isChanMod = channelData.isMod
         permissions = {
             'owner': isOwner,
             'ownerChan': isOwnerChan,
