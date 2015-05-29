@@ -65,6 +65,7 @@
     <Compile Include="ircchannel\__init__.py" />
     <Compile Include="ircuser\jtv.py" />
     <Compile Include="ircuser\notice.py" />
+    <Compile Include="ircuser\userstate.py" />
     <Compile Include="ircuser\__init__.py" />
     <Compile Include="privatechannel\commandList.dist.py" />
     <Compile Include="privatechannel\commandList.py" />
