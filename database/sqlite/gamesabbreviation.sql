@@ -226,6 +226,24 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('lc
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('hw', 'Hyrule Warriors');
 
 
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crash1', 'Crash Bandicoot');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crashbandicoot1', 'Crash Bandicoot');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crash2', 'Crash Bandicoot 2: Cortex Strikes Back');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crashbandicoot2', 'Crash Bandicoot 2: Cortex Strikes Back');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crash3', 'Crash Bandicoot: Warped');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crashbandicoot3', 'Crash Bandicoot: Warped');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ctr', 'Crash Team Racing');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crashbash', 'Crash Bash');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crashtwoc', 'Crash Bandicoot: The Wrath of Cortex');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crashbandicoottwoc', 'Crash Bandicoot: The Wrath of Cortex');
+
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('spyro1', 'Spyro the Dragon');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('spyro2', 'Spyro 2: Ripto''s Rage');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('spyro3', 'Spyro: Year of the Dragon');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('spyroetd', 'Spyro: Enter the Dragonfly');
+
+
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gdash', 'Geometry Dash');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('geometrydash', 'Geometry Dash');
 
