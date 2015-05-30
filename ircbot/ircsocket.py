@@ -156,7 +156,7 @@ class SocketThread(threading.Thread):
                 pathArgs = config.ircLogFolder, fileName
                 with open(os.path.join(*pathArgs), 'a',
                           encoding='utf-8') as file:
-                    file.write(now + str(message))
+                    file.write('> ' + now + ' ' + str(message))
                 if command.startswith(b'PRIVMSG'):
                     now = dtnow.strftime(_logDateFormat)
                     fileName = channel + '#msg.log'
