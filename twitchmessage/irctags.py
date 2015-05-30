@@ -77,6 +77,15 @@ class IrcMessageTags:
     def __delitem__(self, key):
         del self._items[key]
     
+    def __contains__(self, item):
+        if isinstance(item, str):
+            item = IrcMessageTagsKey(keyOrVendorKey=item)
+        elif isinstance(item, IrcMessageTagsKey):
+            pass
+        else:
+            raise TypeError()
+        return item in self._items
+    
     def __iter__(self):
         for i in self._items:
             yield i
@@ -141,6 +150,15 @@ class IrcMessageTagsReadOnly:
         else:
             raise TypeError()
         return self._items[key]
+    
+    def __contains__(self, item):
+        if isinstance(item, str):
+            item = IrcMessageTagsKey(keyOrVendorKey=item)
+        elif isinstance(item, IrcMessageTagsKey):
+            pass
+        else:
+            raise TypeError()
+        return item in self._items
     
     def __iter__(self):
         for i in self._items:

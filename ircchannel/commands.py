@@ -10,6 +10,11 @@ import datetime
 import time
 import sys
 
+typeStaff = ['staff']
+typeAdmin = ['staff', 'admin']
+typeGlobalMod = ['staff', 'admin', 'global_mod']
+typeMod = ['staff', 'admin', 'global_mod', 'mod']
+
 # Set up our commands function
 def parse(channelData, tags, nick, message):
     if len(message) == 0:
@@ -36,6 +41,9 @@ def threadParse(channelData, tags, nick, message, msgParts):
         msgParts = [str(), str()]
     
     try:
+        userType = tags['user-type'] if 'user-type' in tags else ''
+        subscriber = tags['subscriber'] if 'subscriber' in tags else '0'
+        turbo = tags['turbo'] if 'turbo' in tags else '0'
         if config.owner is not None:
             isOwner = nick == config.owner.lower()
             _ = channelData.channel == '#' + config.botnick
@@ -43,14 +51,14 @@ def threadParse(channelData, tags, nick, message, msgParts):
         else:
             isOwner = False
             isOwnerChan = False
-        isStaff = isOwner or tags['user-type'] in ['staff']
-        isAdmin = isStaff or tags['user-type'] in ['staff', 'admin']
-        isGlobalMod = isAdmin or tags['user-type'] == 'global_mod'
+        isStaff = isOwner or userType in typeStaff
+        isAdmin = isStaff or userType in typeAdmin
+        isGlobalMod = isAdmin or userType in typeGlobalMod
         isBroadcaster = nick == channelData.channel[1:]
         isBroadcaster = isGlobalMod or isAdmin or isBroadcaster
-        isMod = isBroadcaster or tags['user-type'] in ['staff', 'admin', 'mod']
-        isSubscriber = isBroadcaster or bool(int(tags['subscriber']))
-        isTurbo = isBroadcaster or bool(int(tags['turbo']))
+        isMod = isBroadcaster or userType in typeMod
+        isSubscriber = isBroadcaster or bool(int(subscriber))
+        isTurbo = isBroadcaster or bool(int(turbo))
         isChanMod = channelData.isMod
         permissions = {
             'owner': isOwner,
