@@ -50,7 +50,7 @@ commands = {
     '!upsidedown': (ircchannel.charConvert.commandUpsideDown, 'moderator'),
     '!come': (ircchannel.broadcaster.commandCome, 'ownerChan'),
     '!autojoin': (ircchannel.broadcaster.commandAutoJoin, 'ownerChan'),
-    '!uptime': (ircchannel.broadcaster.commandUptime, 'ownerChan'),
+    '!uptime': (ircchannel.broadcaster.commandUptime, None),
 }
 commandsStartWith = {
     '!pyramid-': (ircchannel.pyramid.commandPyramidLong, 'moderator'),
