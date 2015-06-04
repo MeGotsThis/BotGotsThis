@@ -48,11 +48,11 @@ def threadParse(channelData, tags, nick, message, msgParts):
         if tags is not None and 'subscriber' in tags:
             subscriber = tags['subscriber']
         else:
-            subscriber = ''
+            subscriber = '0'
         if tags is not None and 'turbo' in tags:
             turbo = tags['turbo']
         else:
-            turbo = ''
+            turbo = '0'
         if config.owner is not None:
             isOwner = nick == config.owner.lower()
             _ = channelData.channel == '#' + config.botnick
