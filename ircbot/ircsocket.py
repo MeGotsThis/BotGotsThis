@@ -150,21 +150,21 @@ class SocketThread(threading.Thread):
             dtnow = datetime.datetime.now()
             now = dtnow.strftime(_logDateFormat)
             with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
-                file.write('> ' + now + ' ' + str(message))
+                file.write('> ' + now + ' ' + str(message) + '\n')
             if channel:
                 fileName = channel + '#full.log'
                 pathArgs = config.ircLogFolder, fileName
                 with open(os.path.join(*pathArgs), 'a',
                           encoding='utf-8') as file:
-                    file.write('> ' + now + ' ' + str(message))
-                if command.startswith(b'PRIVMSG'):
+                    file.write('> ' + now + ' ' + str(message) + '\n')
+                if message.command == 'PRIVMSG':
                     now = dtnow.strftime(_logDateFormat)
                     fileName = channel + '#msg.log'
                     pathArgs = config.ircLogFolder, fileName
                     with open(os.path.join(*pathArgs), 'a',
                               encoding='utf-8') as file:
                         line = '[' + now + '] ' + config.botnick + ': '
-                        line += message.params.trailing
+                        line += message.params.trailing + '\n'
                         file.write(line)
     
     def _connect(self):
