@@ -8,7 +8,7 @@ def parse(channelData, tags):
     ircbot.irc.isTwitchTurbo = bool(int(tags['turbo']))
     channelData.isMod = tags['user-type'] in ['staff', 'admin', 'mod']
     
-    emoteset = tags['emotesets'].split(',')
+    emoteset = tags['emote-sets'].split(',')
     emoteset = [int(i) for i in emoteset]
     # This is to remove twitch turbo emotes that are shared with
     # global emoticons
