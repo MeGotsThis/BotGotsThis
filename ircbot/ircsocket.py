@@ -257,9 +257,10 @@ class SocketThread(threading.Thread):
         
         if message.command == 'USERSTATE':
             where = message.params.middle
-            chan = self._channels[where]
-            tags = message.tags
-            ircuser.userstate.parse(chan, tags)
+            if where in self._channels:
+                chan = self._channels[where]
+                tags = message.tags
+                ircuser.userstate.parse(chan, tags)
             pass
 
 
