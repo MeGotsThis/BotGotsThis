@@ -257,6 +257,14 @@ class SocketThread(threading.Thread):
         
         if message.command == 'USERSTATE':
             where = message.params.middle
+            if where[0] == '#' and config.ircLogFolder:
+                fileName = where + '#full.log'
+                pathArgs = config.ircLogFolder, fileName
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime(_logDateFormat)
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write('< ' + now + ' ' + ircmsg + '\n')
             if where in self._channels:
                 chan = self._channels[where]
                 tags = message.tags
