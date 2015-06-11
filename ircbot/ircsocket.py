@@ -128,7 +128,7 @@ class SocketThread(threading.Thread):
             raise TypeError()
         command = (str(message) + '\r\n').encode('utf-8')
         try:
-            self._ircsock.send(command[:2048])
+            self._ircsock.send(command)
         except socket.error:
             now = datetime.datetime.now()
             _ = traceback.format_exception(*sys.exc_info())

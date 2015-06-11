@@ -36,7 +36,7 @@ class MessageQueue(threading.Thread):
             self.queueWhisper(msgParts[1], msgParts[2])
             return
         with self._queueLock:
-            self._queues[priority].append((channelData, message))
+            self._queues[priority].append((channelData, message[:1000]))
     
     def queueMultipleMessages(self, channelData, messages, priority=1):
         with self._queueLock:
@@ -46,16 +46,16 @@ class MessageQueue(threading.Thread):
                 if message.startswith('/w '):
                     param = (ircbot.irc.groupChannel,
                      '/w ' + msgParts[1] + ' ' + msgParts[2])
-                    self._queues[priority].append(param)
                 else:
-                    self._queues[priority].append((channelData, message))
+                    param = (channelData, message[:1000])
+                self._queues[priority].append(param)
     
     def queueWhisper(self, nick, message, priority=1):
         if not nick and not message:
             return
         with self._queueLock:
             param = (ircbot.irc.groupChannel,
-                     '/w ' + nick + ' ' + message)
+                     ('/w ' + nick + ' ' + message)[:1000])
             self._queues[priority].append(param)
     
     def run(self):

@@ -25,7 +25,7 @@ def commandWall(channelData, nick, message, msgParts, permissions):
             rows = int(msgParts[3])
     except:
         pass
-    length = min(length, (2048 - 11 - len(channelData.channel)) // len(rep))
+    length = min(length, 1000 // len(rep))
     if not permissions['broadcaster']:
         length = min(length, 5)
         rows = min(rows, 10)
