@@ -13,6 +13,7 @@ ini.read('config.ini')
 
 mainServer = str(ini['TWITCH']['main'])
 eventServer = str(ini['TWITCH']['event'])
+groupServer = str(ini['TWITCH']['group'])
 
 botnick = str(ini['BOT']['botnick']).lower()
 password = str(ini['BOT']['password'])

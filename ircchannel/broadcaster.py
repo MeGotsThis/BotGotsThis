@@ -27,11 +27,14 @@ def commandCome(channelData, nick, message, msgParts, permissions):
         None, 'GET', '/api/channels/' + nick + '/chat_properties')
     chatProperties = json.loads(data.decode('utf-8'))
     
-    if ircbot.irc.joinChannel(nick, priority, chatProperties['eventchat']):
+    if chatProperties['eventServer']:
+        server = ircbot.irc.eventChat
+    else:
+        server = ircbot.irc.mainChat
+    if ircbot.irc.joinChannel(nick, priority, server):
         channelData.sendMessage('Joining ' + nick)
     else:
-        params = nick, priority, chatProperties['eventchat']
-        result = ircbot.irc.ensureServer(*params)
+        result = ircbot.irc.ensureServer(nick, priority, server)
         if result == ircbot.irc.ENSURE_CORRECT:
             channelData.sendMessage('Already joined ' + nick)
         elif result == ircbot.irc.ENSURE_REJOIN_TO_MAIN:
@@ -87,11 +90,14 @@ def commandAutoJoin(channelData, nick, message, msgParts, permissions):
             db.setAutoJoinServer(nick, chatProperties['eventchat'])
     
     wasInChat = ('#' + nick) in ircbot.irc.channels
-    if not wasInChat:
-        ircbot.irc.joinChannel(nick, priority, chatProperties['eventchat'])
+    if chatProperties['eventServer']:
+        server = ircbot.irc.eventChat
     else:
-        params = nick, priority, chatProperties['eventchat']
-        rejoin = ircbot.irc.ensureServer(*params)
+        server = ircbot.irc.mainChat
+    if not wasInChat:
+        ircbot.irc.joinChannel(nick, priority, server)
+    else:
+        rejoin = ircbot.irc.ensureServer(nick, priority, server)
     
     if result and not wasInChat:
         channelData.sendMessage(

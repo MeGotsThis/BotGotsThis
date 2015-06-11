@@ -11,6 +11,8 @@ mainChat = ircbot.ircsocket.SocketThread(config.mainServer,
                                          name='Main Chat')
 eventChat = ircbot.ircsocket.SocketThread(config.eventServer,
                                           name='Event Chat')
+groupChat = ircbot.ircsocket.SocketThread(config.groupServer,
+                                          name='Group Chat')
 join = ircbot.join.JoinThread(name='Join Thread')
 join.add(mainChat)
 join.add(eventChat)
@@ -65,7 +67,7 @@ globalEmotes = {
 globalEmotesCache = datetime.datetime.min
 globalSessionData = {}
 
-def joinChannel(channel, priority=float('inf'), eventServer=False):
+def joinChannel(channel, priority=float('inf'), server=mainChat):
     if channel[0] != '#':
         channel = '#' + channel
     channel = channel.lower()
@@ -73,10 +75,9 @@ def joinChannel(channel, priority=float('inf'), eventServer=False):
         channels[channel].joinPriority = min(
             channels[channel].joinPriority, priority)
         return False
-    socket = mainChat if not eventServer else eventChat
-    params = channel, socket, priority
+    params = channel, server, priority
     channels[channel] = ircbot.channeldata.ChannelData(*params)
-    socket.joinChannel(channels[channel])
+    server.joinChannel(channels[channel])
     return True
 
 def partChannel(channel):
@@ -91,17 +92,18 @@ ENSURE_REJOIN_TO_EVENT = int(-1)
 ENSURE_CORRECT = int(0)
 ENSURE_NOT_JOINED = int(1)
 
-def ensureServer(channel, priority=float('inf'), eventServer=False):
+def ensureServer(channel, priority=float('inf'), server=mainChat):
     if channel[0] != '#':
         channel = '#' + channel
     if channel not in channels:
         return ENSURE_NOT_JOINED
-    socket = mainChat if not eventServer else eventChat
-    if socket is channels[channel].socket:
+    if server is channels[channel].socket:
         channels[channel].joinPriority = min(
             channels[channel].joinPriority, priority)
         return ENSURE_CORRECT
     partChannel(channel)
-    joinChannel(channel, priority, eventServer)
-    return ENSURE_REJOIN_TO_EVENT if eventServer else ENSURE_REJOIN_TO_MAIN
-
+    joinChannel(channel, priority, server)
+    if server is eventChat:
+        return ENSURE_REJOIN_TO_EVENT
+    else:
+        return ENSURE_REJOIN_TO_MAIN
