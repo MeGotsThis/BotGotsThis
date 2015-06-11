@@ -16,6 +16,10 @@ groupChat = ircbot.ircsocket.SocketThread(config.groupServer,
 join = ircbot.join.JoinThread(name='Join Thread')
 join.add(mainChat)
 join.add(eventChat)
+join.add(groupChat)
+groupChannel = ircbot.channeldata.ChannelData(
+    '#' + config.botnick, groupChat, float('-inf'))
+groupChat.joinChannel(groupChannel)
 channels = {}
 displayName = config.botnick
 isTwitchTurbo = False

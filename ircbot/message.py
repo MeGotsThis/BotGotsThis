@@ -3,6 +3,7 @@ from config import config
 from twitchmessage.ircmessage import IrcMessage
 from twitchmessage.ircparams import IrcMessageParams
 import ircbot.channeldata
+import ircbot.irc
 import threading
 import traceback
 import datetime
@@ -27,18 +28,35 @@ class MessageQueue(threading.Thread):
     def running(self, value):
         self._running = value
     
-    def queueMessage(self, channelData, message, priority):
+    def queueMessage(self, channelData, message, priority=1):
         if not message:
+            return
+        if message.startswith('/w '):
+            msgParts = message.split(' ', 2)
+            self.queueWhisper(msgParts[1], msgParts[2])
             return
         with self._queueLock:
             self._queues[priority].append((channelData, message))
     
-    def queueMultipleMessages(self, channelData, messages, priority):
+    def queueMultipleMessages(self, channelData, messages, priority=1):
         with self._queueLock:
             for message in messages:
                 if not message:
                     continue
-                self._queues[priority].append((channelData, message))
+                if message.startswith('/w '):
+                    param = (ircbot.irc.groupChannel,
+                     '/w ' + msgParts[1] + ' ' + msgParts[2])
+                    self._queues[priority].append(param)
+                else:
+                    self._queues[priority].append((channelData, message))
+    
+    def queueWhisper(self, nick, message, priority=1):
+        if not nick and not message:
+            return
+        with self._queueLock:
+            param = (ircbot.irc.groupChannel,
+                     '/w ' + nick + ' ' + message)
+            self._queues[priority].append(param)
     
     def run(self):
         print(str(datetime.datetime.now()) + ' Starting MessageQueue')
