@@ -302,6 +302,63 @@ class SocketThread(threading.Thread):
                             encoding='utf-8') as file:
                     file.write('< ' + now + ' ' + ircmsg + '\n')
         
+        if message.command == 'MODE':
+            where = message.params.middle.split()[0]
+            if where[0] == '#' and config.ircLogFolder:
+                fileName = where + '#full.log'
+                pathArgs = config.ircLogFolder, fileName
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime(_logDateFormat)
+                with open(os.path.join(*pathArgs), 'a',
+                            encoding='utf-8') as file:
+                    file.write('< ' + now + ' ' + ircmsg + '\n')
+        
+        if message.command == 'JOIN':
+            where = message.params.middle
+            nick = message.prefix.nick
+            if where[0] == '#' and config.ircLogFolder:
+                fileName = where + '#full.log'
+                pathArgs = config.ircLogFolder, fileName
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime(_logDateFormat)
+                with open(os.path.join(*pathArgs), 'a',
+                            encoding='utf-8') as file:
+                    file.write('< ' + now + ' ' + ircmsg + '\n')
+        
+        if message.command == 353:
+            where = message.params.middle.split()[-1]
+            if where[0] == '#' and config.ircLogFolder:
+                fileName = where + '#full.log'
+                pathArgs = config.ircLogFolder, fileName
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime(_logDateFormat)
+                with open(os.path.join(*pathArgs), 'a',
+                            encoding='utf-8') as file:
+                    file.write('< ' + now + ' ' + ircmsg + '\n')
+        
+        if message.command == 366:
+            where = message.params.middle.split()[-1]
+            if where[0] == '#' and config.ircLogFolder:
+                fileName = where + '#full.log'
+                pathArgs = config.ircLogFolder, fileName
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime(_logDateFormat)
+                with open(os.path.join(*pathArgs), 'a',
+                            encoding='utf-8') as file:
+                    file.write('< ' + now + ' ' + ircmsg + '\n')
+        
+        if message.command == 'PART':
+            where = message.params.middle
+            nick = message.prefix.nick
+            if where[0] == '#' and config.ircLogFolder:
+                fileName = where + '#full.log'
+                pathArgs = config.ircLogFolder, fileName
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime(_logDateFormat)
+                with open(os.path.join(*pathArgs), 'a',
+                            encoding='utf-8') as file:
+                    file.write('< ' + now + ' ' + ircmsg + '\n')
+
         if message.command == 'PING' and message.params.trailing is not None:
             self.ping(message.params.trailing)
         
