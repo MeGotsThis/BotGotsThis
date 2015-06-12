@@ -121,7 +121,7 @@ class SocketThread(threading.Thread):
         print(str(datetime.datetime.now()) + ' Ending SocketThread ' +
               self.name)
     
-    def sendIrcCommand(self, message, channel=None):
+    def sendIrcCommand(self, message, channel=None, whisper=None):
         if isinstance(message, IrcMessage):
             pass
         else:
@@ -151,7 +151,27 @@ class SocketThread(threading.Thread):
             now = dtnow.strftime(_logDateFormat)
             with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
                 file.write('> ' + now + ' ' + str(message) + '\n')
-            if channel:
+            if whisper:
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime(_logDateFormat)
+                fileName = '@' + whisper[0] + '@whisper.log'
+                pathArgs = config.ircLogFolder, fileName
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write('[' + now + '] ' + config.botnick + ': ' +
+                               whisper[1] + '\n')
+                fileName = config.botnick + '-All Whisper.log'
+                pathArgs = config.ircLogFolder, fileName
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write('[' + now + '] ' + config.botnick + ' -> ' + 
+                                whisper[0] + ': ' + whisper[1] + '\n')
+                fileName = config.botnick + '-Raw Whisper.log'
+                pathArgs = config.ircLogFolder, fileName
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write('> ' + now + ' ' + str(message) + '\n')
+            elif channel:
                 fileName = channel + '#full.log'
                 pathArgs = config.ircLogFolder, fileName
                 with open(os.path.join(*pathArgs), 'a',
@@ -237,6 +257,30 @@ class SocketThread(threading.Thread):
             if where in self._channels:
                 chan = self._channels[where]
                 ircchannel.commands.parse(chan, tags, nick, msg)
+        
+        if message.command == 'WHISPER':
+            tags = message.tags
+            nick = message.prefix.nick
+            msg = message.params.trailing
+            if config.ircLogFolder:
+                dtnow = datetime.datetime.now()
+                now = dtnow.strftime(_logDateFormat)
+                fileName = '@' + nick + '@whisper.log'
+                pathArgs = config.ircLogFolder, fileName
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write('[' + now + '] ' + nick + ': ' + msg + '\n')
+                fileName = config.botnick + '-All Whisper.log'
+                pathArgs = config.ircLogFolder, fileName
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write('[' + now + '] ' + nick + ' -> ' + 
+                               config.botnick + ': ' + msg + '\n')
+                fileName = config.botnick + '-Raw Whisper.log'
+                pathArgs = config.ircLogFolder, fileName
+                with open(os.path.join(*pathArgs), 'a',
+                          encoding='utf-8') as file:
+                    file.write('< ' + now + ' ' + ircmsg + '\n')
         
         if (message.command == 'NOTICE' and message.prefix is not None and
             message.prefix.nick is not None and

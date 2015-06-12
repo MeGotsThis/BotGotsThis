@@ -36,7 +36,8 @@ class MessageQueue(threading.Thread):
             self.queueWhisper(msgParts[1], msgParts[2])
             return
         with self._queueLock:
-            self._queues[priority].append((channelData, message[:1000]))
+            param = (channelData, message[:1000], None)
+            self._queues[priority].append(param)
     
     def queueMultipleMessages(self, channelData, messages, priority=1):
         with self._queueLock:
@@ -45,9 +46,10 @@ class MessageQueue(threading.Thread):
                     continue
                 if message.startswith('/w '):
                     param = (ircbot.irc.groupChannel,
-                     '/w ' + msgParts[1] + ' ' + msgParts[2])
+                     '/w ' + msgParts[1] + ' ' + msgParts[2],
+                     (msgParts[1].lower(), msgParts[2]))
                 else:
-                    param = (channelData, message[:1000])
+                    param = (channelData, message[:1000], None)
                 self._queues[priority].append(param)
     
     def queueWhisper(self, nick, message, priority=1):
@@ -55,7 +57,8 @@ class MessageQueue(threading.Thread):
             return
         with self._queueLock:
             param = (ircbot.irc.groupChannel,
-                     ('/w ' + nick + ' ' + message)[:1000])
+                     ('/w ' + nick + ' ' + message)[:1000],
+                     (nick.lower(), message))
             self._queues[priority].append(param)
     
     def run(self):
@@ -73,7 +76,7 @@ class MessageQueue(threading.Thread):
                                        middle=msg[0].channel,
                                        trailing=msg[1]))
                     try:
-                        msg[0].socket.sendIrcCommand(_, msg[0].channel)
+                        msg[0].socket.sendIrcCommand(_, msg[0].channel, msg[2])
                     except OSError:
                         pass
                 time.sleep(1 / config.messagePerSecond)
