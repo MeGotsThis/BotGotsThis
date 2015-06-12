@@ -194,6 +194,9 @@ class SocketThread(threading.Thread):
                 _logMessage(where + '#full.log', '< ' + ircmsg, now)
                 if nick != 'jtv':
                     _logMessage(where + '#msg.log', nick + ': ' + msg, now)
+            if config.botnick in msg.split():
+                file = config.botnick + '-Mentions.log'
+                _logMessage(file, nick + ' -> ' + where + ': ' + msg, now)
             if where in self._channels:
                 chan = self._channels[where]
                 ircchannel.commands.parse(chan, tags, nick, msg)
