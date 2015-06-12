@@ -188,7 +188,7 @@ def parseCommandMessageInput(message):
         command, fullText = mparts
         
         return (originalCommand, action.lower(), level, command, fullText)
-    except Exception:
+    except:
         return None
 
 def _parseFormatMessage(message):

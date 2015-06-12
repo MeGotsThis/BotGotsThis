@@ -62,7 +62,7 @@ class MessageQueue(threading.Thread):
             self._queues[priority].append(param)
     
     def run(self):
-        print(str(datetime.datetime.now()) + ' Starting MessageQueue')
+        print(str(datetime.datetime.utcnow()) + ' Starting MessageQueue')
         try:
             while self.running:
                 msg = self._getMessage()
@@ -80,21 +80,14 @@ class MessageQueue(threading.Thread):
                     except OSError:
                         pass
                 time.sleep(1 / config.messagePerSecond)
-        except Exception as e:
-            now = datetime.datetime.now()
-            _ = traceback.format_exception(*sys.exc_info())
-            if config.exceptionLog is not None:
-                with open(config.exceptionLog, 'a', encoding='utf-8') as file:
-                    file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                    file.write('Exception in thread ')
-                    file.write(threading.current_thread().name + ':\n')
-                    file.write(''.join(_))
+        except:
+            ircbot.irc.logException()
             raise
         finally:
             ircbot.irc.mainChat.running = False
             ircbot.irc.eventChat.running = False
             ircbot.irc.join.running = False
-            print(str(datetime.datetime.now()) + ' Ending MessageQueue')
+            print(str(datetime.datetime.utcnow()) + ' Ending MessageQueue')
     
     def _getMessage(self):
         msgDuration = datetime.timedelta(seconds=30.1)

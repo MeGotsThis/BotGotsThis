@@ -110,15 +110,6 @@ def threadParse(channelData, tags, nick, message, msgParts):
                             break
         if not complete:
             ircchannel.text.customCommands(*arguments)
-    except Exception as e:
-        now = datetime.datetime.now()
-        _ = traceback.format_exception(*sys.exc_info())
-        if config.exceptionLog is not None:
-            with open(config.exceptionLog, 'a', encoding='utf-8') as file:
-                file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                file.write('Exception in thread ')
-                file.write(threading.current_thread().name + ':\n')
-                file.write('Channel: ' + channelData.channel + '\n')
-                file.write('Message: ' + message + '\n')
-                file.write('Nick: ' + nick + '\n')
-                file.write(''.join(_))
+    except:
+        extra = 'Channel: ' + channelData.channel + '\nMessage: ' + message
+        ircbot.irc.logException(extra)

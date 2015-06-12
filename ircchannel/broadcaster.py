@@ -161,7 +161,7 @@ def commandUptime(channelData, nick, message, msgParts, permissions):
     except (ValueError, KeyError) as e:
         msg = 'Fail to get stream information from Twitch.tv'
         channelData.sendMessage(msg)
-    except Exception as e:
+    except:
         msg = 'Unknown Error'
         channelData.sendMessage(msg)
     chan = channelData.channel[1:]

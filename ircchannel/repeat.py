@@ -24,7 +24,7 @@ def commandAutoRepeat(channelData, nick, message, msgParts, permissions):
             minutesDuration = 0
         else:
             minutesDuration = float(msgParts[1])
-    except Exception:
+    except:
         return False
     
     try:

@@ -139,8 +139,8 @@ def manageAutoJoin(channelData, nick, message, msgParts):
                     params += server,
                     rejoin = ircbot.irc.ensureServer(*params)
                     
-                    print(str(datetime.datetime.now()) + ' Set Server for ' +
-                          channelRow['broadcaster'])
+                    print(str(datetime.datetime.utcnow()) + ' Set Server ' +
+                          'for ' + channelRow['broadcaster'])
         channelData.sendMessage('Auto Join reload server complete')
         return True
     
@@ -213,7 +213,7 @@ def manageAutoJoin(channelData, nick, message, msgParts):
     if msgParts[2] in ['pri', 'priority']:
         try:
             priority = int(msgParts[4])
-        except Exception:
+        except:
             priority = 0
         with database.factory.getDatabase() as db:
             result = db.setAutoJoinPriority(msgParts[3], priority)

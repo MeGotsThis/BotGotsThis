@@ -54,7 +54,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             cursor.execute(query, params)
             self.connection.commit()
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -69,7 +69,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             if cursor.rowcount == 0:
                 return False
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -84,7 +84,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             if cursor.rowcount == 0:
                 return False
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -99,7 +99,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             if cursor.rowcount == 0:
                 return False
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -169,7 +169,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
 
             self.connection.commit()
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -202,7 +202,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
 
             self.connection.commit()
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -242,7 +242,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
 
             self.connection.commit()
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -268,7 +268,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             if cursor.rowcount == 0:
                 return False
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -281,7 +281,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             params = broadcaster, feature
             cursor.execute(query, params)
             return cursor.fetchone() is not None
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -295,7 +295,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             cursor.execute(query, params)
             self.connection.commit()
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -311,7 +311,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             if cursor.rowcount == 0:
                 return False
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -322,7 +322,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             query = 'SELECT broadcaster FROM banned_channels'
             cursor.execute(query)
             return [r[0] for r in cursor.fetchall()]
-        except Exception as e:
+        except:
             return []
         finally:
             cursor.close()
@@ -337,7 +337,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             if row is not None:
                 return row[0]
             return False
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -363,7 +363,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
 
             self.connection.commit()
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()
@@ -387,7 +387,7 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
 
             self.connection.commit()
             return True
-        except Exception:
+        except:
             return False
         finally:
             cursor.close()

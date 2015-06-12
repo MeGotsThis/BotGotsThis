@@ -1,6 +1,7 @@
 from config import config
 from twitchmessage.ircmessage import IrcMessage
 from twitchmessage.ircparams import IrcMessageParams
+import ircbot.irc
 import threading
 import traceback
 import datetime
@@ -18,7 +19,7 @@ class JoinThread(threading.Thread):
         self._channelsLock = threading.Lock()
     
     def run(self):
-        print(str(datetime.datetime.now()) + ' Starting SocketJoinThread')
+        print(str(datetime.datetime.utcnow()) + ' Starting SocketJoinThread')
         joinDuration = datetime.timedelta(seconds=10.05)
         running = lambda st: st.running
         while any(map(running, self._socketThreads)):
@@ -60,22 +61,14 @@ class JoinThread(threading.Thread):
                         with self._joinTimesLock:
                             self._joinTimes.append(datetime.datetime.utcnow())
                         
-                        print(str(datetime.datetime.now()) + ' Joined ' +
+                        print(str(datetime.datetime.utcnow()) + ' Joined ' +
                               channelData.channel + ' on ' +
                               channelData.socket.name)
                 
                 time.sleep(1 / config.joinPerSecond)
-            except Exception as e:
-                now = datetime.datetime.now()
-                _ = traceback.format_exception(*sys.exc_info())
-                if config.exceptionLog is not None:
-                    with open(config.exceptionLog, 'a',
-                              encoding='utf-8') as file:
-                        file.write(now.strftime('%Y-%m-%d %H:%M:%S.%f '))
-                        file.write('Exception in thread ')
-                        file.write(threading.current_thread().name + ':\n')
-                        file.write(''.join(_))
-        print(str(datetime.datetime.now()) + ' Ending SocketJoinThread')
+            except:
+                ircbot.irc.logException()
+        print(str(datetime.datetime.utcnow()) + ' Ending SocketJoinThread')
     
     def add(self, socketThread):
         self._socketThreads.append(socketThread)

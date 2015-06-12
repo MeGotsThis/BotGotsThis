@@ -13,8 +13,6 @@ import socket
 import time
 import sys
 
-_logDateFormat = '%Y-%m-%d %H:%M:%S.%f'
-
 class SocketThread(threading.Thread):
     def __init__(self, server, **args):
         threading.Thread.__init__(self, **args)
@@ -42,7 +40,7 @@ class SocketThread(threading.Thread):
         self._running = value
     
     def run(self):
-        print(str(datetime.datetime.now()) + ' Starting SocketThread ' +
+        print(str(datetime.datetime.utcnow()) + ' Starting SocketThread ' +
               self.name)
         
         while self.running:
@@ -51,13 +49,13 @@ class SocketThread(threading.Thread):
             try:
                 self._connect()
             except socket.error as e:
-                print(str(datetime.datetime.now()) + ' ' + self.name + ' ' +
-                      str(e))
+                print(str(datetime.datetime.utcnow()) + ' ' + self.name + 
+                      ' ' + str(e))
                 time.sleep(5)
                 continue
             self.lastSentPing = datetime.datetime.now()
             self.lastPing = datetime.datetime.now()
-            print(str(datetime.datetime.now()) + ' ' + self.name +
+            print(str(datetime.datetime.utcnow()) + ' ' + self.name +
                   ' Connected ' + self._server)
             
             ircbot.irc.join.connected(self)
@@ -74,18 +72,11 @@ class SocketThread(threading.Thread):
                             if not ircmsg:
                                 continue
                             ircmsg = bytes(ircmsg).decode('utf-8')
-                            if config.ircLogFolder:
-                                fileName = config.botnick + '-' + self.name
-                                fileName += '.log'
-                                pathArgs = config.ircLogFolder, fileName
-                                dtnow = datetime.datetime.now()
-                                now = dtnow.strftime(_logDateFormat)
-                                with open(os.path.join(*pathArgs), 'a',
-                                          encoding='utf-8') as file:
-                                    line = '< ' + now + ' ' + ircmsg + '\n'
-                                    file.write(line)
-                            self._parseMsg(ircmsg)
-                    except socket.timeout as e:
+                            now = datetime.datetime.utcnow()
+                            file = config.botnick + '-' + self.name + '.log'
+                            _logMessage(file, '< ' + ircmsg)
+                            self._parseMsg(ircmsg, now)
+                    except socket.timeout:
                         pass
                     sinceLastSend = datetime.datetime.now() - self.lastSentPing
                     sinceLast = datetime.datetime.now() - self.lastPing
@@ -101,24 +92,16 @@ class SocketThread(threading.Thread):
                 pass
             except LoginUnsuccessfulException:
                 pass
-            except Exception as e:
-                now = datetime.datetime.now()
-                _ = traceback.format_exception(*sys.exc_info())
-                if config.exceptionLog is not None:
-                    with open(config.exceptionLog, 'a',
-                              encoding='utf-8') as file:
-                        file.write(now.strftime(_logDateFormat))
-                        file.write(' Exception in thread ')
-                        file.write(threading.current_thread().name + ':\n')
-                        file.write(''.join(_))
+            except:
+                ircbot.irc.logException()
             finally:
                 self._ircsock.close()
             self._isConnected = False
             ircbot.irc.join.disconnected(self)
-            print(str(datetime.datetime.now()) + ' ' +  self.name +
+            print(str(datetime.datetime.utcnow()) + ' ' +  self.name +
                   ' Disconnected ' + self._server)
             time.sleep(5)
-        print(str(datetime.datetime.now()) + ' Ending SocketThread ' +
+        print(str(datetime.datetime.utcnow()) + ' Ending SocketThread ' +
               self.name)
     
     def sendIrcCommand(self, message, channel=None, whisper=None):
@@ -130,62 +113,30 @@ class SocketThread(threading.Thread):
         try:
             self._ircsock.send(command)
         except socket.error:
-            now = datetime.datetime.now()
-            _ = traceback.format_exception(*sys.exc_info())
-            if config.exceptionLog is not None:
-                with open(config.exceptionLog, 'a',
-                            encoding='utf-8') as file:
-                    file.write(now.strftime(_logDateFormat))
-                    file.write(' Exception in thread ')
-                    file.write(threading.current_thread().name + ':\n')
-                    if channel:
-                        file.write('Channel: ' + channel + '\n')
-                    file.write('Command: ' + str(message) + '\n')
-                    file.write(''.join(_))
+            extra = 'Command: ' + str(message)
+            if channel:
+                extra = 'Channel: ' + channel + '\n' + extra
+            ircbot.irc.logException(extra)
             self._isConnected = False
         
-        if config.ircLogFolder:
-            fileName = config.botnick + '-' + self.name + '.log'
-            pathArgs = config.ircLogFolder, fileName
-            dtnow = datetime.datetime.now()
-            now = dtnow.strftime(_logDateFormat)
-            with open(os.path.join(*pathArgs), 'a', encoding='utf-8') as file:
-                file.write('> ' + now + ' ' + str(message) + '\n')
-            if whisper:
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                fileName = '@' + whisper[0] + '@whisper.log'
-                pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('[' + now + '] ' + config.botnick + ': ' +
-                               whisper[1] + '\n')
-                fileName = config.botnick + '-All Whisper.log'
-                pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('[' + now + '] ' + config.botnick + ' -> ' + 
-                                whisper[0] + ': ' + whisper[1] + '\n')
-                fileName = config.botnick + '-Raw Whisper.log'
-                pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('> ' + now + ' ' + str(message) + '\n')
-            elif channel:
-                fileName = channel + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('> ' + now + ' ' + str(message) + '\n')
-                if message.command == 'PRIVMSG':
-                    now = dtnow.strftime(_logDateFormat)
-                    fileName = channel + '#msg.log'
-                    pathArgs = config.ircLogFolder, fileName
-                    with open(os.path.join(*pathArgs), 'a',
-                              encoding='utf-8') as file:
-                        line = '[' + now + '] ' + config.botnick + ': '
-                        line += message.params.trailing + '\n'
-                        file.write(line)
+        now = datetime.datetime.utcnow()
+        file = config.botnick + '-' + self.name + '.log'
+        _logMessage(file, '> ' + str(message), now)
+        if whisper:
+            file = '@' + whisper[0] + '@whisper.log'
+            _logMessage(file, config.botnick + ': ' + whisper[1], now)
+            file = config.botnick + '-All Whisper.log'
+            log = config.botnick + ' -> ' +  whisper[0] + ': ' + whisper[1]
+            _logMessage(file, log, now)
+            file = config.botnick + '-Raw Whisper.log'
+            _logMessage(file, '> ' + str(message), now)
+        elif channel:
+            file = channel + '#full.log'
+            _logMessage(file, '> ' + str(message), now)
+            if message.command == 'PRIVMSG':
+                file = channel + '#msg.log'
+                log = config.botnick + ': ' + message.params.trailing
+                _logMessage(file, log, now)
     
     def _connect(self):
         self._ircsock.connect((self._server, 6667))
@@ -223,7 +174,8 @@ class SocketThread(threading.Thread):
                                middle=channelData.channel)))
             del self._channels[channelData.channel]
         ircbot.irc.join.part(channelData.channel)
-        print(str(datetime.datetime.now()) + ' Parted ' + channelData.channel)
+        print(str(datetime.datetime.utcnow()) + ' Parted ' +
+              channelData.channel)
     
     def ping(self, message='ping'):
         self.sendIrcCommand(
@@ -231,29 +183,17 @@ class SocketThread(threading.Thread):
                        params=IrcMessageParams(trailing=message)))
         self.lastPing = datetime.datetime.now()
 
-    def _parseMsg(self, ircmsg):
+    def _parseMsg(self, ircmsg, now):
         message = IrcMessage(message=ircmsg)
         if message.command == 'PRIVMSG':
             tags = message.tags
             nick = message.prefix.nick
             where = message.params.middle
             msg = message.params.trailing
-            if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
-            if where[0] == '#' and config.ircLogFolder and nick != 'jtv':
-                fileName = where + '#msg.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('[' + now + '] ' + nick + ': ' + msg + '\n')
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
+                if nick != 'jtv':
+                    _logMessage(where + '#msg.log', nick + ': ' + msg, now)
             if where in self._channels:
                 chan = self._channels[where]
                 ircchannel.commands.parse(chan, tags, nick, msg)
@@ -262,25 +202,12 @@ class SocketThread(threading.Thread):
             tags = message.tags
             nick = message.prefix.nick
             msg = message.params.trailing
-            if config.ircLogFolder:
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                fileName = '@' + nick + '@whisper.log'
-                pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('[' + now + '] ' + nick + ': ' + msg + '\n')
-                fileName = config.botnick + '-All Whisper.log'
-                pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('[' + now + '] ' + nick + ' -> ' + 
-                               config.botnick + ': ' + msg + '\n')
-                fileName = config.botnick + '-Raw Whisper.log'
-                pathArgs = config.ircLogFolder, fileName
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
+            file = '@' + nick + '@whisper.log'
+            _logMessage(file, nick + ': ' + msg, now)
+            file = config.botnick + '-All Whisper.log'
+            _logMessage(file, nick + ' -> ' + config.botnick + ': ' + msg, now)
+            file = config.botnick + '-Raw Whisper.log'
+            _logMessage(file, '< ' + ircmsg, now)
         
         if (message.command == 'NOTICE' and message.prefix is not None and
             message.prefix.nick is not None and
@@ -293,25 +220,13 @@ class SocketThread(threading.Thread):
             message.params.middle is not None and
             message.params.trailing is not None):
             where = message.params.middle
-            if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                            encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
         
         if message.command == 'MODE':
             where, mode, nick = message.params.middle.split()
-            if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                            encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 if mode == '+o':
                     self._channels[where].ircOps.add(nick)
@@ -321,53 +236,29 @@ class SocketThread(threading.Thread):
         if message.command == 'JOIN':
             where = message.params.middle
             nick = message.prefix.nick
-            if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                            encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 self._channels[where].ircUsers.add(nick)
         
         if message.command == 353:
             where = message.params.middle.split()[-1]
             nicks = message.params.trailing.split(' ')
-            if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                            encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 self._channels[where].ircUsers.update(nicks)
         
         if message.command == 366:
             where = message.params.middle.split()[-1]
-            if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                            encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
         
         if message.command == 'PART':
             where = message.params.middle
             nick = message.prefix.nick
-            if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                            encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 self._channels[where].ircUsers.discard(nick)
 
@@ -384,14 +275,8 @@ class SocketThread(threading.Thread):
         
         if message.command == 'USERSTATE':
             where = message.params.middle
-            if where[0] == '#' and config.ircLogFolder:
-                fileName = where + '#full.log'
-                pathArgs = config.ircLogFolder, fileName
-                dtnow = datetime.datetime.now()
-                now = dtnow.strftime(_logDateFormat)
-                with open(os.path.join(*pathArgs), 'a',
-                          encoding='utf-8') as file:
-                    file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 chan = self._channels[where]
                 tags = message.tags
@@ -405,3 +290,14 @@ class NoPingException(Exception):
 
 class LoginUnsuccessfulException(Exception):
     pass
+
+
+def _logMessage(filename, message, timestamp=None):
+    if config.ircLogFolder is None:
+        return
+    logDateFormat = '%Y-%m-%dT%H:%M:%S.%f '
+    timestamp = datetime.datetime.utcnow() if timestamp is None else timestamp
+    timestampStr = timestamp.strftime(logDateFormat)
+    fullfilename = os.path.join(config.ircLogFolder, filename)
+    with open(fullfilename, 'a', encoding='utf-8') as file:
+        file.write(timestampStr + message + '\n')

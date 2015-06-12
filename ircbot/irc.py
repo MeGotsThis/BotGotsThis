@@ -4,6 +4,9 @@ import ircbot.ircsocket
 import ircbot.message
 import ircbot.join
 import datetime
+import sys
+import threading
+import traceback
 
 # Import some necessary libraries.
 messaging = ircbot.message.MessageQueue(name='Message Queue')
@@ -110,3 +113,17 @@ def ensureServer(channel, priority=float('inf'), server=mainChat):
         return ENSURE_REJOIN_TO_EVENT
     else:
         return ENSURE_REJOIN_TO_MAIN
+
+def logException(extraMessage=None):
+    if config.exceptionLog is None:
+        return
+    now = datetime.datetime.utcnow()
+    logDateFormat = '%Y-%m-%dT%H:%M:%S.%f '
+    _ = traceback.format_exception(*sys.exc_info())
+    with open(config.exceptionLog, 'a', encoding='utf-8') as file:
+        file.write(now.strftime(logDateFormat))
+        file.write('Exception in thread ')
+        file.write(threading.current_thread().name + ':\n')
+        if extraMessage:
+            file.write(extraMessage + '\n')
+        file.write(''.join(_))
