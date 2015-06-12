@@ -1,14 +1,16 @@
 ﻿import ircbot.irc
 
 class ChannelData:
-    __slots__ = ['_channel', '_socket', '_isMod',
-                 '_isSubscriber', '_sessionData', '_joinPriority']
+    __slots__ = ['_channel', '_socket', '_isMod', '_isSubscriber', '_ircUsers',
+                 '_ircOps', '_sessionData', '_joinPriority']
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
         self._channel = channel
         self._socket = socket
         self._isMod = False
         self._isSubscriber = False
+        self._ircUsers = set()
+        self._ircOps = set()
         self._joinPriority = float(joinPriority)
         self._sessionData = {}
     
@@ -37,6 +39,14 @@ class ChannelData:
         self._isSubscriber = bool(value)
     
     @property
+    def ircUsers(self):
+        return self._ircUsers
+    
+    @property
+    def ircOps(self):
+        return self._ircOps
+    
+    @property
     def joinPriority(self):
         return self._joinPriority
     
@@ -47,6 +57,10 @@ class ChannelData:
     @property
     def sessionData(self):
         return self._sessionData
+    
+    def onJoin(self):
+        self._ircUsers.clear()
+        self._ircOps.clear()
     
     def part(self):
         self.socket.partChannel(self)

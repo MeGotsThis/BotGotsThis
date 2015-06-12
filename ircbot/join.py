@@ -55,6 +55,7 @@ class JoinThread(threading.Thread):
                                 middle=channelData.channel))
                         params = ircCommand, channelData.channel
                         channelData.socket.sendIrcCommand(*params)
+                        channelData.onJoin()
                         self._channelJoined.add(channelData.channel)
                         with self._joinTimesLock:
                             self._joinTimes.append(datetime.datetime.utcnow())

@@ -303,7 +303,7 @@ class SocketThread(threading.Thread):
                     file.write('< ' + now + ' ' + ircmsg + '\n')
         
         if message.command == 'MODE':
-            where = message.params.middle.split()[0]
+            where, mode, nick = message.params.middle.split()
             if where[0] == '#' and config.ircLogFolder:
                 fileName = where + '#full.log'
                 pathArgs = config.ircLogFolder, fileName
@@ -312,6 +312,11 @@ class SocketThread(threading.Thread):
                 with open(os.path.join(*pathArgs), 'a',
                             encoding='utf-8') as file:
                     file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where in self._channels:
+                if mode == '+o':
+                    self._channels[where].ircOps.add(nick)
+                if mode == '-o':
+                    self._channels[where].ircOps.discard(nick)
         
         if message.command == 'JOIN':
             where = message.params.middle
@@ -324,9 +329,12 @@ class SocketThread(threading.Thread):
                 with open(os.path.join(*pathArgs), 'a',
                             encoding='utf-8') as file:
                     file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where in self._channels:
+                self._channels[where].ircUsers.add(nick)
         
         if message.command == 353:
             where = message.params.middle.split()[-1]
+            nicks = message.params.trailing.split(' ')
             if where[0] == '#' and config.ircLogFolder:
                 fileName = where + '#full.log'
                 pathArgs = config.ircLogFolder, fileName
@@ -335,6 +343,8 @@ class SocketThread(threading.Thread):
                 with open(os.path.join(*pathArgs), 'a',
                             encoding='utf-8') as file:
                     file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where in self._channels:
+                self._channels[where].ircUsers.update(nicks)
         
         if message.command == 366:
             where = message.params.middle.split()[-1]
@@ -358,6 +368,8 @@ class SocketThread(threading.Thread):
                 with open(os.path.join(*pathArgs), 'a',
                             encoding='utf-8') as file:
                     file.write('< ' + now + ' ' + ircmsg + '\n')
+            if where in self._channels:
+                self._channels[where].ircUsers.discard(nick)
 
         if message.command == 'PING' and message.params.trailing is not None:
             self.ping(message.params.trailing)
