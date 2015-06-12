@@ -377,8 +377,6 @@ class IrcMessage:
                 elif char == ':' and not len(s):
                     break
                 else:
-                    if char in ' \0\r\n':
-                        raise ValueError()
                     s.append(char)
             
             if len(s):
@@ -390,9 +388,6 @@ class IrcMessage:
                 while i < length:
                     char = message[i]
                     i += 1
-                    
-                    if char in '\0\r\n':
-                        raise ValueError()
                     
                     t.append(char)
             
