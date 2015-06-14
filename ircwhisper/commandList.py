@@ -1,4 +1,5 @@
 import ircwhisper.owner
+import ircwhisper.reload
 try:
     import privatewhisper.commandList as commandList
 except:
@@ -13,6 +14,9 @@ commands = {
     '!emptychat': (ircwhisper.owner.commandEmpty, 'admin'),
     '!emptyall': (ircwhisper.owner.commandEmptyAll, 'admin'),
     '!managebot': (ircwhisper.owner.commandManageBot, 'owner'),
+    '!reload': (ircwhisper.reload.commandReload, 'owner'),
+    '!reloadcommands': (ircwhisper.reload.commandReloadCommands, 'owner'),
+    '!reloadconfig': (ircwhisper.reload.commandReloadConfig, 'owner'),
     }
 
 commands = dict(list(commands.items()) + list(commandList.commands.items()))
