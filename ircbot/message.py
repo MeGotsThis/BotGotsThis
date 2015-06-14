@@ -86,6 +86,7 @@ class MessageQueue(threading.Thread):
         finally:
             ircbot.irc.mainChat.running = False
             ircbot.irc.eventChat.running = False
+            ircbot.irc.groupChat.running = False
             ircbot.irc.join.running = False
             print(str(datetime.datetime.utcnow()) + ' Ending MessageQueue')
     
