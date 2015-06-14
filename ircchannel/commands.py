@@ -77,8 +77,8 @@ def threadParse(channelData, tags, nick, message, msgParts):
             'globalMod': isGlobalMod,
             'broadcaster': isBroadcaster,
             'moderator': isMod,
-            'subscriber': isMod,
-            'turbo': isMod,
+            'subscriber': isSubscriber,
+            'turbo': isTurbo,
             'channelModerator': isChanMod,
             }
     
