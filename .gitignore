@@ -1,8 +1,12 @@
 *.pyc
 privatechannel/*
+privatewhisper/*
 nohup.out
 *.log
 *.suo
+config.ini
+twitchApi.ini
 
 # Ignoring sqlite databases
+*.db
 *.sqlite*
