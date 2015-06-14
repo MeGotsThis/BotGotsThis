@@ -34,6 +34,9 @@
     <Content Include="twitchApi.ini" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="botcommands\channel.py" />
+    <Compile Include="botcommands\exit.py" />
+    <Compile Include="botcommands\__init__.py" />
     <Compile Include="config\config.py" />
     <Compile Include="config\oauth.py" />
     <Compile Include="config\__init__.py" />
@@ -69,6 +72,7 @@
     <Compile Include="ircuser\__init__.py" />
     <Compile Include="ircwhisper\commandList.py" />
     <Compile Include="ircwhisper\commands.py" />
+    <Compile Include="ircwhisper\owner.py" />
     <Compile Include="ircwhisper\__init__.py" />
     <Compile Include="privatechannel\commandList.dist.py" />
     <Compile Include="privatechannel\commandList.py" />
@@ -95,6 +99,7 @@
     <Compile Include="twitchOauth.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="botcommands\" />
     <Folder Include="config" />
     <Folder Include="database" />
     <Folder Include="database\sqlite" />

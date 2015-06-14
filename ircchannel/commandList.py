@@ -26,7 +26,7 @@ commands = {
     '!emptychat': (ircchannel.owner.commandEmpty, 'admin+ownerChan'),
     '!emptyall': (ircchannel.owner.commandEmptyAll, 'admin+ownerChan'),
     '!global': (ircchannel.text.commandCommand, 'admin+ownerChan'),
-    '!say': (ircchannel.owner.commandSay, 'owner'),
+    '!say': (ircchannel.owner.commandSay, 'owner+ownerChan'),
     '!hello': (ircchannel.broadcaster.commandHello, 'broadcaster'),
     '!leave': (ircchannel.broadcaster.commandLeave, 'broadcaster'),
     '!feature': (ircchannel.feature.commandFeature, 'broadcaster'),

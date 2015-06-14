@@ -1,5 +1,8 @@
 from config import config
+import botcommands.channel
+import botcommands.exit
 import database.factory
+import ircbot.twitchApi
 import ircbot.irc
 import datetime
 import time
@@ -11,62 +14,27 @@ except:
     import privatechannel.default.manageBot as manageBot
 
 def commandExit(channelData, nick, message, msgParts, permissions):
-    channelData.sendMessage('Goodbye Keepo', 0)
-    time.sleep(0.5)
-    for channel in set(ircbot.irc.channels.keys()):
-        ircbot.irc.partChannel(channel)
-    ircbot.irc.messaging.running = False
+    botcommands.exit.botExit(channelData.sendMessage)
     return True
 
 def commandSay(channelData, nick, message, msgParts, permissions):
-    if (permissions['owner'] and permissions['ownerChan']):
-        msgParts = message.split(None, 2)
-        if msgParts[1][0] != '#':
-            msgParts[1] = '#' + msgParts[1]
-        if msgParts[1] in ircbot.irc.channels:
-            ircbot.irc.channels[msgParts[1]].sendMessage(msgParts[2])
-        return True
-    return False
+    msgParts = message.split(None, 2)
+    if msgParts[1][0] != '#':
+        msgParts[1] = '#' + msgParts[1]
+    if msgParts[1] in ircbot.irc.channels:
+        botcommands.channel.botSay(msgParts[1], msgParts[2])
+    return True
 
 def commandJoin(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
 
     chan = msgParts[1].lower()
-    
-    with database.factory.getDatabase() as db:
-        if db.isChannelBannedReason(chan):
-            channelData.sendMessage('Chat ' + chan + ' is banned from joining')
-            return True
-        priority = db.getAutoJoinsPriority(chan)
-    priority = priority if priority is not None else float('inf')
-    
-    response, data = ircbot.twitchApi.twitchCall(
-        None, 'GET', '/api/channels/' + chan + '/chat_properties')
-    chatProperties = json.loads(data.decode('utf-8'))
-    
     if chan[0] != '#':
         chan = '#' + chan
-    if chatProperties['eventServer']:
-        server = ircbot.irc.eventChat
-    else:
-        server = ircbot.irc.mainChat
-    if ircbot.irc.joinChannel(chan, priority, server):
-        channelData.sendMessage('Joining ' + chan[1:])
-    else:
-        if chatProperties['eventServer']:
-            server = ircbot.irc.eventChat
-        else:
-            server = ircbot.irc.mainChat
-        result = ircbot.irc.ensureServer(chan, priority, server)
-        if result == ircbot.irc.ENSURE_CORRECT:
-            channelData.sendMessage('Already joined ' + chan[1:])
-        elif result == ircbot.irc.ENSURE_REJOIN_TO_MAIN:
-            msg = 'Moved ' + chan[1:] + ' to main chat server'
-            channelData.sendMessage(msg)
-        elif result == ircbot.irc.ENSURE_REJOIN_TO_EVENT:
-            msg = 'Moved ' + chan[1:] + ' to event chat server'
-            channelData.sendMessage(msg)
+    
+    botcommands.channel.botJoin(chan, channelData.sendMessage)
+    return True
 
 def commandPart(channelData, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
@@ -74,21 +42,19 @@ def commandPart(channelData, nick, message, msgParts, permissions):
     chan = msgParts[1].lower()
     if chan[0] != '#':
         chan = '#' + chan
-    ircbot.irc.partChannel(chan)
-    channelData.sendMessage('Leaving ' + chan[1:])
+    botcommands.channel.botPart(chan, channelData.sendMessage)
     return True
 
 def commandEmptyAll(channelData, nick, message, msgParts, permissions):
-    ircbot.irc.messaging.clearAllQueue()
-    channelData.sendMessage('Cleared all queued msgs')
+    botcommands.channel.botEmptyAll(channelData.sendMessage)
     return True
 
 def commandEmpty(channelData, nick, message, msgParts, permissions):
+    if len(msgParts) < 2:
+        return False
     if msgParts[1][0] != '#':
         msgParts[1] = '#' + msgParts[1].lower()
-    ircbot.irc.messaging.clearQueue(msgParts[1])
-    channelData.sendMessage(
-        'Cleared all queued messages for ' + msgParts[1][1:])
+    botcommands.channel.botEmpty(msgParts[1], channelData.sendMessage)
     return True
 
 def commandManageBot(channelData, nick, message, msgParts, permissions):
