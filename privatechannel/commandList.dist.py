@@ -1,4 +1,2 @@
-commands = {
-}
-commandsStartWith = {
-}
+commands = {}
+commandsStartWith = {}

@@ -67,6 +67,9 @@
     <Compile Include="ircuser\notice.py" />
     <Compile Include="ircuser\userstate.py" />
     <Compile Include="ircuser\__init__.py" />
+    <Compile Include="ircwhisper\commandList.py" />
+    <Compile Include="ircwhisper\commands.py" />
+    <Compile Include="ircwhisper\__init__.py" />
     <Compile Include="privatechannel\commandList.dist.py" />
     <Compile Include="privatechannel\commandList.py" />
     <Compile Include="privatechannel\default\commandList.py" />
@@ -76,10 +79,13 @@
     <Compile Include="privatechannel\feature.dist.py" />
     <Compile Include="privatechannel\feature.py" />
     <Compile Include="privatechannel\manageBot.dist.py">
-    <Compile Include="privatechannel\manageBot.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="privatechannel\manageBot.py" />
     <Compile Include="privatechannel\__init__.py" />
+    <Compile Include="privatewhisper\commandList.dist.py" />
+    <Compile Include="privatewhisper\commandList.py" />
+    <Compile Include="privatewhisper\default\commandList.py" />
+    <Compile Include="privatewhisper\default\__init__.py" />
+    <Compile Include="privatewhisper\__init__.py" />
     <Compile Include="run.py" />
     <Compile Include="twitchmessage\ircmessage.py" />
     <Compile Include="twitchmessage\ircparams.py" />
@@ -95,8 +101,11 @@
     <Folder Include="ircbot" />
     <Folder Include="ircchannel" />
     <Folder Include="ircuser" />
+    <Folder Include="ircwhisper\" />
     <Folder Include="privatechannel" />
     <Folder Include="privatechannel\default\" />
+    <Folder Include="privatewhisper\" />
+    <Folder Include="privatewhisper\default\" />
     <Folder Include="twitchmessage\" />
   </ItemGroup>
   <ItemGroup>

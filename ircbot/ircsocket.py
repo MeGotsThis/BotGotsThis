@@ -5,6 +5,7 @@ import ircchannel.commands
 import ircuser.notice
 import ircuser.userstate
 import ircbot.irc
+import ircwhisper.commands
 import threading
 import traceback
 import datetime
@@ -211,6 +212,7 @@ class SocketThread(threading.Thread):
             _logMessage(file, nick + ' -> ' + config.botnick + ': ' + msg, now)
             file = config.botnick + '-Raw Whisper.log'
             _logMessage(file, '< ' + ircmsg, now)
+            ircwhisper.commands.parse(tags, nick, msg)
         
         if (message.command == 'NOTICE' and message.prefix is not None and
             message.prefix.nick is not None and
