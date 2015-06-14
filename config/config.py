@@ -4,9 +4,20 @@ import json
 import sys
 import os
 
+if not os.path.isfile('twitch.ini'):
+    print('Missing twitch.ini')
+    sys.exit(0)
+
 if not os.path.isfile('config.ini'):
     print('Missing config.ini')
     sys.exit(0)
+
+ini = configparser.ConfigParser()
+ini.read('twitch.ini')
+
+botnick = str(ini['BOT']['botnick']).lower()
+password = str(ini['BOT']['password'])
+owner = str(ini['BOT']['owner']).lower()
 
 ini = configparser.ConfigParser()
 ini.read('config.ini')
@@ -14,10 +25,6 @@ ini.read('config.ini')
 mainServer = str(ini['TWITCH']['main'])
 eventServer = str(ini['TWITCH']['event'])
 groupServer = str(ini['TWITCH']['group'])
-
-botnick = str(ini['BOT']['botnick']).lower()
-password = str(ini['BOT']['password'])
-owner = str(ini['BOT']['owner']).lower()
 
 modLimit = min(int(ini['BOT']['modLimit']), 100)
 modSpamLimit = min(int(ini['BOT']['modSpamLimit']), 100)
