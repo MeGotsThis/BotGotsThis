@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="botcommands\channel.py" />
     <Compile Include="botcommands\exit.py" />
+    <Compile Include="botcommands\managebot.py" />
     <Compile Include="botcommands\__init__.py" />
     <Compile Include="config\config.py" />
     <Compile Include="config\oauth.py" />

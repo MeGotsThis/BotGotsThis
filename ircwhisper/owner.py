@@ -53,3 +53,9 @@ def commandEmpty(nick, message, msgParts, permissions):
     botcommands.channel.botEmpty(msgParts[1], sendMessage(nick))
     return True
 
+def commandManageBot(nick, message, msgParts, permissions):
+    if len(msgParts) < 2:
+        return False
+    
+    return botcommands.managebot.botManageBot(sendMessage(nick),
+                                              nick, message, msgParts)

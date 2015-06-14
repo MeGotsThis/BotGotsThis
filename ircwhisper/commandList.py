@@ -12,6 +12,7 @@ commands = {
     '!part': (ircwhisper.owner.commandPart, 'admin'),
     '!emptychat': (ircwhisper.owner.commandEmpty, 'admin'),
     '!emptyall': (ircwhisper.owner.commandEmptyAll, 'admin'),
+    '!managebot': (ircwhisper.owner.commandManageBot, 'owner'),
     }
 
 commands = dict(list(commands.items()) + list(commandList.commands.items()))
