@@ -121,6 +121,8 @@ class SocketThread(threading.Thread):
             self._isConnected = False
         
         now = datetime.datetime.utcnow()
+        if message.command == 'PASS':
+            message = IrcMessage(command='PASS')
         file = config.botnick + '-' + self.name + '.log'
         _logMessage(file, '> ' + str(message), now)
         if whisper:
