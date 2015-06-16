@@ -27,7 +27,7 @@ def commandCome(channelData, nick, message, msgParts, permissions):
         None, 'GET', '/api/channels/' + nick + '/chat_properties')
     chatProperties = json.loads(data.decode('utf-8'))
     
-    if chatProperties['eventServer']:
+    if chatProperties['eventchat']:
         server = ircbot.irc.eventChat
     else:
         server = ircbot.irc.mainChat
@@ -90,7 +90,7 @@ def commandAutoJoin(channelData, nick, message, msgParts, permissions):
             db.setAutoJoinServer(nick, chatProperties['eventchat'])
     
     wasInChat = ('#' + nick) in ircbot.irc.channels
-    if chatProperties['eventServer']:
+    if chatProperties['eventchat']:
         server = ircbot.irc.eventChat
     else:
         server = ircbot.irc.mainChat
