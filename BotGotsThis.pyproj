@@ -24,12 +24,8 @@
     <Content Include="config.dist.ini" />
     <Content Include="config.ini" />
     <Content Include="database\sqlite\database.sql" />
-    <Content Include="database\sqlite\gamesabbreviation.sql">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="database\sqlite\oauth.sql">
-      <SubType>Code</SubType>
-    </Content>
+    <Content Include="database\sqlite\gamesabbreviation.sql" />
+    <Content Include="database\sqlite\oauth.sql" />
     <Content Include="twitchApi.dist.ini" />
     <Content Include="twitchApi.ini" />
   </ItemGroup>
@@ -37,6 +33,7 @@
     <Compile Include="botcommands\broadcaster.py" />
     <Compile Include="botcommands\channel.py" />
     <Compile Include="botcommands\exit.py" />
+    <Compile Include="botcommands\feature.py" />
     <Compile Include="botcommands\managebot.py" />
     <Compile Include="botcommands\reload.py" />
     <Compile Include="botcommands\__init__.py" />
@@ -76,6 +73,7 @@
     <Compile Include="ircwhisper\broadcaster.py" />
     <Compile Include="ircwhisper\commandList.py" />
     <Compile Include="ircwhisper\commands.py" />
+    <Compile Include="ircwhisper\feature.py" />
     <Compile Include="ircwhisper\owner.py" />
     <Compile Include="ircwhisper\reload.py" />
     <Compile Include="ircwhisper\__init__.py" />
