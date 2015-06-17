@@ -34,6 +34,7 @@
     <Content Include="twitchApi.ini" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="botcommands\broadcaster.py" />
     <Compile Include="botcommands\channel.py" />
     <Compile Include="botcommands\exit.py" />
     <Compile Include="botcommands\managebot.py" />
@@ -72,6 +73,7 @@
     <Compile Include="ircuser\notice.py" />
     <Compile Include="ircuser\userstate.py" />
     <Compile Include="ircuser\__init__.py" />
+    <Compile Include="ircwhisper\broadcaster.py" />
     <Compile Include="ircwhisper\commandList.py" />
     <Compile Include="ircwhisper\commands.py" />
     <Compile Include="ircwhisper\owner.py" />

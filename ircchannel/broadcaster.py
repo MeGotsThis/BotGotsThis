@@ -1,7 +1,5 @@
-from config import config
-import database.factory
+import botcommands.broadcaster
 import ircbot.twitchApi
-import ircbot.irc
 import email.utils
 import datetime
 import time
@@ -12,116 +10,21 @@ def commandHello(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandCome(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
-        if db.isChannelBannedReason(nick):
-            channelData.sendMessage('Chat ' + nick + ' is banned from joining')
-            return True
-        priority = db.getAutoJoinsPriority(nick)
-    priority = priority if priority is not None else float('inf')
-    
-    if ('#' + nick) in ircbot.irc.channels:
-        channelData.sendMessage('I am already in ' + nick)
-        return True
-    
-    response, data = ircbot.twitchApi.twitchCall(
-        None, 'GET', '/api/channels/' + nick + '/chat_properties')
-    chatProperties = json.loads(data.decode('utf-8'))
-    
-    if chatProperties['eventchat']:
-        server = ircbot.irc.eventChat
-    else:
-        server = ircbot.irc.mainChat
-    if ircbot.irc.joinChannel(nick, priority, server):
-        channelData.sendMessage('Joining ' + nick)
-    else:
-        result = ircbot.irc.ensureServer(nick, priority, server)
-        if result == ircbot.irc.ENSURE_CORRECT:
-            channelData.sendMessage('Already joined ' + nick)
-        elif result == ircbot.irc.ENSURE_REJOIN_TO_MAIN:
-            msg = 'Moved ' + nick + ' to main chat server'
-            channelData.sendMessage(msg)
-        elif result == ircbot.irc.ENSURE_REJOIN_TO_EVENT:
-            msg = 'Moved ' + nick + ' to event chat server'
-            channelData.sendMessage(msg)
+    botcommands.broadcaster.botCome(nick, channelData.sendMessage)
     return True
 
 def commandLeave(channelData, nick, message, msgParts, permissions):
-    if channelData.channel == '#' + config.botnick:
-        return False
-    channelData.sendMessage('Bye ' + channelData.channel[1:])
-    time.sleep(1)
-    ircbot.irc.partChannel(channelData.channel)
-    return True
+    return botcommands.broadcaster.botLeave(channelData.channel,
+                                            channelData.sendMessage)
 
 def commandEmpty(channelData, nick, message, msgParts, permissions):
-    ircbot.irc.messaging.clearQueue(channelData.channel)
-    channelData.sendMessage(
-        'Cleared all queued messages for ' + channelData.channel[1:])
+    botcommands.broadcaster.botEmpty(channelData.channel,
+                                     channelData.sendMessage)
     return True
 
 def commandAutoJoin(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
-        if db.isChannelBannedReason(nick):
-            channelData.sendMessage('Chat ' + nick + ' is banned from joining')
-            return True
-
-    if len(msgParts) >= 2:
-        removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
-                      'leave', 'part']
-        if msgParts[1].lower() in removeMsgs:
-            with database.factory.getDatabase() as db:
-                result = db.discardAutoJoin(nick)
-                if result:
-                    channelData.sendMessage(
-                        'Auto join for ' + nick + ' is now disabled')
-                else:
-                    channelData.sendMessage(
-                        'Auto join for ' + nick + ' was never enabled')
-            return True
-    
-    response, data = ircbot.twitchApi.twitchCall(
-        None, 'GET', '/api/channels/' + nick + '/chat_properties')
-    chatProperties = json.loads(data.decode('utf-8'))
-    
-    with database.factory.getDatabase() as db:
-        result = db.saveAutoJoin(nick, 0, chatProperties['eventchat'])
-        priority = db.getAutoJoinsPriority(nick)
-        if result == False:
-            db.setAutoJoinServer(nick, chatProperties['eventchat'])
-    
-    wasInChat = ('#' + nick) in ircbot.irc.channels
-    if chatProperties['eventchat']:
-        server = ircbot.irc.eventChat
-    else:
-        server = ircbot.irc.mainChat
-    if not wasInChat:
-        ircbot.irc.joinChannel(nick, priority, server)
-    else:
-        rejoin = ircbot.irc.ensureServer(nick, priority, server)
-    
-    if result and not wasInChat:
-        channelData.sendMessage(
-            'Auto join for ' + nick + ' is now enabled and joined ' +
-            nick + ' chat')
-    elif result:
-        if rejoin < 0:
-            msg = 'Auto join for ' + nick
-            msg += ' is now enabled and moved to the correct server'
-        else:
-            msg = 'Auto join for ' + nick + ' is now enabled'
-        channelData.sendMessage(msg)
-    elif not wasInChat:
-        channelData.sendMessage(
-            'Auto join for ' + nick + ' is already enabled but now joined ' +
-            nick + ' chat')
-    else:
-        if rejoin < 0:
-            msg = 'Auto join for ' + nick
-            msg += ' is already enabled and moved to the correct server'
-        else:
-            msg = 'Auto join for ' + nick
-            msg += ' is already enabled and already in chat'
-        channelData.sendMessage(msg)
+    botcommands.broadcaster.botAutoJoin(
+        nick, channelData.sendMessage, msgParts)
     return True
 
 def commandUptime(channelData, nick, message, msgParts, permissions):
