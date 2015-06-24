@@ -226,6 +226,103 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('lc
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('hw', 'Hyrule Warriors');
 
 
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonic1', 'Sonic the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonic1romhacks', 'Sonic the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s1gg', 'Sonic the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s1sms', 'Sonic the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s1gba', 'Sonic the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonic2013', 'Sonic the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonic2', 'Sonic the Hedgehog 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonic2romhacks', 'Sonic the Hedgehog 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s2rr', 'Sonic the Hedgehog 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s2gg', 'Sonic the Hedgehog 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s2sms', 'Sonic the Hedgehog 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('soniccd', 'Sonic CD');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('schaos', 'Sonic the Hedgehog Chaos');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonic3', 'Sonic the Hedgehog 3');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicandknuckles', 'Sonic & Knuckles');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s3kme', 'Sonic 3 and Knuckles Master Edition');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('stt', 'Sonic Triple Trouble');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('kchaotix', 'Knuckles'' Chaotix');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicblast', 'Sonic Blast');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicpocketadventure', 'Sonic the Hedgehog Pocket Adventure');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sadv', 'Sonic Advance');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sadv2', 'Sonic Advance 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sadv3', 'Sonic Advance 3');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicrush', 'Sonic Rush');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('srushadv', 'Sonic Rush Adventure');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s4e1', 'Sonic the Hedgehog 4: Episode I');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s4e2', 'Sonic the Hedgehog 4: Episode II');
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s3d', 'Sonic 3D Blast');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('s3dblast', 'Sonic 3D Blast');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sadv', 'Sonic Adventure');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sadx', 'Sonic Adventure DX: Director''s Cut');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sadv2', 'Sonic Adventure 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sa2b', 'Sonic Adventure 2: Battle');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sheroes', 'Sonic Heroes');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('shadowth', 'Shadow the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonic06', 'Sonic the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ssecretrings', 'Sonic and the Secret Rings');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sunleased', 'Sonic Unleashed');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('su360', 'Sonic Unleashed');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('suwii', 'Sonic Unleashed');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('satbk', 'Sonic and the Black Knight');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('scolors', 'Sonic Colors');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('scolorsds', 'Sonic Colors');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicgenerations', 'Sonic Generations');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('soniclw', 'Sonic Lost World');
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sdrift', 'Sonic Drift');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sdrift2', 'Sonic Drift 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicr', 'Sonic R');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicriders', 'Sonic Riders');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicrivals', 'Sonic Rivals');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicrivals2', 'Sonic Rivals 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicriderszg', 'Sonic Riders: Zero Gravity');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('asr', 'Sonic & Sega All-Stars Racing');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sfreeriders', 'Sonic Free Riders');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicasrt', 'Sonic & All-Stars Racing Transformed');
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('segasoniccf', 'SegaSonic Cosmo Fighter');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('wwsonicpc', 'Waku Waku Sonic Patrol Car');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('segasonic', 'SegaSonic the Hedgehog');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('stf', 'Sonic the Fighters');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicathletics', 'Sonic Athletics');
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tailsmusicmaker', 'Tails and the Music Maker');
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicschoolhouse', 'Sonic Eraser');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('robotnikmbm', 'Dr. Robotnik''s Mean Bean Machine');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicspinball', 'Sonic the Hedgehog: Spinball');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('skypatrol', 'Tails'' Skypatrol');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tailsadv', 'Tails Adventure');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('soniclabyrinth', 'Sonic Labyrinth');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicshuffle', 'Sonic Shuffle');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicpp', 'Sonic Pinball Party');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicspinball', 'Sonic Pinball Party');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicbattle', 'Sonic Battle');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mariosonicolympic', 'Mario & Sonic at the Olympic Games');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('scdarkbrotherhood', 'Sonic Chronicles: The Dark Brotherhood');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mariosonicwinterolympic', 'Mario & Sonic at the Olympic Winter Games');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mariosonic2012olympic', 'Mario & Sonic at the London 2012 Olympic Games');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicjump', 'Sonic Jump');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicjumpfever', 'Sonic Jump Fever');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicdash', 'Sonic Dash');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mariosonic2014winterolympic', 'Mario & Sonic at the Sochi 2014 Winter Olympic Games');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicboomrol', 'Sonic Boom: Rise of Lyric');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicboomsc', 'Sonic Boom: Shattered Crystal');
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sonicclassics', 'Sonic Classics: 3-in-1');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('skcollection', 'Sonic & Knuckles');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sjam', 'Sonic Jam');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('smegacollect', 'Sonic Mega Collection');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('smegacollectplus', 'Sonic Mega Collection Plus');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sgemcollect', 'Sonic Gems Collection');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('spccollect', 'Sonic PC Collection');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sclassiccollect', 'Sonic Classic Collection');
+
+
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crash1', 'Crash Bandicoot');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crashbandicoot1', 'Crash Bandicoot');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('crash2', 'Crash Bandicoot 2: Cortex Strikes Back');
