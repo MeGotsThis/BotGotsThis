@@ -79,6 +79,8 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pk
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnrangergs', 'Pokémon Ranger: Guardian Signs');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pokeparkwii', 'PokéPark Wii: Pikachu''s Adventure');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pokepark2', 'PokéPark 2: Wonders Beyond');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmntcgo', 'Pokémon Trading Card Game Online');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pokemontcgo', 'Pokémon Trading Card Game Online');
 
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mm1', 'Mega Man');
