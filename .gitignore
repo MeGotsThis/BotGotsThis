@@ -1,6 +1,7 @@
 *.pyc
 privatechannel/*
 privatewhisper/*
+botprivate/*
 nohup.out
 *.log
 *.suo
