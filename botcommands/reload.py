@@ -3,6 +3,7 @@ import imp
 
 def loadThisModule(module):
     _ = module.startswith('botcommands')
+    _ = _ or module.startswith('botprivate')
     _ = _ or module.startswith('ircchannel')
     _ = _ or module.startswith('ircwhisper')
     _ = _ or module.startswith('privatechannel')
@@ -20,6 +21,9 @@ def moduleKey(module):
     if module.startswith('database'):
         return (1, module)
 
+    if module.startswith('botprivate'):
+        return (600, module)
+    
     if module.startswith('botcommands'):
         return (700, module)
     
