@@ -1,5 +1,6 @@
 import database.factory
 import ircbot.irc
+import json
 try:
     import privatechannel.manageBot as manageBot
 except:
