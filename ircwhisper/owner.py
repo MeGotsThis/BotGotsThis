@@ -15,6 +15,7 @@ def commandExit(nick, message, msgParts, permissions):
 
 def commandSay(nick, message, msgParts, permissions):
     msgParts = message.split(None, 2)
+    msgParts[1] = msgParts[1].lower()
     if msgParts[1][0] != '#':
         msgParts[1] = '#' + msgParts[1]
     if msgParts[1] in ircbot.irc.channels:
