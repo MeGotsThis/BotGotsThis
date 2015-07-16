@@ -222,6 +222,10 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             params += display, fullMessage, user, user
             cursor.execute(query, params)
 
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+
             query = 'INSERT INTO custom_commands_history '
             query += '(broadcaster, permission, command, '
             query += 'commandDisplay, fullMessage, creator, created) '
@@ -254,6 +258,10 @@ class SQLiteDatabase(database.databasebase.DatabaseBase):
             query += 'broadcaster=? AND permission=? AND command=?'
             params = broadcaster, permission, command.lower()
             cursor.execute(query, params)
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
 
             query = 'INSERT INTO custom_commands_history '
             query += '(broadcaster, permission, command, '
