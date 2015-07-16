@@ -72,7 +72,8 @@ def manageAutoJoin(sendMessage, nick, message, msgParts):
                 server = ircbot.irc.eventChat
             else:
                 server = ircbot.irc.mainChat
-            result = db.saveAutoJoin(msgParts[3], 0, server)
+            params = msgParts[3], 0, chatProperties['eventchat']
+            result = db.saveAutoJoin(*params)
             priority = db.getAutoJoinsPriority(msgParts[3])
             if result == False:
                 db.setAutoJoinServer(msgParts[3], chatProperties['eventchat'])
