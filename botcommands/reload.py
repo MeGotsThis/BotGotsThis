@@ -21,6 +21,8 @@ def moduleKey(module):
     if module.startswith('database'):
         return (1, module)
 
+    if module == 'privatechannel.feature':
+        return (599, module)
     if module.startswith('botprivate'):
         return (600, module)
     
