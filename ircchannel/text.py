@@ -235,9 +235,15 @@ def _parseFormatMessage(message):
             i += 1
             
             if char == ':':
-                break
+                if i < length and message[i] == ':':
+                    i += 1
+                else:
+                    break
             if char == '!':
-                break
+                if i < length and message[i] == '!':
+                    i += 1
+                else:
+                    break
             if char == '{':
                 if i < length and message[i] == '{':
                     i += 1
@@ -261,7 +267,10 @@ def _parseFormatMessage(message):
                 i += 1
                 
                 if char == '!':
-                    break
+                    if i < length and message[i] == '!':
+                        i += 1
+                    else:
+                        break
                 if char == '{':
                     if i < length and message[i] == '{':
                         i += 1
