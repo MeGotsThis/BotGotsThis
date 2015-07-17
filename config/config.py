@@ -39,6 +39,9 @@ if customMessageCooldown <= 0:
 customMessageUserCooldown = float(ini['BOT']['customMessageUserCooldown'])
 if customMessageUserCooldown <= 0:
     customMessageUserCooldown = 20
+customMessageUrlTimeout = float(ini['BOT']['customMessageUrlTimeout'])
+if customMessageUrlTimeout <= 0:
+    customMessageUrlTimeout = 5
 
 spamModeratorCooldown = float(ini['BOT']['spamModeratorCooldown'])
 if spamModeratorCooldown <= 0:

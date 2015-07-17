@@ -4,6 +4,7 @@ import database.factory
 import ircbot.irc
 import datetime
 import re
+import urllib.request
 
 def customCommands(channelData, nick, originalMsg, msgParts, permissions):
     command = msgParts[0].lower()
@@ -48,11 +49,11 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
         final = []
         try:
             for part in _parseFormatMessage(str(message)):
-                plain, field, format, default, original = part
+                plain, field, format, param, default, original = part
                 final.append(plain)
                 if field is not None:
-                    string = _getString(str(field), str(default), originalMsg,
-                                        msgParts, nick, query)
+                    string = _getString(str(field), str(param), str(default),
+                                        originalMsg, msgParts, nick, query)
                     if string is not None:
                         string = _formatString(str(string), str(format),
                                                hasTextConvert)
@@ -239,6 +240,11 @@ def _parseFormatMessage(message):
                     i += 1
                 else:
                     break
+            if char == '@':
+                if i < length and message[i] == '@':
+                    i += 1
+                else:
+                    break
             if char == '!':
                 if i < length and message[i] == '!':
                     i += 1
@@ -266,6 +272,11 @@ def _parseFormatMessage(message):
                 char = message[i]
                 i += 1
                 
+                if char == '@':
+                    if i < length and message[i] == '@':
+                        i += 1
+                    else:
+                        break
                 if char == '!':
                     if i < length and message[i] == '!':
                         i += 1
@@ -283,6 +294,33 @@ def _parseFormatMessage(message):
                         i -= 1
                         break
                 format.append(char)
+
+        param = []
+        if char == '@':
+            while True:
+                if i == length:
+                    raise ValueError()
+                
+                char = message[i]
+                i += 1
+                
+                if char == '!':
+                    if i < length and message[i] == '!':
+                        i += 1
+                    else:
+                        break
+                if char == '{':
+                    if i < length and message[i] == '{':
+                        i += 1
+                    else:
+                        raise ValueError()
+                if char == '}':
+                    if i < length and message[i] == '}':
+                        i += 1
+                    else:
+                        i -= 1
+                        break
+                param.append(char)
 
         default = []
         if char == '!':
@@ -314,17 +352,35 @@ def _parseFormatMessage(message):
         parsed.append((''.join(noFormat),
                        ''.join(field),
                        ''.join(format),
+                       ''.join(param),
                        ''.join(default),
                        original))
         
     return parsed
 
-def _getString(field, default, message, msgParts, nick, query):
+def _getString(field, param, default, message, msgParts, nick, query):
     if field.lower() == 'user' or field.lower() == 'nick':
         return nick if nick else default
     
     if field.lower() == 'query':
         return query if query else default
+    
+    if field.lower() == 'url':
+        url = param.replace('{query}', query)
+        url = url.replace('{user}', nick)
+        url = url.replace('{nick}', nick)
+        try:
+            urlopen = urllib.request.urlopen
+            req = urlopen(url, timeout=config.customMessageUrlTimeout)
+            if int(req.status) == 200:
+                data = req.read().decode('utf-8')
+                data = data.replace('\r\n', ' ')
+                data = data.replace('\n', ' ')
+                data = data.replace('\r', ' ')
+                return data
+        except:
+            pass
+        return default
     
     try:
         match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', field)
