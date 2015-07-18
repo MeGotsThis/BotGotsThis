@@ -50,10 +50,12 @@ def moduleKey(module):
     if module.startswith('ircwhisper'):
         return (981, module)
     
-    if module == 'ircchannel.commandList':
-        return (999, module)
     if module == 'ircchannel':
         return (990, module)
+    if module == 'ircchannel.commandList':
+        return (998, module)
+    if module == 'ircchannel.commands':
+        return (999, module)
     if module.startswith('ircchannel'):
         return (991, module)
     
