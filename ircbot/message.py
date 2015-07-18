@@ -33,6 +33,8 @@ class MessageQueue(threading.Thread):
             return
         if message.startswith('/w '):
             msgParts = message.split(' ', 2)
+            if len(msgParts) < 3:
+                return
             self.queueWhisper(msgParts[1], msgParts[2])
             return
         with self._queueLock:
