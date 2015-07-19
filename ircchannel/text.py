@@ -219,7 +219,8 @@ def _parseFormatMessage(message):
         
         if i == length:
             if noFormat:
-                parsed.append((''.join(noFormat), None, None, None, None))
+                p = ''.join(noFormat), None, None, None, None, None
+                parsed.append(p)
             break
         
         s = i
