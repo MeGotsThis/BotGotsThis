@@ -86,7 +86,7 @@
     <Compile Include="privatechannel\default\__init__.py" />
     <Compile Include="privatechannel\feature.dist.py" />
     <Compile Include="privatechannel\feature.py" />
-    <Compile Include="privatechannel\manageBot.dist.py">
+    <Compile Include="privatechannel\manageBot.dist.py" />
     <Compile Include="privatechannel\manageBot.py" />
     <Compile Include="privatechannel\__init__.py" />
     <Compile Include="privatewhisper\commandList.dist.py" />
