@@ -11,10 +11,13 @@ import traceback
 # Import some necessary libraries.
 messaging = ircbot.message.MessageQueue(name='Message Queue')
 mainChat = ircbot.ircsocket.SocketThread(config.mainServer,
+                                         config.mainPort,
                                          name='Main Chat')
 eventChat = ircbot.ircsocket.SocketThread(config.eventServer,
+                                         config.eventPort,
                                           name='Event Chat')
 groupChat = ircbot.ircsocket.SocketThread(config.groupServer,
+                                         config.groupPort,
                                           name='Group Chat')
 join = ircbot.join.JoinThread(name='Join Thread')
 join.add(mainChat)
