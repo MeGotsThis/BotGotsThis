@@ -26,7 +26,7 @@ def botCome(channel, sendMessage):
     else:
         server = ircbot.irc.mainChat
     if ircbot.irc.joinChannel(channel, priority, server):
-        channelData.sendMessage('Joining ' + channel)
+        sendMessage('Joining ' + channel)
     else:
         result = ircbot.irc.ensureServer(channel, priority, server)
         if result == ircbot.irc.ENSURE_CORRECT:
