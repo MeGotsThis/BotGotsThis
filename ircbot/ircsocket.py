@@ -15,9 +15,10 @@ import time
 import sys
 
 class SocketThread(threading.Thread):
-    def __init__(self, server, **args):
+    def __init__(self, server, port, **args):
         threading.Thread.__init__(self, **args)
         self._server = server
+        self._port = port
         self._channels = {}
         self._channelsLock = threading.Lock()
         self._isConnected = False
@@ -142,7 +143,7 @@ class SocketThread(threading.Thread):
                 _logMessage(file, log, now)
     
     def _connect(self):
-        self._ircsock.connect((self._server, 6667))
+        self._ircsock.connect((self._server, self._port))
         comms = [
             IrcMessage(command='PASS',
                        params=IrcMessageParams(middle=config.password)),
