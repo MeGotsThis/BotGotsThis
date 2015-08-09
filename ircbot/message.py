@@ -1,4 +1,4 @@
-# Message Queue
+﻿# Message Queue
 from config import config
 from twitchmessage.ircmessage import IrcMessage
 from twitchmessage.ircparams import IrcMessageParams
@@ -47,6 +47,7 @@ class MessageQueue(threading.Thread):
                 if not message:
                     continue
                 if message.startswith('/w '):
+                    msgParts = message.split(' ', 2)
                     param = (ircbot.irc.groupChannel,
                      '/w ' + msgParts[1] + ' ' + msgParts[2],
                      (msgParts[1].lower(), msgParts[2]))
