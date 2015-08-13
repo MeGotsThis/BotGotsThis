@@ -175,7 +175,7 @@ def parseCommandMessageInput(message):
             level = False
         mparts = m.split(None, 1)
         while len(mparts) < 2:
-            mparts.append(None)
+            mparts.append('')
         command, fullText = mparts
         
         return (originalCommand, action.lower(), level, command, fullText)
