@@ -1,4 +1,4 @@
-from config import config
+﻿from config import config
 import ircchannel.charConvert
 import database.factory
 import ircbot.irc
@@ -91,11 +91,6 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
             return
     
     if action in ['add', 'insert', 'new']:
-        if not fullText:
-            channelData.sendMessage(
-                'You need to specify some text for that command')
-            return
-        
         with database.factory.getDatabase() as db:
             result = db.insertCustomCommand(
                 broadcaster, level, command, fullText, nick)
@@ -106,11 +101,6 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
                     command + ' was not added successfully. There might be '
                     'an existing command')
     elif action in ['edit', 'update']:
-        if not fullText:
-            channelData.sendMessage(
-                'You need to specify some text for that command')
-            return
-        
         with database.factory.getDatabase() as db:
             result = db.updateCustomCommand(
                 broadcaster, level, command, fullText, nick)
