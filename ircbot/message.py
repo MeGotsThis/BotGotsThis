@@ -48,6 +48,8 @@ class MessageQueue(threading.Thread):
                     continue
                 if message.startswith('/w '):
                     msgParts = message.split(' ', 2)
+                    if len(msgParts) < 3:
+                        continue
                     param = (ircbot.irc.groupChannel,
                      '/w ' + msgParts[1] + ' ' + msgParts[2],
                      (msgParts[1].lower(), msgParts[2]))
