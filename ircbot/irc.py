@@ -1,4 +1,4 @@
-from config import config
+﻿from config import config
 import ircbot.channeldata
 import ircbot.ircsocket
 import ircbot.message
@@ -75,6 +75,18 @@ globalEmotes = {
     }
 globalEmotesCache = datetime.datetime.min
 globalSessionData = {}
+globalFfzEmotes = {
+    25927: 'CatBag',
+    27081: 'ZreknarF',
+    28136: 'LilZ',
+    28138: 'ZliL',
+    9: 'ZrehplaR',
+    6: 'YooHoo',
+    5: 'YellowFever',
+    4: 'ManChicken',
+    3: 'BeanieHipster',
+    }
+globalFfzEmotesCache = datetime.datetime.min
 
 def joinChannel(channel, priority=float('inf'), server=mainChat):
     if channel[0] != '#':

@@ -1,4 +1,4 @@
-import config.oauth
+﻿import config.oauth
 import urllib.parse
 import http.client
 import ircbot.irc
@@ -44,6 +44,7 @@ def getTwitchEmotes():
     emotes = ircbot.irc.globalEmotes
     since = currentTime - ircbot.irc.globalEmotesCache
     if since > datetime.timedelta(hours=1):
+        ircbot.irc.globalEmotesCache = currentTime
         emoteset = [str(i) for i in ircbot.irc.emoteset]
         response, data = twitchCall(
             None, 'GET',
@@ -76,5 +77,4 @@ def getTwitchEmotes():
                 else:
                     emotes[emote['id']] = emote['code']
         ircbot.irc.globalEmotes = emotes
-        ircbot.irc.globalEmotesCache = currentTime
     return emotes

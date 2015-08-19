@@ -1,8 +1,12 @@
-﻿import ircbot.irc
+﻿import datetime
+import ircbot.ffzApi
+import ircbot.irc
 
 class ChannelData:
     __slots__ = ['_channel', '_socket', '_isMod', '_isSubscriber', '_ircUsers',
-                 '_ircOps', '_sessionData', '_joinPriority']
+                 '_ircOps', '_sessionData', '_joinPriority', '_ffzEmotes',
+                 '_ffzCache',
+                 ]
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
         self._channel = channel
@@ -13,6 +17,8 @@ class ChannelData:
         self._ircOps = set()
         self._joinPriority = float(joinPriority)
         self._sessionData = {}
+        self._ffzEmotes = {}
+        self._ffzCache = datetime.datetime.min
     
     @property
     def channel(self):
@@ -57,6 +63,14 @@ class ChannelData:
     @property
     def sessionData(self):
         return self._sessionData
+    
+    @property
+    def ffzEmotes(self):
+        currentTime = datetime.datetime.utcnow()
+        if currentTime - self._ffzCache >= datetime.timedelta(hours=1):
+            emotes = ircbot.ffzApi.getBroadcasterEmotes(self._channel[1:])
+            self._ffzEmotes = emotes or self._ffzEmotes
+        return self._ffzEmotes
     
     def onJoin(self):
         self._ircUsers.clear()
