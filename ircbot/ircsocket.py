@@ -1,4 +1,4 @@
-from config import config
+﻿from config import config
 from twitchmessage.ircmessage import IrcMessage
 from twitchmessage.ircparams import IrcMessageParams
 import ircchannel.commands
@@ -13,6 +13,11 @@ import os.path
 import socket
 import time
 import sys
+
+_logCommandPerChannel = [
+    'PRIVMSG', 'NOTICE', 'MODE', 'JOIN', 'PART', 'USERSTATE', 'HOSTTARGET',
+    'CLEARCHAT', 'ROOMSTATE',
+    ]
 
 class SocketThread(threading.Thread):
     def __init__(self, server, port, **args):
@@ -194,10 +199,8 @@ class SocketThread(threading.Thread):
             nick = message.prefix.nick
             where = message.params.middle
             msg = message.params.trailing
-            if where[0] == '#':
-                _logMessage(where + '#full.log', '< ' + ircmsg, now)
-                if nick != 'jtv':
-                    _logMessage(where + '#msg.log', nick + ': ' + msg, now)
+            if where[0] == '#' and nick != 'jtv':
+                _logMessage(where + '#msg.log', nick + ': ' + msg, now)
             if config.botnick in msg.split():
                 file = config.botnick + '-Mentions.log'
                 _logMessage(file, nick + ' -> ' + where + ': ' + msg, now)
@@ -223,18 +226,8 @@ class SocketThread(threading.Thread):
             ircuser.notice.parse(self, message.prefix.nick,
                                  message.params.trailing)
         
-        if (message.command == 'NOTICE' and message.prefix is not None and
-            message.prefix.nick is None and
-            message.params.middle is not None and
-            message.params.trailing is not None):
-            where = message.params.middle
-            if where[0] == '#':
-                _logMessage(where + '#full.log', '< ' + ircmsg, now)
-        
         if message.command == 'MODE':
             where, mode, nick = message.params.middle.split()
-            if where[0] == '#':
-                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 if mode == '+o':
                     self._channels[where].ircOps.add(nick)
@@ -244,8 +237,6 @@ class SocketThread(threading.Thread):
         if message.command == 'JOIN':
             where = message.params.middle
             nick = message.prefix.nick
-            if where[0] == '#':
-                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 self._channels[where].ircUsers.add(nick)
         
@@ -265,8 +256,6 @@ class SocketThread(threading.Thread):
         if message.command == 'PART':
             where = message.params.middle
             nick = message.prefix.nick
-            if where[0] == '#':
-                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 self._channels[where].ircUsers.discard(nick)
 
@@ -283,13 +272,15 @@ class SocketThread(threading.Thread):
         
         if message.command == 'USERSTATE':
             where = message.params.middle
-            if where[0] == '#':
-                _logMessage(where + '#full.log', '< ' + ircmsg, now)
             if where in self._channels:
                 chan = self._channels[where]
                 tags = message.tags
                 ircuser.userstate.parse(chan, tags)
-            pass
+        
+        if message.command in _logCommandPerChannel:
+            where = message.params.middle.split(None, 1)[0]
+            if where[0] == '#':
+                _logMessage(where + '#full.log', '< ' + ircmsg, now)
 
 
 class NoPingException(Exception):
