@@ -47,6 +47,7 @@
     <Compile Include="database\sqlite\__init__.py" />
     <Compile Include="database\__init__.py" />
     <Compile Include="ircbot\channeldata.py" />
+    <Compile Include="ircbot\ffzApi.py" />
     <Compile Include="ircbot\irc.py" />
     <Compile Include="ircbot\join.py" />
     <Compile Include="ircbot\message.py" />
