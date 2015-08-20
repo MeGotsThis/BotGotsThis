@@ -52,8 +52,9 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
                 plain, field, format, param, default, original = part
                 final.append(plain)
                 if field is not None:
-                    string = _getString(str(field), str(param), str(default),
-                                        originalMsg, msgParts, nick, query)
+                    params = str(field), str(param), str(default), originalMsg,
+                    params += msgParts, channel, nick, query,
+                    string = _getString(*params)
                     if string is not None:
                         string = _formatString(str(string), str(format),
                                                hasTextConvert)
@@ -349,7 +350,7 @@ def _parseFormatMessage(message):
         
     return parsed
 
-def _getString(field, param, default, message, msgParts, nick, query):
+def _getString(field, param, default, message, msgParts, channel, nick, query):
     if field.lower() == 'user' or field.lower() == 'nick':
         return nick if nick else default
     
@@ -360,6 +361,8 @@ def _getString(field, param, default, message, msgParts, nick, query):
         url = param.replace('{query}', query)
         url = url.replace('{user}', nick)
         url = url.replace('{nick}', nick)
+        url = url.replace('{broadcaster}', channel)
+        url = url.replace('{streamer}', channel)
         try:
             urlopen = urllib.request.urlopen
             req = urlopen(url, timeout=config.customMessageUrlTimeout)
