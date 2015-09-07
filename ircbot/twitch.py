@@ -7,6 +7,7 @@ import traceback
 import datetime
 import sys
 import taskerbot.emotes
+import taskerbot.twitch
 import time
 
 print(str(datetime.datetime.utcnow()) + ' Starting')
@@ -17,6 +18,8 @@ ircbot.irc.messaging.start()
 ircbot.irc.background.start()
 ircbot.irc.join.start()
 
+ircbot.background.addTask(taskerbot.twitch.checkStreamsAndChannel,
+                          datetime.timedelta(seconds=30))
 ircbot.background.addTask(taskerbot.emotes.refreshTwitchGlobalEmotes,
                           datetime.timedelta(seconds=1))
 ircbot.background.addTask(taskerbot.emotes.refreshTwitchGlobalEmotes,

@@ -5,7 +5,8 @@ import ircbot.irc
 class ChannelData:
     __slots__ = ['_channel', '_socket', '_isMod', '_isSubscriber', '_ircUsers',
                  '_ircOps', '_sessionData', '_joinPriority', '_ffzEmotes',
-                 '_ffzCache',
+                 '_ffzCache', '_streamingSince', '_twitchStatus',
+                 '_twitchGame',
                  ]
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
@@ -19,6 +20,9 @@ class ChannelData:
         self._sessionData = {}
         self._ffzEmotes = {}
         self._ffzCache = datetime.datetime.min
+        self._streamingSince = None
+        self._twitchStatus = None
+        self._twitchGame = None
     
     @property
     def channel(self):
@@ -75,6 +79,34 @@ class ChannelData:
             emotes = ircbot.ffzApi.getBroadcasterEmotes(self._channel[1:])
             self._ffzEmotes = emotes or self._ffzEmotes
         return self._ffzEmotes
+    
+    @property
+    def streamingSince(self):
+        return self._streamingSince
+    
+    @streamingSince.setter
+    def streamingSince(self, value):
+        self._streamingSince = value
+    
+    @property
+    def isStreaming(self):
+        return self._streamingSince is not None
+    
+    @property
+    def twitchStatus(self):
+        return self._twitchStatus
+    
+    @twitchStatus.setter
+    def twitchStatus(self, value):
+        self._twitchStatus = value
+    
+    @property
+    def twitchGame(self):
+        return self._twitchGame
+    
+    @twitchGame.setter
+    def twitchGame(self, value):
+        self._twitchGame = value
     
     def onJoin(self):
         self._ircUsers.clear()

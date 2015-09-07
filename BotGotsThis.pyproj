@@ -98,6 +98,7 @@
     <Compile Include="privatewhisper\__init__.py" />
     <Compile Include="run.py" />
     <Compile Include="taskerbot\emotes.py" />
+    <Compile Include="taskerbot\twitch.py" />
     <Compile Include="taskerbot\__init__.py" />
     <Compile Include="taskerprivate\__init__.py" />
     <Compile Include="twitchmessage\ircmessage.py" />
