@@ -1,4 +1,4 @@
-import botcommands.broadcaster
+﻿import botcommands.broadcaster
 import ircbot.twitchApi
 import email.utils
 import datetime
@@ -36,33 +36,30 @@ def commandUptime(channelData, nick, message, msgParts, permissions):
     channelData.sessionData['uptime'] = currentTime
 
     chan = channelData.channel[1:]
+    if not channelData.isStreaming:
+        msg = chan + ' is currently not streaming or has not been for a minute'
+        channelData.sendMessage(msg)
+        return True
+
     response, data = ircbot.twitchApi.twitchCall(
-        channelData.channel, 'GET', '/kraken/streams/' + chan,
+        channelData.channel, 'GET', '/kraken/',
         headers = {
             'Accept': 'application/vnd.twitchtv.v3+json',
             })
     try:
         if response.status == 200:
             streamData = json.loads(data.decode('utf-8'))
-            if streamData['stream']:
-                date = response.getheader('Date')
-                dateStruct = email.utils.parsedate(date)
-                unixTimestamp = time.mktime(dateStruct)
-                currentTime = datetime.datetime.fromtimestamp(unixTimestamp)
-                params = streamData['stream']['created_at'],
-                params += '%Y-%m-%dT%H:%M:%SZ',
-                created = datetime.datetime.strptime(*params)
+            date = response.getheader('Date')
+            dateStruct = email.utils.parsedate(date)
+            unixTimestamp = time.mktime(dateStruct)
+            currentTime = datetime.datetime.fromtimestamp(unixTimestamp)
                 
-                msg = 'Uptime: ' + str(currentTime - created)
-                channelData.sendMessage(msg)
-                return True
-            elif streamData['stream'] is None:
-                msg = chan + ' is currently not streaming'                                                                                                                                                                                                                                                                                                                                  
-                channelData.sendMessage(msg)
-                return True
+            msg = 'Uptime: ' + str(currentTime - channelData.streamingSince)
+            channelData.sendMessage(msg)
+            return True
         raise ValueError()
     except (ValueError, KeyError) as e:
-        msg = 'Fail to get stream information from Twitch.tv'
+        msg = 'Fail to get information from Twitch.tv'
         channelData.sendMessage(msg)
     except:
         msg = 'Unknown Error'
