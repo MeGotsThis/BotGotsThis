@@ -2,6 +2,7 @@
 privatechannel/*
 privatewhisper/*
 botprivate/*
+taskerprivate/*
 nohup.out
 *.log
 *.suo
