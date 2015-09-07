@@ -93,6 +93,7 @@ class MessageQueue(threading.Thread):
             ircbot.irc.eventChat.running = False
             ircbot.irc.groupChat.running = False
             ircbot.irc.join.running = False
+            ircbot.irc.background.running = False
             print(str(datetime.datetime.utcnow()) + ' Ending MessageQueue')
     
     def _getMessage(self):

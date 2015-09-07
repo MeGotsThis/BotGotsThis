@@ -65,6 +65,10 @@ class ChannelData:
         return self._sessionData
     
     @property
+    def ffzCache(self):
+        return self._ffzCache
+    
+    @property
     def ffzEmotes(self):
         currentTime = datetime.datetime.utcnow()
         if currentTime - self._ffzCache >= datetime.timedelta(hours=1):

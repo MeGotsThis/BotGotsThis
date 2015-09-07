@@ -1,8 +1,9 @@
 ﻿from config import config
+import ircbot.background
 import ircbot.channeldata
 import ircbot.ircsocket
-import ircbot.message
 import ircbot.join
+import ircbot.message
 import datetime
 import sys
 import threading
@@ -10,6 +11,7 @@ import traceback
 
 # Import some necessary libraries.
 messaging = ircbot.message.MessageQueue(name='Message Queue')
+
 mainChat = ircbot.ircsocket.SocketThread(config.mainServer,
                                          config.mainPort,
                                          name='Main Chat')
@@ -19,12 +21,16 @@ eventChat = ircbot.ircsocket.SocketThread(config.eventServer,
 groupChat = ircbot.ircsocket.SocketThread(config.groupServer,
                                          config.groupPort,
                                           name='Group Chat')
+
 join = ircbot.join.JoinThread(name='Join Thread')
 join.add(mainChat)
 join.add(eventChat)
 join.add(groupChat)
 groupChannel = ircbot.channeldata.ChannelData(
     '#' + config.botnick, groupChat, float('-inf'))
+
+background = ircbot.background.BackgroundTasker(name='Background Tasker')
+
 channels = {}
 displayName = config.botnick
 isTwitchTurbo = False

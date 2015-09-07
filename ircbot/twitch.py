@@ -6,6 +6,7 @@ import threading
 import traceback
 import datetime
 import sys
+import taskerbot.emotes
 import time
 
 print(str(datetime.datetime.utcnow()) + ' Starting')
@@ -13,7 +14,13 @@ ircbot.irc.mainChat.start()
 ircbot.irc.eventChat.start()
 ircbot.irc.groupChat.start()
 ircbot.irc.messaging.start()
+ircbot.irc.background.start()
 ircbot.irc.join.start()
+
+ircbot.background.addTask(taskerbot.emotes.refreshTwitchGlobalEmotes,
+                          datetime.timedelta(seconds=1))
+ircbot.background.addTask(taskerbot.emotes.refreshTwitchGlobalEmotes,
+                          datetime.timedelta(milliseconds=.75))
 
 try:
     ircbot.irc.joinChannel(config.botnick, float('-inf'), ircbot.irc.mainChat)

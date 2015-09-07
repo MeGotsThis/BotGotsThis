@@ -46,6 +46,7 @@
     <Compile Include="database\sqlite\sqlite.py" />
     <Compile Include="database\sqlite\__init__.py" />
     <Compile Include="database\__init__.py" />
+    <Compile Include="ircbot\background.py" />
     <Compile Include="ircbot\channeldata.py" />
     <Compile Include="ircbot\ffzApi.py" />
     <Compile Include="ircbot\irc.py" />
@@ -96,6 +97,9 @@
     <Compile Include="privatewhisper\default\__init__.py" />
     <Compile Include="privatewhisper\__init__.py" />
     <Compile Include="run.py" />
+    <Compile Include="taskerbot\emotes.py" />
+    <Compile Include="taskerbot\__init__.py" />
+    <Compile Include="taskerprivate\__init__.py" />
     <Compile Include="twitchmessage\ircmessage.py" />
     <Compile Include="twitchmessage\ircparams.py" />
     <Compile Include="twitchmessage\ircprefix.py" />
@@ -117,6 +121,8 @@
     <Folder Include="privatechannel\default\" />
     <Folder Include="privatewhisper\" />
     <Folder Include="privatewhisper\default\" />
+    <Folder Include="taskerprivate\" />
+    <Folder Include="taskerbot\" />
     <Folder Include="twitchmessage\" />
   </ItemGroup>
   <ItemGroup>
