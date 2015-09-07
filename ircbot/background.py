@@ -26,7 +26,7 @@ class BackgroundTasker(threading.Thread):
                 for t in _tasks:
                     task, interval, last = t
                     if now >= last + interval:
-                        threading.Thread(target=task, args=(now,)).run()
+                        threading.Thread(target=task, args=(now,)).start()
                         t[2] = now
                 time.sleep(1 / 1000)
         except:
