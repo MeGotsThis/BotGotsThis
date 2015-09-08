@@ -1,14 +1,16 @@
 ﻿# Import some necessary libraries.
 from config import config
+import autoloadbot
+import autoloadprivate
 import database.factory
-import ircbot.irc
-import threading
-import traceback
 import datetime
+import ircbot.irc
+import importlib
+import pkgutil
 import sys
-import taskerbot.emotes
-import taskerbot.twitch
+import threading
 import time
+import traceback
 
 print(str(datetime.datetime.utcnow()) + ' Starting')
 ircbot.irc.mainChat.start()
@@ -18,12 +20,15 @@ ircbot.irc.messaging.start()
 ircbot.irc.background.start()
 ircbot.irc.join.start()
 
-ircbot.background.addTask(taskerbot.twitch.checkStreamsAndChannel,
-                          datetime.timedelta(seconds=30))
-ircbot.background.addTask(taskerbot.emotes.refreshTwitchGlobalEmotes,
-                          datetime.timedelta(seconds=1))
-ircbot.background.addTask(taskerbot.emotes.refreshTwitchGlobalEmotes,
-                          datetime.timedelta(milliseconds=.75))
+_modulesList = [
+    pkgutil.walk_packages(path=autoloadbot.__path__,
+                          prefix=autoloadbot.__name__+'.'),
+    pkgutil.walk_packages(path=autoloadprivate.__path__,
+                                 prefix=autoloadprivate.__name__+'.')
+    ]
+for _modules in _modulesList:
+    for importer, modname, ispkg in _modules:
+          __import__(modname)
 
 try:
     ircbot.irc.joinChannel(config.botnick, float('-inf'), ircbot.irc.mainChat)

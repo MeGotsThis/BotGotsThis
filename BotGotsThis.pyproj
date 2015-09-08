@@ -30,6 +30,8 @@
     <Content Include="twitchApi.ini" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="autoloadbot\emotes.py" />
+    <Compile Include="autoloadbot\twitch.py" />
     <Compile Include="autoloadbot\__init__.py" />
     <Compile Include="autoloadprivate\__init__.py" />
     <Compile Include="botcommands\broadcaster.py" />
