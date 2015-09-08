@@ -30,6 +30,8 @@
     <Content Include="twitchApi.ini" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="autoloadbot\__init__.py" />
+    <Compile Include="autoloadprivate\__init__.py" />
     <Compile Include="botcommands\broadcaster.py" />
     <Compile Include="botcommands\channel.py" />
     <Compile Include="botcommands\exit.py" />
@@ -109,6 +111,8 @@
     <Compile Include="twitchOauth.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="autoloadbot\" />
+    <Folder Include="autoloadprivate\" />
     <Folder Include="botcommands\" />
     <Folder Include="botprivate\" />
     <Folder Include="config" />
