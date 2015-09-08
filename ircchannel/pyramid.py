@@ -1,4 +1,4 @@
-from config import config
+﻿from config import config
 import database.factory
 import ircbot.irc
 import datetime
@@ -43,7 +43,7 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
             not permissions['broadcaster']):
             return False
     
-    emotes = ircbot.twitchApi.getTwitchEmotes()
+    emotes = ircbot.irc.globalEmotes
     
     try:
         count = int(msgParts[1])

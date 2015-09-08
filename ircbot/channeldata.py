@@ -74,10 +74,6 @@ class ChannelData:
     
     @property
     def ffzEmotes(self):
-        currentTime = datetime.datetime.utcnow()
-        if currentTime - self._ffzCache >= datetime.timedelta(hours=1):
-            emotes = ircbot.ffzApi.getBroadcasterEmotes(self._channel[1:])
-            self._ffzEmotes = emotes or self._ffzEmotes
         return self._ffzEmotes
     
     @property
@@ -122,3 +118,8 @@ class ChannelData:
     
     def sendMulipleMessages(self, messages, priority=1):
         ircbot.irc.messaging.queueMultipleMessages(self, messages, priority)
+    
+    def updateFfzEmotes(self):
+        self._ffzCache = datetime.datetime.utcnow()
+        emotes = ircbot.ffzApi.getBroadcasterEmotes(self._channel[1:])
+        self._ffzEmotes = emotes or self._ffzEmotes
