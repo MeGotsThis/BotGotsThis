@@ -1,3 +1,4 @@
+﻿import config.config
 import database.factory
 import ircbot.irc
 import ircbot.twitchApi
@@ -31,6 +32,8 @@ def botJoin(channel, sendMessage):
             sendMessage('Moved ' + channel[1:] + ' to event chat server')
 
 def botPart(channel, sendMessage):
+    if channel[1:] == config.config.botnick:
+        return
     ircbot.irc.partChannel(channel)
     sendMessage('Leaving ' + channel[1:])
 
