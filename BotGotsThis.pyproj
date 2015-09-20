@@ -84,6 +84,7 @@
     <Compile Include="ircwhisper\owner.py" />
     <Compile Include="ircwhisper\reload.py" />
     <Compile Include="ircwhisper\__init__.py" />
+    <Compile Include="privatechannel\commandList.dist.disableAll.py" />
     <Compile Include="privatechannel\commandList.dist.py" />
     <Compile Include="privatechannel\commandList.py" />
     <Compile Include="privatechannel\default\commandList.py" />

@@ -1,4 +1,4 @@
-import ircchannel.broadcaster
+﻿import ircchannel.broadcaster
 import ircchannel.charConvert
 import ircchannel.feature
 import ircchannel.reload
@@ -58,7 +58,12 @@ commandsStartWith = {
     '!autorepeat-': (ircchannel.repeat.commandAutoRepeat, 'broadcaster'),
 }
 
+filterMessage = commandList.filterMessage
 commands = dict(list(commands.items()) + list(commandList.commands.items()))
 commandsStartWith = dict(
     list(commandsStartWith.items()) +
     list(commandList.commandsStartWith.items()))
+processNoCommand = commandList.noCommandPreCustom
+if not commandList.disableCustomMessage:
+    processNoCommand += [ircchannel.text.customCommands]
+processNoCommand += commandList.noCommandPostCustom

@@ -86,7 +86,11 @@ def threadParse(channelData, tags, nick, message, msgParts):
     
         complete = False
         arguments = channelData, nick, message, msgParts, permissions
-        if command in ircchannel.commandList.commands:
+        for filter in ircchannel.commandList.filterMessage:
+            complete = filter(*arguments)
+            if complete:
+                break
+        if not complete and command in ircchannel.commandList.commands:
             commInfo = ircchannel.commandList.commands[command]
             hasPerm = True
             if commInfo[1] is not None:
@@ -109,7 +113,10 @@ def threadParse(channelData, tags, nick, message, msgParts):
                         if complete:
                             break
         if not complete:
-            ircchannel.text.customCommands(*arguments)
+            for process in ircchannel.commandList.processNoCommand:
+                complete = process(*arguments)
+                if complete:
+                    break
     except:
         extra = 'Channel: ' + channelData.channel + '\nMessage: ' + message
         ircbot.irc.logException(extra)
