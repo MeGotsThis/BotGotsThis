@@ -12,6 +12,9 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
     message = None
     
     with database.factory.getDatabase() as db:
+        if db.hasFeature(channel, 'nocustom'):
+            return False
+
         commands = db.getChatCommands(channel, command)
         hasTextConvert = db.hasFeature(channelData.channel[1:], 'textconvert')
     
@@ -78,61 +81,61 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
     if com == '!global':
         broadcaster = '#global'
     
-    if level == False:
-        channelData.sendMessage(nick + ' -> Invalid level, command ignored')
-        return
-    if level:
-        if level not in permissions:
-            channelData.sendMessage(
-                nick + ' -> Invalid level, command ignored')
+    with database.factory.getDatabase() as db:
+        if db.hasFeature(channel, 'nocustom') and broadcaster != '#global':
+            return False
+        
+        msg = None
+        if level == False:
+            msg = nick + ' -> Invalid level, command ignored'
+            channelData.sendMessage(msg)
             return
-        elif not permissions[level]:
-            channelData.sendMessage(
-                nick + ' -> You do not have permission to set that level')
-            return
-    
-    if action in ['add', 'insert', 'new']:
-        with database.factory.getDatabase() as db:
+        if level:
+            if level not in permissions:
+                msg = nick + ' -> Invalid level, command ignored'
+                channelData.sendMessage(msg)
+                return
+            elif not permissions[level]:
+                msg = nick + ' -> You do not have permission to set that level'
+                channelData.sendMessage(msg)
+                return
+        
+        if action in ['add', 'insert', 'new']:
             result = db.insertCustomCommand(
                 broadcaster, level, command, fullText, nick)
             if result:
                 channelData.sendMessage(command + ' was added successfully')
             else:
-                channelData.sendMessage(
-                    command + ' was not added successfully. There might be '
-                    'an existing command')
-    elif action in ['edit', 'update']:
-        with database.factory.getDatabase() as db:
-            result = db.updateCustomCommand(
-                broadcaster, level, command, fullText, nick)
+                msg = command + ' was not added successfully. There might be '
+                msg += 'an existing command'
+                channelData.sendMessage(msg)
+        elif action in ['edit', 'update']:
+            params = broadcaster, level, command, fullText, nick
+            result = db.updateCustomCommand(*params)
             if result:
-                channelData.sendMessage(
-                    command + ' was updated successfully')
+                msg = command + ' was updated successfully'
+                channelData.sendMessage(msg)
             else:
-                channelData.sendMessage(
-                    command + ' was not updated successfully. The command '
-                    'might not exist')
-    elif action in ['replace', 'override']:
-        with database.factory.getDatabase() as db:
-            result = db.replaceCustomCommand(
-                broadcaster, level, command, fullText, nick)
+                msg = command + ' was not updated successfully. The command '
+                msg += 'might not exist'
+                channelData.sendMessage(msg)
+        elif action in ['replace', 'override']:
+            params = broadcaster, level, command, fullText, nick
+            result = db.replaceCustomCommand(*params)
             if result:
-                channelData.sendMessage(
-                    command + ' was updated successfully')
+                channelData.sendMessage(command + ' was updated successfully')
             else:
-                channelData.sendMessage(
-                    command + ' was not updated successfully. The command '
-                    'might not exist')
-    elif action in ['del', 'delete', 'rem', 'remove',]:
-        with database.factory.getDatabase() as db:
+                msg = command + ' was not updated successfully. The command '
+                msg += 'might not exist'
+                channelData.sendMessage(msg)
+        elif action in ['del', 'delete', 'rem', 'remove',]:
             result = db.deleteCustomCommand(broadcaster, level, command, nick)
             if result:
-                channelData.sendMessage(
-                    command + ' was removed successfully')
+                channelData.sendMessage(command + ' was removed successfully')
             else:
-                channelData.sendMessage(
-                    command + ' was not removed successfully. The command '
-                    'might not exist')
+                msg = command + ' was not removed successfully. The command '
+                msg += 'might not exist'
+                channelData.sendMessage(msg)
 
 def parseCommandMessageInput(message):
     allowPermissions = {

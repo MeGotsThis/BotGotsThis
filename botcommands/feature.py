@@ -1,4 +1,4 @@
-import database.factory
+﻿import database.factory
 try:
     import privatechannel.feature as feature
 except:
@@ -9,6 +9,7 @@ features = {
     'textconvert': 'Text Character Conversion',
     'modpyramid': 'Mods Using !pyramid',
     'modwall': 'Mods Using !wall',
+    'nocustom': 'Disable Custom Commands',
     }
 features = dict(list(features.items()) + list(feature.features.items()))
 
