@@ -19,7 +19,7 @@ def commandPyramid(channelData, nick, message, msgParts, permissions):
             count = 5
         else:
             count = 3
-    count = min(count, 1000 // len(rep))
+    count = min(count, config.messageLimit // len(rep))
     if not permissions['broadcaster']:
         count = min(count, 5)
         
@@ -68,7 +68,7 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
     emoteIds = list(emotes.keys())
     for i in range(count):
         rep.append(emotes[random.choice(emoteIds)])
-        if len(' '.join(rep)) > 1000:
+        if len(' '.join(rep)) > config.messageLimit:
             del rep[-1]
             break
     messages = [' '.join(rep[0:i]) for i in range(1, count)]
@@ -92,7 +92,7 @@ def commandPyramidLong(channelData, nick, message, msgParts, permissions):
             count = 5
         else:
             count = 3
-    count = min(count, 1000 // len(rep))
+    count = min(count, config.messageLimit // len(rep))
     if not permissions['broadcaster']:
         count = min(count, 5)
         

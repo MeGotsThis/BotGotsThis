@@ -29,6 +29,7 @@ eventPort = int(ini['TWITCH']['eventPort'])
 groupServer = str(ini['TWITCH']['groupServer'])
 groupPort = int(ini['TWITCH']['groupPort'])
 
+messageLimit = int(ini['BOT']['messageLimit'])
 modLimit = min(int(ini['BOT']['modLimit']), 100)
 modSpamLimit = min(int(ini['BOT']['modSpamLimit']), 100)
 publicLimit = min(int(ini['BOT']['publicLimit']), 20)

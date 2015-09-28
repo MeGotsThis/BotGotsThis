@@ -38,7 +38,7 @@ class MessageQueue(threading.Thread):
             self.queueWhisper(msgParts[1], msgParts[2])
             return
         with self._queueLock:
-            param = (channelData, message[:1000], None)
+            param = (channelData, message[:config.messageLimit], None)
             self._queues[priority].append(param)
     
     def queueMultipleMessages(self, channelData, messages, priority=1):
@@ -54,7 +54,7 @@ class MessageQueue(threading.Thread):
                      '/w ' + msgParts[1] + ' ' + msgParts[2],
                      (msgParts[1].lower(), msgParts[2]))
                 else:
-                    param = (channelData, message[:1000], None)
+                    param = (channelData, message[:config.messageLimit], None)
                 self._queues[priority].append(param)
     
     def queueWhisper(self, nick, message, priority=1):
@@ -62,7 +62,7 @@ class MessageQueue(threading.Thread):
             return
         with self._queueLock:
             param = (ircbot.irc.groupChannel,
-                     ('/w ' + nick + ' ' + message)[:1000],
+                     ('/w ' + nick + ' ' + message)[:config.messageLimit],
                      (nick.lower(), message))
             self._queues[priority].append(param)
     
