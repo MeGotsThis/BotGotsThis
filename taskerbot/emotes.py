@@ -8,9 +8,9 @@ def refreshTwitchGlobalEmotes(timestamp):
         ircbot.twitchApi.updateTwitchEmotes()
 
 def refreshFrankerFaceZEmotes(timestamp):
-    for channel in ircbot.irc.channels:
-        since = timestamp - channel.ffzCache
+    for chan in ircbot.irc.channels:
+        since = timestamp - ircbot.irc.channels[chan].ffzCache
         if since >= datetime.timedelta(hours=1):
-            channel.updateFfzEmotes()
+            ircbot.irc.channels[chan].updateFfzEmotes()
             return
         
