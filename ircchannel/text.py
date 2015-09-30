@@ -81,6 +81,7 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
     if com == '!global':
         broadcaster = '#global'
     
+    channel = channelData.channel[1:]
     with database.factory.getDatabase() as db:
         if db.hasFeature(channel, 'nocustom') and broadcaster != '#global':
             return False
