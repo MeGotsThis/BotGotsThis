@@ -1,4 +1,5 @@
-﻿import ircchannel.broadcaster
+﻿import ircchannel.blockUrl
+import ircchannel.broadcaster
 import ircchannel.charConvert
 import ircchannel.feature
 import ircchannel.reload
@@ -13,6 +14,9 @@ try:
 except:
     import privatechannel.default.commandList as commandList
 
+filterMessage = [
+    ircchannel.blockUrl.filterNoUrlForBots
+    ]
 commands = {
     '!exit': (ircchannel.owner.commandExit, 'owner+ownerChan'),
     '!managebot': (ircchannel.owner.commandManageBot, 'owner+ownerChan'),
@@ -58,7 +62,7 @@ commandsStartWith = {
     '!autorepeat-': (ircchannel.repeat.commandAutoRepeat, 'broadcaster'),
 }
 
-filterMessage = commandList.filterMessage
+filterMessage = filterMessage + commandList.filterMessage
 commands = dict(list(commands.items()) + list(commandList.commands.items()))
 commandsStartWith = dict(
     list(commandsStartWith.items()) +

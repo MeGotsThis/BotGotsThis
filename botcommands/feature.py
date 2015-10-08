@@ -10,6 +10,7 @@ features = {
     'modpyramid': 'Mods Using !pyramid',
     'modwall': 'Mods Using !wall',
     'nocustom': 'Disable Custom Commands',
+    'nourlredirect': 'Ban URL Redirect (user has no follows)',
     }
 features = dict(list(features.items()) + list(feature.features.items()))
 
