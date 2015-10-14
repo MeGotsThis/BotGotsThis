@@ -54,8 +54,14 @@ def checkIfUrlMaybeBad(channelData, nick, message):
             if parsedOriginal.netloc != parsedReponse.netloc:
                 channelData.sendMessage('.ban ' + nick)
                 return
-        except (urllib.error.URLError, urllib.error.HTTPError,
-                http.client.InvalidURL):
-            ircbot.irc.logException(message)
+        except urllib.error.HTTPError as e:
+            parsedOriginal = urllib.parse.urlparse(url)
+            parsedReponse = urllib.parse.urlparse(e.geturl())
+            if parsedOriginal.netloc != parsedReponse.netloc:
+                channelData.sendMessage('.ban ' + nick)
+                return
+        except urllib.error.URLError as e:
+            if 'Errno 11001' not in e.reason:
+                ircbot.irc.logException(message)
         except:
             ircbot.irc.logException(message)
