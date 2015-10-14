@@ -1,4 +1,5 @@
-﻿disableCustomMessage = False
+﻿disableFilters = False
+disableCustomMessage = False
 
 filterMessage = []
 commands = {}

@@ -62,7 +62,10 @@ commandsStartWith = {
     '!autorepeat-': (ircchannel.repeat.commandAutoRepeat, 'broadcaster'),
 }
 
-filterMessage = filterMessage + commandList.filterMessage
+if commandList.disableFilters:
+    filterMessage = commandList.filterMessage
+else:
+    filterMessage = filterMessage + commandList.filterMessage
 commands = dict(list(commands.items()) + list(commandList.commands.items()))
 commandsStartWith = dict(
     list(commandsStartWith.items()) +
