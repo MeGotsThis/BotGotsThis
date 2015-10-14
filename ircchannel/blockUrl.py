@@ -1,4 +1,5 @@
-﻿import datetime
+﻿import config
+import datetime
 import database.factory
 import http.client
 import ircbot.irc
@@ -43,7 +44,11 @@ def checkIfUrlMaybeBad(channelData, nick, message):
         if not url.startswith('http://') and not url.startswith('https://'):
             url = 'http://' + url
         try:
-            urlRequest = urllib.request.urlopen(url)
+            request = urllib.request.Request(
+                url, headers={
+                    'User-Agent': 'MeGotsThis/' + config.config.botnick,
+                    })
+            urlRequest = urllib.request.urlopen(request)
             parsedOriginal = urllib.parse.urlparse(url)
             parsedReponse = urllib.parse.urlparse(urlRequest.geturl())
             if parsedOriginal.netloc != parsedReponse.netloc:
