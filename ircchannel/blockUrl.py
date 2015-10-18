@@ -61,7 +61,10 @@ def checkIfUrlMaybeBad(channelData, nick, message):
                 channelData.sendMessage('.ban ' + nick)
                 return
         except urllib.error.URLError as e:
-            if 'Errno 11001' not in e.reason:
+            try:
+                if e.reason.errno != 11001:
+                    ircbot.irc.logException(message)
+            except BaseException as e:
                 ircbot.irc.logException(message)
         except:
             ircbot.irc.logException(message)
