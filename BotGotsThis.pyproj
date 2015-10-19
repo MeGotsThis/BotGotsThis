@@ -45,6 +45,17 @@
     <Compile Include="config\config.py" />
     <Compile Include="config\oauth.py" />
     <Compile Include="config\__init__.py" />
+    <Compile Include="customfield\customList.py" />
+    <Compile Include="customfield\params.py" />
+    <Compile Include="customfield\query.py" />
+    <Compile Include="customfield\url.py" />
+    <Compile Include="customfield\user.py" />
+    <Compile Include="customfield\__init__.py" />
+    <Compile Include="customprivate\customList.dist.py" />
+    <Compile Include="customprivate\customList.py" />
+    <Compile Include="customprivate\default\customList.py" />
+    <Compile Include="customprivate\default\__init__.py" />
+    <Compile Include="customprivate\__init__.py" />
     <Compile Include="database\databasebase.py" />
     <Compile Include="database\factory.py" />
     <Compile Include="database\sqlite\sqlite.py" />
@@ -120,6 +131,9 @@
     <Folder Include="botcommands\" />
     <Folder Include="botprivate\" />
     <Folder Include="config" />
+    <Folder Include="customfield\" />
+    <Folder Include="customprivate\" />
+    <Folder Include="customprivate\default\" />
     <Folder Include="database" />
     <Folder Include="database\sqlite" />
     <Folder Include="ircbot" />

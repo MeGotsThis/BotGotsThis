@@ -1,10 +1,9 @@
 ﻿from config import config
+import customfield.customList
 import ircchannel.charConvert
 import database.factory
 import ircbot.irc
 import datetime
-import re
-import urllib.request
 
 def customCommands(channelData, nick, originalMsg, msgParts, permissions):
     command = msgParts[0].lower()
@@ -355,71 +354,11 @@ def _parseFormatMessage(message):
     return parsed
 
 def _getString(field, param, default, message, msgParts, channel, nick, query):
-    if field.lower() == 'user' or field.lower() == 'nick':
-        return nick if nick else default
-    
-    if field.lower() == 'query':
-        return query if query else default
-    
-    if field.lower() == 'url':
-        url = param.replace('{query}', query)
-        url = url.replace('{user}', nick)
-        url = url.replace('{nick}', nick)
-        url = url.replace('{broadcaster}', channel)
-        url = url.replace('{streamer}', channel)
-        try:
-            urlopen = urllib.request.urlopen
-            req = urlopen(url, timeout=config.customMessageUrlTimeout)
-            if int(req.status) == 200:
-                data = req.read().decode('utf-8')
-                data = data.replace('\r\n', ' ')
-                data = data.replace('\n', ' ')
-                data = data.replace('\r', ' ')
-                return data
-        except:
-            pass
-        return default
-    
-    try:
-        match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', field)
-        if match is not None:
-            matchParts = match.groups()
-            if matchParts[0] is not None:
-                i = int(matchParts[0])
-                if i >= len(msgParts):
-                    return default
-                if matchParts[2] is None:
-                    return msgParts[i]
-                else:
-                    s = message.split(None, i)[i]
-                    j = int(matchParts[2])
-                    if len(msgParts) > j:
-                        k = len(msgParts) - j - 1
-                        return s.rsplit(None, k)[0]
-                    else:
-                        return s
-            elif matchParts[3] is not None:
-                i = int(matchParts[3])
-                msgParts = message.split(None, i)
-                if i < len(msgParts):
-                    return msgParts[i]
-                else:
-                    return default
-            elif matchParts[4] is not None:
-                i = int(matchParts[4])
-                if i == 0:
-                    return msgParts[0]
-                elif len(msgParts) >= 2:
-                    if len(msgParts) <= i:
-                        return message.split(None, 1)[1]
-                    else:
-                        k = len(msgParts) - i - 1
-                        msg = message.rsplit(None, k)[0]
-                        return msg.split(None, 1)[1]
-                else:
-                    return default
-    except TypeError:
-        return None
+    for fieldConvert in customfield.customList.fields:
+        result = fieldConvert(field, param, default, message, msgParts,
+                              channel, nick, query)
+        if result is not None:
+            return result
 
     return None
 
