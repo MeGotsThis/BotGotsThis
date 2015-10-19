@@ -60,6 +60,7 @@
     <Compile Include="ircbot\twitch.py" />
     <Compile Include="ircbot\twitchApi.py" />
     <Compile Include="ircbot\__init__.py" />
+    <Compile Include="ircchannel\blockUrl.py" />
     <Compile Include="ircchannel\broadcaster.py" />
     <Compile Include="ircchannel\commandList.py" />
     <Compile Include="ircchannel\commands.py" />
