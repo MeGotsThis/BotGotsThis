@@ -24,7 +24,7 @@ _modulesList = [
     pkgutil.walk_packages(path=autoloadbot.__path__,
                           prefix=autoloadbot.__name__+'.'),
     pkgutil.walk_packages(path=autoloadprivate.__path__,
-                                 prefix=autoloadprivate.__name__+'.')
+                          prefix=autoloadprivate.__name__+'.')
     ]
 for _modules in _modulesList:
     for importer, modname, ispkg in _modules:
