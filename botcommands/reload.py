@@ -1,9 +1,11 @@
-import sys
+﻿import sys
 import imp
 
 def loadThisModule(module):
     _ = module.startswith('botcommands')
     _ = _ or module.startswith('botprivate')
+    _ = _ or module.startswith('customfield')
+    _ = _ or module.startswith('customprivate')
     _ = _ or module.startswith('ircchannel')
     _ = _ or module.startswith('ircwhisper')
     _ = _ or module.startswith('privatechannel')
@@ -22,9 +24,22 @@ def moduleKey(module):
         return (1, module)
 
     if module == 'privatechannel.feature':
-        return (599, module)
+        return (499, module)
     if module.startswith('botprivate'):
+        return (500, module)
+    
+    if module == 'customfield.customList':
+        return (699, module)
+    if module == 'customprivate.customList':
+        return (698, module)
+    if module == 'customprivate':
         return (600, module)
+    if module == 'customfield':
+        return (601, module)
+    if module.startswith('customprivate'):
+        return (610, module)
+    if module.startswith('customfield'):
+        return (611, module)
     
     if module.startswith('botcommands'):
         return (700, module)
