@@ -1,4 +1,4 @@
-def format(timeDelta):
+﻿def format(timeDelta):
     formatted = []
     if timeDelta.days == 1:
         formatted.append('1 day')
@@ -8,7 +8,7 @@ def format(timeDelta):
     if hours == 1:
         formatted.append('1 hour')
     elif hours > 1:
-        formatted.append(str(hours) + ' hour')
+        formatted.append(str(hours) + ' hours')
     minutes = timeDelta.seconds // 60 % 60
     if minutes == 1:
         formatted.append('1 minute')
