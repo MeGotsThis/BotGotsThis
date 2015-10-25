@@ -1,4 +1,5 @@
-﻿import customfield.params
+﻿import customfield.countdown
+import customfield.params
 import customfield.query
 import customfield.url
 import customfield.user
@@ -9,5 +10,10 @@ except:
 
 fields = [customfield.user.fieldUser,
           customfield.query.fieldQuery,
-          customfield.url.fieldUrl]
+          customfield.url.fieldUrl,
+          customfield.countdown.fieldCountdown,
+          customfield.countdown.fieldSince,
+          customfield.countdown.fieldNext,
+          customfield.countdown.fieldPrevious,
+          ]
 fields += customList.fields + [customfield.params.fieldParams]

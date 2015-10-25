@@ -45,6 +45,7 @@
     <Compile Include="config\config.py" />
     <Compile Include="config\oauth.py" />
     <Compile Include="config\__init__.py" />
+    <Compile Include="customfield\countdown.py" />
     <Compile Include="customfield\customList.py" />
     <Compile Include="customfield\params.py" />
     <Compile Include="customfield\query.py" />
@@ -61,6 +62,9 @@
     <Compile Include="database\sqlite\sqlite.py" />
     <Compile Include="database\sqlite\__init__.py" />
     <Compile Include="database\__init__.py" />
+    <Compile Include="data\timedelta.py" />
+    <Compile Include="data\timezones.py" />
+    <Compile Include="data\__init__.py" />
     <Compile Include="ircbot\background.py" />
     <Compile Include="ircbot\channeldata.py" />
     <Compile Include="ircbot\ffzApi.py" />
@@ -134,6 +138,7 @@
     <Folder Include="customfield\" />
     <Folder Include="customprivate\" />
     <Folder Include="customprivate\default\" />
+    <Folder Include="data\" />
     <Folder Include="database" />
     <Folder Include="database\sqlite" />
     <Folder Include="ircbot" />
