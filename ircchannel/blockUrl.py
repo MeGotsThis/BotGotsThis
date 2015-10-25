@@ -62,7 +62,7 @@ def checkIfUrlMaybeBad(channelData, nick, message):
                 return
         except urllib.error.URLError as e:
             try:
-                if e.reason.errno != 11001:
+                if e.reason.errno not in [-2, 11001]:
                     ircbot.irc.logException(message)
             except BaseException as e:
                 ircbot.irc.logException(message)
