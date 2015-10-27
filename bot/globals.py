@@ -1,9 +1,9 @@
 ﻿from . import config
-from .channel import ChannelData
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.message import MessageQueue
 from .thread.socket import SocketThread
+import bot.channel as channel
 import datetime
 import sys
 import threading
@@ -22,7 +22,7 @@ join = JoinThread(name='Join Thread')
 join.addSocket(mainChat)
 join.addSocket(eventChat)
 join.addSocket(groupChat)
-groupChannel = ChannelData('#' + config.botnick, groupChat, float('-inf'))
+groupChannel = channel.Channel(config.botnick, groupChat, float('-inf'))
 
 background = BackgroundTasker(name='Background Tasker')
 

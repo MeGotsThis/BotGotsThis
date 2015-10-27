@@ -1,16 +1,17 @@
-﻿import datetime
-import ircbot.ffzApi
-import ircbot.irc
+﻿from .api.ffz import getBroadcasterEmotes
+from . import globals
+import datetime
 
-class ChannelData:
-    __slots__ = ['_channel', '_socket', '_isMod', '_isSubscriber', '_ircUsers',
-                 '_ircOps', '_sessionData', '_joinPriority', '_ffzEmotes',
-                 '_ffzCache', '_streamingSince', '_twitchStatus',
-                 '_twitchGame',
+class Channel:
+    __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',
+                 '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
+                 '_joinPriority', '_ffzEmotes', '_ffzCache', '_streamingSince',
+                 '_twitchStatus', '_twitchGame',
                  ]
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
         self._channel = channel
+        self._ircChannel = '#' + channel
         self._socket = socket
         self._isMod = False
         self._isSubscriber = False
@@ -27,6 +28,10 @@ class ChannelData:
     @property
     def channel(self):
         return self._channel
+    
+    @property
+    def ircChannel(self):
+        return self._ircChannel
     
     @property
     def socket(self):
@@ -110,16 +115,16 @@ class ChannelData:
     
     def part(self):
         self.socket.partChannel(self)
-        ircbot.irc.messaging.clearQueue(self.channel)
+        globals.messaging.clearQueue(self.channel)
         self._socket = None
     
     def sendMessage(self, msg, priority=1):
-        ircbot.irc.messaging.queueMessage(self, msg, priority)
+        globals.messaging.queueMessage(self, msg, priority)
     
     def sendMulipleMessages(self, messages, priority=1):
-        ircbot.irc.messaging.queueMultipleMessages(self, messages, priority)
+        globals.messaging.queueMultipleMessages(self, messages, priority)
     
     def updateFfzEmotes(self):
         self._ffzCache = datetime.datetime.utcnow()
-        emotes = ircbot.ffzApi.getBroadcasterEmotes(self._channel[1:])
+        emotes = getBroadcasterEmotes(self._channel[1:])
         self._ffzEmotes = emotes or self._ffzEmotes

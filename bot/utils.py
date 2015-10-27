@@ -1,21 +1,17 @@
-from .channel import ChannelData
+﻿from .channel import Channel
 from .globals import channels, mainChat
 
 def joinChannel(channel, priority=float('inf'), server=mainChat):
-    if channel[0] != '#':
-        channel = '#' + channel
     channel = channel.lower()
     if channel in channels:
         t = min(channels[channel].joinPriority, priority)
         channels[channel].joinPriority = t
         return False
-    channels[channel] = ChannelData(channel, server, priority)
+    channels[channel] = Channel(channel, server, priority)
     server.joinChannel(channels[channel])
     return True
 
 def partChannel(channel):
-    if channel[0] != '#':
-        channel = '#' + channel
     if channel in channels:
         channels[channel].part()
         del channels[channel]
@@ -26,8 +22,6 @@ ENSURE_CORRECT = int(0)
 ENSURE_NOT_JOINED = int(1)
 
 def ensureServer(channel, priority=float('inf'), server=mainChat):
-    if channel[0] != '#':
-        channel = '#' + channel
     if channel not in channels:
         return ENSURE_NOT_JOINED
     if server is channels[channel].socket:
