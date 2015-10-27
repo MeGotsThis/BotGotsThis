@@ -1,1 +1,1 @@
-﻿import ircbot.twitch
+﻿import bot.main
