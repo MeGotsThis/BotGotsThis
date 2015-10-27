@@ -1,10 +1,6 @@
 *.pyc
-autoloadprivate/*
-privatechannel/*
-customprivate/*
-privatewhisper/*
-botprivate/*
-taskerprivate/*
+source/private/*
+lists/private/*
 nohup.out
 *.log
 *.suo
