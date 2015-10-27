@@ -48,6 +48,7 @@
     <Compile Include="bot\twitchmessage\ircprefix.py" />
     <Compile Include="bot\twitchmessage\irctags.py" />
     <Compile Include="bot\twitchmessage\__init__.py" />
+    <Compile Include="bot\utils.py" />
     <Compile Include="bot\__init__.py" />
     <Compile Include="lists\private\channel.dist.disableAll.py" />
     <Compile Include="lists\private\channel.dist.py" />

@@ -1,4 +1,4 @@
-from config import config
+﻿from config import config
 from twitchmessage.ircmessage import IrcMessage
 from twitchmessage.ircparams import IrcMessageParams
 import ircbot.irc
@@ -70,7 +70,7 @@ class JoinThread(threading.Thread):
                 ircbot.irc.logException()
         print(str(datetime.datetime.utcnow()) + ' Ending SocketJoinThread')
     
-    def add(self, socketThread):
+    def addSocket(self, socketThread):
         self._socketThreads.append(socketThread)
     
     def connected(self, socketThread):

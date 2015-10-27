@@ -1,9 +1,10 @@
 ﻿# Import some necessary libraries.
-from bot import config
+from . import config
+from . import globals
+from . import utils
 from source.database.factory import getDatabase
 import source.private.autoload as privateAuto
 import source.public.autoload as publicAuto
-import bot.globals as globals
 import datetime
 import importlib
 import pkgutil
@@ -41,7 +42,7 @@ try:
                 params += globals.eventChat,
             else:
                 params += globals.mainChat,
-            globals.joinChannel(*params)
+            utils.joinChannel(*params)
     
     globals.messaging.join()
 except:

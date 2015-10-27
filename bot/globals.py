@@ -1,35 +1,30 @@
-﻿from config import config
-import ircbot.background
-import ircbot.channeldata
-import ircbot.ircsocket
-import ircbot.join
-import ircbot.message
+﻿from . import config
+from .channel import ChannelData
+from .thread.background import BackgroundTasker
+from .thread.join import JoinThread
+from .thread.message import MessageQueue
+from .thread.socket import SocketThread
 import datetime
 import sys
 import threading
 import traceback
 
 # Import some necessary libraries.
-messaging = ircbot.message.MessageQueue(name='Message Queue')
+messaging = MessageQueue(name='Message Queue')
 
-mainChat = ircbot.ircsocket.SocketThread(config.mainServer,
-                                         config.mainPort,
-                                         name='Main Chat')
-eventChat = ircbot.ircsocket.SocketThread(config.eventServer,
-                                         config.eventPort,
-                                          name='Event Chat')
-groupChat = ircbot.ircsocket.SocketThread(config.groupServer,
-                                         config.groupPort,
-                                          name='Group Chat')
+mainChat = SocketThread(config.mainServer, config.mainPort, name='Main Chat')
+eventChat = SocketThread(config.eventServer, config.eventPort,
+                         name='Event Chat')
+groupChat = SocketThread(config.groupServer, config.groupPort,
+                         name='Group Chat')
 
-join = ircbot.join.JoinThread(name='Join Thread')
-join.add(mainChat)
-join.add(eventChat)
-join.add(groupChat)
-groupChannel = ircbot.channeldata.ChannelData(
-    '#' + config.botnick, groupChat, float('-inf'))
+join = JoinThread(name='Join Thread')
+join.addSocket(mainChat)
+join.addSocket(eventChat)
+join.addSocket(groupChat)
+groupChannel = ChannelData('#' + config.botnick, groupChat, float('-inf'))
 
-background = ircbot.background.BackgroundTasker(name='Background Tasker')
+background = BackgroundTasker(name='Background Tasker')
 
 channels = {}
 displayName = config.botnick
@@ -93,58 +88,3 @@ globalFfzEmotes = {
     3: 'BeanieHipster',
     }
 globalFfzEmotesCache = datetime.datetime.min
-
-def joinChannel(channel, priority=float('inf'), server=mainChat):
-    if channel[0] != '#':
-        channel = '#' + channel
-    channel = channel.lower()
-    if channel in channels:
-        channels[channel].joinPriority = min(
-            channels[channel].joinPriority, priority)
-        return False
-    params = channel, server, priority
-    channels[channel] = ircbot.channeldata.ChannelData(*params)
-    server.joinChannel(channels[channel])
-    return True
-
-def partChannel(channel):
-    if channel[0] != '#':
-        channel = '#' + channel
-    if channel in channels:
-        channels[channel].part()
-        del channels[channel]
-
-ENSURE_REJOIN_TO_MAIN = int(-2)
-ENSURE_REJOIN_TO_EVENT = int(-1)
-ENSURE_CORRECT = int(0)
-ENSURE_NOT_JOINED = int(1)
-
-def ensureServer(channel, priority=float('inf'), server=mainChat):
-    if channel[0] != '#':
-        channel = '#' + channel
-    if channel not in channels:
-        return ENSURE_NOT_JOINED
-    if server is channels[channel].socket:
-        channels[channel].joinPriority = min(
-            channels[channel].joinPriority, priority)
-        return ENSURE_CORRECT
-    partChannel(channel)
-    joinChannel(channel, priority, server)
-    if server is eventChat:
-        return ENSURE_REJOIN_TO_EVENT
-    else:
-        return ENSURE_REJOIN_TO_MAIN
-
-def logException(extraMessage=None):
-    if config.exceptionLog is None:
-        return
-    now = datetime.datetime.utcnow()
-    logDateFormat = '%Y-%m-%dT%H:%M:%S.%f '
-    _ = traceback.format_exception(*sys.exc_info())
-    with open(config.exceptionLog, 'a', encoding='utf-8') as file:
-        file.write(now.strftime(logDateFormat))
-        file.write('Exception in thread ')
-        file.write(threading.current_thread().name + ':\n')
-        if extraMessage:
-            file.write(extraMessage + '\n')
-        file.write(''.join(_))
