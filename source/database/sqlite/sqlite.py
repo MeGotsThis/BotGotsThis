@@ -1,9 +1,8 @@
-import database.databasebase
+﻿from ..databasebase import DatabaseBase
 import sqlite3
 
-class SQLiteDatabase(database.databasebase.DatabaseBase):
-    __slots__ = database.databasebase.DatabaseBase.__slots__ + (
-        '_dbfile', '_oauthfile',)
+class SQLiteDatabase(DatabaseBase):
+    __slots__ = DatabaseBase.__slots__ + ('_dbfile', '_oauthfile',)
     
     def __init__(self, ini, *args):
         super().__init__(*args)

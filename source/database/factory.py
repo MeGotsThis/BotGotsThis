@@ -1,10 +1,10 @@
+﻿from .databasebase import DatabaseBase
+from .sqlite.sqlite import SQLiteDatabase
 import configparser
-import database.databasebase
-import database.sqlite.sqlite
 import os.path
 
 engines = {
-    'sqlite': database.sqlite.sqlite.SQLiteDatabase,
+    'sqlite': SQLiteDatabase,
     }
 
 def getDatabase():
@@ -13,4 +13,4 @@ def getDatabase():
         ini.read('config.ini')
         if ini['DATABASE']['engine'] in engines:
             return engines[ini['DATABASE']['engine']](ini['DATABASE'])
-    return database.databasebase.DatabaseBase()
+    return DatabaseBase()
