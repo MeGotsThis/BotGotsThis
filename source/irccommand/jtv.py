@@ -1,5 +1,4 @@
-from config import config
-import ircbot.irc
+﻿from bot import globals
 
 messageLimit = 'Your message was not sent because you are '
 messageLimit += 'sending messages too quickly.'
@@ -9,6 +8,6 @@ messageIdentical += 'previous one you sent, less than 30 seconds ago.'
 def parse(channelData, message):
     if message.startswith('You are permanently banned from talking in '):
         channelData.isMod = False
-        ircbot.irc.messaging.clearQueue(channelData.channel)
+        globals.messaging.clearQueue(channelData.channel)
     if message in [messageLimit, messageIdentical]:
         channelData.isMod = False
