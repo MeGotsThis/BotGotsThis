@@ -1,9 +1,9 @@
 ﻿# Message Queue
-from config import config
-from twitchmessage.ircmessage import IrcMessage
-from twitchmessage.ircparams import IrcMessageParams
-import ircbot.channeldata
-import ircbot.irc
+from .. import config
+from .. import globals
+from .. import utils
+from ..twitchmessage.ircmessage import IrcMessage
+from ..twitchmessage.ircparams import IrcMessageParams
 import threading
 import traceback
 import datetime
@@ -50,7 +50,7 @@ class MessageQueue(threading.Thread):
                     msgParts = message.split(' ', 2)
                     if len(msgParts) < 3:
                         continue
-                    param = (ircbot.irc.groupChannel,
+                    param = (globals.groupChannel,
                      '/w ' + msgParts[1] + ' ' + msgParts[2],
                      (msgParts[1].lower(), msgParts[2]))
                 else:
@@ -61,7 +61,7 @@ class MessageQueue(threading.Thread):
         if not nick and not message:
             return
         with self._queueLock:
-            param = (ircbot.irc.groupChannel,
+            param = (globals.groupChannel,
                      ('/w ' + nick + ' ' + message)[:config.messageLimit],
                      (nick.lower(), message))
             self._queues[priority].append(param)
@@ -86,14 +86,14 @@ class MessageQueue(threading.Thread):
                         pass
                 time.sleep(1 / config.messagePerSecond)
         except:
-            ircbot.irc.logException()
+            utils.logException()
             raise
         finally:
-            ircbot.irc.mainChat.running = False
-            ircbot.irc.eventChat.running = False
-            ircbot.irc.groupChat.running = False
-            ircbot.irc.join.running = False
-            ircbot.irc.background.running = False
+            globals.mainChat.running = False
+            globals.eventChat.running = False
+            globals.groupChat.running = False
+            globals.join.running = False
+            globals.background.running = False
             print(str(datetime.datetime.utcnow()) + ' Ending MessageQueue')
     
     def _getMessage(self):

@@ -1,7 +1,7 @@
-﻿from config import config
-from twitchmessage.ircmessage import IrcMessage
-from twitchmessage.ircparams import IrcMessageParams
-import ircbot.irc
+﻿from .. import config
+from .. import utils
+from ..twitchmessage.ircmessage import IrcMessage
+from ..twitchmessage.ircparams import IrcMessageParams
 import threading
 import traceback
 import datetime
@@ -67,7 +67,7 @@ class JoinThread(threading.Thread):
                 
                 time.sleep(1 / config.joinPerSecond)
             except:
-                ircbot.irc.logException()
+                utils.logException()
         print(str(datetime.datetime.utcnow()) + ' Ending SocketJoinThread')
     
     def addSocket(self, socketThread):

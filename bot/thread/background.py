@@ -1,5 +1,5 @@
-﻿import datetime
-import ircbot.irc
+﻿from .. import utils
+import datetime
 import threading
 import time
 
@@ -30,7 +30,7 @@ class BackgroundTasker(threading.Thread):
                         t[2] = now
                 time.sleep(1 / 1000)
         except:
-            ircbot.irc.logException()
+            utils.logException()
             raise
         finally:
             print(str(datetime.datetime.utcnow()) + ' Ending BackgroundTasker')

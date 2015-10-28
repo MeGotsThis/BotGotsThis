@@ -1,18 +1,20 @@
-﻿from config import config
-from twitchmessage.ircmessage import IrcMessage
-from twitchmessage.ircparams import IrcMessageParams
-import ircchannel.commands
-import ircuser.notice
-import ircuser.userstate
-import ircbot.irc
-import ircwhisper.commands
-import threading
-import traceback
+﻿from .. import config
+from .. import globals
+from .. import utils
+from ..twitchmessage.ircmessage import IrcMessage
+from ..twitchmessage.ircparams import IrcMessageParams
+from source.public.irccommand.userstate import parse as parseUserState
 import datetime
 import os.path
 import socket
-import time
+import source.channel
+import source.public.irccommand.notice
+import source.public.irccommand.userstate
+import source.whisper
 import sys
+import threading
+import time
+import traceback
 
 _logCommandPerChannel = [
     'PRIVMSG', 'NOTICE', 'MODE', 'JOIN', 'PART', 'USERSTATE', 'HOSTTARGET',
@@ -65,7 +67,7 @@ class SocketThread(threading.Thread):
             print(str(datetime.datetime.utcnow()) + ' ' + self.name +
                   ' Connected ' + self._server)
             
-            ircbot.irc.join.connected(self)
+            globals.join.connected(self)
             self._isConnected = True
             try:
                 while self.running:
@@ -100,11 +102,11 @@ class SocketThread(threading.Thread):
             except LoginUnsuccessfulException:
                 pass
             except:
-                ircbot.irc.logException()
+                utils.logException()
             finally:
                 self._ircsock.close()
             self._isConnected = False
-            ircbot.irc.join.disconnected(self)
+            globals.join.disconnected(self)
             print(str(datetime.datetime.utcnow()) + ' ' +  self.name +
                   ' Disconnected ' + self._server)
             time.sleep(5)
@@ -123,7 +125,7 @@ class SocketThread(threading.Thread):
             extra = 'Command: ' + str(message)
             if channel:
                 extra = 'Channel: ' + channel + '\n' + extra
-            ircbot.irc.logException(extra)
+            utils.logException(extra)
             self._isConnected = False
         
         now = datetime.datetime.utcnow()
@@ -182,7 +184,7 @@ class SocketThread(threading.Thread):
                            params=IrcMessageParams(
                                middle=channelData.channel)))
             del self._channels[channelData.channel]
-        ircbot.irc.join.part(channelData.channel)
+        globals.join.part(channelData.channel)
         print(str(datetime.datetime.utcnow()) + ' Parted ' +
               channelData.channel)
     
@@ -206,7 +208,7 @@ class SocketThread(threading.Thread):
                 _logMessage(file, nick + ' -> ' + where + ': ' + msg, now)
             if where in self._channels:
                 chan = self._channels[where]
-                ircchannel.commands.parse(chan, tags, nick, msg)
+                source.channel.parse(chan, tags, nick, msg)
         
         if message.command == 'WHISPER':
             tags = message.tags
@@ -218,13 +220,13 @@ class SocketThread(threading.Thread):
             _logMessage(file, nick + ' -> ' + config.botnick + ': ' + msg, now)
             file = config.botnick + '-Raw Whisper.log'
             _logMessage(file, '< ' + ircmsg, now)
-            ircwhisper.commands.parse(tags, nick, msg)
+            source.whisper.parse(tags, nick, msg)
         
         if (message.command == 'NOTICE' and message.prefix is not None and
             message.prefix.nick is not None and
             message.params.trailing is not None):
-            ircuser.notice.parse(self, message.prefix.nick,
-                                 message.params.trailing)
+            source.public.irccommand.notice.parse(
+                self, message.prefix.nick, message.params.trailing)
         
         if message.command == 'MODE':
             where, mode, nick = message.params.middle.split()
@@ -275,7 +277,7 @@ class SocketThread(threading.Thread):
             if where in self._channels:
                 chan = self._channels[where]
                 tags = message.tags
-                ircuser.userstate.parse(chan, tags)
+                parseUserState(chan, tags)
         
         if message.command in _logCommandPerChannel:
             where = message.params.middle.split(None, 1)[0]
