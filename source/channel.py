@@ -1,9 +1,7 @@
-﻿from config import config
-import ircchannel.commandList
-import ircbot.channeldata
-import ircchannel.text
-import ircuser.jtv
-import ircbot.irc
+﻿from .irccommand import jtv
+from bot import config, utils
+from bot.channel import Channel
+import lists.public.channel
 import threading
 import traceback
 import datetime
@@ -16,26 +14,26 @@ typeGlobalMod = ['staff', 'admin', 'global_mod']
 typeMod = ['staff', 'admin', 'global_mod', 'mod']
 
 # Set up our commands function
-def parse(channelData, tags, nick, message):
+def parse(channel, tags, nick, message):
     if len(message) == 0:
         return
     
     if nick == 'jtv':
-        ircuser.jtv.parse(channelData, message)
+        jtv.parse(channel, message)
         return
     
     msgParts = message.split(None)
     if len(msgParts) == 0:
         return
     
-    name = channelData.channel + '-' + str(msgParts[0]) + '-'
+    name = channel.channel + '-' + str(msgParts[0]) + '-'
     name += str(time.time())
-    params = channelData, tags, nick, message, msgParts
+    params = channel, tags, nick, message, msgParts
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(channelData, tags, nick, message, msgParts):
+def threadParse(channel, tags, nick, message, msgParts):
     if False: # Hints for Intellisense
-        channelData = ircbot.channeldata.ChannelData('', None)
+        channel = Channel('', None)
         nick = str()
         message = str()
         msgParts = [str(), str()]
@@ -55,20 +53,20 @@ def threadParse(channelData, tags, nick, message, msgParts):
             turbo = '0'
         if config.owner is not None:
             isOwner = nick == config.owner.lower()
-            _ = channelData.channel == '#' + config.botnick
-            isOwnerChan = channelData.channel == '#' + config.owner or _
+            _ = channel.channel == '#' + config.botnick
+            isOwnerChan = channel.channel == '#' + config.owner or _
         else:
             isOwner = False
             isOwnerChan = False
         isStaff = isOwner or userType in typeStaff
         isAdmin = isStaff or userType in typeAdmin
         isGlobalMod = isAdmin or userType in typeGlobalMod
-        isBroadcaster = nick == channelData.channel[1:]
+        isBroadcaster = nick == channel.channel[1:]
         isBroadcaster = isGlobalMod or isAdmin or isBroadcaster
         isMod = isBroadcaster or userType in typeMod
         isSubscriber = isBroadcaster or bool(int(subscriber))
         isTurbo = isBroadcaster or bool(int(turbo))
-        isChanMod = channelData.isMod
+        isChanMod = channel.isMod
         permissions = {
             'owner': isOwner,
             'ownerChan': isOwnerChan,
@@ -85,13 +83,13 @@ def threadParse(channelData, tags, nick, message, msgParts):
         command = str(msgParts[0]).lower()
     
         complete = False
-        arguments = channelData, nick, message, msgParts, permissions
-        for filter in ircchannel.commandList.filterMessage:
+        arguments = channel, nick, message, msgParts, permissions
+        for filter in lists.public.channel.filterMessage:
             complete = filter(*arguments)
             if complete:
                 break
-        if not complete and command in ircchannel.commandList.commands:
-            commInfo = ircchannel.commandList.commands[command]
+        if not complete and command in lists.public.channel.commands:
+            commInfo = lists.public.channel.commands[command]
             hasPerm = True
             if commInfo[1] is not None:
                 permissionSet = commInfo[1].split('+')
@@ -100,9 +98,9 @@ def threadParse(channelData, tags, nick, message, msgParts):
             if hasPerm and commInfo[0] is not None:
                 complete = commInfo[0](*arguments)
         if not complete:
-            for comm in ircchannel.commandList.commandsStartWith:
+            for comm in lists.public.channel.commandsStartWith:
                 if command.startswith(comm):
-                    commInfo = ircchannel.commandList.commandsStartWith[comm]
+                    commInfo = lists.public.channel.commandsStartWith[comm]
                     hasPerm = True
                     if commInfo[1] is not None:
                         permissionSet = commInfo[1].split('+')
@@ -113,10 +111,10 @@ def threadParse(channelData, tags, nick, message, msgParts):
                         if complete:
                             break
         if not complete:
-            for process in ircchannel.commandList.processNoCommand:
+            for process in lists.public.channel.processNoCommand:
                 complete = process(*arguments)
                 if complete:
                     break
     except:
-        extra = 'Channel: ' + channelData.channel + '\nMessage: ' + message
-        ircbot.irc.logException(extra)
+        extra = 'Channel: ' + channel.channel + '\nMessage: ' + message
+        utils.logException(extra)
