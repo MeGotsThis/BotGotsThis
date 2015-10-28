@@ -1,5 +1,5 @@
+﻿from .. import globals
 import datetime
-import ircbot.irc
 import json
 import urllib.request
 
