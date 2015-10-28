@@ -1,76 +1,65 @@
-﻿import ircchannel.blockUrl
-import ircchannel.broadcaster
-import ircchannel.charConvert
-import ircchannel.feature
-import ircchannel.reload
-import ircchannel.owner
-import ircchannel.pyramid
-import ircchannel.wall
-import ircchannel.mod
-import ircchannel.text
-import ircchannel.repeat
+﻿from source.public.channel import blockUrl, broadcaster, charConvert, feature
+from source.public.channel import mod, owner, pyramid, reload, repeat, text
+from source.public.channel import wall
 try:
-    import privatechannel.commandList as commandList
+    from ..private import channel as privateList
 except:
-    import privatechannel.default.commandList as commandList
+    from ..private.default import channel as privateList
 
 filterMessage = [
-    ircchannel.blockUrl.filterNoUrlForBots
+    blockUrl.filterNoUrlForBots
     ]
 commands = {
-    '!exit': (ircchannel.owner.commandExit, 'owner+ownerChan'),
-    '!managebot': (ircchannel.owner.commandManageBot, 'owner+ownerChan'),
-    '!reload': (ircchannel.reload.commandReload, 'owner+ownerChan'),
-    '!reloadcommands':
-    (ircchannel.reload.commandReloadCommands, 'owner+ownerChan'),
-    '!reloadconfig':
-    (ircchannel.reload.commandReloadConfig, 'owner+ownerChan'),
-    '!join': (ircchannel.owner.commandJoin, 'admin+ownerChan'),
-    '!part': (ircchannel.owner.commandPart, 'admin+ownerChan'),
-    '!emptychat': (ircchannel.owner.commandEmpty, 'admin+ownerChan'),
-    '!emptyall': (ircchannel.owner.commandEmptyAll, 'admin+ownerChan'),
-    '!global': (ircchannel.text.commandCommand, 'admin+ownerChan'),
-    '!say': (ircchannel.owner.commandSay, 'owner+ownerChan'),
-    '!hello': (ircchannel.broadcaster.commandHello, 'broadcaster'),
-    '!leave': (ircchannel.broadcaster.commandLeave, 'broadcaster'),
-    '!feature': (ircchannel.feature.commandFeature, 'broadcaster'),
-    '!empty': (ircchannel.broadcaster.commandEmpty, 'broadcaster'),
-    '!autorepeat': (ircchannel.repeat.commandAutoRepeat, 'broadcaster'),
-    '!pyramid': (ircchannel.pyramid.commandPyramid, 'moderator'),
-    '!rpyramid': (ircchannel.pyramid.commandRPyramid, 'moderator'),
-    '!wall': (ircchannel.wall.commandWall, 'moderator'),
-    '!status': (ircchannel.mod.commandStatus, 'moderator'),
-    '!title': (ircchannel.mod.commandStatus, 'moderator'),
-    '!game': (ircchannel.mod.commandGame, 'moderator'),
-    '!setgame': (ircchannel.mod.commandGame, 'moderator'),
-    '!purge': (ircchannel.mod.commandPurge, 'moderator'),
-    '!rekt': (ircchannel.mod.commandPurge, 'moderator'),
-    '!command': (ircchannel.text.commandCommand, 'moderator'),
-    '!full': (ircchannel.charConvert.commandFull, 'moderator'),
-    '!parenthesized':
-    (ircchannel.charConvert.commandParenthesized, 'moderator'),
-    '!circled': (ircchannel.charConvert.commandCircled, 'moderator'),
-    '!smallcaps': (ircchannel.charConvert.commandSmallCaps, 'moderator'),
-    '!upsidedown': (ircchannel.charConvert.commandUpsideDown, 'moderator'),
-    '!come': (ircchannel.broadcaster.commandCome, 'ownerChan'),
-    '!autojoin': (ircchannel.broadcaster.commandAutoJoin, 'ownerChan'),
-    '!uptime': (ircchannel.broadcaster.commandUptime, None),
+    '!exit': (owner.commandExit, 'owner+ownerChan'),
+    '!managebot': (owner.commandManageBot, 'owner+ownerChan'),
+    '!reload': (reload.commandReload, 'owner+ownerChan'),
+    '!reloadcommands': (reload.commandReloadCommands, 'owner+ownerChan'),
+    '!reloadconfig': (reload.commandReloadConfig, 'owner+ownerChan'),
+    '!join': (owner.commandJoin, 'admin+ownerChan'),
+    '!part': (owner.commandPart, 'admin+ownerChan'),
+    '!emptychat': (owner.commandEmpty, 'admin+ownerChan'),
+    '!emptyall': (owner.commandEmptyAll, 'admin+ownerChan'),
+    '!global': (text.commandCommand, 'admin+ownerChan'),
+    '!say': (owner.commandSay, 'owner+ownerChan'),
+    '!hello': (broadcaster.commandHello, 'broadcaster'),
+    '!leave': (broadcaster.commandLeave, 'broadcaster'),
+    '!feature': (feature.commandFeature, 'broadcaster'),
+    '!empty': (broadcaster.commandEmpty, 'broadcaster'),
+    '!autorepeat': (repeat.commandAutoRepeat, 'broadcaster'),
+    '!pyramid': (pyramid.commandPyramid, 'moderator'),
+    '!rpyramid': (pyramid.commandRPyramid, 'moderator'),
+    '!wall': (wall.commandWall, 'moderator'),
+    '!status': (mod.commandStatus, 'moderator'),
+    '!title': (mod.commandStatus, 'moderator'),
+    '!game': (mod.commandGame, 'moderator'),
+    '!setgame': (mod.commandGame, 'moderator'),
+    '!purge': (mod.commandPurge, 'moderator'),
+    '!rekt': (mod.commandPurge, 'moderator'),
+    '!command': (text.commandCommand, 'moderator'),
+    '!full': (charConvert.commandFull, 'moderator'),
+    '!parenthesized': (charConvert.commandParenthesized, 'moderator'),
+    '!circled': (charConvert.commandCircled, 'moderator'),
+    '!smallcaps': (charConvert.commandSmallCaps, 'moderator'),
+    '!upsidedown': (charConvert.commandUpsideDown, 'moderator'),
+    '!come': (broadcaster.commandCome, 'ownerChan'),
+    '!autojoin': (broadcaster.commandAutoJoin, 'ownerChan'),
+    '!uptime': (broadcaster.commandUptime, None),
 }
 commandsStartWith = {
-    '!pyramid-': (ircchannel.pyramid.commandPyramidLong, 'moderator'),
-    '!wall-': (ircchannel.wall.commandWallLong, 'moderator'),
-    '!autorepeat-': (ircchannel.repeat.commandAutoRepeat, 'broadcaster'),
+    '!pyramid-': (pyramid.commandPyramidLong, 'moderator'),
+    '!wall-': (wall.commandWallLong, 'moderator'),
+    '!autorepeat-': (repeat.commandAutoRepeat, 'broadcaster'),
 }
 
-if commandList.disableFilters:
-    filterMessage = commandList.filterMessage
+if privateList.disableFilters:
+    filterMessage = privateList.filterMessage
 else:
-    filterMessage = filterMessage + commandList.filterMessage
-commands = dict(list(commands.items()) + list(commandList.commands.items()))
+    filterMessage = filterMessage + privateList.filterMessage
+commands = dict(list(commands.items()) + list(privateList.commands.items()))
 commandsStartWith = dict(
     list(commandsStartWith.items()) +
-    list(commandList.commandsStartWith.items()))
-processNoCommand = commandList.noCommandPreCustom
-if not commandList.disableCustomMessage:
-    processNoCommand += [ircchannel.text.customCommands]
-processNoCommand += commandList.noCommandPostCustom
+    list(privateList.commandsStartWith.items()))
+processNoCommand = privateList.noCommandPreCustom
+if not privateList.disableCustomMessage:
+    processNoCommand += [text.customCommands]
+processNoCommand += privateList.noCommandPostCustom
