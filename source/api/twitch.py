@@ -1,11 +1,11 @@
-﻿import config.oauth
-import urllib.parse
-import http.client
-import ircbot.irc
-import os.path
+﻿from . import oauth
+from bot import globals
 import configparser
 import datetime
+import http.client
 import json
+import os.path
+import urllib.parse
 
 def getTwitchClientId():
     if os.path.isfile('config.ini'):
@@ -40,8 +40,8 @@ def twitchCall(channel, method, uri, headers={}, data=None):
     return (response, responseData)
 
 def updateTwitchEmotes():
-    ircbot.irc.globalEmotesCache = datetime.datetime.utcnow()
-    emoteset = [str(i) for i in ircbot.irc.emoteset]
+    globals.globalEmotesCache = datetime.datetime.utcnow()
+    emoteset = [str(i) for i in globals.emoteset]
     response, data = twitchCall(
         None, 'GET',
         '/kraken/chat/emoticon_images?emotesets=' + ','.join(emoteset),
@@ -72,4 +72,4 @@ def updateTwitchEmotes():
                 emotes[emote['id']] = replaceGlobal[emote['id']]
             else:
                 emotes[emote['id']] = emote['code']
-    ircbot.irc.globalEmotes = emotes
+    globals.globalEmotes = emotes
