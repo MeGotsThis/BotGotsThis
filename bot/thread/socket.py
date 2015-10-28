@@ -3,13 +3,12 @@ from .. import globals
 from .. import utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
-from source.public.irccommand.userstate import parse as parseUserState
+from source.irccommand.userstate import parse as parseUserState
 import datetime
 import os.path
 import socket
 import source.channel
-import source.public.irccommand.notice
-import source.public.irccommand.userstate
+import source.irccommand.notice
 import source.whisper
 import sys
 import threading
@@ -225,8 +224,8 @@ class SocketThread(threading.Thread):
         if (message.command == 'NOTICE' and message.prefix is not None and
             message.prefix.nick is not None and
             message.params.trailing is not None):
-            source.public.irccommand.notice.parse(
-                self, message.prefix.nick, message.params.trailing)
+            source.irccommand.notice.parse(self, message.prefix.nick,
+                                           message.params.trailing)
         
         if message.command == 'MODE':
             where, mode, nick = message.params.middle.split()

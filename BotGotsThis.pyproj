@@ -84,6 +84,10 @@
     <Compile Include="source\database\sqlite\sqlite.py" />
     <Compile Include="source\database\sqlite\__init__.py" />
     <Compile Include="source\database\__init__.py" />
+    <Compile Include="source\irccommand\jtv.py" />
+    <Compile Include="source\irccommand\notice.py" />
+    <Compile Include="source\irccommand\userstate.py" />
+    <Compile Include="source\irccommand\__init__.py" />
     <Compile Include="source\private\autoload\__init__.py" />
     <Compile Include="source\private\channel\__init__.py" />
     <Compile Include="source\private\common\__init__.py" />
@@ -121,10 +125,6 @@
     <Compile Include="source\public\custom\url.py" />
     <Compile Include="source\public\custom\user.py" />
     <Compile Include="source\public\custom\__init__.py" />
-    <Compile Include="source\public\irccommand\jtv.py" />
-    <Compile Include="source\public\irccommand\notice.py" />
-    <Compile Include="source\public\irccommand\userstate.py" />
-    <Compile Include="source\public\irccommand\__init__.py" />
     <Compile Include="source\public\manage\__init__.py" />
     <Compile Include="source\public\tasks\emotes.py" />
     <Compile Include="source\public\tasks\twitch.py" />
@@ -152,6 +152,7 @@
     <Folder Include="source\data\" />
     <Folder Include="source\database\" />
     <Folder Include="source\database\sqlite\" />
+    <Folder Include="source\irccommand\" />
     <Folder Include="source\private\" />
     <Folder Include="source\private\autoload\" />
     <Folder Include="source\private\channel\" />
@@ -165,7 +166,6 @@
     <Folder Include="source\public\common\" />
     <Folder Include="source\public\custom\" />
     <Folder Include="source\public\channel\" />
-    <Folder Include="source\public\irccommand\" />
     <Folder Include="source\public\manage\" />
     <Folder Include="source\public\tasks\" />
     <Folder Include="source\public\whisper\" />
