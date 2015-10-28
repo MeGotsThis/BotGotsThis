@@ -1,4 +1,4 @@
-﻿from .api.ffz import getBroadcasterEmotes
+﻿from source.api.ffz import getBroadcasterEmotes
 from . import globals
 import datetime
 

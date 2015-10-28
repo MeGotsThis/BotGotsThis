@@ -1,4 +1,4 @@
-﻿from .. import globals
+﻿from bot import globals
 import datetime
 import json
 import urllib.request

@@ -30,10 +30,6 @@
     <Content Include="twitchApi.ini" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="bot\api\ffz.py" />
-    <Compile Include="bot\api\oauth.py" />
-    <Compile Include="bot\api\twitch.py" />
-    <Compile Include="bot\api\__init__.py" />
     <Compile Include="bot\config.py" />
     <Compile Include="bot\channel.py" />
     <Compile Include="bot\globals.py" />
@@ -75,6 +71,10 @@
     <Compile Include="lists\public\__init__.py" />
     <Compile Include="lists\__init__.py" />
     <Compile Include="main.py" />
+    <Compile Include="source\api\ffz.py" />
+    <Compile Include="source\api\oauth.py" />
+    <Compile Include="source\api\twitch.py" />
+    <Compile Include="source\api\__init__.py" />
     <Compile Include="source\channel.py" />
     <Compile Include="source\data\timedelta.py" />
     <Compile Include="source\data\timezones.py" />
@@ -140,7 +140,6 @@
     <Compile Include="twitchOauth.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bot\api\" />
     <Folder Include="bot\thread\" />
     <Folder Include="bot\" />
     <Folder Include="bot\twitchmessage\" />
@@ -149,6 +148,7 @@
     <Folder Include="lists\private\default\" />
     <Folder Include="lists\public\" />
     <Folder Include="source\" />
+    <Folder Include="source\api\" />
     <Folder Include="source\data\" />
     <Folder Include="source\database\" />
     <Folder Include="source\database\sqlite\" />
