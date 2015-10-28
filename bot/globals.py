@@ -1,30 +1,20 @@
 ﻿from . import config
-from .thread.background import BackgroundTasker
-from .thread.join import JoinThread
-from .thread.message import MessageQueue
-from .thread.socket import SocketThread
-import bot.channel as channel
 import datetime
 import sys
 import threading
 import traceback
 
 # Import some necessary libraries.
-messaging = MessageQueue(name='Message Queue')
+messaging = None
 
-mainChat = SocketThread(config.mainServer, config.mainPort, name='Main Chat')
-eventChat = SocketThread(config.eventServer, config.eventPort,
-                         name='Event Chat')
-groupChat = SocketThread(config.groupServer, config.groupPort,
-                         name='Group Chat')
+mainChat = None
+eventChat = None
+groupChat = None
 
-join = JoinThread(name='Join Thread')
-join.addSocket(mainChat)
-join.addSocket(eventChat)
-join.addSocket(groupChat)
-groupChannel = channel.Channel(config.botnick, groupChat, float('-inf'))
+join = None
+groupChannel = None
 
-background = BackgroundTasker(name='Background Tasker')
+background = None
 
 channels = {}
 displayName = config.botnick

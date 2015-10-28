@@ -2,6 +2,11 @@
 from . import config
 from . import globals
 from . import utils
+from .channel import Channel
+from .thread.background import BackgroundTasker
+from .thread.join import JoinThread
+from .thread.message import MessageQueue
+from .thread.socket import SocketThread
 from source.database.factory import getDatabase
 import source.private.autoload as privateAuto
 import source.public.autoload as publicAuto
@@ -14,6 +19,23 @@ import time
 import traceback
 
 print(str(datetime.datetime.utcnow()) + ' Starting')
+globals.messaging = MessageQueue(name='Message Queue')
+
+globals.mainChat = SocketThread(config.mainServer, config.mainPort, name='Main Chat')
+globals.eventChat = SocketThread(config.eventServer, config.eventPort,
+                         name='Event Chat')
+globals.groupChat = SocketThread(config.groupServer, config.groupPort,
+                         name='Group Chat')
+
+globals.join = JoinThread(name='Join Thread')
+globals.join.addSocket(mainChat)
+globals.join.addSocket(eventChat)
+globals.join.addSocket(groupChat)
+globals.groupChannel = Channel(config.botnick, groupChat, float('-inf'))
+
+globals.background = BackgroundTasker(name='Background Tasker')
+
+# Start the Threads
 globals.mainChat.start()
 globals.eventChat.start()
 globals.groupChat.start()
