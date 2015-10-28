@@ -1,11 +1,11 @@
-import datetime
-import ircbot.irc
+﻿import datetime
+import bot.globals
 
 def parse(channelData, tags):
-    ircbot.irc.displayName = tags['display-name']
-    ircbot.irc.isTwitchStaff = tags['user-type'] in ['staff']
-    ircbot.irc.isTwitchAdmin = tags['user-type'] in ['staff', 'admin']
-    ircbot.irc.isTwitchTurbo = bool(int(tags['turbo']))
+    bot.globals.displayName = tags['display-name']
+    bot.globals.isTwitchStaff = tags['user-type'] in ['staff']
+    bot.globals.isTwitchAdmin = tags['user-type'] in ['staff', 'admin']
+    bot.globals.isTwitchTurbo = bool(int(tags['turbo']))
     channelData.isMod = tags['user-type'] in ['staff', 'admin', 'mod']
     
     emoteset = tags['emote-sets'].split(',')
@@ -16,6 +16,6 @@ def parse(channelData, tags):
         emoteset.remove(33)
     if 42 in emoteset:
         emoteset.remove(42)
-    if ircbot.irc.emoteset != emoteset:
-        ircbot.irc.emoteset = emoteset
-        ircbot.irc.globalEmotesCache = datetime.datetime.min
+    if bot.globals.emoteset != emoteset:
+        bot.globals.emoteset = emoteset
+        bot.globals.globalEmotesCache = datetime.datetime.min
