@@ -1,7 +1,5 @@
 ﻿# Import some necessary libraries.
-from . import config
-from . import globals
-from . import utils
+from . import config, globals, utils
 from .channel import Channel
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
@@ -56,9 +54,9 @@ for _modules in _modulesList:
           importlib.import_module(modname)
 
 try:
-    globals.joinChannel(config.botnick, float('-inf'), globals.mainChat)
+    utils.joinChannel(config.botnick, float('-inf'), globals.mainChat)
     if config.owner:
-        globals.joinChannel(config.owner, float('-inf'), globals.mainChat)
+        utils.joinChannel(config.owner, float('-inf'), globals.mainChat)
     with getDatabase() as db:
         for channelRow in db.getAutoJoinsChats():
             params = channelRow['broadcaster'], channelRow['priority'],
@@ -70,7 +68,7 @@ try:
     
     globals.messaging.join()
 except:
-    globals.logException()
+    utils.logException()
     raise
 finally:
     print(str(datetime.datetime.utcnow()) + ' Ended')
