@@ -1,12 +1,12 @@
 ﻿from .irccommand import jtv
 from bot import config, utils
 from bot.channel import Channel
-import lists.public.channel
-import threading
-import traceback
 import datetime
-import time
+import lists.public.channel
 import sys
+import threading
+import time
+import traceback
 
 typeStaff = ['staff']
 typeAdmin = ['staff', 'admin']

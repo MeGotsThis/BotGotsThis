@@ -1,11 +1,10 @@
-from config import config
-import ircwhisper.commandList
-import ircbot.irc
-import threading
-import traceback
+﻿from bot import config, utils
 import datetime
-import time
+import lists.public.whisper
 import sys
+import threading
+import time
+import traceback
 
 typeStaff = ['staff']
 typeAdmin = ['staff', 'admin']
@@ -61,8 +60,8 @@ def threadParse(tags, nick, message, msgParts):
     
         complete = False
         arguments = nick, message, msgParts, permissions
-        if command in ircwhisper.commandList.commands:
-            commInfo = ircwhisper.commandList.commands[command]
+        if command in lists.public.whisper.commands:
+            commInfo = lists.public.whisper.commands[command]
             hasPerm = True
             if commInfo[1] is not None:
                 permissionSet = commInfo[1].split('+')
@@ -72,4 +71,4 @@ def threadParse(tags, nick, message, msgParts):
                 complete = commInfo[0](*arguments)
     except:
         extra = 'From: ' + nick + '\nMessage: ' + message
-        ircbot.irc.logException(extra)
+        utils.logException(extra)

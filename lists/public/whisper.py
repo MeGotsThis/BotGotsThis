@@ -1,29 +1,26 @@
-import ircwhisper.broadcaster
-import ircwhisper.feature
-import ircwhisper.owner
-import ircwhisper.reload
+﻿from source.public.whisper import broadcaster, feature, owner, reload
 try:
-    import privatewhisper.commandList as commandList
+    from ..private import whisper as privateList
 except:
-    import privatewhisper.default.commandList as commandList
+    from ..private.default import whisper as privateList
 
 commands = {
-    '!hello': (ircwhisper.owner.commandHello, 'owner'),
-    '!exit': (ircwhisper.owner.commandExit, 'owner'),
-    '!say': (ircwhisper.owner.commandSay, 'owner'),
-    '!join': (ircwhisper.owner.commandJoin, 'admin'),
-    '!part': (ircwhisper.owner.commandPart, 'admin'),
-    '!emptychat': (ircwhisper.owner.commandEmpty, 'admin'),
-    '!emptyall': (ircwhisper.owner.commandEmptyAll, 'admin'),
-    '!managebot': (ircwhisper.owner.commandManageBot, 'owner'),
-    '!reload': (ircwhisper.reload.commandReload, 'owner'),
-    '!reloadcommands': (ircwhisper.reload.commandReloadCommands, 'owner'),
-    '!reloadconfig': (ircwhisper.reload.commandReloadConfig, 'owner'),
-    '!leave': (ircwhisper.broadcaster.commandLeave, None),
-    '!empty': (ircwhisper.broadcaster.commandEmpty, None),
-    '!come': (ircwhisper.broadcaster.commandCome, None),
-    '!autojoin': (ircwhisper.broadcaster.commandAutoJoin, None),
-    '!feature': (ircwhisper.feature.commandFeature, None),
+    '!hello': (owner.commandHello, 'owner'),
+    '!exit': (owner.commandExit, 'owner'),
+    '!say': (owner.commandSay, 'owner'),
+    '!join': (owner.commandJoin, 'admin'),
+    '!part': (owner.commandPart, 'admin'),
+    '!emptychat': (owner.commandEmpty, 'admin'),
+    '!emptyall': (owner.commandEmptyAll, 'admin'),
+    '!managebot': (owner.commandManageBot, 'owner'),
+    '!reload': (reload.commandReload, 'owner'),
+    '!reloadcommands': (reload.commandReloadCommands, 'owner'),
+    '!reloadconfig': (reload.commandReloadConfig, 'owner'),
+    '!leave': (broadcaster.commandLeave, None),
+    '!empty': (broadcaster.commandEmpty, None),
+    '!come': (broadcaster.commandCome, None),
+    '!autojoin': (broadcaster.commandAutoJoin, None),
+    '!feature': (feature.commandFeature, None),
     }
 
-commands = dict(list(commands.items()) + list(commandList.commands.items()))
+commands = dict(list(commands.items()) + list(privateList.commands.items()))
