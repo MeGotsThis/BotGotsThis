@@ -1,16 +1,16 @@
+﻿from ...api import twitch
+from bot import globals
 import copy
 import datetime
-import ircbot.irc
-import ircbot.twitchApi
 import json
 
 def checkStreamsAndChannel(timestamp):
-    if not ircbot.irc.channels:
+    if not globals.channels:
         return
-    channels = copy.copy(ircbot.irc.channels)
-    channelsList = ','.join([c[1:] for c in ircbot.irc.channels])
+    channels = copy.copy(globals.channels)
+    channelsList = ','.join([c[1:] for c in globals.channels])
     uri = '/kraken/streams?channel=' + channelsList
-    response, responseData = ircbot.twitchApi.twitchCall(None, 'GET', uri)
+    response, responseData = twitch.twitchCall(None, 'GET', uri)
     onlineStreams = []
     if response.status == 200:
         streamsData = json.loads(responseData.decode('utf-8'))
@@ -30,7 +30,7 @@ def checkStreamsAndChannel(timestamp):
         if channel in onlineStreams:
             continue
         uri = '/kraken/channels/' + channel[1:]
-        response, responseData = ircbot.twitchApi.twitchCall(None, 'GET', uri)
+        response, responseData = twitch.twitchCall(None, 'GET', uri)
         if response.status != 200:
             continue
         stream = json.loads(responseData.decode('utf-8'))

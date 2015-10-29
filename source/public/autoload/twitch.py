@@ -1,6 +1,6 @@
+﻿from ..tasks import twitch
+from bot.thread import background
 import datetime
-import ircbot.background
-import taskerbot.twitch
 
-ircbot.background.addTask(taskerbot.twitch.checkStreamsAndChannel,
-                          datetime.timedelta(seconds=30))
+background.addTask(twitch.checkStreamsAndChannel,
+                   datetime.timedelta(seconds=30))

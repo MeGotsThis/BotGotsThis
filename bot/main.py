@@ -21,17 +21,19 @@ import traceback
 print(str(datetime.datetime.utcnow()) + ' Starting')
 globals.messaging = MessageQueue(name='Message Queue')
 
-globals.mainChat = SocketThread(config.mainServer, config.mainPort, name='Main Chat')
+globals.mainChat = SocketThread(config.mainServer, config.mainPort,
+                                name='Main Chat')
 globals.eventChat = SocketThread(config.eventServer, config.eventPort,
                          name='Event Chat')
 globals.groupChat = SocketThread(config.groupServer, config.groupPort,
                          name='Group Chat')
 
 globals.join = JoinThread(name='Join Thread')
-globals.join.addSocket(mainChat)
-globals.join.addSocket(eventChat)
-globals.join.addSocket(groupChat)
-globals.groupChannel = Channel(config.botnick, groupChat, float('-inf'))
+globals.join.addSocket(globals.mainChat)
+globals.join.addSocket(globals.eventChat)
+globals.join.addSocket(globals.groupChat)
+globals.groupChannel = Channel(config.botnick, globals.groupChat,
+                               float('-inf'))
 
 globals.background = BackgroundTasker(name='Background Tasker')
 

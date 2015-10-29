@@ -1,8 +1,8 @@
-﻿import datetime
-import ircbot.background
-import taskerbot.emotes
+﻿from ..tasks import emotes
+from bot.thread import background
+import datetime
 
-ircbot.background.addTask(taskerbot.emotes.refreshTwitchGlobalEmotes,
-                          datetime.timedelta(seconds=1))
-ircbot.background.addTask(taskerbot.emotes.refreshFrankerFaceZEmotes,
-                          datetime.timedelta(milliseconds=.75))
+background.addTask(emotes.refreshTwitchGlobalEmotes,
+                   datetime.timedelta(seconds=1))
+background.addTask(emotes.refreshFrankerFaceZEmotes,
+                   datetime.timedelta(milliseconds=.75))

@@ -1,16 +1,16 @@
-﻿import datetime
-import ircbot.irc
-import ircbot.twitchApi
+﻿from ...api import twitch
+from bot import globals
+import datetime
 
 def refreshTwitchGlobalEmotes(timestamp):
-    since = timestamp - ircbot.irc.globalEmotesCache
+    since = timestamp - globals.globalEmotesCache
     if since >= datetime.timedelta(hours=1):
-        ircbot.twitchApi.updateTwitchEmotes()
+        twitch.updateTwitchEmotes()
 
 def refreshFrankerFaceZEmotes(timestamp):
-    for chan in ircbot.irc.channels:
-        since = timestamp - ircbot.irc.channels[chan].ffzCache
+    for chan in globals.channels:
+        since = timestamp - globals.channels[chan].ffzCache
         if since >= datetime.timedelta(hours=1):
-            ircbot.irc.channels[chan].updateFfzEmotes()
+            globals.channels[chan].updateFfzEmotes()
             return
         

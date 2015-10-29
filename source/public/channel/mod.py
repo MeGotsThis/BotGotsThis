@@ -1,5 +1,5 @@
-﻿from ...database.factory import getDatabase
-from ...api import oauth, twitch
+﻿from ...api import oauth, twitch
+from ...database.factory import getDatabase
 import threading
 
 def commandStatus(channelData, nick, message, msgParts, permissions):
