@@ -1,6 +1,5 @@
-﻿import database.factory
-import config.oauth
-import ircbot.twitchApi
+﻿from ...database.factory import getDatabase
+from ...api import oauth, twitch
 import threading
 
 def commandStatus(channelData, nick, message, msgParts, permissions):
@@ -8,10 +7,10 @@ def commandStatus(channelData, nick, message, msgParts, permissions):
     if len(msgParts) != 2:
         return False
     
-    if config.oauth.getOAuthToken(channelData.channel) is None:
+    if oauth.getOAuthToken(channelData.channel) is None:
         return False
     chan = channelData.channel[1:]
-    response, data = ircbot.twitchApi.twitchCall(
+    response, data = twitch.twitchCall(
         channelData.channel, 'PUT', '/kraken/channels/' + chan,
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -29,17 +28,17 @@ def commandGame(channelData, nick, message, msgParts, permissions):
     if len(msgParts) != 2:
         msgParts.append('')
     
-    if config.oauth.getOAuthToken(channelData.channel) is None:
+    if oauth.getOAuthToken(channelData.channel) is None:
         return False
     if msgParts[0].lower() == '!game':
-        with database.factory.getDatabase() as db:
+        with getDatabase() as db:
             fullGame = db.getFullGameTitle(msgParts[1])
             if fullGame is not None:
                 msgParts[1] = fullGame
         msgParts[1] = msgParts[1].replace('Pokemon', 'Pokémon')
         msgParts[1] = msgParts[1].replace('Pokepark', 'Poképark')
     chan = channelData.channel[1:]
-    response, data = ircbot.twitchApi.twitchCall(
+    response, data = twitch.twitchCall(
         channelData.channel, 'PUT', '/kraken/channels/' + chan,
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',

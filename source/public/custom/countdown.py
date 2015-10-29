@@ -9,8 +9,8 @@
 # {countdown@1/20/2015 0:00,1/21/2015 0:00,1/22/2015 0:00}
 # {countdown@15:00,Friday 6:00PM,1/1 7:00 PST,12/22/2015 9:00 PM}
 
-import data.timedelta
-import data.timezones
+from ...data.timedelta import format as timedeltaFormat
+from ...data import timezones
 import datetime
 import re
 
@@ -80,12 +80,12 @@ def fieldCountdown(field, param, default, message, msgParts, channel, nick,
             return default if default else 'has passed'
         else:
             next = min(dt[0] for dt in nextDateTimes)
-            now = datetime.datetime.utcnow().replace(tzinfo=data.timezones.utc)
+            now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
             if len(pastDateTimes) > 0 and cooldown:
                 past = max(dt[0] for dt in pastDateTimes)
                 if _testCooldown(cooldown, past, next, now) < 0:
                     return default if default else 'has passed'
-            return data.timedelta.format(next - now)
+            return timedeltaFormat(next - now)
     return None
 
 def fieldSince(field, param, default, message, msgParts, channel, nick,
@@ -112,12 +112,12 @@ def fieldSince(field, param, default, message, msgParts, channel, nick,
             return default if default else 'has passed'
         else:
             past = max(dt[0] for dt in pastDateTimes)
-            now = datetime.datetime.utcnow().replace(tzinfo=data.timezones.utc)
+            now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
             if len(nextDateTimes) > 0 and cooldown:
                 next = min(dt[0] for dt in nextDateTimes)
                 if _testCooldown(cooldown, past, next, now) < 0:
                     return default if default else 'has passed'
-            return data.timedelta.format(now - past)
+            return timedeltaFormat(now - past)
     return None
 
 def fieldNext(field, param, default, message, msgParts, channel, nick,
@@ -197,10 +197,10 @@ def _parseDateString(string):
         is24Hour = False
     else:
         return None
-    if g[13] is not None and g[13].lower() in data.timezones.abbreviations:
-        timezone = data.timezones.abbreviations[g[13].lower()]
+    if g[13] is not None and g[13].lower() in timezones.abbreviations:
+        timezone = timezones.abbreviations[g[13].lower()]
     else:
-        timezone = data.timezones.utc
+        timezone = timezones.utc
     timeOfDay = datetime.time(hour, minute, seconds, microseconds, timezone)
     dayofweek = None
     date = None
@@ -218,7 +218,7 @@ def _parseDateString(string):
     return (timeOfDay, dayofweek, date, is24Hour)
 
 def _getNextDateTime(timeOfDay, dayofweek, date, is24Hour):
-    now = datetime.datetime.utcnow().replace(tzinfo=data.timezones.utc)
+    now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
     today = datetime.date.today()
     if date is not None:
         if date[0] is not None:
@@ -267,7 +267,7 @@ def _getNextDateTime(timeOfDay, dayofweek, date, is24Hour):
             return dt + datetime.timedelta(days=1), is24Hour
 
 def _getPastDateTime(timeOfDay, dayofweek, date, is24Hour):
-    now = datetime.datetime.utcnow().replace(tzinfo=data.timezones.utc)
+    now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
     today = datetime.date.today()
     if date is not None:
         if date[0] is not None:

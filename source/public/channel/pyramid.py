@@ -1,11 +1,10 @@
-﻿from config import config
-import database.factory
-import ircbot.irc
+﻿from ...database.factory import getDatabase
+from bot import config, globals
 import datetime
 import random
 
 def commandPyramid(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
             not permissions['broadcaster']):
             return False
@@ -38,12 +37,12 @@ def commandPyramid(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandRPyramid(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
             not permissions['broadcaster']):
             return False
     
-    emotes = ircbot.irc.globalEmotes
+    emotes = globals.globalEmotes
     
     try:
         count = int(msgParts[1])
@@ -77,7 +76,7 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandPyramidLong(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
             not permissions['broadcaster']):
             return False

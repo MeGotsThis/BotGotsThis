@@ -1,30 +1,28 @@
-﻿import botcommands.broadcaster
-import ircbot.twitchApi
-import email.utils
+﻿from ...api import twitch
+from ..common import broadcaster
 import datetime
-import time
+import email.utils
 import json
+import time
 
 def commandHello(channelData, nick, message, msgParts, permissions):
     channelData.sendMessage('Hello Kappa')
     return True
 
 def commandCome(channelData, nick, message, msgParts, permissions):
-    botcommands.broadcaster.botCome(nick, channelData.sendMessage)
+    broadcaster.botCome(nick, channelData.sendMessage)
     return True
 
 def commandLeave(channelData, nick, message, msgParts, permissions):
-    return botcommands.broadcaster.botLeave(channelData.channel,
-                                            channelData.sendMessage)
+    return broadcaster.botLeave(channelData.channel, channelData.sendMessage)
 
 def commandEmpty(channelData, nick, message, msgParts, permissions):
-    botcommands.broadcaster.botEmpty(channelData.channel,
+    broadcaster.botEmpty(channelData.channel,
                                      channelData.sendMessage)
     return True
 
 def commandAutoJoin(channelData, nick, message, msgParts, permissions):
-    botcommands.broadcaster.botAutoJoin(
-        nick, channelData.sendMessage, msgParts)
+    broadcaster.botAutoJoin(nick, channelData.sendMessage, msgParts)
     return True
 
 def commandUptime(channelData, nick, message, msgParts, permissions):
@@ -41,7 +39,7 @@ def commandUptime(channelData, nick, message, msgParts, permissions):
         channelData.sendMessage(msg)
         return True
 
-    response, data = ircbot.twitchApi.twitchCall(
+    response, data = twitch.twitchCall(
         channelData.channel, 'GET', '/kraken/',
         headers = {
             'Accept': 'application/vnd.twitchtv.v3+json',

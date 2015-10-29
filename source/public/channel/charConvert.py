@@ -1,5 +1,4 @@
-﻿import database.factory
-import ircbot.irc
+﻿from ...database.factory import getDatabase
 
 ascii = (''' !"#$%&'()*+,-./'''
           '0123456789'
@@ -78,7 +77,7 @@ def _translateAsciiChain(c):
     return c
 
 def commandFull(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
@@ -89,7 +88,7 @@ def commandFull(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandParenthesized(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
@@ -100,7 +99,7 @@ def commandParenthesized(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandCircled(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
@@ -111,7 +110,7 @@ def commandCircled(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandSmallCaps(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     
@@ -122,7 +121,7 @@ def commandSmallCaps(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandUpsideDown(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'textconvert'):
             return False
     

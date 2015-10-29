@@ -1,5 +1,5 @@
-import botcommands.feature
+﻿from ..common import feature
 
 def commandFeature(channelData, nick, message, msgParts, permissions):
-    return botcommands.feature.botFeature(
+    return feature.botFeature(
         channelData.channel[1:], msgParts, channelData.sendMessage)

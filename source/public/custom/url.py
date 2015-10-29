@@ -1,4 +1,4 @@
-﻿from config import config
+﻿from bot import config
 import urllib.request
 
 def fieldUrl(field, param, default, message, msgParts, channel, nick, query):

@@ -1,9 +1,8 @@
-﻿import config
+﻿from ...api import twitch
+from ...database.factory import getDatabase
+from bot import config, utils
 import datetime
-import database.factory
 import http.client
-import ircbot.irc
-import ircbot.twitchApi
 import json
 import re
 import threading
@@ -17,7 +16,7 @@ twitchUrlRegex += r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)"
 
 # This is for banning the users who post a URL with no follows
 def filterNoUrlForBots(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if not db.hasFeature(channelData.channel[1:], 'nourlredirect'):
             return False
     
@@ -32,7 +31,7 @@ def filterNoUrlForBots(channelData, nick, message, msgParts, permissions):
 def checkIfUrlMaybeBad(channelData, nick, message):
     try:
         uri = '/kraken/users/' + nick + '/follows/channels?limit=1'
-        response, data = ircbot.twitchApi.twitchCall(None, 'GET', uri)
+        response, data = twitch.twitchCall(None, 'GET', uri)
         followerData = json.loads(data.decode('utf-8'))
         if int(followerData['_total']) > 0:
             return False
@@ -46,7 +45,7 @@ def checkIfUrlMaybeBad(channelData, nick, message):
         try:
             request = urllib.request.Request(
                 url, headers={
-                    'User-Agent': 'MeGotsThis/' + config.config.botnick,
+                    'User-Agent': 'MeGotsThis/' + config.botnick,
                     })
             urlRequest = urllib.request.urlopen(request)
             parsedOriginal = urllib.parse.urlparse(url)
@@ -63,8 +62,8 @@ def checkIfUrlMaybeBad(channelData, nick, message):
         except urllib.error.URLError as e:
             try:
                 if e.reason.errno not in [-2, 11001]:
-                    ircbot.irc.logException(message)
+                    utils.logException(message)
             except BaseException as e:
-                ircbot.irc.logException(message)
+                utils.logException(message)
         except:
-            ircbot.irc.logException(message)
+            utils.logException(message)

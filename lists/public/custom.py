@@ -1,19 +1,15 @@
-﻿import customfield.countdown
-import customfield.params
-import customfield.query
-import customfield.url
-import customfield.user
+﻿from source.public.custom import countdown, params, query, url, user
 try:
-    import customprivate.customList as customList
+    from ..private import custom as privateCustom
 except:
-    import customprivate.default.customList as customList
+    from ..private.default import custom as privateCustom
 
-fields = [customfield.user.fieldUser,
-          customfield.query.fieldQuery,
-          customfield.url.fieldUrl,
-          customfield.countdown.fieldCountdown,
-          customfield.countdown.fieldSince,
-          customfield.countdown.fieldNext,
-          customfield.countdown.fieldPrevious,
+fields = [user.fieldUser,
+          query.fieldQuery,
+          url.fieldUrl,
+          countdown.fieldCountdown,
+          countdown.fieldSince,
+          countdown.fieldNext,
+          countdown.fieldPrevious,
           ]
-fields += customList.fields + [customfield.params.fieldParams]
+fields += privateCustom.fields + [params.fieldParams]

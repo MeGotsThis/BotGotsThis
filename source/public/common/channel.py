@@ -1,50 +1,49 @@
-﻿import config.config
-import database.factory
-import ircbot.irc
-import ircbot.twitchApi
+﻿from ...database.factory import getDatabase
+from ...api import twitch
+from bot import config, globals, utils
 import json
 
 def botJoin(channel, sendMessage):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if db.isChannelBannedReason(channel[1:]):
             sendMessage('Chat ' + channel[1:] + ' is banned from joining')
             return True
         priority = db.getAutoJoinsPriority(channel[1:])
     priority = priority if priority is not None else float('inf')
     
-    response, data = ircbot.twitchApi.twitchCall(
+    response, data = twitch.twitchCall(
         None, 'GET', '/api/channels/' + channel[1:] + '/chat_properties')
     chatProperties = json.loads(data.decode('utf-8'))
     
     if chatProperties['eventchat']:
-        server = ircbot.irc.eventChat
+        server = globals.eventChat
     else:
-        server = ircbot.irc.mainChat
-    if ircbot.irc.joinChannel(channel, priority, server):
+        server = globals.mainChat
+    if utils.joinChannel(channel, priority, server):
         sendMessage('Joining ' + channel[1:])
     else:
-        result = ircbot.irc.ensureServer(channel, priority, server)
-        if result == ircbot.irc.ENSURE_CORRECT:
+        result = utils.ensureServer(channel, priority, server)
+        if result == utils.ENSURE_CORRECT:
             sendMessage('Already joined ' + channel[1:])
-        elif result == ircbot.irc.ENSURE_REJOIN_TO_MAIN:
+        elif result == utils.ENSURE_REJOIN_TO_MAIN:
             sendMessage('Moved ' + channel[1:] + ' to main chat server')
-        elif result == ircbot.irc.ENSURE_REJOIN_TO_EVENT:
+        elif result == utils.ENSURE_REJOIN_TO_EVENT:
             sendMessage('Moved ' + channel[1:] + ' to event chat server')
 
 def botPart(channel, sendMessage):
-    if channel[1:] == config.config.botnick:
+    if channel[1:] == config.botnick:
         return
-    ircbot.irc.partChannel(channel)
+    utils.partChannel(channel)
     sendMessage('Leaving ' + channel[1:])
 
 def botSay(channel, message):
-    if channel in ircbot.irc.channels:
-        ircbot.irc.channels[channel].sendMessage(message)
+    if channel in globals.channels:
+        globals.channels[channel].sendMessage(message)
 
 def botEmptyAll(sendMessage):
-    ircbot.irc.messaging.clearAllQueue()
+    globals.messaging.clearAllQueue()
     sendMessage('Cleared all queued messages')
 
 def botEmpty(channel, sendMessage):
-    ircbot.irc.messaging.clearQueue(msgParts[1])
+    globals.messaging.clearQueue(msgParts[1])
     sendMessage('Cleared all queued messages for ' + msgParts[1][1:])

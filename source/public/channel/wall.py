@@ -1,10 +1,9 @@
-﻿from config import config
-import database.factory
-import ircbot.irc
+﻿from ...database.factory import getDatabase
+from bot import config
 import datetime
 
 def commandWall(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if (not db.hasFeature(channelData.channel[1:], 'modwall') and
             not permissions['broadcaster']):
             return False
@@ -46,7 +45,7 @@ def commandWall(channelData, nick, message, msgParts, permissions):
     return True
 
 def commandWallLong(channelData, nick, message, msgParts, permissions):
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if (not db.hasFeature(channelData.channel[1:], 'modwall') and
             not permissions['broadcaster']):
             return False

@@ -1,8 +1,8 @@
-﻿import database.factory
+﻿from ...database.factory import getDatabase
 try:
-    import privatechannel.feature as feature
+    from lists.private import feature as privateFeature
 except:
-    import privatechannel.default.feature as feature
+    from lists.private.default import feature as privateFeature
 
 
 features = {
@@ -12,7 +12,7 @@ features = {
     'nocustom': 'Disable Custom Commands',
     'nourlredirect': 'Ban URL Redirect (user has no follows)',
     }
-features = dict(list(features.items()) + list(feature.features.items()))
+features = dict(list(features.items()) + list(privateFeature.features.items()))
 
 enable = {
     '',
@@ -43,7 +43,7 @@ def botFeature(channel, msgParts, sendMessage):
         sendMessage(msg)
         return True
     
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         hasFeature = db.hasFeature(channel, msgParts[1])
         if not hasFeature and msgParts[2] in enable:
             db.addFeature(channel, msgParts[1])

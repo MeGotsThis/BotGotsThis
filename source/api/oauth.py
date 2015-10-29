@@ -1,4 +1,4 @@
-import database.factory
+﻿from ..database.factory import getDatabase
 import json
 
 def getOAuthToken(broadcaster):
@@ -7,5 +7,5 @@ def getOAuthToken(broadcaster):
     
     if broadcaster[0] == '#':
         broadcaster = broadcaster[1:]
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         return db.getOAuthToken(broadcaster)

@@ -1,8 +1,7 @@
-﻿from config import config
-import customfield.customList
-import ircchannel.charConvert
-import database.factory
-import ircbot.irc
+﻿from . import charConvert
+from ...database.factory import getDatabase
+from bot import config
+from lists.public import custom
 import datetime
 
 def customCommands(channelData, nick, originalMsg, msgParts, permissions):
@@ -10,7 +9,7 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
     channel = channelData.channel[1:]
     message = None
     
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if db.hasFeature(channel, 'nocustom'):
             return False
 
@@ -81,7 +80,7 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
         broadcaster = '#global'
     
     channel = channelData.channel[1:]
-    with database.factory.getDatabase() as db:
+    with getDatabase() as db:
         if db.hasFeature(channel, 'nocustom') and broadcaster != '#global':
             return False
         
@@ -354,7 +353,7 @@ def _parseFormatMessage(message):
     return parsed
 
 def _getString(field, param, default, message, msgParts, channel, nick, query):
-    for fieldConvert in customfield.customList.fields:
+    for fieldConvert in custom.fields:
         result = fieldConvert(field, param, default, message, msgParts,
                               channel, nick, query)
         if result is not None:
@@ -366,15 +365,15 @@ def _formatString(string, format, hasTextConvert):
     format = format.lower()
     if hasTextConvert:
         if format == 'ascii':
-            return ircchannel.charConvert.allToAscii(string)
+            return charConvert.allToAscii(string)
         if format == 'full':
-            return ircchannel.charConvert.asciiToFullWidth(string)
+            return charConvert.asciiToFullWidth(string)
         if format == 'parenthesized':
-            return ircchannel.charConvert.asciiToParenthesized(string)
+            return charConvert.asciiToParenthesized(string)
         if format == 'circled':
-            return ircchannel.charConvert.asciiToCircled(string)
+            return charConvert.asciiToCircled(string)
         if format == 'smallcaps':
-            return ircchannel.charConvert.asciiToSmallCaps(string)
+            return charConvert.asciiToSmallCaps(string)
         if format == 'upsidedown':
-            return ircchannel.charConvert.asciiToUpsideDown(string)
+            return charConvert.asciiToUpsideDown(string)
     return string
