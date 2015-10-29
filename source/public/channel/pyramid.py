@@ -5,7 +5,7 @@ import random
 
 def commandPyramid(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
+        if (not db.hasFeature(channelData.channel, 'modpyramid') and
             not permissions['broadcaster']):
             return False
     if len(msgParts) < 2:
@@ -38,7 +38,7 @@ def commandPyramid(channelData, nick, message, msgParts, permissions):
 
 def commandRPyramid(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
+        if (not db.hasFeature(channelData.channel, 'modpyramid') and
             not permissions['broadcaster']):
             return False
     
@@ -77,7 +77,7 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
 
 def commandPyramidLong(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel[1:], 'modpyramid') and
+        if (not db.hasFeature(channelData.channel, 'modpyramid') and
             not permissions['broadcaster']):
             return False
     msgParts = message.split(None, 1)

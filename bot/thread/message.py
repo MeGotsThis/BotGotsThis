@@ -72,16 +72,16 @@ class MessageQueue(threading.Thread):
             while self.running:
                 msg = self._getMessage()
                 if msg is not None:
-                    if (not msg[0].isMod and
-                        '#' + config.botnick != msg[0].channel):
+                    if (not msg[0].isMod and config.botnick != msg[0].channel):
                         self._publicTime = datetime.datetime.utcnow()
                     self._timesSent.append(datetime.datetime.utcnow())
                     _ = IrcMessage(command='PRIVMSG',
                                    params=IrcMessageParams(
-                                       middle=msg[0].channel,
+                                       middle=msg[0].ircChannel,
                                        trailing=msg[1]))
                     try:
-                        msg[0].socket.sendIrcCommand(_, msg[0].channel, msg[2])
+                        params = _, msg[0].ircChannel, msg[2]
+                        msg[0].socket.sendIrcCommand(*params)
                     except OSError:
                         pass
                 time.sleep(1 / config.messagePerSecond)
@@ -165,7 +165,7 @@ class MessageQueue(threading.Thread):
     
     @staticmethod
     def _isModInChannel(msgQueue):
-        return msgQueue[0].isMod or '#' + config.botnick == msgQueue[0].channel
+        return msgQueue[0].isMod or config.botnick == msgQueue[0].channel
     
     def clearQueue(self, channel):
         with self._queueLock:

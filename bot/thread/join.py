@@ -46,24 +46,24 @@ class JoinThread(threading.Thread):
                         continue
                     
                     params = channels, notJoined
-                    channel = self._getChannelWithLowestPriority(*params)
-                    channelData = channels[channel]
-                    socket = channelData.socket
+                    broadcaster = self._getJoinWithLowestPriority(*params)
+                    channel = channels[broadcaster]
+                    socket = channel.socket
                     if socket is not None:
                         ircCommand = IrcMessage(
                             command='JOIN',
                             params=IrcMessageParams(
-                                middle=channelData.channel))
-                        params = ircCommand, channelData.channel
-                        channelData.socket.sendIrcCommand(*params)
-                        channelData.onJoin()
-                        self._channelJoined.add(channelData.channel)
+                                middle=channel.ircChannel))
+                        params = ircCommand, channel.ircChannel
+                        channel.socket.sendIrcCommand(*params)
+                        channel.onJoin()
+                        self._channelJoined.add(channel.channel)
                         with self._joinTimesLock:
                             self._joinTimes.append(datetime.datetime.utcnow())
                         
                         print(str(datetime.datetime.utcnow()) + ' Joined ' +
-                              channelData.channel + ' on ' +
-                              channelData.socket.name)
+                              channel.channel + ' on ' +
+                              channel.socket.name)
                 
                 time.sleep(1 / config.joinPerSecond)
             except:
@@ -86,7 +86,7 @@ class JoinThread(threading.Thread):
             self._channelJoined.discard(channel)
     
     @staticmethod
-    def _getChannelWithLowestPriority(channelsData, notJoinedChannels):
+    def _getJoinWithLowestPriority(channelsData, notJoinedChannels):
         priority = float(min([float(channelsData[c].joinPriority)
                               for c in notJoinedChannels]))
         return [str(c) for c in notJoinedChannels

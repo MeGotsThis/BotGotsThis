@@ -4,7 +4,7 @@ import datetime
 
 def commandWall(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel[1:], 'modwall') and
+        if (not db.hasFeature(channelData.channel, 'modwall') and
             not permissions['broadcaster']):
             return False
     if len(msgParts) < 2:
@@ -46,7 +46,7 @@ def commandWall(channelData, nick, message, msgParts, permissions):
 
 def commandWallLong(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel[1:], 'modwall') and
+        if (not db.hasFeature(channelData.channel, 'modwall') and
             not permissions['broadcaster']):
             return False
     msgParts = message.split(None, 1)

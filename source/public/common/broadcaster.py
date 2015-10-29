@@ -12,7 +12,7 @@ def botCome(channel, sendMessage):
         priority = db.getAutoJoinsPriority(channel)
     priority = priority if priority is not None else float('inf')
     
-    if ('#' + channel) in globals.channels:
+    if channel in globals.channels:
         sendMessage('I am already in ' + channel)
         return True
     
@@ -38,7 +38,7 @@ def botCome(channel, sendMessage):
             sendMessage(msg)
 
 def botLeave(channel, sendMessage):
-    if channel == '#' + config.botnick:
+    if channel == config.botnick:
         return False
     sendMessage('Bye ' + channel[1:])
     time.sleep(1)
@@ -80,7 +80,7 @@ def botAutoJoin(channel, sendMessage, msgParts):
         if result == False:
             db.setAutoJoinServer(channel, chatProperties['eventchat'])
     
-    wasInChat = ('#' + channel) in globals.channels
+    wasInChat = channel in globals.channels
     if chatProperties['eventchat']:
         server = globals.eventChat
     else:

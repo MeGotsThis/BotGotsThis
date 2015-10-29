@@ -9,9 +9,8 @@ def commandStatus(channelData, nick, message, msgParts, permissions):
     
     if oauth.getOAuthToken(channelData.channel) is None:
         return False
-    chan = channelData.channel[1:]
     response, data = twitch.twitchCall(
-        channelData.channel, 'PUT', '/kraken/channels/' + chan,
+        channelData.channel, 'PUT', '/kraken/channels/' + channelData.channel,
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/vnd.twitchtv.v3+json',
@@ -37,9 +36,8 @@ def commandGame(channelData, nick, message, msgParts, permissions):
                 msgParts[1] = fullGame
         msgParts[1] = msgParts[1].replace('Pokemon', 'Pokémon')
         msgParts[1] = msgParts[1].replace('Pokepark', 'Poképark')
-    chan = channelData.channel[1:]
     response, data = twitch.twitchCall(
-        channelData.channel, 'PUT', '/kraken/channels/' + chan,
+        channelData.channel, 'PUT', '/kraken/channels/' + channelData.channel,
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/vnd.twitchtv.v3+json',

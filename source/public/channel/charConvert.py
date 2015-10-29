@@ -78,7 +78,7 @@ def _translateAsciiChain(c):
 
 def commandFull(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if not db.hasFeature(channelData.channel[1:], 'textconvert'):
+        if not db.hasFeature(channelData.channel, 'textconvert'):
             return False
     
     parts = message.split(None, 1)
@@ -89,7 +89,7 @@ def commandFull(channelData, nick, message, msgParts, permissions):
 
 def commandParenthesized(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if not db.hasFeature(channelData.channel[1:], 'textconvert'):
+        if not db.hasFeature(channelData.channel, 'textconvert'):
             return False
     
     parts = message.split(None, 1)
@@ -100,7 +100,7 @@ def commandParenthesized(channelData, nick, message, msgParts, permissions):
 
 def commandCircled(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if not db.hasFeature(channelData.channel[1:], 'textconvert'):
+        if not db.hasFeature(channelData.channel, 'textconvert'):
             return False
     
     parts = message.split(None, 1)
@@ -111,7 +111,7 @@ def commandCircled(channelData, nick, message, msgParts, permissions):
 
 def commandSmallCaps(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if not db.hasFeature(channelData.channel[1:], 'textconvert'):
+        if not db.hasFeature(channelData.channel, 'textconvert'):
             return False
     
     parts = message.split(None, 1)
@@ -122,7 +122,7 @@ def commandSmallCaps(channelData, nick, message, msgParts, permissions):
 
 def commandUpsideDown(channelData, nick, message, msgParts, permissions):
     with getDatabase() as db:
-        if not db.hasFeature(channelData.channel[1:], 'textconvert'):
+        if not db.hasFeature(channelData.channel, 'textconvert'):
             return False
     
     parts = message.split(None, 1)

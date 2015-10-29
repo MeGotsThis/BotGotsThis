@@ -33,9 +33,9 @@ def commandUptime(channelData, nick, message, msgParts, permissions):
             return False
     channelData.sessionData['uptime'] = currentTime
 
-    chan = channelData.channel[1:]
     if not channelData.isStreaming:
-        msg = chan + ' is currently not streaming or has not been for a minute'
+        msg = channelData.channel + ' is currently not streaming or has not '
+        msg += 'been for a minute'
         channelData.sendMessage(msg)
         return True
 
@@ -62,4 +62,3 @@ def commandUptime(channelData, nick, message, msgParts, permissions):
     except:
         msg = 'Unknown Error'
         channelData.sendMessage(msg)
-    chan = channelData.channel[1:]

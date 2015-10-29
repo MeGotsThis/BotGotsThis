@@ -9,10 +9,10 @@ def commandCome(nick, message, msgParts, permissions):
     return True
 
 def commandLeave(nick, message, msgParts, permissions):
-    return broadcaster.botLeave('#' + nick, sendMessage(nick))
+    return broadcaster.botLeave(nick, sendMessage(nick))
 
 def commandEmpty(nick, message, msgParts, permissions):
-    broadcaster.botEmpty('#' + nick, sendMessage(nick))
+    broadcaster.botEmpty(nick, sendMessage(nick))
     return True
 
 def commandAutoJoin(nick, message, msgParts, permissions):

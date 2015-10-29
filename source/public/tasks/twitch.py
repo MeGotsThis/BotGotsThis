@@ -20,11 +20,11 @@ def checkStreamsAndChannel(timestamp):
             streamingSince = datetime.datetime.strptime(*params)
             twitchStatus = stream['channel']['status']
             twitchGame = stream['channel']['game']
-            channelData = channels['#' + channel]
+            channelData = channels[channel]
             channelData.streamingSince = streamingSince
             channelData.twitchStatus = twitchStatus
             channelData.twitchGame = twitchGame
-            onlineStreams.append('#' + channel)
+            onlineStreams.append(channel)
     
     for channel in channels:
         if channel in onlineStreams:

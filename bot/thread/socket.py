@@ -205,8 +205,8 @@ class SocketThread(threading.Thread):
             if config.botnick in msg.split():
                 file = config.botnick + '-Mentions.log'
                 _logMessage(file, nick + ' -> ' + where + ': ' + msg, now)
-            if where in self._channels:
-                chan = self._channels[where]
+            if where[0] == '#' and where[1:] in self._channels:
+                chan = self._channels[where[1:]]
                 source.channel.parse(chan, tags, nick, msg)
         
         if message.command == 'WHISPER':
@@ -229,25 +229,25 @@ class SocketThread(threading.Thread):
         
         if message.command == 'MODE':
             where, mode, nick = message.params.middle.split()
-            if where in self._channels:
+            if where[0] == '#' and where[1:] in self._channels:
                 if mode == '+o':
-                    self._channels[where].ircOps.add(nick)
+                    self._channels[where[1:]].ircOps.add(nick)
                 if mode == '-o':
-                    self._channels[where].ircOps.discard(nick)
+                    self._channels[where[1:]].ircOps.discard(nick)
         
         if message.command == 'JOIN':
             where = message.params.middle
             nick = message.prefix.nick
-            if where in self._channels:
-                self._channels[where].ircUsers.add(nick)
+            if where[0] == '#' and where[1:] in self._channels:
+                self._channels[where[1:]].ircUsers.add(nick)
         
         if message.command == 353:
             where = message.params.middle.split()[-1]
             nicks = message.params.trailing.split(' ')
             if where[0] == '#':
                 _logMessage(where + '#full.log', '< ' + ircmsg, now)
-            if where in self._channels:
-                self._channels[where].ircUsers.update(nicks)
+                if where[1:] in self._channels:
+                    self._channels[where[1:]].ircUsers.update(nicks)
         
         if message.command == 366:
             where = message.params.middle.split()[-1]
@@ -257,8 +257,8 @@ class SocketThread(threading.Thread):
         if message.command == 'PART':
             where = message.params.middle
             nick = message.prefix.nick
-            if where in self._channels:
-                self._channels[where].ircUsers.discard(nick)
+            if where[0] == '#' and where[1:] in self._channels:
+                self._channels[where[1:]].ircUsers.discard(nick)
 
         if message.command == 'PING' and message.params.trailing is not None:
             self.ping(message.params.trailing)
@@ -273,8 +273,8 @@ class SocketThread(threading.Thread):
         
         if message.command == 'USERSTATE':
             where = message.params.middle
-            if where in self._channels:
-                chan = self._channels[where]
+            if where[0] == '#' and where[1:] in self._channels:
+                chan = self._channels[where[1:]]
                 tags = message.tags
                 parseUserState(chan, tags)
         
