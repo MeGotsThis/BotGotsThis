@@ -1,14 +1,11 @@
 ﻿from source.public.channel import blockUrl, broadcaster, charConvert, feature
 from source.public.channel import mod, owner, pyramid, reload, repeat, text
 from source.public.channel import wall
-try:
-    from ..private import channel as privateList
-except:
-    from ..private.default import channel as privateList
 
 filterMessage = [
     blockUrl.filterNoUrlForBots
     ]
+
 commands = {
     '!exit': (owner.commandExit, 'owner+ownerChan'),
     '!managebot': (owner.commandManageBot, 'owner+ownerChan'),
@@ -51,15 +48,4 @@ commandsStartWith = {
     '!autorepeat-': (repeat.commandAutoRepeat, 'broadcaster'),
 }
 
-if privateList.disableFilters:
-    filterMessage = privateList.filterMessage
-else:
-    filterMessage = filterMessage + privateList.filterMessage
-commands = dict(list(commands.items()) + list(privateList.commands.items()))
-commandsStartWith = dict(
-    list(commandsStartWith.items()) +
-    list(privateList.commandsStartWith.items()))
-processNoCommand = privateList.noCommandPreCustom
-if not privateList.disableCustomMessage:
-    processNoCommand += [text.customCommands]
-processNoCommand += privateList.noCommandPostCustom
+processNoCommand = [text.customCommands]

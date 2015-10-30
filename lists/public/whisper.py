@@ -1,8 +1,4 @@
 ﻿from source.public.whisper import broadcaster, feature, owner, reload
-try:
-    from ..private import whisper as privateList
-except:
-    from ..private.default import whisper as privateList
 
 commands = {
     '!hello': (owner.commandHello, 'owner'),
@@ -22,5 +18,3 @@ commands = {
     '!autojoin': (broadcaster.commandAutoJoin, None),
     '!feature': (feature.commandFeature, None),
     }
-
-commands = dict(list(commands.items()) + list(privateList.commands.items()))

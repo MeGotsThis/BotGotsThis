@@ -46,6 +46,10 @@
     <Compile Include="bot\twitchmessage\__init__.py" />
     <Compile Include="bot\utils.py" />
     <Compile Include="bot\__init__.py" />
+    <Compile Include="lists\channel.py" />
+    <Compile Include="lists\custom.py" />
+    <Compile Include="lists\feature.py" />
+    <Compile Include="lists\manage.py" />
     <Compile Include="lists\private\channel.dist.disableAll.py" />
     <Compile Include="lists\private\channel.dist.py" />
     <Compile Include="lists\private\channel.py" />
@@ -69,6 +73,7 @@
     <Compile Include="lists\public\manage.py" />
     <Compile Include="lists\public\whisper.py" />
     <Compile Include="lists\public\__init__.py" />
+    <Compile Include="lists\whisper.py" />
     <Compile Include="lists\__init__.py" />
     <Compile Include="main.py" />
     <Compile Include="source\api\ffz.py" />

@@ -1,20 +1,9 @@
 ﻿from ...database.factory import getDatabase
 from bot import globals, utils
+from lists.manage import methods
 import json
-try:
-    from lists.private import manage as privateManage
-except:
-    from lists.private.default import manage as privateManage
 
 def botManageBot(sendMessage, nick, message, msgParts):
-    methods = {
-        'listchats': manageListChats,
-        'autojoin': manageAutoJoin,
-        'banned': manageBanned,
-        }
-
-    methods = dict(list(methods.items()) + list(privateManage.methods.items()))
-
     params = sendMessage, nick, message, msgParts
     
     if msgParts[1].lower() in methods:
@@ -78,7 +67,7 @@ def manageAutoJoin(sendMessage, nick, message, msgParts):
             if result == False:
                 db.setAutoJoinServer(msgParts[3], chatProperties['eventchat'])
             
-        wasInChat = ('#' + msgParts[3]) in globals.channels
+        wasInChat = msgParts[3] in globals.channels
         if chatProperties['eventchat']:
             server = globals.eventChat
         else:

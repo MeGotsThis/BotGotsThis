@@ -1,6 +1,6 @@
 ﻿from bot import config, utils
+from lists import whisper
 import datetime
-import lists.public.whisper
 import sys
 import threading
 import time
@@ -60,8 +60,8 @@ def threadParse(tags, nick, message, msgParts):
     
         complete = False
         arguments = nick, message, msgParts, permissions
-        if command in lists.public.whisper.commands:
-            commInfo = lists.public.whisper.commands[command]
+        if command in whisper.commands:
+            commInfo = whisper.commands[command]
             hasPerm = True
             if commInfo[1] is not None:
                 permissionSet = commInfo[1].split('+')

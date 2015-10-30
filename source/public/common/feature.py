@@ -1,18 +1,5 @@
 ﻿from ...database.factory import getDatabase
-try:
-    from lists.private import feature as privateFeature
-except:
-    from lists.private.default import feature as privateFeature
-
-
-features = {
-    'textconvert': 'Text Character Conversion',
-    'modpyramid': 'Mods Using !pyramid',
-    'modwall': 'Mods Using !wall',
-    'nocustom': 'Disable Custom Commands',
-    'nourlredirect': 'Ban URL Redirect (user has no follows)',
-    }
-features = dict(list(features.items()) + list(privateFeature.features.items()))
+from lists.feature import features
 
 enable = {
     '',

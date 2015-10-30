@@ -1,20 +1,19 @@
 ﻿from . import charConvert
 from ...database.factory import getDatabase
 from bot import config
-from lists.public import custom
+from lists import custom
 import datetime
 
 def customCommands(channelData, nick, originalMsg, msgParts, permissions):
     command = msgParts[0].lower()
-    channel = channelData.channel[1:]
     message = None
     
     with getDatabase() as db:
-        if db.hasFeature(channel, 'nocustom'):
+        if db.hasFeature(channelData.channel, 'nocustom'):
             return False
 
-        commands = db.getChatCommands(channel, command)
-        hasTextConvert = db.hasFeature(channelData.channel[1:], 'textconvert')
+        commands = db.getChatCommands(channelData.channel, command)
+        hasTextConvert = db.hasFeature(channelData.channel, 'textconvert')
     
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
                       'globalMod', 'admin', 'staff', 'owner',]
@@ -22,8 +21,8 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
         if not perm or permissions[perm]:
             if perm in commands['#global']:
                 message = commands['#global'][perm]
-            if perm in commands[channel]:
-                message = commands[channel][perm]
+            if perm in commands[channelData.channel]:
+                message = commands[channelData.channel][perm]
     
     if message:
         currentTime = datetime.datetime.utcnow()
@@ -54,7 +53,7 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
                 final.append(plain)
                 if field is not None:
                     params = str(field), str(param), str(default), originalMsg,
-                    params += msgParts, channel, nick, query,
+                    params += msgParts, channelData.channel, nick, query,
                     string = _getString(*params)
                     if string is not None:
                         string = _formatString(str(string), str(format),
@@ -75,13 +74,13 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
         return
     
     com, action, level, command, fullText = r
-    broadcaster = channelData.channel[1:]
+    broadcaster = channelData.channel
     if com == '!global':
         broadcaster = '#global'
     
-    channel = channelData.channel[1:]
     with getDatabase() as db:
-        if db.hasFeature(channel, 'nocustom') and broadcaster != '#global':
+        if (db.hasFeature(channelData.channel, 'nocustom') and
+            broadcaster != '#global'):
             return False
         
         msg = None

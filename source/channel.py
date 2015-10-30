@@ -1,8 +1,8 @@
 ﻿from .irccommand import jtv
 from bot import config, utils
 from bot.channel import Channel
+from lists import channel
 import datetime
-import lists.public.channel
 import sys
 import threading
 import time
@@ -84,12 +84,12 @@ def threadParse(channel, tags, nick, message, msgParts):
     
         complete = False
         arguments = channel, nick, message, msgParts, permissions
-        for filter in lists.public.channel.filterMessage:
+        for filter in channel.filterMessage:
             complete = filter(*arguments)
             if complete:
                 break
-        if not complete and command in lists.public.channel.commands:
-            commInfo = lists.public.channel.commands[command]
+        if not complete and command in channel.commands:
+            commInfo = channel.commands[command]
             hasPerm = True
             if commInfo[1] is not None:
                 permissionSet = commInfo[1].split('+')
@@ -98,9 +98,9 @@ def threadParse(channel, tags, nick, message, msgParts):
             if hasPerm and commInfo[0] is not None:
                 complete = commInfo[0](*arguments)
         if not complete:
-            for comm in lists.public.channel.commandsStartWith:
+            for comm in channel.commandsStartWith:
                 if command.startswith(comm):
-                    commInfo = lists.public.channel.commandsStartWith[comm]
+                    commInfo = channel.commandsStartWith[comm]
                     hasPerm = True
                     if commInfo[1] is not None:
                         permissionSet = commInfo[1].split('+')
@@ -111,7 +111,7 @@ def threadParse(channel, tags, nick, message, msgParts):
                         if complete:
                             break
         if not complete:
-            for process in lists.public.channel.processNoCommand:
+            for process in channel.processNoCommand:
                 complete = process(*arguments)
                 if complete:
                     break
