@@ -2,6 +2,7 @@
 from .channel import Channel
 from .globals import channels, mainChat
 import datetime
+import os.path
 
 def joinChannel(channel, priority=float('inf'), server=mainChat):
     channel = channel.lower()

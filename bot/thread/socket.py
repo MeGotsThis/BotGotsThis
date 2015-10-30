@@ -3,7 +3,6 @@ from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
 from source.ircmessage import parseMessage
 import datetime
-import os.path
 import socket
 import threading
 import time

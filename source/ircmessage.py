@@ -1,6 +1,6 @@
-﻿from . import channel, whisper, utils
+﻿from . import channel, whisper
 from .irccommand import notice, userstate
-from bot import config
+from bot import config, utils
 from bot.twitchmessage.ircmessage import IrcMessage
 import bot.thread.socket
 import datetime
