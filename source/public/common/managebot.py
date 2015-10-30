@@ -11,7 +11,7 @@ def botManageBot(sendMessage, nick, message, msgParts):
     return False
 
 def manageListChats(sendMessage, nick, message, msgParts):
-    channels = [c[1:] for c in globals.channels.keys()]
+    channels = [c for c in globals.channels.keys()]
     sendMessage('Twitch Chats: ' + ', '.join(channels))
     return True
 

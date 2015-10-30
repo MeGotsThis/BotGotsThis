@@ -31,10 +31,10 @@ def botJoin(channel, sendMessage):
             sendMessage('Moved ' + channel + ' to event chat server')
 
 def botPart(channel, sendMessage):
-    if channel[1:] == config.botnick:
+    if channel == config.botnick:
         return
     utils.partChannel(channel)
-    sendMessage('Leaving ' + channel[1:])
+    sendMessage('Leaving ' + channel)
 
 def botSay(channel, message):
     if channel in globals.channels:
@@ -46,4 +46,4 @@ def botEmptyAll(sendMessage):
 
 def botEmpty(channel, sendMessage):
     globals.messaging.clearQueue(msgParts[1])
-    sendMessage('Cleared all queued messages for ' + msgParts[1][1:])
+    sendMessage('Cleared all queued messages for ' + msgParts[1])

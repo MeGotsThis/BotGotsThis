@@ -40,7 +40,7 @@ def botCome(channel, sendMessage):
 def botLeave(channel, sendMessage):
     if channel == config.botnick:
         return False
-    sendMessage('Bye ' + channel[1:])
+    sendMessage('Bye ' + channel)
     time.sleep(1)
     utils.partChannel(channel)
     return True
@@ -48,7 +48,7 @@ def botLeave(channel, sendMessage):
 def botEmpty(channel, sendMessage):
     if channel in globals.channels:
         globals.messaging.clearQueue(channel)
-        sendMessage('Cleared all queued messages for ' + channel[1:])
+        sendMessage('Cleared all queued messages for ' + channel)
 
 def botAutoJoin(channel, sendMessage, msgParts):
     with getDatabase() as db:

@@ -61,7 +61,7 @@ def threadParse(channel, tags, nick, message, msgParts):
         isStaff = isOwner or userType in typeStaff
         isAdmin = isStaff or userType in typeAdmin
         isGlobalMod = isAdmin or userType in typeGlobalMod
-        isBroadcaster = nick == channel.channel[1:]
+        isBroadcaster = nick == channel.channel
         isBroadcaster = isGlobalMod or isAdmin or isBroadcaster
         isMod = isBroadcaster or userType in typeMod
         isSubscriber = isBroadcaster or bool(int(subscriber))

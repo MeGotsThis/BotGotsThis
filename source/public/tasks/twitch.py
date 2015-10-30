@@ -8,7 +8,7 @@ def checkStreamsAndChannel(timestamp):
     if not globals.channels:
         return
     channels = copy.copy(globals.channels)
-    channelsList = ','.join([c[1:] for c in globals.channels])
+    channelsList = ','.join([c for c in globals.channels])
     uri = '/kraken/streams?channel=' + channelsList
     response, responseData = twitch.twitchCall(None, 'GET', uri)
     onlineStreams = []
@@ -29,7 +29,7 @@ def checkStreamsAndChannel(timestamp):
     for channel in channels:
         if channel in onlineStreams:
             continue
-        uri = '/kraken/channels/' + channel[1:]
+        uri = '/kraken/channels/' + channel
         response, responseData = twitch.twitchCall(None, 'GET', uri)
         if response.status != 200:
             continue

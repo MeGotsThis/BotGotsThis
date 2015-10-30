@@ -126,5 +126,5 @@ class Channel:
     
     def updateFfzEmotes(self):
         self._ffzCache = datetime.datetime.utcnow()
-        emotes = getBroadcasterEmotes(self._channel[1:])
+        emotes = getBroadcasterEmotes(self._channel)
         self._ffzEmotes = emotes or self._ffzEmotes

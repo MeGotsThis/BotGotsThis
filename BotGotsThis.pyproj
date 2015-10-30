@@ -93,6 +93,7 @@
     <Compile Include="source\irccommand\notice.py" />
     <Compile Include="source\irccommand\userstate.py" />
     <Compile Include="source\irccommand\__init__.py" />
+    <Compile Include="source\ircmessage.py" />
     <Compile Include="source\private\autoload\__init__.py" />
     <Compile Include="source\private\channel\__init__.py" />
     <Compile Include="source\private\common\__init__.py" />
