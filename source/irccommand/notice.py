@@ -1,5 +1,5 @@
-﻿import bot.thread.socket
+﻿import bot.error
 
 def parse(channelData, nick, message):
     if message == 'Login unsuccessful':
-        raise bot.thread.socket.LoginUnsuccessfulException()
+        raise bot.error.LoginUnsuccessfulException()

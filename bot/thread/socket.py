@@ -1,4 +1,4 @@
-﻿from .. import config, globals, utils
+﻿from .. import config, error, globals, utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
 from source.ircmessage import parseMessage
@@ -82,10 +82,10 @@ class SocketThread(threading.Thread):
                                            middle=config.botnick)))
                         self.lastSentPing = datetime.datetime.now()
                     elif sinceLast >= datetime.timedelta(minutes=1,seconds=15):
-                        raise NoPingException()
-            except NoPingException:
+                        raise error.NoPingException()
+            except error.NoPingException:
                 pass
-            except LoginUnsuccessfulException:
+            except error.LoginUnsuccessfulException:
                 pass
             except:
                 utils.logException()
@@ -179,11 +179,3 @@ class SocketThread(threading.Thread):
             IrcMessage(command='PONG',
                        params=IrcMessageParams(trailing=message)))
         self.lastPing = datetime.datetime.now()
-
-
-class NoPingException(Exception):
-    pass
-
-
-class LoginUnsuccessfulException(Exception):
-    pass

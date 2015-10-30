@@ -32,6 +32,7 @@
   <ItemGroup>
     <Compile Include="bot\config.py" />
     <Compile Include="bot\channel.py" />
+    <Compile Include="bot\error.py" />
     <Compile Include="bot\globals.py" />
     <Compile Include="bot\main.py" />
     <Compile Include="bot\thread\background.py" />
