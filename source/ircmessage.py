@@ -1,4 +1,4 @@
-from . import channel, whisper
+﻿from . import channel, whisper, utils
 from .irccommand import notice, userstate
 from bot import config
 from bot.twitchmessage.ircmessage import IrcMessage
@@ -19,12 +19,10 @@ def parseMessage(socket, ircmsg, now):
         where = message.params.middle
         msg = message.params.trailing
         if where[0] == '#' and nick != 'jtv':
-            bot.thread.socket._logMessage(
-                where + '#msg.log', nick + ': ' + msg, now)
+            utils.logIrcMessage(where + '#msg.log', nick + ': ' + msg, now)
         if config.botnick in msg.split():
             file = config.botnick + '-Mentions.log'
-            bot.thread.socket._logMessage(
-                file, nick + ' -> ' + where + ': ' + msg, now)
+            utils.logIrcMessage(file, nick + ' -> ' + where + ': ' + msg, now)
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
             channel.parse(chan, tags, nick, msg)
@@ -34,12 +32,12 @@ def parseMessage(socket, ircmsg, now):
         nick = message.prefix.nick
         msg = message.params.trailing
         file = '@' + nick + '@whisper.log'
-        bot.thread.socket._logMessage(file, nick + ': ' + msg, now)
+        utils.logIrcMessage(file, nick + ': ' + msg, now)
         file = config.botnick + '-All Whisper.log'
-        bot.thread.socket._logMessage(
-            file, nick + ' -> ' + config.botnick + ': ' + msg, now)
+        utils.logIrcMessage(file, nick + ' -> ' + config.botnick + ': ' + msg,
+                            now)
         file = config.botnick + '-Raw Whisper.log'
-        bot.thread.socket._logMessage(file, '< ' + ircmsg, now)
+        utils.logIrcMessage(file, '< ' + ircmsg, now)
         whisper.parse(tags, nick, msg)
         
     if (message.command == 'NOTICE' and message.prefix is not None and
@@ -65,16 +63,14 @@ def parseMessage(socket, ircmsg, now):
         where = message.params.middle.split()[-1]
         nicks = message.params.trailing.split(' ')
         if where[0] == '#':
-            bot.thread.socket._logMessage(
-                where + '#full.log', '< ' + ircmsg, now)
+            utils.logIrcMessage(where + '#full.log', '< ' + ircmsg, now)
             if where[1:] in channels:
                 channels[where[1:]].ircUsers.update(nicks)
         
     if message.command == 366:
         where = message.params.middle.split()[-1]
         if where[0] == '#':
-            bot.thread.socket._logMessage(
-                where + '#full.log', '< ' + ircmsg, now)
+            utils.logIrcMessage(where + '#full.log', '< ' + ircmsg, now)
         
     if message.command == 'PART':
         where = message.params.middle
@@ -103,5 +99,4 @@ def parseMessage(socket, ircmsg, now):
     if message.command in _logCommandPerChannel:
         where = message.params.middle.split(None, 1)[0]
         if where[0] == '#':
-            bot.thread.socket._logMessage(
-                where + '#full.log', '< ' + ircmsg, now)
+            utils.logIrcMessage(where + '#full.log', '< ' + ircmsg, now)

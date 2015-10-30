@@ -70,7 +70,7 @@ class SocketThread(threading.Thread):
                             ircmsg = bytes(ircmsg).decode('utf-8')
                             now = datetime.datetime.utcnow()
                             file = config.botnick + '-' + self.name + '.log'
-                            _logMessage(file, '< ' + ircmsg)
+                            utils.logIrcMessage(file, '< ' + ircmsg)
                             parseMessage(self, ircmsg, now)
                     except socket.timeout:
                         pass
@@ -119,22 +119,22 @@ class SocketThread(threading.Thread):
         if message.command == 'PASS':
             message = IrcMessage(command='PASS')
         file = config.botnick + '-' + self.name + '.log'
-        _logMessage(file, '> ' + str(message), now)
+        utils.logIrcMessage(file, '> ' + str(message), now)
         if whisper:
             file = '@' + whisper[0] + '@whisper.log'
-            _logMessage(file, config.botnick + ': ' + whisper[1], now)
+            utils.logIrcMessage(file, config.botnick + ': ' + whisper[1], now)
             file = config.botnick + '-All Whisper.log'
             log = config.botnick + ' -> ' +  whisper[0] + ': ' + whisper[1]
-            _logMessage(file, log, now)
+            utils.logIrcMessage(file, log, now)
             file = config.botnick + '-Raw Whisper.log'
-            _logMessage(file, '> ' + str(message), now)
+            utils.logIrcMessage(file, '> ' + str(message), now)
         elif channel:
             file = channel + '#full.log'
-            _logMessage(file, '> ' + str(message), now)
+            utils.logIrcMessage(file, '> ' + str(message), now)
             if message.command == 'PRIVMSG':
                 file = channel + '#msg.log'
                 log = config.botnick + ': ' + message.params.trailing
-                _logMessage(file, log, now)
+                utils.logIrcMessage(file, log, now)
     
     def _connect(self):
         self._ircsock.connect((self._server, self._port))
@@ -188,14 +188,3 @@ class NoPingException(Exception):
 
 class LoginUnsuccessfulException(Exception):
     pass
-
-
-def _logMessage(filename, message, timestamp=None):
-    if config.ircLogFolder is None:
-        return
-    logDateFormat = '%Y-%m-%dT%H:%M:%S.%f '
-    timestamp = datetime.datetime.utcnow() if timestamp is None else timestamp
-    timestampStr = timestamp.strftime(logDateFormat)
-    fullfilename = os.path.join(config.ircLogFolder, filename)
-    with open(fullfilename, 'a', encoding='utf-8') as file:
-        file.write(timestampStr + message + '\n')

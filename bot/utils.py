@@ -1,4 +1,5 @@
-﻿from .channel import Channel
+﻿from bot import config
+from .channel import Channel
 from .globals import channels, mainChat
 import datetime
 
@@ -35,6 +36,16 @@ def ensureServer(channel, priority=float('inf'), server=mainChat):
         return ENSURE_REJOIN_TO_EVENT
     else:
         return ENSURE_REJOIN_TO_MAIN
+
+def logIrcMessage(filename, message, timestamp=None):
+    if config.ircLogFolder is None:
+        return
+    logDateFormat = '%Y-%m-%dT%H:%M:%S.%f '
+    timestamp = datetime.datetime.utcnow() if timestamp is None else timestamp
+    timestampStr = timestamp.strftime(logDateFormat)
+    fullfilename = os.path.join(config.ircLogFolder, filename)
+    with open(fullfilename, 'a', encoding='utf-8') as file:
+        file.write(timestampStr + message + '\n')
 
 def logException(extraMessage=None):
     if config.exceptionLog is None:
