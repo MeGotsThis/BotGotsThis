@@ -1,19 +1,17 @@
 ﻿from . import charConvert
-from ...database.factory import getDatabase
 from bot import config
 from lists import custom
 import datetime
 
-def customCommands(channelData, nick, originalMsg, msgParts, permissions):
+def customCommands(db, channel, nick, message, msgParts, permissions):
     command = msgParts[0].lower()
     message = None
     
-    with getDatabase() as db:
-        if db.hasFeature(channelData.channel, 'nocustom'):
-            return False
-
-        commands = db.getChatCommands(channelData.channel, command)
-        hasTextConvert = db.hasFeature(channelData.channel, 'textconvert')
+    if db.hasFeature(channel.channel, 'nocustom'):
+        return False
+    
+    commands = db.getChatCommands(channel.channel, command)
+    hasTextConvert = db.hasFeature(channel.channel, 'textconvert')
     
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
                       'globalMod', 'admin', 'staff', 'owner',]
@@ -21,29 +19,29 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
         if not perm or permissions[perm]:
             if perm in commands['#global']:
                 message = commands['#global'][perm]
-            if perm in commands[channelData.channel]:
-                message = commands[channelData.channel][perm]
+            if perm in commands[channel.channel]:
+                message = commands[channel.channel][perm]
     
     if message:
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.customMessageCooldown)
         if (not permissions['moderator'] and
-            'customCommand' in channelData.sessionData):
-            since = currentTime - channelData.sessionData['customCommand']
+            'customCommand' in channel.sessionData):
+            since = currentTime - channel.sessionData['customCommand']
             if since < cooldown:
                 return
-        channelData.sessionData['customCommand'] = currentTime
+        channel.sessionData['customCommand'] = currentTime
 
         cooldown = datetime.timedelta(seconds=config.customMessageUserCooldown)
-        if 'customUserCommand' not in channelData.sessionData:
-            channelData.sessionData['customUserCommand'] = {}
+        if 'customUserCommand' not in channel.sessionData:
+            channel.sessionData['customUserCommand'] = {}
         if (not permissions['moderator'] and
-            nick in channelData.sessionData['customUserCommand']):
-            oldTime = channelData.sessionData['customUserCommand'][nick]
+            nick in channel.sessionData['customUserCommand']):
+            oldTime = channel.sessionData['customUserCommand'][nick]
             since = currentTime - oldTime
             if since < cooldown:
                 return
-        channelData.sessionData['customUserCommand'][nick] = currentTime
+        channel.sessionData['customUserCommand'][nick] = currentTime
         
         query = str(originalMsg.split(None, 1)[1]) if len(msgParts) > 1 else ''
         final = []
@@ -53,7 +51,7 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
                 final.append(plain)
                 if field is not None:
                     params = str(field), str(param), str(default), originalMsg,
-                    params += msgParts, channelData.channel, nick, query,
+                    params += msgParts, channel.channel, nick, query,
                     string = _getString(*params)
                     if string is not None:
                         string = _formatString(str(string), str(format),
@@ -63,9 +61,9 @@ def customCommands(channelData, nick, originalMsg, msgParts, permissions):
                     final.append(str(string))
         except:
             final.append(str(message))
-        channelData.sendMessage(''.join(final))
+        channel.sendMessage(''.join(final))
 
-def commandCommand(channelData, nick, message, msgParts, permissions):
+def commandCommand(db, channel, nick, message, msgParts, permissions):
     if len(msgParts) < 3:
         return False
     
@@ -74,66 +72,65 @@ def commandCommand(channelData, nick, message, msgParts, permissions):
         return
     
     com, action, level, command, fullText = r
-    broadcaster = channelData.channel
+    broadcaster = channel.channel
     if com == '!global':
         broadcaster = '#global'
     
-    with getDatabase() as db:
-        if (db.hasFeature(channelData.channel, 'nocustom') and
-            broadcaster != '#global'):
-            return False
+    if (db.hasFeature(channel.channel, 'nocustom') and
+        broadcaster != '#global'):
+        return False
         
-        msg = None
-        if level == False:
+    msg = None
+    if level == False:
+        msg = nick + ' -> Invalid level, command ignored'
+        channel.sendMessage(msg)
+        return
+    if level:
+        if level not in permissions:
             msg = nick + ' -> Invalid level, command ignored'
-            channelData.sendMessage(msg)
+            channel.sendMessage(msg)
             return
-        if level:
-            if level not in permissions:
-                msg = nick + ' -> Invalid level, command ignored'
-                channelData.sendMessage(msg)
-                return
-            elif not permissions[level]:
-                msg = nick + ' -> You do not have permission to set that level'
-                channelData.sendMessage(msg)
-                return
+        elif not permissions[level]:
+            msg = nick + ' -> You do not have permission to set that level'
+            channel.sendMessage(msg)
+            return
         
-        if action in ['add', 'insert', 'new']:
-            result = db.insertCustomCommand(
-                broadcaster, level, command, fullText, nick)
-            if result:
-                channelData.sendMessage(command + ' was added successfully')
-            else:
-                msg = command + ' was not added successfully. There might be '
-                msg += 'an existing command'
-                channelData.sendMessage(msg)
-        elif action in ['edit', 'update']:
-            params = broadcaster, level, command, fullText, nick
-            result = db.updateCustomCommand(*params)
-            if result:
-                msg = command + ' was updated successfully'
-                channelData.sendMessage(msg)
-            else:
-                msg = command + ' was not updated successfully. The command '
-                msg += 'might not exist'
-                channelData.sendMessage(msg)
-        elif action in ['replace', 'override']:
-            params = broadcaster, level, command, fullText, nick
-            result = db.replaceCustomCommand(*params)
-            if result:
-                channelData.sendMessage(command + ' was updated successfully')
-            else:
-                msg = command + ' was not updated successfully. The command '
-                msg += 'might not exist'
-                channelData.sendMessage(msg)
-        elif action in ['del', 'delete', 'rem', 'remove',]:
-            result = db.deleteCustomCommand(broadcaster, level, command, nick)
-            if result:
-                channelData.sendMessage(command + ' was removed successfully')
-            else:
-                msg = command + ' was not removed successfully. The command '
-                msg += 'might not exist'
-                channelData.sendMessage(msg)
+    if action in ['add', 'insert', 'new']:
+        result = db.insertCustomCommand(
+            broadcaster, level, command, fullText, nick)
+        if result:
+            channel.sendMessage(command + ' was added successfully')
+        else:
+            msg = command + ' was not added successfully. There might be an '
+            msg += 'existing command'
+            channel.sendMessage(msg)
+    elif action in ['edit', 'update']:
+        params = broadcaster, level, command, fullText, nick
+        result = db.updateCustomCommand(*params)
+        if result:
+            msg = command + ' was updated successfully'
+            channel.sendMessage(msg)
+        else:
+            msg = command + ' was not updated successfully. The command might '
+            msg += 'not exist'
+            channel.sendMessage(msg)
+    elif action in ['replace', 'override']:
+        params = broadcaster, level, command, fullText, nick
+        result = db.replaceCustomCommand(*params)
+        if result:
+            channel.sendMessage(command + ' was updated successfully')
+        else:
+            msg = command + ' was not updated successfully. The command might '
+            msg += 'not exist'
+            channel.sendMessage(msg)
+    elif action in ['del', 'delete', 'rem', 'remove',]:
+        result = db.deleteCustomCommand(broadcaster, level, command, nick)
+        if result:
+            channel.sendMessage(command + ' was removed successfully')
+        else:
+            msg = command + ' was not removed successfully. The command might '
+            msg += 'not exist'
+            channel.sendMessage(msg)
 
 def parseCommandMessageInput(message):
     allowPermissions = {

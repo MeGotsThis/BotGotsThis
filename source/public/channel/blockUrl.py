@@ -1,5 +1,4 @@
 ﻿from ...api import twitch
-from ...database.factory import getDatabase
 from bot import config, utils
 import datetime
 import http.client
@@ -15,20 +14,19 @@ twitchUrlRegex += r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)"
 #twitchUrlRegex = r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|" + twitchUrlRegex
 
 # This is for banning the users who post a URL with no follows
-def filterNoUrlForBots(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if not db.hasFeature(channelData.channel, 'nourlredirect'):
-            return False
+def filterNoUrlForBots(db, channel, nick, message, msgParts, permissions):
+    if not db.hasFeature(channel.channel, 'nourlredirect'):
+        return False
     
     if permissions['moderator']:
         return False
     match = re.search(twitchUrlRegex, message)
     if match is not None:
-        params = channelData, nick, message
+        params = channel, nick, message
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
-def checkIfUrlMaybeBad(channelData, nick, message):
+def checkIfUrlMaybeBad(channel, nick, message):
     try:
         uri = '/kraken/users/' + nick + '/follows/channels?limit=1'
         response, data = twitch.twitchCall(None, 'GET', uri)
@@ -51,13 +49,13 @@ def checkIfUrlMaybeBad(channelData, nick, message):
             parsedOriginal = urllib.parse.urlparse(url)
             parsedReponse = urllib.parse.urlparse(urlRequest.geturl())
             if parsedOriginal.netloc != parsedReponse.netloc:
-                channelData.sendMessage('.ban ' + nick)
+                channel.sendMessage('.ban ' + nick)
                 return
         except urllib.error.HTTPError as e:
             parsedOriginal = urllib.parse.urlparse(url)
             parsedReponse = urllib.parse.urlparse(e.geturl())
             if parsedOriginal.netloc != parsedReponse.netloc:
-                channelData.sendMessage('.ban ' + nick)
+                channel.sendMessage('.ban ' + nick)
                 return
         except urllib.error.URLError as e:
             try:

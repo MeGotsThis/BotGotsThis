@@ -1,6 +1,4 @@
-﻿from ...database.factory import getDatabase
-
-ascii = (''' !"#$%&'()*+,-./'''
+﻿ascii = (''' !"#$%&'()*+,-./'''
           '0123456789'
           ':;<=>?@'
           'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -76,57 +74,52 @@ def _translateAsciiChain(c):
     c = _translate(c, upsidedown, ascii)
     return c
 
-def commandFull(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if not db.hasFeature(channelData.channel, 'textconvert'):
-            return False
+def commandFull(db, channel, nick, message, msgParts, permissions):
+    if not db.hasFeature(channel.channel, 'textconvert'):
+        return False
     
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    channelData.sendMessage(asciiToFullWidth(parts[1]))
+    channel.sendMessage(asciiToFullWidth(parts[1]))
     return True
 
-def commandParenthesized(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if not db.hasFeature(channelData.channel, 'textconvert'):
-            return False
+def commandParenthesized(db, channel, nick, message, msgParts, permissions):
+    if not db.hasFeature(channel.channel, 'textconvert'):
+        return False
     
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    channelData.sendMessage(asciiToParenthesized(parts[1]))
+    channel.sendMessage(asciiToParenthesized(parts[1]))
     return True
 
-def commandCircled(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if not db.hasFeature(channelData.channel, 'textconvert'):
-            return False
+def commandCircled(db, channel, nick, message, msgParts, permissions):
+    if not db.hasFeature(channel.channel, 'textconvert'):
+        return False
     
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    channelData.sendMessage(asciiToCircled(parts[1]))
+    channel.sendMessage(asciiToCircled(parts[1]))
     return True
 
-def commandSmallCaps(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if not db.hasFeature(channelData.channel, 'textconvert'):
-            return False
+def commandSmallCaps(db, channel, nick, message, msgParts, permissions):
+    if not db.hasFeature(channel.channel, 'textconvert'):
+        return False
     
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    channelData.sendMessage(asciiToSmallCaps(parts[1]))
+    channel.sendMessage(asciiToSmallCaps(parts[1]))
     return True
 
-def commandUpsideDown(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if not db.hasFeature(channelData.channel, 'textconvert'):
-            return False
+def commandUpsideDown(channel, nick, message, msgParts, permissions):
+    if not db.hasFeature(channel.channel, 'textconvert'):
+        return False
     
     parts = message.split(None, 1)
     if len(parts) < 2:
         return False
-    channelData.sendMessage(asciiToUpsideDown(parts[1]))
+    channel.sendMessage(asciiToUpsideDown(parts[1]))
     return True

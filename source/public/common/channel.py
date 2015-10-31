@@ -3,12 +3,11 @@ from ...api import twitch
 from bot import config, globals, utils
 import json
 
-def botJoin(channel, sendMessage):
-    with getDatabase() as db:
-        if db.isChannelBannedReason(channel):
-            sendMessage('Chat ' + channel + ' is banned from joining')
-            return True
-        priority = db.getAutoJoinsPriority(channel)
+def botJoin(db, channel, sendMessage):
+    if db.isChannelBannedReason(channel):
+        sendMessage('Chat ' + channel + ' is banned from joining')
+        return True
+    priority = db.getAutoJoinsPriority(channel)
     priority = priority if priority is not None else float('inf')
     
     response, data = twitch.twitchCall(

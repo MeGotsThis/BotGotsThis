@@ -1,9 +1,9 @@
-import threading
+﻿import threading
 import datetime
 import time
 import json
 
-def commandAutoRepeat(channelData, nick, message, msgParts, permissions):
+def commandAutoRepeat(db, channelData, nick, message, msgParts, permissions):
     """
     !autorepeat 1 MONEY MONEY
     !autorepeat-20 0.5 MONEY MONEY 

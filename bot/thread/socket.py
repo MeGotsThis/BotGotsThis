@@ -19,6 +19,9 @@ class SocketThread(threading.Thread):
     
     @property
     def channels(self):
+        # Hints for Intellisense
+        if False:
+            return self._channels
         with self._channelsLock:
             return self._channels.copy()
     

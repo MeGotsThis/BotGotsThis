@@ -1,12 +1,11 @@
-﻿from ...database.factory import getDatabase
-from bot import config
+﻿from bot import config
 import datetime
 
-def commandWall(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel, 'modwall') and
-            not permissions['broadcaster']):
-            return False
+def commandWall(db, channel, nick, message, msgParts, permissions):
+    if (not db.hasFeature(channel.channel, 'modwall') and
+        not permissions['broadcaster']):
+        return False
+    
     if len(msgParts) < 2:
         return False
     rep = msgParts[1] + ' '
@@ -31,24 +30,24 @@ def commandWall(channelData, nick, message, msgParts, permissions):
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modWall' in channelData.sessionData:
-            since = currentTime - channelData.sessionData['modWall']
+        if 'modWall' in channel.sessionData:
+            since = currentTime - channel.sessionData['modWall']
             if since < cooldown:
                 return False
-        channelData.sessionData['modWall'] = currentTime
+        channel.sessionData['modWall'] = currentTime
     elif not permissions['globalMod']:
         length = min(length, 20)
         rows = min(rows, 500)
     messages = [rep * length + ('' if i % 2 == 0 else ' \ufeff')
                 for i in range(rows)]
-    channelData.sendMulipleMessages(messages, 2)
+    channel.sendMulipleMessages(messages, 2)
     return True
 
-def commandWallLong(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel, 'modwall') and
-            not permissions['broadcaster']):
-            return False
+def commandWallLong(db, channel, nick, message, msgParts, permissions):
+    if (not db.hasFeature(channel.channel, 'modwall') and
+        not permissions['broadcaster']):
+        return False
+    
     msgParts = message.split(None, 1)
     if len(msgParts) < 2:
         return False
@@ -64,14 +63,14 @@ def commandWallLong(channelData, nick, message, msgParts, permissions):
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modWall' in channelData.sessionData:
-            since = currentTime - channelData.sessionData['modWall']
+        if 'modWall' in channel.sessionData:
+            since = currentTime - channel.sessionData['modWall']
             if since < cooldown:
                 return False
-        channelData.sessionData['modWall'] = currentTime
+        channel.sessionData['modWall'] = currentTime
     elif not permissions['globalMod']:
         rows = min(rows, 500)
     messages = [msgParts[1] + ('' if i % 2 == 0 else ' \ufeff')
                 for i in range(rows)]
-    channelData.sendMulipleMessages(messages, 2)
+    channel.sendMulipleMessages(messages, 2)
     return True

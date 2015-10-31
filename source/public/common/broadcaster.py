@@ -1,15 +1,13 @@
 ﻿from bot import config, globals, utils
 from ...api import twitch
-from ...database.factory import getDatabase
 import time
 import json
 
-def botCome(channel, sendMessage):
-    with getDatabase() as db:
-        if db.isChannelBannedReason(channel):
-            sendMessage('Chat ' + channel + ' is banned from joining')
-            return True
-        priority = db.getAutoJoinsPriority(channel)
+def botCome(db, channel, sendMessage):
+    if db.isChannelBannedReason(channel):
+        sendMessage('Chat ' + channel + ' is banned from joining')
+        return True
+    priority = db.getAutoJoinsPriority(channel)
     priority = priority if priority is not None else float('inf')
     
     if channel in globals.channels:
@@ -50,35 +48,30 @@ def botEmpty(channel, sendMessage):
         globals.messaging.clearQueue(channel)
         sendMessage('Cleared all queued messages for ' + channel)
 
-def botAutoJoin(channel, sendMessage, msgParts):
-    with getDatabase() as db:
-        if db.isChannelBannedReason(channel):
-            sendMessage('Chat ' + channel + ' is banned from joining')
-            return
+def botAutoJoin(db, channel, sendMessage, msgParts):
+    if db.isChannelBannedReason(channel):
+        sendMessage('Chat ' + channel + ' is banned from joining')
+        return
 
     if len(msgParts) >= 2:
         removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
                       'leave', 'part']
         if msgParts[1].lower() in removeMsgs:
-            with getDatabase() as db:
-                result = db.discardAutoJoin(channel)
-                if result:
-                    sendMessage(
-                        'Auto join for ' + channel + ' is now disabled')
-                else:
-                    sendMessage(
-                        'Auto join for ' + channel + ' was never enabled')
+            result = db.discardAutoJoin(channel)
+            if result:
+                sendMessage('Auto join for ' + channel + ' is now disabled')
+            else:
+                sendMessage('Auto join for ' + channel + ' was never enabled')
             return True
     
     response, data = twitch.twitchCall(
         None, 'GET', '/api/channels/' + channel + '/chat_properties')
     chatProperties = json.loads(data.decode('utf-8'))
     
-    with getDatabase() as db:
-        result = db.saveAutoJoin(channel, 0, chatProperties['eventchat'])
-        priority = db.getAutoJoinsPriority(channel)
-        if result == False:
-            db.setAutoJoinServer(channel, chatProperties['eventchat'])
+    result = db.saveAutoJoin(channel, 0, chatProperties['eventchat'])
+    priority = db.getAutoJoinsPriority(channel)
+    if result == False:
+        db.setAutoJoinServer(channel, chatProperties['eventchat'])
     
     wasInChat = channel in globals.channels
     if chatProperties['eventchat']:

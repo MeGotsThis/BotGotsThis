@@ -1,13 +1,12 @@
-﻿from ...database.factory import getDatabase
-from bot import config, globals
+﻿from bot import config, globals
 import datetime
 import random
 
-def commandPyramid(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel, 'modpyramid') and
-            not permissions['broadcaster']):
-            return False
+def commandPyramid(db, channel, nick, message, msgParts, permissions):
+    if (not db.hasFeature(channel.channel, 'modpyramid') and
+        not permissions['broadcaster']):
+        return False
+    
     if len(msgParts) < 2:
         return False
     rep = msgParts[1] + ' '
@@ -24,23 +23,22 @@ def commandPyramid(channelData, nick, message, msgParts, permissions):
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modPyramid' in channelData.sessionData:
-            since = currentTime - channelData.sessionData['modPyramid']
+        if 'modPyramid' in channel.sessionData:
+            since = currentTime - channel.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        channelData.sessionData['modPyramid'] = currentTime
+        channel.sessionData['modPyramid'] = currentTime
     elif not permissions['globalMod']:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
-    channelData.sendMulipleMessages(messages, 2)
+    channel.sendMulipleMessages(messages, 2)
     return True
 
-def commandRPyramid(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel, 'modpyramid') and
-            not permissions['broadcaster']):
-            return False
+def commandRPyramid(db, channel, nick, message, msgParts, permissions):
+    if (not db.hasFeature(channel.channel, 'modpyramid') and
+        not permissions['broadcaster']):
+        return False
     
     emotes = globals.globalEmotes
     
@@ -57,11 +55,11 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modPyramid' in channelData.sessionData:
-            since = currentTime - channelData.sessionData['modPyramid']
+        if 'modPyramid' in channel.sessionData:
+            since = currentTime - channel.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        channelData.sessionData['modPyramid'] = currentTime
+        channel.sessionData['modPyramid'] = currentTime
     elif not permissions['globalMod']:
         count = min(count, 20)
     emoteIds = list(emotes.keys())
@@ -72,14 +70,14 @@ def commandRPyramid(channelData, nick, message, msgParts, permissions):
             break
     messages = [' '.join(rep[0:i]) for i in range(1, count)]
     messages += [' '.join(rep[0:i]) for i in range(count, 0, -1)]
-    channelData.sendMulipleMessages(messages, 2)
+    channel.sendMulipleMessages(messages, 2)
     return True
 
-def commandPyramidLong(channelData, nick, message, msgParts, permissions):
-    with getDatabase() as db:
-        if (not db.hasFeature(channelData.channel, 'modpyramid') and
-            not permissions['broadcaster']):
-            return False
+def commandPyramidLong(db, channel, nick, message, msgParts, permissions):
+    if (not db.hasFeature(channel.channel, 'modpyramid') and
+        not permissions['broadcaster']):
+        return False
+    
     msgParts = message.split(None, 1)
     if len(msgParts) < 2:
         return False
@@ -97,14 +95,14 @@ def commandPyramidLong(channelData, nick, message, msgParts, permissions):
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modPyramid' in channelData.sessionData:
-            since = currentTime - channelData.sessionData['modPyramid']
+        if 'modPyramid' in channel.sessionData:
+            since = currentTime - channel.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        channelData.sessionData['modPyramid'] = currentTime
+        channel.sessionData['modPyramid'] = currentTime
     elif not permissions['globalMod']:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
-    channelData.sendMulipleMessages(messages, 2)
+    channel.sendMulipleMessages(messages, 2)
     return True

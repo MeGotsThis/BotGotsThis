@@ -1,5 +1,4 @@
-﻿from ...database.factory import getDatabase
-from lists.feature import features
+﻿from lists.feature import features
 
 enable = {
     '',
@@ -13,7 +12,7 @@ disable = {
     '0',
     }
 
-def botFeature(channel, msgParts, sendMessage):
+def botFeature(db, channel, msgParts, sendMessage):
     if len(msgParts) < 2:
         return False
     
@@ -30,12 +29,12 @@ def botFeature(channel, msgParts, sendMessage):
         sendMessage(msg)
         return True
     
-    with getDatabase() as db:
-        hasFeature = db.hasFeature(channel, msgParts[1])
-        if not hasFeature and msgParts[2] in enable:
-            db.addFeature(channel, msgParts[1])
-        if hasFeature and msgParts[2] in disable:
-            db.removeFeature(channel, msgParts[1])
+    hasFeature = db.hasFeature(channel, msgParts[1])
+    if not hasFeature and msgParts[2] in enable:
+        db.addFeature(channel, msgParts[1])
+    if hasFeature and msgParts[2] in disable:
+        db.removeFeature(channel, msgParts[1])
+    
     msg = None
     if hasFeature:
         if msgParts[2] in enable:

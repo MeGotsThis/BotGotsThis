@@ -1,4 +1,5 @@
-﻿from .irccommand import jtv
+﻿from .database.factory import getDatabase
+from .irccommand import jtv
 from bot import config, utils
 from bot.channel import Channel
 from lists import channel as commandList
@@ -83,38 +84,39 @@ def threadParse(channel, tags, nick, message, msgParts):
         command = str(msgParts[0]).lower()
     
         complete = False
-        arguments = channel, nick, message, msgParts, permissions
-        for filter in commandList.filterMessage:
-            complete = filter(*arguments)
-            if complete:
-                break
-        if not complete and command in commandList.commands:
-            commInfo = commandList.commands[command]
-            hasPerm = True
-            if commInfo[1] is not None:
-                permissionSet = commInfo[1].split('+')
-                for perm in permissionSet:
-                    hasPerm = hasPerm and permissions[perm]
-            if hasPerm and commInfo[0] is not None:
-                complete = commInfo[0](*arguments)
-        if not complete:
-            for comm in commandList.commandsStartWith:
-                if command.startswith(comm):
-                    commInfo = channel.commandsStartWith[comm]
-                    hasPerm = True
-                    if commInfo[1] is not None:
-                        permissionSet = commInfo[1].split('+')
-                        for perm in permissionSet:
-                            hasPerm = hasPerm and permissions[perm]
-                    if hasPerm and commInfo[0] is not None:
-                        complete = commInfo[0](*arguments)
-                        if complete:
-                            break
-        if not complete:
-            for process in commandList.processNoCommand:
-                complete = process(*arguments)
+        with getDatabase() as db:
+            arguments = db, channel, nick, message, msgParts, permissions
+            for filter in commandList.filterMessage:
+                complete = filter(*arguments)
                 if complete:
                     break
+            if not complete and command in commandList.commands:
+                commInfo = commandList.commands[command]
+                hasPerm = True
+                if commInfo[1] is not None:
+                    permissionSet = commInfo[1].split('+')
+                    for perm in permissionSet:
+                        hasPerm = hasPerm and permissions[perm]
+                if hasPerm and commInfo[0] is not None:
+                    complete = commInfo[0](*arguments)
+            if not complete:
+                for comm in commandList.commandsStartWith:
+                    if command.startswith(comm):
+                        commInfo = channel.commandsStartWith[comm]
+                        hasPerm = True
+                        if commInfo[1] is not None:
+                            permissionSet = commInfo[1].split('+')
+                            for perm in permissionSet:
+                                hasPerm = hasPerm and permissions[perm]
+                        if hasPerm and commInfo[0] is not None:
+                            complete = commInfo[0](*arguments)
+                            if complete:
+                                break
+            if not complete:
+                for process in commandList.processNoCommand:
+                    complete = process(*arguments)
+                    if complete:
+                        break
     except:
         extra = 'Channel: ' + channel.channel + '\nMessage: ' + message
         utils.logException(extra)

@@ -5,45 +5,45 @@ import json
 import sys
 import time
 
-def commandExit(channelData, nick, message, msgParts, permissions):
-    exit.botExit(channelData.sendMessage)
+def commandExit(db, chanObj, nick, message, msgParts, permissions):
+    exit.botExit(chanObj.sendMessage)
     return True
 
-def commandSay(channelData, nick, message, msgParts, permissions):
+def commandSay(db, chanObj, nick, message, msgParts, permissions):
     msgParts = message.split(None, 2)
     msgParts[1] = msgParts[1].lower()
     if msgParts[1] in globals.channels:
         channel.botSay(msgParts[1], msgParts[2])
     return True
 
-def commandJoin(channelData, nick, message, msgParts, permissions):
+def commandJoin(db, chanObj, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
 
     chan = msgParts[1].lower()
-    channel.botJoin(chan, channelData.sendMessage)
+    channel.botJoin(db, chan, chanObj.sendMessage)
     return True
 
-def commandPart(channelData, nick, message, msgParts, permissions):
+def commandPart(db, chanObj, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
     chan = msgParts[1].lower()
-    channel.botPart(chan, channelData.sendMessage)
+    channel.botPart(chan, chanObj.sendMessage)
     return True
 
-def commandEmptyAll(channelData, nick, message, msgParts, permissions):
-    channel.botEmptyAll(channelData.sendMessage)
+def commandEmptyAll(db, chanObj, nick, message, msgParts, permissions):
+    channel.botEmptyAll(chanObj.sendMessage)
     return True
 
-def commandEmpty(channelData, nick, message, msgParts, permissions):
+def commandEmpty(db, chanObj, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
-    channel.botEmpty(msgParts[1], channelData.sendMessage)
+    channel.botEmpty(msgParts[1], chanObj.sendMessage)
     return True
 
-def commandManageBot(channelData, nick, message, msgParts, permissions):
+def commandManageBot(db, chanObj, nick, message, msgParts, permissions):
     if len(msgParts) < 2:
         return False
     
-    return managebot.botManageBot(channelData.sendMessage,
+    return managebot.botManageBot(db, chanObj.sendMessage,
                                   nick, message, msgParts)
