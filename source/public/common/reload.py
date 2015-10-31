@@ -76,29 +76,29 @@ def moduleKey(module):
     
     return (100, module)
 
-def botReload(sendMessage, nick, message, msgParts, permissions):
-    sendMessage('Reloading', 0)
+def botReload(send, nick, message, msgParts, permissions):
+    send('Reloading', 0)
     
-    botReloadCommands(sendMessage, nick, message, msgParts, permissions)
-    botReloadConfig(sendMessage, nick, message, msgParts, permissions)
+    botReloadCommands(send, nick, message, msgParts, permissions)
+    botReloadConfig(send, nick, message, msgParts, permissions)
     
-    sendMessage('Complete', 0)
+    send('Complete', 0)
     return True
 
-def botReloadCommands(sendMessage, nick, message, msgParts, permissions):
-    sendMessage('Reloading Commands', 0)
+def botReloadCommands(send, nick, message, msgParts, permissions):
+    send('Reloading Commands', 0)
     
     modules = [m for m in sys.modules.keys() if loadThisModule(m)]
     for moduleString in sorted(modules, key=moduleKey):
         imp.reload(sys.modules[moduleString])
     
-    sendMessage('Complete Reloading', 0)
+    send('Complete Reloading', 0)
     return True
 
-def botReloadConfig(sendMessage, nick, message, msgParts, permissions):
-    sendMessage('Reloading Config', 0)
+def botReloadConfig(send, nick, message, msgParts, permissions):
+    send('Reloading Config', 0)
     
     imp.reload(sys.modules['config.config'])
     
-    sendMessage('Complete Reloading', 0)
+    send('Complete Reloading', 0)
     return True

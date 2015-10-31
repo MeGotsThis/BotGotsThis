@@ -3,9 +3,9 @@ from ...api import twitch
 from bot import config, globals, utils
 import json
 
-def botJoin(db, channel, sendMessage):
+def botJoin(db, channel, send):
     if db.isChannelBannedReason(channel):
-        sendMessage('Chat ' + channel + ' is banned from joining')
+        send('Chat ' + channel + ' is banned from joining')
         return True
     priority = db.getAutoJoinsPriority(channel)
     priority = priority if priority is not None else float('inf')
@@ -19,30 +19,30 @@ def botJoin(db, channel, sendMessage):
     else:
         server = globals.mainChat
     if utils.joinChannel(channel, priority, server):
-        sendMessage('Joining ' + channel)
+        send('Joining ' + channel)
     else:
         result = utils.ensureServer(channel, priority, server)
         if result == utils.ENSURE_CORRECT:
-            sendMessage('Already joined ' + channel)
+            send('Already joined ' + channel)
         elif result == utils.ENSURE_REJOIN_TO_MAIN:
-            sendMessage('Moved ' + channel + ' to main chat server')
+            send('Moved ' + channel + ' to main chat server')
         elif result == utils.ENSURE_REJOIN_TO_EVENT:
-            sendMessage('Moved ' + channel + ' to event chat server')
+            send('Moved ' + channel + ' to event chat server')
 
-def botPart(channel, sendMessage):
+def botPart(channel, send):
     if channel == config.botnick:
         return
     utils.partChannel(channel)
-    sendMessage('Leaving ' + channel)
+    send('Leaving ' + channel)
 
 def botSay(channel, message):
     if channel in globals.channels:
         globals.channels[channel].sendMessage(message)
 
-def botEmptyAll(sendMessage):
+def botEmptyAll(send):
     globals.messaging.clearAllQueue()
-    sendMessage('Cleared all queued messages')
+    send('Cleared all queued messages')
 
-def botEmpty(channel, sendMessage):
+def botEmpty(channel, send):
     globals.messaging.clearQueue(msgParts[1])
-    sendMessage('Cleared all queued messages for ' + msgParts[1])
+    send('Cleared all queued messages for ' + msgParts[1])

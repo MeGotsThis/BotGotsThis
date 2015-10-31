@@ -1,5 +1,5 @@
 ﻿from ...api import twitch
-from ..common import broadcaster
+from ..common import broadcaster, send
 import datetime
 import email.utils
 import json
@@ -10,18 +10,18 @@ def commandHello(db, channelData, nick, message, msgParts, permissions):
     return True
 
 def commandCome(db, channel, nick, message, msgParts, permissions):
-    broadcaster.botCome(db, nick, channel.sendMessage)
+    broadcaster.botCome(db, nick, send.channel(channel))
     return True
 
 def commandLeave(db, channel, nick, message, msgParts, permissions):
-    return broadcaster.botLeave(channel.channel, channel.sendMessage)
+    return broadcaster.botLeave(channel.channel, send.channel(channel))
 
 def commandEmpty(db, channel, nick, message, msgParts, permissions):
-    broadcaster.botEmpty(channel.channel, channel.sendMessage)
+    broadcaster.botEmpty(channel.channel, send.channel(channel))
     return True
 
 def commandAutoJoin(db, channel, nick, message, msgParts, permissions):
-    broadcaster.botAutoJoin(db, nick, channel.sendMessage, msgParts)
+    broadcaster.botAutoJoin(db, nick, send.channel(channel), msgParts)
     return True
 
 def commandUptime(db, channel, nick, message, msgParts, permissions):

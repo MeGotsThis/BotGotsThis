@@ -1,21 +1,18 @@
-﻿from ..common import broadcaster
+﻿from ..common import broadcaster, send
 from bot import globals
 
-def sendMessage(nick):
-    return lambda m, p=1: globals.messaging.queueWhisper(nick, m, p)
-
 def commandCome(db, nick, message, msgParts, permissions):
-    broadcaster.botCome(nick, sendMessage(nick))
+    broadcaster.botCome(nick, send.whisper(nick))
     return True
 
 def commandLeave(db, nick, message, msgParts, permissions):
-    return broadcaster.botLeave(nick, sendMessage(nick))
+    return broadcaster.botLeave(nick, send.whisper(nick))
 
 def commandEmpty(db, nick, message, msgParts, permissions):
-    broadcaster.botEmpty(nick, sendMessage(nick))
+    broadcaster.botEmpty(nick, send.whisper(nick))
     return True
 
 def commandAutoJoin(db, nick, message, msgParts, permissions):
-    broadcaster.botAutoJoin(nick, sendMessage(nick), msgParts)
+    broadcaster.botAutoJoin(nick, send.whisper(nick), msgParts)
     return True
 

@@ -12,7 +12,7 @@ disable = {
     '0',
     }
 
-def botFeature(db, channel, msgParts, sendMessage):
+def botFeature(db, channel, msgParts, send):
     if len(msgParts) < 2:
         return False
     
@@ -21,12 +21,12 @@ def botFeature(db, channel, msgParts, sendMessage):
     
     msgParts[1] = msgParts[1].lower()
     if msgParts[1] not in features:
-        sendMessage('Unrecognized feature: ' + msgParts[1])
+        send('Unrecognized feature: ' + msgParts[1])
         return True
     
     if msgParts[2] not in enable and msgParts[2] not in disable:
         msg = 'Unrecognized second parameter: ' + msgParts[2]
-        sendMessage(msg)
+        send(msg)
         return True
     
     hasFeature = db.hasFeature(channel, msgParts[1])
@@ -50,5 +50,5 @@ def botFeature(db, channel, msgParts, sendMessage):
         if msgParts[2] in disable:
             msg = 'The feature ' + features[msgParts[1]] + ' was not '
             msg += 'enabled in ' + channel
-    sendMessage(msg)
+    send(msg)
     return True

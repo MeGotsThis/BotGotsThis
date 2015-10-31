@@ -2,4 +2,4 @@
 
 def commandFeature(db, channel, nick, message, msgParts, permissions):
     return feature.botFeature(db, channel.channel, msgParts,
-                              channel.sendMessage)
+                              send.channel(channel))
