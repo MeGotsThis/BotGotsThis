@@ -1,4 +1,4 @@
-﻿from . import charConvert
+﻿from ..common import charConvert
 from bot import config
 from lists import custom
 import datetime

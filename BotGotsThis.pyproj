@@ -120,6 +120,7 @@
     <Compile Include="source\public\channel\__init__.py" />
     <Compile Include="source\public\common\broadcaster.py" />
     <Compile Include="source\public\common\channel.py" />
+    <Compile Include="source\public\common\charConvert.py" />
     <Compile Include="source\public\common\exit.py" />
     <Compile Include="source\public\common\feature.py" />
     <Compile Include="source\public\common\managebot.py" />
