@@ -1,4 +1,5 @@
-﻿from bot import config, utils
+﻿from .database.factory import getDatabase
+from bot import config, utils
 from lists import whisper
 import datetime
 import sys
@@ -59,16 +60,17 @@ def threadParse(tags, nick, message, msgParts):
         command = str(msgParts[0]).lower()
     
         complete = False
-        arguments = nick, message, msgParts, permissions
-        if command in whisper.commands:
-            commInfo = whisper.commands[command]
-            hasPerm = True
-            if commInfo[1] is not None:
-                permissionSet = commInfo[1].split('+')
-                for perm in permissionSet:
-                    hasPerm = hasPerm and permissions[perm]
-            if hasPerm and commInfo[0] is not None:
-                complete = commInfo[0](*arguments)
+        with getDatabase() as db:
+            arguments = db, nick, message, msgParts, permissions
+            if command in whisper.commands:
+                commInfo = whisper.commands[command]
+                hasPerm = True
+                if commInfo[1] is not None:
+                    permissionSet = commInfo[1].split('+')
+                    for perm in permissionSet:
+                        hasPerm = hasPerm and permissions[perm]
+                if hasPerm and commInfo[0] is not None:
+                    complete = commInfo[0](*arguments)
     except:
         extra = 'From: ' + nick + '\nMessage: ' + message
         utils.logException(extra)
