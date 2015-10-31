@@ -6,7 +6,7 @@ def commandStatus(db, channel, nick, message, msgParts, permissions):
     if len(msgParts) != 2:
         return False
     
-    if oauth.getOAuthToken(channel.channel) is None:
+    if oauth.getOAuthTokenWithDB(db, channel.channel) is None:
         return False
     response, data = twitch.twitchCall(
         channel.channel, 'PUT', '/kraken/channels/' + channel.channel,
