@@ -1,4 +1,4 @@
-﻿from ..common import reload
+﻿from ..common import reload, send
 
 def commandReload(db, channel, nick, message, msgParts, permissions):
     reload.botReload(send.channel(channel), nick, message, msgParts,
