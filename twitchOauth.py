@@ -1,5 +1,5 @@
-import database.factory
-import ircbot.twitchApi
+﻿from source.api import twitch
+from source.database.factory import getDatabase
 import urllib.parse
 import configparser
 import json
@@ -15,7 +15,7 @@ try:
     
     if 'code' in queryParts and len(queryParts['code']):
         for code in queryParts['code']:
-            response, data = ircbot.twitchApi.twitchCall(
+            response, data = twitch.twitchCall(
                 None, 'POST', '/kraken/oauth2/token/',
                 headers = {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -33,7 +33,7 @@ try:
                 oauthTokens = json.loads(data.decode('utf-8'))
                 token = oauthTokens['access_token']
                 
-                response, data = ircbot.twitchApi.twitchCall(
+                response, data = twitch.twitchCall(
                     None, 'GET', '/kraken/',
                     headers = {
                         'Authorization': 'OAuth ' + token,
@@ -42,7 +42,7 @@ try:
                 if response.status == 200:
                     tokenInfo = json.loads(data.decode('utf-8'))
                     
-                    with database.factory.getDatabase() as db:
+                    with getDatabase() as db:
                         db.saveBroadcasterToken(
                             tokenInfo['token']['user_name'].lower(), token)
                     print(
