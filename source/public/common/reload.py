@@ -2,79 +2,71 @@
 import imp
 
 def loadThisModule(module):
-    _ = module.startswith('botcommands')
-    _ = _ or module.startswith('botprivate')
-    _ = _ or module.startswith('customfield')
-    _ = _ or module.startswith('customprivate')
-    _ = _ or module.startswith('ircchannel')
-    _ = _ or module.startswith('ircwhisper')
-    _ = _ or module.startswith('privatechannel')
-    _ = _ or module.startswith('privatewhisper')
-    _ = _ or module.startswith('database')
-    return  _ and module != 'botcommands.reload'
+    include = module.startswith('source') or module.startswith('lists')
+    exclude = module != 'source.public.common.reload'
+    exclude = exclude or module.startswith('source.private.autoload')
+    exclude = exclude or module.startswith('source.public.autoload')
+    return include and exclude
 
 def moduleKey(module):
-    if module == 'database.databasebase':
-        return (9, module)
-    if module == 'database.factory':
-        return (8, module)
-    if module == 'database':
+    if module == 'source.database':
         return (0, module)
-    if module.startswith('database'):
+    if module == 'source.database.databasebase':
         return (1, module)
+    if module == 'source.database.factory':
+        return (9, module)
+    if module.startswith('source.database'):
+        return (8, module)
 
-    if module == 'privatechannel.feature':
-        return (499, module)
-    if module.startswith('botprivate'):
-        return (500, module)
+    if module.startswith('source.api'):
+        return (10, module)
+    if module.startswith('source.data'):
+        return (11, module)
+    if module.startswith('source.public.common'):
+        return (18, module)
+    if module.startswith('source.private.common'):
+        return (19, module)
     
-    if module == 'customfield.customList':
-        return (699, module)
-    if module == 'customprivate.customList':
-        return (698, module)
-    if module == 'customprivate':
-        return (600, module)
-    if module == 'customfield':
-        return (601, module)
-    if module.startswith('customprivate'):
-        return (610, module)
-    if module.startswith('customfield'):
-        return (611, module)
+    if module.startswith('source.public.tasks'):
+        return (20, module)
+    if module.startswith('source.private.tasks'):
+        return (21, module)
     
-    if module.startswith('botcommands'):
-        return (700, module)
+    if module.startswith('source.public.manage'):
+        return (60, module)
+    if module.startswith('source.private.manage'):
+        return (61, module)
+    if module.startswith('source.public.custom'):
+        return (60, module)
+    if module.startswith('source.private.custom'):
+        return (61, module)
     
-    if module == 'privatewhisper.commandList':
-        return (889, module)
-    if module == 'privatewhisper':
-        return (880, module)
-    if module.startswith('privatewhisper'):
-        return (881, module)
+    if module.startswith('source.public.channel'):
+        return (70, module)
+    if module.startswith('source.private.channel'):
+        return (71, module)
+    if module.startswith('source.public.whisper'):
+        return (72, module)
+    if module.startswith('source.private.whisper'):
+        return (73, module)
     
-    if module == 'privatechannel.commandList':
-        return (899, module)
-    if module == 'privatechannel':
-        return (890, module)
-    if module.startswith('privatechannel'):
-        return (891, module)
+    if module.startswith('lists.private'):
+        return (87, module)
+    if module.startswith('lists.public'):
+        return (88, module)
+    if module.startswith('lists'):
+        return (89, module)
     
-    if module == 'ircwhisper.commandList':
-        return (989, module)
-    if module == 'ircwhisper':
-        return (980, module)
-    if module.startswith('ircwhisper'):
-        return (981, module)
+    if module.startswith('source.irccommand'):
+        return (96, module)
+    if module == 'source.channel':
+        return (97, module)
+    if module == 'source.whisper':
+        return (98, module)
+    if module == 'source.ircmessage':
+        return (99, module)
     
-    if module == 'ircchannel':
-        return (990, module)
-    if module == 'ircchannel.commandList':
-        return (998, module)
-    if module == 'ircchannel.commands':
-        return (999, module)
-    if module.startswith('ircchannel'):
-        return (991, module)
-    
-    return (100, module)
+    return (50, module)
 
 def botReload(send, nick, message, msgParts, permissions):
     send('Reloading', 0)
@@ -98,7 +90,7 @@ def botReloadCommands(send, nick, message, msgParts, permissions):
 def botReloadConfig(send, nick, message, msgParts, permissions):
     send('Reloading Config', 0)
     
-    imp.reload(sys.modules['config.config'])
+    imp.reload(sys.modules['bot.config'])
     
     send('Complete Reloading', 0)
     return True
