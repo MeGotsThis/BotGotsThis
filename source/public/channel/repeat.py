@@ -3,7 +3,7 @@ import datetime
 import time
 import json
 
-def commandAutoRepeat(db, channelData, nick, message, msgParts, permissions):
+def commandAutoRepeat(db, channel, nick, message, msgParts, permissions):
     """
     !autorepeat 1 MONEY MONEY
     !autorepeat-20 0.5 MONEY MONEY 
@@ -32,18 +32,18 @@ def commandAutoRepeat(db, channelData, nick, message, msgParts, permissions):
     except IndexError:
         messageToSend = None
     
-    if 'repeatThread' in channelData.sessionData:
-        channelData.sessionData['repeatThread'].count = 0
+    if 'repeatThread' in channel.sessionData:
+        channel.sessionData['repeatThread'].count = 0
     
     if minutesDuration <= 0 or count == 0 or not messageToSend:
         return True
     
     thread = MessageRepeater(
-        channelData=channelData,
+        channelData=channel,
         message=messageToSend,
         duration=datetime.timedelta(minutes=minutesDuration),
         count=count)
-    channelData.sessionData['repeatThread'] = thread
+    channel.sessionData['repeatThread'] = thread
     thread.start()
     
     return True

@@ -5,8 +5,8 @@ import email.utils
 import json
 import time
 
-def commandHello(db, channelData, nick, message, msgParts, permissions):
-    channelData.sendMessage('Hello Kappa')
+def commandHello(db, channel, nick, message, msgParts, permissions):
+    channel.sendMessage('Hello Kappa')
     return True
 
 def commandCome(db, channel, nick, message, msgParts, permissions):
