@@ -40,7 +40,7 @@ def commandSmallCaps(db, channel, nick, message, msgParts, permissions):
     channel.sendMessage(charConvert.asciiToSmallCaps(parts[1]))
     return True
 
-def commandUpsideDown(channel, nick, message, msgParts, permissions):
+def commandUpsideDown(db, channel, nick, message, msgParts, permissions):
     if not db.hasFeature(channel.channel, 'textconvert'):
         return False
     
