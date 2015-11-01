@@ -22,16 +22,16 @@ def botCome(db, channel, send):
         server = globals.eventChat
     else:
         server = globals.mainChat
-    if globals.joinChannel(channel, priority, server):
+    if utils.joinChannel(channel, priority, server):
         send('Joining ' + channel)
     else:
-        result = globals.ensureServer(channel, priority, server)
-        if result == globals.ENSURE_CORRECT:
+        result = utils.ensureServer(channel, priority, server)
+        if result == utils.ENSURE_CORRECT:
             send('Already joined ' + channel)
-        elif result == globals.ENSURE_REJOIN_TO_MAIN:
+        elif result == utils.ENSURE_REJOIN_TO_MAIN:
             msg = 'Moved ' + channel + ' to main chat server'
             send(msg)
-        elif result == globals.ENSURE_REJOIN_TO_EVENT:
+        elif result == utils.ENSURE_REJOIN_TO_EVENT:
             msg = 'Moved ' + channel + ' to event chat server'
             send(msg)
 
