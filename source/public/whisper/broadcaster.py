@@ -2,7 +2,7 @@
 from bot import globals
 
 def commandCome(db, nick, message, msgParts, permissions):
-    broadcaster.botCome(nick, send.whisper(nick))
+    broadcaster.botCome(db, nick, send.whisper(nick))
     return True
 
 def commandLeave(db, nick, message, msgParts, permissions):
