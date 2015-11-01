@@ -102,7 +102,7 @@ def threadParse(channel, tags, nick, message, msgParts):
             if not complete:
                 for comm in commandList.commandsStartWith:
                     if command.startswith(comm):
-                        commInfo = channel.commandsStartWith[comm]
+                        commInfo = commandList.commandsStartWith[comm]
                         hasPerm = True
                         if commInfo[1] is not None:
                             permissionSet = commInfo[1].split('+')
