@@ -3,7 +3,7 @@ from bot import config
 from lists import custom
 import datetime
 
-def customCommands(db, channel, nick, message, msgParts, permissions):
+def customCommands(db, channel, nick, originalMsg, msgParts, permissions):
     command = msgParts[0].lower()
     message = None
     
