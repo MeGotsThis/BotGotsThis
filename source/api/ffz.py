@@ -5,11 +5,11 @@ import urllib.request
 
 def getGlobalEmotes():
     currentTime = datetime.datetime.utcnow()
-    emotes = ircbot.irc.globalFfzEmotes
-    since = currentTime - ircbot.irc.globalFfzEmotesCache
+    emotes = globals.globalFfzEmotes
+    since = currentTime - globals.globalFfzEmotesCache
     url = 'https://api.frankerfacez.com/v1/set/global'
     if since > datetime.timedelta(hours=1):
-        ircbot.irc.globalFfzEmotesCache = currentTime
+        globals.globalFfzEmotesCache = currentTime
         try:
             response = urllib.request.urlopen(url)
             if response.status == 200:
@@ -19,7 +19,7 @@ def getGlobalEmotes():
                 for s in ffzData['default_sets']:
                     for emote in ffzData['sets'][str(s)]['emoticons']:
                         emotes[emote['id']] = emote['name']
-                ircbot.irc.globalFfzEmotes = emotes
+                globals.globalFfzEmotes = emotes
         except:
             pass
     return emotes
