@@ -1,5 +1,5 @@
 ﻿import sys
-import imp
+import importlib
 
 def loadThisModule(module):
     include = module.startswith('source') or module.startswith('lists')
@@ -82,7 +82,7 @@ def botReloadCommands(send, nick, message, msgParts, permissions):
     
     modules = [m for m in sys.modules.keys() if loadThisModule(m)]
     for moduleString in sorted(modules, key=moduleKey):
-        imp.reload(sys.modules[moduleString])
+        importlib.reload(sys.modules[moduleString])
     
     send('Complete Reloading', 0)
     return True
