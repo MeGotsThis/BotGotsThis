@@ -3,10 +3,10 @@ import imp
 
 def loadThisModule(module):
     include = module.startswith('source') or module.startswith('lists')
-    exclude = module != 'source.public.common.reload'
+    exclude = module == 'source.public.common.reload'
     exclude = exclude or module.startswith('source.private.autoload')
     exclude = exclude or module.startswith('source.public.autoload')
-    return include and exclude
+    return include and not exclude
 
 def moduleKey(module):
     if module == 'source.database':
