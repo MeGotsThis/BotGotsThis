@@ -9,6 +9,21 @@ def loadThisModule(module):
     return include and not exclude
 
 def moduleKey(module):
+    if module.startswith('source.irccommand'):
+        return (90, module)
+    if module == 'source.public.channel.text':
+        return (96, module)
+    if module == 'source.public.common.feature':
+        return (96, module)
+    if module == 'source.public.common.managebot':
+        return (96, module)
+    if module == 'source.channel':
+        return (97, module)
+    if module == 'source.whisper':
+        return (98, module)
+    if module == 'source.ircmessage':
+        return (99, module)
+    
     if module == 'source.database':
         return (0, module)
     if module == 'source.database.databasebase':
@@ -56,15 +71,6 @@ def moduleKey(module):
         return (88, module)
     if module.startswith('lists'):
         return (89, module)
-    
-    if module.startswith('source.irccommand'):
-        return (96, module)
-    if module == 'source.channel':
-        return (97, module)
-    if module == 'source.whisper':
-        return (98, module)
-    if module == 'source.ircmessage':
-        return (99, module)
     
     return (50, module)
 
