@@ -133,6 +133,9 @@
     <Compile Include="source\public\custom\url.py" />
     <Compile Include="source\public\custom\user.py" />
     <Compile Include="source\public\custom\__init__.py" />
+    <Compile Include="source\public\manage\autojoin.py" />
+    <Compile Include="source\public\manage\banned.py" />
+    <Compile Include="source\public\manage\listchats.py" />
     <Compile Include="source\public\manage\__init__.py" />
     <Compile Include="source\public\tasks\emotes.py" />
     <Compile Include="source\public\tasks\twitch.py" />

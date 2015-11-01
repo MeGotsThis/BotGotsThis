@@ -1,7 +1,7 @@
-﻿from source.public.common import managebot
+﻿from source.public.manage import autojoin, banned, listchats
 
 methods = {
-    'listchats': managebot.manageListChats,
-    'autojoin': managebot.manageAutoJoin,
-    'banned': managebot.manageBanned,
+    'listchats': listchats.manageListChats,
+    'autojoin': autojoin.manageAutoJoin,
+    'banned': banned.manageBanned,
     }
