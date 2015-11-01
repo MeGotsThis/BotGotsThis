@@ -4,5 +4,9 @@ try:
 except:
     from .private.default import whisper as privateList
 
+if False: # Hints for Intellisense
+    commands = privateList.commands
+    commands = publicList.commands
+
 commands = dict(list(publicList.commands.items()) +
                 list(privateList.commands.items()))
