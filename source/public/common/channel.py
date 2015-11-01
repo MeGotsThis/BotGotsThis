@@ -43,5 +43,5 @@ def botEmptyAll(send):
     send('Cleared all queued messages')
 
 def botEmpty(channel, send):
-    globals.messaging.clearQueue(msgParts[1])
-    send('Cleared all queued messages for ' + msgParts[1])
+    globals.messaging.clearQueue(channel)
+    send('Cleared all queued messages for ' + channel)
