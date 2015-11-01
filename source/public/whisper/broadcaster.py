@@ -13,6 +13,6 @@ def commandEmpty(db, nick, message, msgParts, permissions):
     return True
 
 def commandAutoJoin(db, nick, message, msgParts, permissions):
-    broadcaster.botAutoJoin(nick, send.whisper(nick), msgParts)
+    broadcaster.botAutoJoin(db, nick, send.whisper(nick), msgParts)
     return True
 
