@@ -1,5 +1,4 @@
-﻿from ...database.factory import getDatabase
-from ...api import twitch
+﻿from ...api import twitch
 from bot import config, globals, utils
 import json
 
