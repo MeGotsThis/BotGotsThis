@@ -18,7 +18,7 @@ def parseMessage(socket, ircmsg, now):
         nick = message.prefix.nick
         where = message.params.middle
         msg = message.params.trailing
-        if where[0] == '#' and nick != 'jtv':
+        if where[0] == '#':
             utils.logIrcMessage(where + '#msg.log', nick + ': ' + msg, now)
         if config.botnick in msg.split():
             file = config.botnick + '-Mentions.log'
@@ -40,10 +40,16 @@ def parseMessage(socket, ircmsg, now):
         utils.logIrcMessage(file, '< ' + ircmsg, now)
         whisper.parse(tags, nick, msg)
         
-    if (message.command == 'NOTICE' and message.prefix is not None and
-        message.prefix.nick is not None and
-        message.params.trailing is not None):
-        notice.parse(socket, message.prefix.nick, message.params.trailing)
+    if message.command == 'NOTICE':
+        nick = None
+        chan = None
+        msg = message.params.trailing
+        if message.prefix.nick is not None:
+            nick = message.prefix.nick
+        where = message.params.middle
+        if where[0] == '#' and where[1:] in channels:
+            chan = channels[where[1:]]
+        notice.parse(chan, nick, msg)
         
     if message.command == 'MODE':
         where, mode, nick = message.params.middle.split()

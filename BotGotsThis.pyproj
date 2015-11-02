@@ -90,7 +90,6 @@
     <Compile Include="source\database\sqlite\sqlite.py" />
     <Compile Include="source\database\sqlite\__init__.py" />
     <Compile Include="source\database\__init__.py" />
-    <Compile Include="source\irccommand\jtv.py" />
     <Compile Include="source\irccommand\notice.py" />
     <Compile Include="source\irccommand\userstate.py" />
     <Compile Include="source\irccommand\__init__.py" />

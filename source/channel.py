@@ -1,5 +1,4 @@
 ﻿from .database.factory import getDatabase
-from .irccommand import jtv
 from bot import config, utils
 from bot.channel import Channel
 from lists import channel as commandList
@@ -17,10 +16,6 @@ typeMod = ['staff', 'admin', 'global_mod', 'mod']
 # Set up our commands function
 def parse(channel, tags, nick, message):
     if len(message) == 0:
-        return
-    
-    if nick == 'jtv':
-        jtv.parse(channel, message)
         return
     
     msgParts = message.split(None)
