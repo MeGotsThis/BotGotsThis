@@ -1,5 +1,5 @@
 ﻿from . import channel, whisper
-from .irccommand import notice, userstate
+from .irccommand import clearchat, notice, userstate
 from bot import config, utils
 from bot.twitchmessage.ircmessage import IrcMessage
 import bot.thread.socket
@@ -51,6 +51,16 @@ def parseMessage(socket, ircmsg, now):
             chan = channels[where[1:]]
         notice.parse(chan, nick, msg)
         
+    if message.command == 'CLEARCHAT':
+        nick = None
+        chan = None
+        if message.params.trailing is not None:
+            nick = message.params.trailing
+        where = message.params.middle
+        if where[0] == '#' and where[1:] in channels:
+            chan = channels[where[1:]]
+        clearchat.parse(chan, nick)
+    
     if message.command == 'MODE':
         where, mode, nick = message.params.middle.split()
         if where[0] == '#' and where[1:] in channels:
