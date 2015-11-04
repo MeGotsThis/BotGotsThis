@@ -20,7 +20,7 @@ def botFeature(db, channel, msgParts, send):
         msgParts.append('')
     
     msgParts[1] = msgParts[1].lower()
-    if msgParts[1] not in features:
+    if msgParts[1] not in features or features[msgParts[1]] is None:
         send('Unrecognized feature: ' + msgParts[1])
         return True
     
