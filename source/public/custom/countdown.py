@@ -56,8 +56,8 @@ daysOfWeek = {
     'sat': SATURDAY,
     }
 
-def fieldCountdown(field, param, default, message, msgParts, channel, nick,
-                   query):
+def fieldCountdown(field, param, prefix, suffix, default,
+                   message, msgParts, channel, nick, query):
     if field.lower() == 'countdown':
         cooldown = None
         dateInstances = []
@@ -85,11 +85,11 @@ def fieldCountdown(field, param, default, message, msgParts, channel, nick,
                 past = max(dt[0] for dt in pastDateTimes)
                 if _testCooldown(cooldown, past, next, now) < 0:
                     return default if default else 'has passed'
-            return timedeltaFormat(next - now)
+            return prefix + timedeltaFormat(next - now) + suffix
     return None
 
-def fieldSince(field, param, default, message, msgParts, channel, nick,
-               query):
+def fieldSince(field, param, prefix, suffix, default,
+               message, msgParts, channel, nick, query):
     if field.lower() == 'since':
         cooldown = 0
         dateInstances = []
@@ -117,11 +117,11 @@ def fieldSince(field, param, default, message, msgParts, channel, nick,
                 next = min(dt[0] for dt in nextDateTimes)
                 if _testCooldown(cooldown, past, next, now) < 0:
                     return default if default else 'has passed'
-            return timedeltaFormat(now - past)
+            return prefix + timedeltaFormat(now - past) + suffix
     return None
 
-def fieldNext(field, param, default, message, msgParts, channel, nick,
-              query):
+def fieldNext(field, param, prefix, suffix, default,
+              message, msgParts, channel, nick, query):
     if field.lower() in ['next', 'future']:
         dateInstances = []
         params = param.split(',')
@@ -142,11 +142,11 @@ def fieldNext(field, param, default, message, msgParts, channel, nick,
         else:
             nextDateTime = min(nextDateTimes, key=lambda dt: dt[0])
             format = _24HourFormat if nextDateTime[1] else _12HourFormat
-            return nextDateTime[0].strftime(format)
+            return prefix + nextDateTime[0].strftime(format) + suffix
     return None
 
-def fieldPrevious(field, param, default, message, msgParts, channel, nick,
-                  query):
+def fieldPrevious(field, param, prefix, suffix, default,
+                  message, msgParts, channel, nick, query):
     if field.lower() in ['prev', 'previous', 'past']:
         dateInstances = []
         params = param.split(',')
@@ -167,7 +167,7 @@ def fieldPrevious(field, param, default, message, msgParts, channel, nick,
         else:
             pastDateTime = max(pastDateTimes, key=lambda dt: dt[0])
             format = _24HourFormat if pastDateTime[1] else _12HourFormat
-            return pastDateTime[0].strftime(format)
+            return prefix + pastDateTime[0].strftime(format) + suffix
     return None
 
 def _parseDateString(string):

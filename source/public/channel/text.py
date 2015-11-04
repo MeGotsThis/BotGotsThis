@@ -47,11 +47,13 @@ def customCommands(db, channel, nick, originalMsg, msgParts, permissions):
         final = []
         try:
             for part in _parseFormatMessage(str(message)):
-                plain, field, format, param, default, original = part
+                plain, field, format, prefix, suffix, *_ = part
+                param, default, original = _
                 final.append(plain)
                 if field is not None:
-                    params = str(field), str(param), str(default), originalMsg,
-                    params += msgParts, channel.channel, nick, query,
+                    params = str(field), str(param), str(prefix), str(suffix),
+                    params += str(default), originalMsg, msgParts,
+                    params += channel.channel, nick, query,
                     string = _getString(*params)
                     if string is not None:
                         string = _formatString(str(string), str(format),
@@ -59,7 +61,7 @@ def customCommands(db, channel, nick, originalMsg, msgParts, permissions):
                     else:
                         string = str(original)
                     final.append(str(string))
-        except:
+        except Exception as e:
             final.append(str(message))
         channel.sendMessage(''.join(final))
 
@@ -182,6 +184,7 @@ def parseCommandMessageInput(message):
         return None
 
 def _parseFormatMessage(message):
+    # Format: {field:format<prefix>suffix@param!default}
     parsed = []
     i = 0
     length = len(message)
@@ -208,7 +211,7 @@ def _parseFormatMessage(message):
         
         if i == length:
             if noFormat:
-                p = ''.join(noFormat), None, None, None, None, None
+                p = (''.join(noFormat),) + (None,) * 7
                 parsed.append(p)
             break
         
@@ -227,6 +230,16 @@ def _parseFormatMessage(message):
             
             if char == ':':
                 if i < length and message[i] == ':':
+                    i += 1
+                else:
+                    break
+            if char == '<':
+                if i < length and message[i] == '<':
+                    i += 1
+                else:
+                    break
+            if char == '>':
+                if i < length and message[i] == '>':
                     i += 1
                 else:
                     break
@@ -267,6 +280,16 @@ def _parseFormatMessage(message):
                         i += 1
                     else:
                         break
+                if char == '<':
+                    if i < length and message[i] == '<':
+                        i += 1
+                    else:
+                        break
+                if char == '>':
+                    if i < length and message[i] == '>':
+                        i += 1
+                    else:
+                        break
                 if char == '!':
                     if i < length and message[i] == '!':
                         i += 1
@@ -284,6 +307,75 @@ def _parseFormatMessage(message):
                         i -= 1
                         break
                 format.append(char)
+
+        prefix = []
+        if char == '<':
+            while True:
+                if i == length:
+                    raise ValueError()
+                
+                char = message[i]
+                i += 1
+                
+                if char == '>':
+                    if i < length and message[i] == '>':
+                        i += 1
+                    else:
+                        break
+                if char == '@':
+                    if i < length and message[i] == '@':
+                        i += 1
+                    else:
+                        break
+                if char == '!':
+                    if i < length and message[i] == '!':
+                        i += 1
+                    else:
+                        break
+                if char == '{':
+                    if i < length and message[i] == '{':
+                        i += 1
+                    else:
+                        raise ValueError()
+                if char == '}':
+                    if i < length and message[i] == '}':
+                        i += 1
+                    else:
+                        i -= 1
+                        break
+                prefix.append(char)
+
+        suffix = []
+        if char == '>':
+            while True:
+                if i == length:
+                    raise ValueError()
+                
+                char = message[i]
+                i += 1
+                
+                if char == '@':
+                    if i < length and message[i] == '@':
+                        i += 1
+                    else:
+                        break
+                if char == '!':
+                    if i < length and message[i] == '!':
+                        i += 1
+                    else:
+                        break
+                if char == '{':
+                    if i < length and message[i] == '{':
+                        i += 1
+                    else:
+                        raise ValueError()
+                if char == '}':
+                    if i < length and message[i] == '}':
+                        i += 1
+                    else:
+                        i -= 1
+                        break
+                suffix.append(char)
 
         param = []
         if char == '@':
@@ -342,16 +434,19 @@ def _parseFormatMessage(message):
         parsed.append((''.join(noFormat),
                        ''.join(field),
                        ''.join(format),
+                       ''.join(prefix),
+                       ''.join(suffix),
                        ''.join(param),
                        ''.join(default),
                        original))
         
     return parsed
 
-def _getString(field, param, default, message, msgParts, channel, nick, query):
+def _getString(field, param, prefix, suffix, default,
+               message, msgParts, channel, nick, query):
     for fieldConvert in custom.fields:
-        result = fieldConvert(field, param, default, message, msgParts,
-                              channel, nick, query)
+        result = fieldConvert(field, param, prefix, suffix, default,
+                              message, msgParts, channel, nick, query)
         if result is not None:
             return result
 

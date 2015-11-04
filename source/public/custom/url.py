@@ -1,7 +1,8 @@
 ﻿from bot import config
 import urllib.request
 
-def fieldUrl(field, param, default, message, msgParts, channel, nick, query):
+def fieldUrl(field, param, prefix, suffix, default,
+             message, msgParts, channel, nick, query):
     if field.lower() == 'url':
         url = param.replace('{query}', query)
         url = url.replace('{user}', nick)
@@ -16,7 +17,7 @@ def fieldUrl(field, param, default, message, msgParts, channel, nick, query):
                 data = data.replace('\r\n', ' ')
                 data = data.replace('\n', ' ')
                 data = data.replace('\r', ' ')
-                return data
+                return prefix + data + suffix
         except:
             pass
         return default
