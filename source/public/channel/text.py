@@ -50,18 +50,21 @@ def customCommands(db, channel, nick, originalMsg, msgParts, permissions):
                 plain, field, format, prefix, suffix, *_ = part
                 param, default, original = _
                 final.append(plain)
-                if field is not None:
-                    params = str(field), str(param), str(prefix), str(suffix),
-                    params += str(default), originalMsg, msgParts,
-                    params += channel.channel, nick, query,
-                    string = _getString(*params)
-                    if string is not None:
-                        string = _formatString(str(string), str(format),
-                                               hasTextConvert)
-                    else:
-                        string = str(original)
-                    final.append(str(string))
-        except Exception as e:
+                try:
+                    if field is not None:
+                        params = str(field), str(param), str(prefix), str(suffix),
+                        params += str(default), originalMsg, msgParts,
+                        params += channel.channel, nick, query,
+                        string = _getString(*params)
+                        if string is not None:
+                            string = _formatString(str(string), str(format),
+                                                    hasTextConvert)
+                        else:
+                            string = str(original)
+                        final.append(str(string))
+                except:
+                    final.append(str(original))
+        except:
             final.append(str(message))
         channel.sendMessage(''.join(final))
 
