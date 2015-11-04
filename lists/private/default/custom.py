@@ -1,1 +1,3 @@
-﻿fields = []
+﻿disablePublic = False
+
+fields = []

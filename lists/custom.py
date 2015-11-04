@@ -4,4 +4,9 @@ try:
 except:
     from .private.default import custom as privateCustom
 
-fields = publicCustom.fields + privateCustom.fields + publicCustom.fieldsEnd
+fields = []
+if not privateCustom.disablePublic:
+    fields = privateCustom.fields
+else:
+    fields = publicCustom.fields + privateCustom.fields
+    fields += publicCustom.fieldsEnd
