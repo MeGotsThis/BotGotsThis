@@ -54,6 +54,7 @@
     <Compile Include="lists\private\channel.dist.disableAll.py" />
     <Compile Include="lists\private\channel.dist.py" />
     <Compile Include="lists\private\channel.py" />
+    <Compile Include="lists\private\custom.dist.disableAll.py" />
     <Compile Include="lists\private\custom.dist.py" />
     <Compile Include="lists\private\custom.py" />
     <Compile Include="lists\private\default\chat.py" />
@@ -61,10 +62,13 @@
     <Compile Include="lists\private\default\manage.py" />
     <Compile Include="lists\private\default\whisper.py" />
     <Compile Include="lists\private\default\__init__.py" />
+    <Compile Include="lists\private\feature.dist.disableAll.py" />
     <Compile Include="lists\private\feature.dist.py" />
     <Compile Include="lists\private\feature.py" />
+    <Compile Include="lists\private\manage.dist.disableAll.py" />
     <Compile Include="lists\private\manage.dist.py" />
     <Compile Include="lists\private\manage.py" />
+    <Compile Include="lists\private\whisper.dist.disableAll.py" />
     <Compile Include="lists\private\whisper.dist.py" />
     <Compile Include="lists\private\whisper.py" />
     <Compile Include="lists\private\__init__.py" />

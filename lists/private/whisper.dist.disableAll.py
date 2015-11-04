@@ -1,0 +1,18 @@
+﻿commands = {
+    '!hello': (None, None),
+    '!exit': (None, None),
+    '!say': (None, None),
+    '!join': (None, None),
+    '!part': (None, None),
+    '!emptychat': (None, None),
+    '!emptyall': (None, None),
+    '!managebot': (None, None),
+    '!reload': (None, None),
+    '!reloadcommands': (None, None),
+    '!reloadconfig': (None, None),
+    '!leave': (None, None),
+    '!empty': (None, None),
+    '!come': (None, None),
+    '!autojoin': (None, None),
+    '!feature': (None, None),
+    }
