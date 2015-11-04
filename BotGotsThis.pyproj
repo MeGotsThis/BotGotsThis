@@ -127,6 +127,7 @@
     <Compile Include="source\public\common\reload.py" />
     <Compile Include="source\public\common\send.py" />
     <Compile Include="source\public\common\__init__.py" />
+    <Compile Include="source\public\custom\broadcaster.py" />
     <Compile Include="source\public\custom\countdown.py" />
     <Compile Include="source\public\custom\params.py" />
     <Compile Include="source\public\custom\query.py" />

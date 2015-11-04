@@ -1,6 +1,8 @@
-﻿from source.public.custom import countdown, params, query, url, user
+﻿from source.public.custom import broadcaster, countdown, params, query, url
+from source.public.custom import user
 
-fields = [user.fieldUser,
+fields = [broadcaster.fieldBroadcaster,
+          user.fieldUser,
           query.fieldQuery,
           url.fieldUrl,
           countdown.fieldCountdown,
