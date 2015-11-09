@@ -23,9 +23,10 @@
   <ItemGroup>
     <Content Include="config.dist.ini" />
     <Content Include="config.ini" />
-    <Content Include="database\sqlite\database.sql" />
-    <Content Include="database\sqlite\gamesabbreviation.sql" />
-    <Content Include="database\sqlite\oauth.sql" />
+    <Content Include="source\database\sqlite\database.sql" />
+    <Content Include="source\database\sqlite\gamesabbreviation.sql" />
+    <Content Include="source\database\sqlite\oauth.sql" />
+    <Content Include="source\database\sqlite\timezonedb.sql" />
     <Content Include="twitchApi.dist.ini" />
     <Content Include="twitchApi.ini" />
   </ItemGroup>
@@ -153,6 +154,7 @@
     <Compile Include="source\public\__init__.py" />
     <Compile Include="source\whisper.py" />
     <Compile Include="source\__init__.py" />
+    <Compile Include="timezonedb.py" />
     <Compile Include="twitchOauth.py" />
   </ItemGroup>
   <ItemGroup>
