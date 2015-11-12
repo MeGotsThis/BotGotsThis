@@ -1,278 +1,137 @@
-﻿import datetime
+﻿import configparser
+import datetime
+import sqlite3
 
 ZERO = datetime.timedelta(0)
 
-class TimeZone(datetime.tzinfo):
+class BasicTimeZone(datetime.tzinfo):
     """Fixed offset in minutes east from UTC."""
+    __slots__ = ('__offset', '__name')
     
     def __init__(self, offset, name):
         self.__offset = datetime.timedelta(minutes=offset)
         self.__name = name
     
-    def utcoffset(self, dt):
-        return self.__offset
+    def zone(self):
+        return self.__name
     
     def tzname(self, dt):
         return self.__name
     
+    def utcoffset(self, dt):
+        return self.__offset
+    
     def dst(self, dt):
         return ZERO
 
-utc = TimeZone(0,'UTC')
+class TimeZone(datetime.tzinfo):
+    """Fixed offset in minutes east from UTC."""
+    __slots__ = ('__zone', '_transitions')
+    
+    def __init__(self, zone, transitions):
+        self.__zone = zone
+        _transitions = []
+        epoch = datetime.datetime.utcfromtimestamp(0)
+        self._transitions = transitions
+    
+    def zone(self):
+        return self.__zone
+    
+    def tzname(self, dt):
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
+        transistion = self._transitions[0]
+        for t in self._transitions[::-1]:
+            if unixTime >= t[0]:
+                transistion = t
+                break
+        return transistion[1]
+    
+    def utcoffset(self, dt):
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
+        transistion = self._transitions[0]
+        for t in self._transitions[::-1]:
+            if unixTime >= t[0]:
+                transistion = t
+                break
+        return datetime.timedelta(seconds=transistion[2])
+     
+    def dst(self, dt):
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
+        transistion = self._transitions[0]
+        for t in self._transitions[::-1]:
+            if unixTime >= t[0]:
+                transistion = t
+                break
+        delta = transistion[2] - self._transitions[0][2]
+        return datetime.timedelta(seconds=delta)
+
+utc = BasicTimeZone(0,'UTC')
+unixEpoch = datetime.datetime(1970, 1, 1, 0, 0, 0, 0)
 
 timezones = [
-    TimeZone(60,'A'),
-    TimeZone(630,'ACDT'),
-    TimeZone(570,'ACST'),
-    TimeZone(-180,'ADT'),
-    TimeZone(660,'AEDT'),
-    TimeZone(270,'AFT'),
-    TimeZone(-480,'AKDT'),
-    TimeZone(-540,'AKST'),
-    TimeZone(360,'ALMT'),
-    TimeZone(300,'AMST'),
-    TimeZone(-180,'AMST'),
-    TimeZone(240,'AMT'),
-    TimeZone(-240,'AMT'),
-    TimeZone(720,'ANAST'),
-    TimeZone(720,'ANAT'),
-    TimeZone(300,'AQTT'),
-    TimeZone(-180,'ART'),
-    TimeZone(180,'AST'),
-    TimeZone(-240,'AST'),
-    TimeZone(540,'AWDT'),
-    TimeZone(480,'AWST'),
-    TimeZone(0,'AZOST'),
-    TimeZone(-60,'AZOT'),
-    TimeZone(300,'AZST'),
-    TimeZone(240,'AZT'),
-    TimeZone(120,'B'),
-    TimeZone(480,'BNT'),
-    TimeZone(-240,'BOT'),
-    TimeZone(-120,'BRST'),
-    TimeZone(-180,'BRT'),
-    #TimeZone(360,'BST'), # Bangladesh Standard Time
-    TimeZone(60,'BST'), # British Summer Time
-    TimeZone(360,'BTT'),
-    TimeZone(180,'C'),
-    TimeZone(480,'CAST'),
-    TimeZone(120,'CAT'),
-    TimeZone(390,'CCT'),
-    #TimeZone(-240,'CDT'), # Cocos Islands Time
-    TimeZone(-300,'CDT'), # Cuba Daylight Time
-    TimeZone(120,'CEST'),
-    TimeZone(60,'CET'),
-    TimeZone(825,'CHADT'),
-    TimeZone(765,'CHAST'),
-    TimeZone(-600,'CKT'),
-    TimeZone(-180,'CLST'),
-    TimeZone(-240,'CLT'),
-    TimeZone(-300,'COT'),
-    #TimeZone(480,'CST'), # China Standard Time
-    TimeZone(-360,'CST'), # Central Standard Time
-    TimeZone(-60,'CVT'),
-    TimeZone(420,'CXT'),
-    TimeZone(600,'ChST'),
-    TimeZone(240,'D'),
-    TimeZone(420,'DAVT'),
-    TimeZone(300,'E'),
-    TimeZone(-300,'EASST'),
-    TimeZone(-360,'EAST'),
-    TimeZone(180,'EAT'),
-    TimeZone(-300,'ECT'),
-    TimeZone(-240,'EDT'),
-    TimeZone(180,'EEST'),
-    TimeZone(120,'EET'),
-    TimeZone(0,'EGST'),
-    TimeZone(-60,'EGT'),
-    TimeZone(-300,'EST'),
-    TimeZone(-300,'ET'),
-    TimeZone(360,'F'),
-    TimeZone(780,'FJST'),
-    TimeZone(720,'FJT'),
-    TimeZone(-180,'FKST'),
-    TimeZone(-240,'FKT'),
-    TimeZone(-120,'FNT'),
-    TimeZone(420,'G'),
-    TimeZone(-360,'GALT'),
-    TimeZone(-540,'GAMT'),
-    TimeZone(240,'GET'),
-    TimeZone(-180,'GFT'),
-    TimeZone(720,'GILT'),
-    TimeZone(0,'GMT'),
-    TimeZone(240,'GST'),
-    TimeZone(-240,'GYT'),
-    TimeZone(480,'H'),
-    TimeZone(-180,'HAA'),
-    TimeZone(-300,'HAC'),
-    TimeZone(-540,'HADT'),
-    TimeZone(-240,'HAE'),
-    TimeZone(-420,'HAP'),
-    TimeZone(-360,'HAR'),
-    TimeZone(-600,'HAST'),
-    TimeZone(-90,'HAT'),
-    TimeZone(-480,'HAY'),
-    TimeZone(480,'HKT'),
-    TimeZone(-210,'HLV'),
-    TimeZone(-240,'HNA'),
-    TimeZone(-360,'HNC'),
-    TimeZone(-300,'HNE'),
-    TimeZone(-480,'HNP'),
-    TimeZone(-420,'HNR'),
-    TimeZone(-150,'HNT'),
-    TimeZone(-540,'HNY'),
-    TimeZone(420,'HOVT'),
-    TimeZone(540,'I'),
-    TimeZone(420,'ICT'),
-    TimeZone(180,'IDT'),
-    TimeZone(360,'IOT'),
-    TimeZone(270,'IRDT'),
-    TimeZone(540,'IRKST'),
-    TimeZone(540,'IRKT'),
-    TimeZone(210,'IRST'),
-    #TimeZone(120,'IST'), # Israel Standard Time
-    #TimeZone(330,'IST'), # India Standard Time
-    TimeZone(60,'IST'), # Irish Standard Time
-    TimeZone(540,'JST'),
-    TimeZone(600,'K'),
-    TimeZone(360,'KGT'),
-    TimeZone(480,'KRAST'),
-    TimeZone(480,'KRAT'),
-    TimeZone(540,'KST'),
-    TimeZone(240,'KUYT'),
-    TimeZone(660,'L'),
-    TimeZone(660,'LHDT'),
-    TimeZone(630,'LHST'),
-    TimeZone(840,'LINT'),
-    TimeZone(720,'M'),
-    TimeZone(720,'MAGST'),
-    TimeZone(720,'MAGT'),
-    TimeZone(-510,'MART'),
-    TimeZone(300,'MAWT'),
-    TimeZone(-360,'MDT'),
-    TimeZone(120,'MESZ'),
-    TimeZone(60,'MEZ'),
-    TimeZone(720,'MHT'),
-    TimeZone(390,'MMT'),
-    TimeZone(240,'MSD'),
-    TimeZone(240,'MSK'),
-    TimeZone(-420,'MST'),
-    TimeZone(240,'MUT'),
-    TimeZone(300,'MVT'),
-    TimeZone(480,'MYT'),
-    TimeZone(-60,'N'),
-    TimeZone(660,'NCT'),
-    TimeZone(-90,'NDT'),
-    TimeZone(690,'NFT'),
-    TimeZone(420,'NOVST'),
-    TimeZone(360,'NOVT'),
-    TimeZone(345,'NPT'),
-    TimeZone(-150,'NST'),
-    TimeZone(-660,'NUT'),
-    TimeZone(780,'NZDT'),
-    TimeZone(720,'NZST'),
-    TimeZone(-120,'O'),
-    TimeZone(420,'OMSST'),
-    TimeZone(420,'OMST'),
-    TimeZone(-180,'P'),
-    TimeZone(-420,'PDT'),
-    TimeZone(-300,'PET'),
-    TimeZone(720,'PETST'),
-    TimeZone(720,'PETT'),
-    TimeZone(600,'PGT'),
-    TimeZone(780,'PHOT'),
-    TimeZone(480,'PHT'),
-    TimeZone(300,'PKT'),
-    TimeZone(-120,'PMDT'),
-    TimeZone(-180,'PMST'),
-    TimeZone(660,'PONT'),
-    TimeZone(-480,'PST'),
-    TimeZone(-480,'PT'),
-    TimeZone(540,'PWT'),
-    TimeZone(-180,'PYST'),
-    TimeZone(-240,'PYT'),
-    TimeZone(-240,'Q'),
-    TimeZone(-300,'R'),
-    TimeZone(240,'RET'),
-    TimeZone(-360,'S'),
-    TimeZone(240,'SAMT'),
-    TimeZone(120,'SAST'),
-    TimeZone(660,'SBT'),
-    TimeZone(240,'SCT'),
-    TimeZone(480,'SGT'),
-    TimeZone(-180,'SRT'),
-    TimeZone(-660,'SST'),
-    TimeZone(-420,'T'),
-    TimeZone(-600,'TAHT'),
-    TimeZone(300,'TFT'),
-    TimeZone(300,'TJT'),
-    TimeZone(780,'TKT'),
-    TimeZone(540,'TLT'),
-    TimeZone(300,'TMT'),
-    TimeZone(720,'TVT'),
-    TimeZone(-480,'U'),
-    TimeZone(480,'ULAT'),
-    TimeZone(-120,'UYST'),
-    TimeZone(-180,'UYT'),
-    TimeZone(300,'UZT'),
-    TimeZone(-540,'V'),
-    TimeZone(-210,'VET'),
-    TimeZone(660,'VLAST'),
-    TimeZone(660,'VLAT'),
-    TimeZone(660,'VUT'),
-    TimeZone(-600,'W'),
-    TimeZone(120,'WAST'),
-    TimeZone(60,'WAT'),
-    TimeZone(60,'WEST'),
-    TimeZone(60,'WEST'),
-    TimeZone(60,'WESZ'),
-    TimeZone(0,'WET'),
-    TimeZone(0,'WEZ'),
-    TimeZone(720,'WFT'),
-    TimeZone(-120,'WGST'),
-    TimeZone(-180,'WGT'),
-    TimeZone(420,'WIB'),
-    TimeZone(540,'WIT'),
-    TimeZone(480,'WITA'),
-    #TimeZone(60,'WST'), # Western Sahara Summer Time
-    TimeZone(780,'WST'), # West Samoa Time
-    TimeZone(0,'WT'),
-    TimeZone(-660,'X'),
-    TimeZone(-720,'Y'),
-    TimeZone(600,'YAKST'),
-    TimeZone(600,'YAKT'),
-    TimeZone(600,'YAPT'),
-    TimeZone(360,'YEKST'),
-    TimeZone(360,'YEKT'),
-    TimeZone(0,'Z'),
-
     utc,
-    TimeZone(0,'UTC+0:00'),
-    TimeZone(60,'UTC+1:00'),
-    TimeZone(120,'UTC+2:00'),
-    TimeZone(180,'UTC+3:00'),
-    TimeZone(240,'UTC+4:00'),
-    TimeZone(300,'UTC+5:00'),
-    TimeZone(360,'UTC+6:00'),
-    TimeZone(420,'UTC+7:00'),
-    TimeZone(480,'UTC+8:00'),
-    TimeZone(540,'UTC+9:00'),
-    TimeZone(600,'UTC+10:00'),
-    TimeZone(660,'UTC+11:00'),
-    TimeZone(720,'UTC+12:00'),
-    TimeZone(-0,'UTC-0:00'),
-    TimeZone(-60,'UTC-1:00'),
-    TimeZone(-120,'UTC-2:00'),
-    TimeZone(-180,'UTC-3:00'),
-    TimeZone(-240,'UTC-4:00'),
-    TimeZone(-300,'UTC-5:00'),
-    TimeZone(-360,'UTC-6:00'),
-    TimeZone(-420,'UTC-7:00'),
-    TimeZone(-480,'UTC-8:00'),
-    TimeZone(-540,'UTC-9:00'),
-    TimeZone(-600,'UTC-10:00'),
-    TimeZone(-660,'UTC-11:00'),
-    TimeZone(-720,'UTC-12:00'),
+    BasicTimeZone(0,'UTC+0:00'),
+    BasicTimeZone(60,'UTC+1:00'),
+    BasicTimeZone(120,'UTC+2:00'),
+    BasicTimeZone(180,'UTC+3:00'),
+    BasicTimeZone(240,'UTC+4:00'),
+    BasicTimeZone(300,'UTC+5:00'),
+    BasicTimeZone(360,'UTC+6:00'),
+    BasicTimeZone(420,'UTC+7:00'),
+    BasicTimeZone(480,'UTC+8:00'),
+    BasicTimeZone(540,'UTC+9:00'),
+    BasicTimeZone(600,'UTC+10:00'),
+    BasicTimeZone(660,'UTC+11:00'),
+    BasicTimeZone(720,'UTC+12:00'),
+    BasicTimeZone(-0,'UTC-0:00'),
+    BasicTimeZone(-60,'UTC-1:00'),
+    BasicTimeZone(-120,'UTC-2:00'),
+    BasicTimeZone(-180,'UTC-3:00'),
+    BasicTimeZone(-240,'UTC-4:00'),
+    BasicTimeZone(-300,'UTC-5:00'),
+    BasicTimeZone(-360,'UTC-6:00'),
+    BasicTimeZone(-420,'UTC-7:00'),
+    BasicTimeZone(-480,'UTC-8:00'),
+    BasicTimeZone(-540,'UTC-9:00'),
+    BasicTimeZone(-600,'UTC-10:00'),
+    BasicTimeZone(-660,'UTC-11:00'),
+    BasicTimeZone(-720,'UTC-12:00'),
     ]
 
-abbreviations = { tz.tzname(None).lower(): tz for tz in timezones }
+_ini = configparser.ConfigParser()
+_ini.read('config.ini')
+_connection = sqlite3.connect(_ini['DATABASE']['timezonedb'],
+                              detect_types=True)
+_cursor = _connection.cursor()
+_cursor.execute('SELECT abbreviation, gmt_offset FROM timezone '
+                'WHERE time_start >= 2114380800 AND '
+                "abbreviation NOT IN ('CST', 'CDT', 'AMT', 'AST', 'GST', "
+                "'IST', 'KST', 'BST', 'UTC') GROUP BY abbreviation "
+                'UNION ALL '
+                'SELECT abbreviation, gmt_offset FROM timezone '
+                'WHERE time_start=2147483647 AND '
+                'zone_id IN (382, 75, 294, 281, 190, 211, 159)')
+# For the abbreviation conflicts of CST, CDT, AMT, AST, GST, IST, KST, BST
+# I have choosen: America/Chicago, America/Boa_Vista, America/Puerto_Rico,
+# Asia/Muscat, Asia/Jerusalem, Asia/Seoul, Europe/London
+for _row in _cursor:
+    timezones.append(BasicTimeZone(_row[1] // 60, _row[0]))
+_zones = {}
+_transitions = {}
+_cursor.execute('SELECT zone_id, zone_name FROM zone ORDER BY zone_id')
+for _row in _cursor:
+    _zones[_row[0]] = _row[1]
+    _transitions[_row[0]] = []
+_cursor.execute('SELECT zone_id, abbreviation, time_start, gmt_offset '
+                "FROM timezone WHERE abbreviation != 'UTC' "
+                'ORDER BY zone_id, time_start')
+for _row in _cursor:
+    _transitions[_row[0]].append((_row[2], _row[1], _row[3]))
+for _z in _zones:
+    timezones.append(TimeZone(_zones[_z], _transitions[_z]))
+_cursor.close()
+_connection.close()
+
+abbreviations = { tz.zone().lower(): tz for tz in timezones }
+
+del _ini, _connection, _cursor, _row, _z, _zones, _transitions

@@ -62,9 +62,9 @@ def customCommands(db, channel, nick, originalMsg, msgParts, permissions):
                         else:
                             string = str(original)
                         final.append(str(string))
-                except:
+                except Exception as e:
                     final.append(str(original))
-        except:
+        except Exception as e:
             final.append(str(message))
         channel.sendMessage(''.join(final))
 
