@@ -5,7 +5,7 @@ except:
     from .private.default import custom as privateCustom
 
 fields = []
-if not privateCustom.disablePublic:
+if privateCustom.disablePublic:
     fields = privateCustom.fields
 else:
     fields = publicCustom.fields + privateCustom.fields
