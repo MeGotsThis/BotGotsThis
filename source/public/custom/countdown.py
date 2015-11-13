@@ -109,14 +109,14 @@ def fieldSince(field, param, prefix, suffix, default,
         nextDateTimes = [dt for dt in nextDateTimes if dt is not None]
         pastDateTimes = [dt for dt in pastDateTimes if dt is not None]
         if len(pastDateTimes) == 0:
-            return default if default else 'has passed'
+            return default if default else 'is coming'
         else:
             past = max(dt[0] for dt in pastDateTimes)
             now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
             if len(nextDateTimes) > 0 and cooldown:
                 next = min(dt[0] for dt in nextDateTimes)
-                if _testCooldown(cooldown, past, next, now) < 0:
-                    return default if default else 'has passed'
+                if _testCooldown(cooldown, past, next, now) >= 0:
+                    return default if default else 'is coming'
             return prefix + timedeltaFormat(now - past) + suffix
     return None
 
