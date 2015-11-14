@@ -20,7 +20,7 @@ try:
 except:
     row = None
 if row is None or tzdate > row[0]:
-    with open('source/database/timezonedb.sql', 'r') as file:
+    with open('source/database/sqlite/timezonedb.sql', 'r') as file:
         cursor.executescript(file.read())
             
     url = 'https://timezonedb.com/files/timezonedb.csv.zip'
