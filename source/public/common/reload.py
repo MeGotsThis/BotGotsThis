@@ -96,7 +96,7 @@ def botReloadCommands(send, nick, message, msgParts, permissions):
 def botReloadConfig(send, nick, message, msgParts, permissions):
     send('Reloading Config', 0)
     
-    imp.reload(sys.modules['bot.config'])
+    importlib.reload(sys.modules['bot.config'])
     
     send('Complete Reloading', 0)
     return True
