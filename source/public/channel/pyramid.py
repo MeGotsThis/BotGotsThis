@@ -83,7 +83,7 @@ def commandPyramidLong(db, channel, nick, message, msgParts, permissions):
         return False
     rep = msgParts[1] + ' '
     try:
-        count = int(msgParts[0].split('-')[1])
+        count = int(msgParts[0].split('pyramid-')[1])
     except:
         if permissions['broadcaster']:
             count = 5
