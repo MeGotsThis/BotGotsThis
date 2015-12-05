@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{c1dd62a8-4a7c-41b8-8a7a-936c573e0c91}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>run.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -59,6 +59,7 @@
     <Compile Include="lists\private\custom.dist.py" />
     <Compile Include="lists\private\custom.py" />
     <Compile Include="lists\private\default\chat.py" />
+    <Compile Include="lists\private\default\custom.py" />
     <Compile Include="lists\private\default\feature.py" />
     <Compile Include="lists\private\default\manage.py" />
     <Compile Include="lists\private\default\whisper.py" />
@@ -104,6 +105,8 @@
     <Compile Include="source\private\channel\__init__.py" />
     <Compile Include="source\private\common\__init__.py" />
     <Compile Include="source\private\custom\__init__.py" />
+    <Compile Include="source\private\ircmessage.dist.py" />
+    <Compile Include="source\private\ircmessage.py" />
     <Compile Include="source\private\manage\__init__.py" />
     <Compile Include="source\private\tasks\__init__.py" />
     <Compile Include="source\private\whisper\__init__.py" />
@@ -139,6 +142,8 @@
     <Compile Include="source\public\custom\url.py" />
     <Compile Include="source\public\custom\user.py" />
     <Compile Include="source\public\custom\__init__.py" />
+    <Compile Include="source\public\default\ircmessage.py" />
+    <Compile Include="source\public\default\__init__.py" />
     <Compile Include="source\public\manage\autojoin.py" />
     <Compile Include="source\public\manage\banned.py" />
     <Compile Include="source\public\manage\listchats.py" />
@@ -181,9 +186,10 @@
     <Folder Include="source\private\whisper\" />
     <Folder Include="source\public\" />
     <Folder Include="source\public\autoload\" />
+    <Folder Include="source\public\channel\" />
     <Folder Include="source\public\common\" />
     <Folder Include="source\public\custom\" />
-    <Folder Include="source\public\channel\" />
+    <Folder Include="source\public\default\" />
     <Folder Include="source\public\manage\" />
     <Folder Include="source\public\tasks\" />
     <Folder Include="source\public\whisper\" />

@@ -1,5 +1,9 @@
 ﻿from . import channel, whisper
 from .irccommand import clearchat, notice, userstate
+try:
+    from .private import ircmessage
+except:
+    from .public.default import ircmessage
 from bot import config, utils
 from bot.twitchmessage.ircmessage import IrcMessage
 import bot.thread.socket
@@ -134,3 +138,5 @@ def parseMessage(socket, ircmsg, now):
         where = message.params.middle.split(None, 1)[0]
         if where[0] == '#':
             utils.logIrcMessage(where + '#full.log', '< ' + ircmsg, now)
+
+    ircmessage.parseMessage(socket, ircmsg, now)
