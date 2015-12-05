@@ -38,8 +38,12 @@ def checkIfUrlMaybeBad(channel, nick, message):
     except Exception:
         return
     
+    # Record all urls with users of no follows
+    utils.logIrcMessage(where + '#blockurl.log', message, now)
+
     matches = re.findall(twitchUrlRegex, message)
-    for url in matches:
+    for originalUrl in matches:
+        url = originalUrl
         if not url.startswith('http://') and not url.startswith('https://'):
             url = 'http://' + url
         try:
@@ -49,14 +53,20 @@ def checkIfUrlMaybeBad(channel, nick, message):
                     })
             urlRequest = urllib.request.urlopen(request)
             parsedOriginal = urllib.parse.urlparse(url)
-            parsedReponse = urllib.parse.urlparse(urlRequest.geturl())
+            responseUrl = urlRequest.geturl()
+            parsedReponse = urllib.parse.urlparse()
             if parsedOriginal.netloc != parsedReponse.netloc:
+                log = nick + ': ' + originalUrl + ' -> ' + responseUrl
+                utils.logIrcMessage(where + '#blockurl-match.log', log, now)
                 channel.sendMessage('.ban ' + nick)
                 return
         except urllib.error.HTTPError as e:
             parsedOriginal = urllib.parse.urlparse(url)
-            parsedReponse = urllib.parse.urlparse(e.geturl())
+            responseUrl = e.geturl()
+            parsedReponse = urllib.parse.urlparse(responseUrl)
             if parsedOriginal.netloc != parsedReponse.netloc:
+                log = nick + ': ' + originalUrl + ' -> ' + responseUrl
+                utils.logIrcMessage(where + '#blockurl-match.log', log, now)
                 channel.sendMessage('.ban ' + nick)
                 return
         except urllib.error.URLError as e:
