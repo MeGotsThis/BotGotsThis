@@ -49,6 +49,8 @@ def parseMessage(socket, ircmsg, now):
         where = message.params.middle
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
+        if where[0] == '#':
+            utils.logIrcMessage(where + '#notice.log', msg, now)
         notice.parse(chan, nick, msg)
         
     if message.command == 'CLEARCHAT':
@@ -59,7 +61,21 @@ def parseMessage(socket, ircmsg, now):
         where = message.params.middle
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
+        if where[0] == '#':
+            utils.logIrcMessage(where + '#clearchat.log', nick, now)
         clearchat.parse(chan, nick)
+    
+    if message.command == 'ROOMSTATE':
+        msg = message.params.trailing
+        where = message.params.middle
+        if where[0] == '#':
+            utils.logIrcMessage(where + '#roomstate.log', str(message), now)
+    
+    if message.command == 'HOSTTARGET':
+        msg = message.params.trailing
+        where = message.params.middle
+        if where[0] == '#':
+            utils.logIrcMessage(where + '#hosttarget.log', str(message), now)
     
     if message.command == 'MODE':
         where, mode, nick = message.params.middle.split()
@@ -107,6 +123,8 @@ def parseMessage(socket, ircmsg, now):
         
     if message.command == 'USERSTATE':
         where = message.params.middle
+        if where[0] == '#':
+            utils.logIrcMessage(where + '#userstate.log', str(message), now)
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
             tags = message.tags
