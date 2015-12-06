@@ -66,7 +66,8 @@ def parseMessage(socket, ircmsg, now):
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
         if where[0] == '#':
-            utils.logIrcMessage(where + '#clearchat.log', nick, now)
+            who = nick if nick else '#chat'
+            utils.logIrcMessage(where + '#clearchat.log', who, now)
         clearchat.parse(chan, nick)
     
     if message.command == 'ROOMSTATE':
