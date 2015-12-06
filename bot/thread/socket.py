@@ -1,9 +1,9 @@
 ﻿from .. import config, error, globals, utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
-from source.ircmessage import parseMessage
 import datetime
 import socket
+import source.ircmessage
 import threading
 import time
 
@@ -73,7 +73,7 @@ class SocketThread(threading.Thread):
                             now = datetime.datetime.utcnow()
                             file = config.botnick + '-' + self.name + '.log'
                             utils.logIrcMessage(file, '< ' + ircmsg)
-                            parseMessage(self, ircmsg, now)
+                            source.ircmessage.parseMessage(self, ircmsg, now)
                     except socket.timeout:
                         pass
                     sinceLastSend = datetime.datetime.now() - self.lastSentPing
