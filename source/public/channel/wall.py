@@ -1,7 +1,7 @@
 ﻿from bot import config
 import datetime
 
-def commandWall(db, channel, nick, message, msgParts, permissions):
+def commandWall(db, channel, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(channel.channel, 'modwall') and
         not permissions['broadcaster']):
         return False
@@ -43,7 +43,7 @@ def commandWall(db, channel, nick, message, msgParts, permissions):
     channel.sendMulipleMessages(messages, 2)
     return True
 
-def commandWallLong(db, channel, nick, message, msgParts, permissions):
+def commandWallLong(db, channel, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(channel.channel, 'modwall') and
         not permissions['broadcaster']):
         return False

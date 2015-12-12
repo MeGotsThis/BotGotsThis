@@ -74,16 +74,16 @@ def moduleKey(module):
     
     return (50, module)
 
-def botReload(send, nick, message, msgParts, permissions):
+def botReload(send):
     send('Reloading', 0)
     
-    botReloadCommands(send, nick, message, msgParts, permissions)
-    botReloadConfig(send, nick, message, msgParts, permissions)
+    botReloadCommands(send)
+    botReloadConfig(send)
     
     send('Complete', 0)
     return True
 
-def botReloadCommands(send, nick, message, msgParts, permissions):
+def botReloadCommands(send):
     send('Reloading Commands', 0)
     
     modules = [m for m in sys.modules.keys() if loadThisModule(m)]
@@ -93,7 +93,7 @@ def botReloadCommands(send, nick, message, msgParts, permissions):
     send('Complete Reloading', 0)
     return True
 
-def botReloadConfig(send, nick, message, msgParts, permissions):
+def botReloadConfig(send):
     send('Reloading Config', 0)
     
     importlib.reload(sys.modules['bot.config'])

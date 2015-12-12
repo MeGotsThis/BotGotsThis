@@ -13,7 +13,7 @@ typeGlobalMod = ['staff', 'admin', 'global_mod']
 typeMod = ['staff', 'admin', 'global_mod', 'mod']
 
 # Set up our commands function
-def parse(tags, nick, message):
+def parse(tags, nick, message, now):
     if len(message) == 0:
         return
     
@@ -23,10 +23,10 @@ def parse(tags, nick, message):
     
     name = nick + '-' + str(msgParts[0]) + '-'
     name += str(time.time())
-    params = tags, nick, message, msgParts
+    params = tags, nick, message, msgParts, now
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(tags, nick, message, msgParts):
+def threadParse(tags, nick, message, msgParts, now):
     if False: # Hints for Intellisense
         nick = str()
         message = str()
@@ -61,7 +61,7 @@ def threadParse(tags, nick, message, msgParts):
     
         complete = False
         with getDatabase() as db:
-            arguments = db, nick, message, msgParts, permissions
+            arguments = db, nick, message, msgParts, permissions, now
             if command in whisper.commands:
                 commInfo = whisper.commands[command]
                 hasPerm = True

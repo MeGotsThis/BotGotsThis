@@ -1,7 +1,7 @@
 ﻿from ...api import oauth, twitch
 import threading
 
-def commandStatus(db, channel, nick, message, msgParts, permissions):
+def commandStatus(db, channel, nick, message, msgParts, permissions, now):
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         return False
@@ -21,7 +21,7 @@ def commandStatus(db, channel, nick, message, msgParts, permissions):
         channel.sendMessage('Channel Status failed to set')
     return True
 
-def commandGame(db, channel, nick, message, msgParts, permissions):
+def commandGame(db, channel, nick, message, msgParts, permissions, now):
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         msgParts.append('')
@@ -50,7 +50,7 @@ def commandGame(db, channel, nick, message, msgParts, permissions):
         channel.sendMessage('Channel Game failed to set')
     return True
 
-def commandPurge(db, channel, nick, message, msgParts, permissions):
+def commandPurge(db, channel, nick, message, msgParts, permissions, now):
     if permissions['channelModerator'] and len(msgParts) > 1:
         channel.sendMessage('.timeout ' + msgParts[1] + ' 1')
         return True

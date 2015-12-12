@@ -29,7 +29,7 @@ def parseMessage(socket, ircmsg, now):
             utils.logIrcMessage(file, nick + ' -> ' + where + ': ' + msg, now)
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
-            channel.parse(chan, tags, nick, msg)
+            channel.parse(chan, tags, nick, msg, now)
         
     if message.command == 'WHISPER':
         tags = message.tags
@@ -42,7 +42,7 @@ def parseMessage(socket, ircmsg, now):
                             now)
         file = config.botnick + '-Raw Whisper.log'
         utils.logIrcMessage(file, '< ' + ircmsg, now)
-        whisper.parse(tags, nick, msg)
+        whisper.parse(tags, nick, msg, now)
         
     if message.command == 'NOTICE':
         nick = None

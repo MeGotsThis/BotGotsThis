@@ -2,7 +2,7 @@
 import datetime
 import random
 
-def commandPyramid(db, channel, nick, message, msgParts, permissions):
+def commandPyramid(db, channel, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(channel.channel, 'modpyramid') and
         not permissions['broadcaster']):
         return False
@@ -35,7 +35,7 @@ def commandPyramid(db, channel, nick, message, msgParts, permissions):
     channel.sendMulipleMessages(messages, 2)
     return True
 
-def commandRPyramid(db, channel, nick, message, msgParts, permissions):
+def commandRPyramid(db, channel, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(channel.channel, 'modpyramid') and
         not permissions['broadcaster']):
         return False
@@ -73,7 +73,7 @@ def commandRPyramid(db, channel, nick, message, msgParts, permissions):
     channel.sendMulipleMessages(messages, 2)
     return True
 
-def commandPyramidLong(db, channel, nick, message, msgParts, permissions):
+def commandPyramidLong(db, channel, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(channel.channel, 'modpyramid') and
         not permissions['broadcaster']):
         return False

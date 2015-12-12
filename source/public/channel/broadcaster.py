@@ -5,26 +5,26 @@ import email.utils
 import json
 import time
 
-def commandHello(db, channel, nick, message, msgParts, permissions):
+def commandHello(db, channel, nick, message, msgParts, permissions, now):
     channel.sendMessage('Hello Kappa')
     return True
 
-def commandCome(db, channel, nick, message, msgParts, permissions):
+def commandCome(db, channel, nick, message, msgParts, permissions, now):
     broadcaster.botCome(db, nick, send.channel(channel))
     return True
 
-def commandLeave(db, channel, nick, message, msgParts, permissions):
+def commandLeave(db, channel, nick, message, msgParts, permissions, now):
     return broadcaster.botLeave(channel.channel, send.channel(channel))
 
-def commandEmpty(db, channel, nick, message, msgParts, permissions):
+def commandEmpty(db, channel, nick, message, msgParts, permissions, now):
     broadcaster.botEmpty(channel.channel, send.channel(channel))
     return True
 
-def commandAutoJoin(db, channel, nick, message, msgParts, permissions):
+def commandAutoJoin(db, channel, nick, message, msgParts, permissions, now):
     broadcaster.botAutoJoin(db, nick, send.channel(channel), msgParts)
     return True
 
-def commandUptime(db, channel, nick, message, msgParts, permissions):
+def commandUptime(db, channel, nick, message, msgParts, permissions, now):
     currentTime = datetime.datetime.utcnow()
     if 'uptime' in channel.sessionData:
         since = currentTime - channel.sessionData['uptime']

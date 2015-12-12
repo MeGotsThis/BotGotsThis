@@ -1,5 +1,5 @@
-﻿def fieldQuery(field, param, prefix, suffix, default,
-               message, msgParts, channel, nick, query):
+﻿def fieldQuery(field, param, prefix, suffix, default, message,
+               msgParts, channel, nick, query, now):
     if field.lower() == 'query':
         return prefix + query + suffix if query else default
     return None

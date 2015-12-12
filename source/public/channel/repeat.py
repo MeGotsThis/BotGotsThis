@@ -3,7 +3,7 @@ import datetime
 import time
 import json
 
-def commandAutoRepeat(db, channel, nick, message, msgParts, permissions):
+def commandAutoRepeat(db, channel, nick, message, msgParts, permissions, now):
     """
     !autorepeat 1 MONEY MONEY
     !autorepeat-20 0.5 MONEY MONEY 

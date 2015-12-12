@@ -14,7 +14,7 @@ typeGlobalMod = ['staff', 'admin', 'global_mod']
 typeMod = ['staff', 'admin', 'global_mod', 'mod']
 
 # Set up our commands function
-def parse(channel, tags, nick, message):
+def parse(channel, tags, nick, message, now):
     if len(message) == 0:
         return
     
@@ -24,10 +24,10 @@ def parse(channel, tags, nick, message):
     
     name = channel.channel + '-' + str(msgParts[0]) + '-'
     name += str(time.time())
-    params = channel, tags, nick, message, msgParts
+    params = channel, tags, nick, message, msgParts, now
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(channel, tags, nick, message, msgParts):
+def threadParse(channel, tags, nick, message, msgParts, now):
     if False: # Hints for Intellisense
         channel = Channel('', None)
         nick = str()
@@ -80,7 +80,7 @@ def threadParse(channel, tags, nick, message, msgParts):
     
         complete = False
         with getDatabase() as db:
-            arguments = db, channel, nick, message, msgParts, permissions
+            arguments = db, channel, nick, message, msgParts, permissions, now
             for filter in commandList.filterMessage:
                 complete = filter(*arguments)
                 if complete:

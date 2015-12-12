@@ -1,6 +1,6 @@
 ﻿from ..common import charConvert
 
-def commandFull(db, channel, nick, message, msgParts, permissions):
+def commandFull(db, channel, nick, message, msgParts, permissions, now):
     if not db.hasFeature(channel.channel, 'textconvert'):
         return False
     
@@ -10,7 +10,8 @@ def commandFull(db, channel, nick, message, msgParts, permissions):
     channel.sendMessage(charConvert.asciiToFullWidth(parts[1]))
     return True
 
-def commandParenthesized(db, channel, nick, message, msgParts, permissions):
+def commandParenthesized(db, channel, nick, message, msgParts, permissions,
+                         now):
     if not db.hasFeature(channel.channel, 'textconvert'):
         return False
     
@@ -20,7 +21,7 @@ def commandParenthesized(db, channel, nick, message, msgParts, permissions):
     channel.sendMessage(charConvert.asciiToParenthesized(parts[1]))
     return True
 
-def commandCircled(db, channel, nick, message, msgParts, permissions):
+def commandCircled(db, channel, nick, message, msgParts, permissions, now):
     if not db.hasFeature(channel.channel, 'textconvert'):
         return False
     
@@ -30,7 +31,7 @@ def commandCircled(db, channel, nick, message, msgParts, permissions):
     channel.sendMessage(charConvert.asciiToCircled(parts[1]))
     return True
 
-def commandSmallCaps(db, channel, nick, message, msgParts, permissions):
+def commandSmallCaps(db, channel, nick, message, msgParts, permissions, now):
     if not db.hasFeature(channel.channel, 'textconvert'):
         return False
     
@@ -40,7 +41,7 @@ def commandSmallCaps(db, channel, nick, message, msgParts, permissions):
     channel.sendMessage(charConvert.asciiToSmallCaps(parts[1]))
     return True
 
-def commandUpsideDown(db, channel, nick, message, msgParts, permissions):
+def commandUpsideDown(db, channel, nick, message, msgParts, permissions, now):
     if not db.hasFeature(channel.channel, 'textconvert'):
         return False
     

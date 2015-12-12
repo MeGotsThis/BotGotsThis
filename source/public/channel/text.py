@@ -3,7 +3,7 @@ from bot import config
 from lists import custom
 import datetime
 
-def customCommands(db, channel, nick, originalMsg, msgParts, permissions):
+def customCommands(db, channel, nick, originalMsg, msgParts, permissions, now):
     command = msgParts[0].lower()
     message = None
     
@@ -52,9 +52,9 @@ def customCommands(db, channel, nick, originalMsg, msgParts, permissions):
                 final.append(plain)
                 try:
                     if field is not None:
-                        params = str(field), str(param), str(prefix), str(suffix),
-                        params += str(default), originalMsg, msgParts,
-                        params += channel.channel, nick, query,
+                        params = str(field), str(param), str(prefix),
+                        params += str(suffix),str(default), originalMsg,
+                        params += msgParts, channel.channel, nick, query, now
                         string = _getString(*params)
                         if string is not None:
                             string = _formatString(str(string), str(format),
@@ -68,7 +68,7 @@ def customCommands(db, channel, nick, originalMsg, msgParts, permissions):
             final.append(str(message))
         channel.sendMessage(''.join(final))
 
-def commandCommand(db, channel, nick, message, msgParts, permissions):
+def commandCommand(db, channel, nick, message, msgParts, permissions, now):
     if len(msgParts) < 3:
         return False
     
@@ -445,11 +445,11 @@ def _parseFormatMessage(message):
         
     return parsed
 
-def _getString(field, param, prefix, suffix, default,
-               message, msgParts, channel, nick, query):
+def _getString(field, param, prefix, suffix, default, message,  msgParts,
+               channel, nick, query, now):
     for fieldConvert in custom.fields:
-        result = fieldConvert(field, param, prefix, suffix, default,
-                              message, msgParts, channel, nick, query)
+        result = fieldConvert(field, param, prefix, suffix, default, message,
+                              msgParts, channel, nick, query, now)
         if result is not None:
             return result
 

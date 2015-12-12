@@ -56,8 +56,8 @@ daysOfWeek = {
     'sat': SATURDAY,
     }
 
-def fieldCountdown(field, param, prefix, suffix, default,
-                   message, msgParts, channel, nick, query):
+def fieldCountdown(field, param, prefix, suffix, default, message,
+                   msgParts, channel, nick, query, now):
     if field.lower() == 'countdown':
         cooldown = None
         dateInstances = []
@@ -72,15 +72,15 @@ def fieldCountdown(field, param, prefix, suffix, default,
                 dateInstances.append(pds)
         if dateInstances is None:
             return None
-        nextDateTimes = [_getNextDateTime(*i) for i in dateInstances]
-        pastDateTimes = [_getPastDateTime(*i) for i in dateInstances]
+        nextDateTimes = [_getNextDateTime(now, *i) for i in dateInstances]
+        pastDateTimes = [_getPastDateTime(now, *i) for i in dateInstances]
         nextDateTimes = [dt for dt in nextDateTimes if dt is not None]
         pastDateTimes = [dt for dt in pastDateTimes if dt is not None]
         if len(nextDateTimes) == 0:
             return default if default else 'has passed'
         else:
             next = min(dt[0] for dt in nextDateTimes)
-            now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
+            now = now.replace(tzinfo=timezones.utc)
             if len(pastDateTimes) > 0 and cooldown:
                 past = max(dt[0] for dt in pastDateTimes)
                 if _testCooldown(cooldown, past, next, now) < 0:
@@ -88,8 +88,8 @@ def fieldCountdown(field, param, prefix, suffix, default,
             return prefix + timedeltaFormat(next - now) + suffix
     return None
 
-def fieldSince(field, param, prefix, suffix, default,
-               message, msgParts, channel, nick, query):
+def fieldSince(field, param, prefix, suffix, default, message,
+               msgParts, channel, nick, query, now):
     if field.lower() == 'since':
         cooldown = 0
         dateInstances = []
@@ -104,15 +104,15 @@ def fieldSince(field, param, prefix, suffix, default,
                 dateInstances.append(pds)
         if dateInstances is None:
             return None
-        nextDateTimes = [_getNextDateTime(*i) for i in dateInstances]
-        pastDateTimes = [_getPastDateTime(*i) for i in dateInstances]
+        nextDateTimes = [_getNextDateTime(now, *i) for i in dateInstances]
+        pastDateTimes = [_getPastDateTime(now, *i) for i in dateInstances]
         nextDateTimes = [dt for dt in nextDateTimes if dt is not None]
         pastDateTimes = [dt for dt in pastDateTimes if dt is not None]
         if len(pastDateTimes) == 0:
             return default if default else 'is coming'
         else:
             past = max(dt[0] for dt in pastDateTimes)
-            now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
+            now = now.replace(tzinfo=timezones.utc)
             if len(nextDateTimes) > 0 and cooldown:
                 next = min(dt[0] for dt in nextDateTimes)
                 if _testCooldown(cooldown, past, next, now) >= 0:
@@ -120,8 +120,8 @@ def fieldSince(field, param, prefix, suffix, default,
             return prefix + timedeltaFormat(now - past) + suffix
     return None
 
-def fieldNext(field, param, prefix, suffix, default,
-              message, msgParts, channel, nick, query):
+def fieldNext(field, param, prefix, suffix, default, message,
+              msgParts, channel, nick, query, now):
     if field.lower() in ['next', 'future']:
         dateInstances = []
         params = param.split(',')
@@ -135,7 +135,7 @@ def fieldNext(field, param, prefix, suffix, default,
                 dateInstances.append(pds)
         if dateInstances is None:
             return None
-        nextDateTimes = [_getNextDateTime(*i) for i in dateInstances]
+        nextDateTimes = [_getNextDateTime(now, *i) for i in dateInstances]
         nextDateTimes = [dt for dt in nextDateTimes if dt is not None]
         if len(nextDateTimes) == 0:
             return default if default else 'None'
@@ -145,8 +145,8 @@ def fieldNext(field, param, prefix, suffix, default,
             return prefix + nextDateTime[0].strftime(format) + suffix
     return None
 
-def fieldPrevious(field, param, prefix, suffix, default,
-                  message, msgParts, channel, nick, query):
+def fieldPrevious(field, param, prefix, suffix, default, message,
+                  msgParts, channel, nick, query, now):
     if field.lower() in ['prev', 'previous', 'past']:
         dateInstances = []
         params = param.split(',')
@@ -160,7 +160,7 @@ def fieldPrevious(field, param, prefix, suffix, default,
                 dateInstances.append(pds)
         if dateInstances is None:
             return None
-        pastDateTimes = [_getPastDateTime(*i) for i in dateInstances]
+        pastDateTimes = [_getPastDateTime(now, *i) for i in dateInstances]
         pastDateTimes = [dt for dt in pastDateTimes if dt is not None]
         if len(pastDateTimes) == 0:
             return default if default else 'has passed'
@@ -217,8 +217,8 @@ def _parseDateString(string):
 
     return (timeOfDay, dayofweek, date, is24Hour)
 
-def _getNextDateTime(timeOfDay, dayofweek, date, is24Hour):
-    now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
+def _getNextDateTime(now, timeOfDay, dayofweek, date, is24Hour):
+    now = now.replace(tzinfo=timezones.utc)
     today = datetime.date.today()
     if date is not None:
         if date[0] is not None:
@@ -266,8 +266,8 @@ def _getNextDateTime(timeOfDay, dayofweek, date, is24Hour):
         else:
             return dt + datetime.timedelta(days=1), is24Hour
 
-def _getPastDateTime(timeOfDay, dayofweek, date, is24Hour):
-    now = datetime.datetime.utcnow().replace(tzinfo=timezones.utc)
+def _getPastDateTime(now, timeOfDay, dayofweek, date, is24Hour):
+    now = now.replace(tzinfo=timezones.utc)
     today = datetime.date.today()
     if date is not None:
         if date[0] is not None:

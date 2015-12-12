@@ -1,7 +1,7 @@
 ﻿import re
 
-def fieldParams(field, param, prefix, suffix, default,
-                message, msgParts, channel, nick, query):
+def fieldParams(field, param, prefix, suffix, default, message,
+                msgParts, channel, nick, query, now):
     try:
         match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', field)
         if match is not None:
