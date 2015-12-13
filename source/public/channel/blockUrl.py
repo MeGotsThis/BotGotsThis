@@ -67,7 +67,7 @@ def checkIfUrlMaybeBad(channel, nick, message, now):
             if parsedOriginal.netloc != parsedReponse.netloc:
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
                 utils.logIrcMessage(where + '#blockurl-match.log', log, now)
-                channel.sendMessage('.ban ' + nick)
+                channel.sendMessage('.ban ' + nick, 0)
                 return
         except urllib.error.URLError as e:
             try:
