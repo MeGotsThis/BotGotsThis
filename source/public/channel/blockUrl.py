@@ -57,7 +57,8 @@ def checkIfUrlMaybeBad(channel, nick, message, now):
             parsedReponse = urllib.parse.urlparse()
             if parsedOriginal.netloc != parsedReponse.netloc:
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
-                utils.logIrcMessage(where + '#blockurl-match.log', log, now)
+                utils.logIrcMessage(channel.ircChannel + '#blockurl-match.log',
+                                    log, now)
                 channel.sendMessage('.ban ' + nick)
                 return
         except urllib.error.HTTPError as e:
@@ -66,7 +67,8 @@ def checkIfUrlMaybeBad(channel, nick, message, now):
             parsedReponse = urllib.parse.urlparse(responseUrl)
             if parsedOriginal.netloc != parsedReponse.netloc:
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
-                utils.logIrcMessage(where + '#blockurl-match.log', log, now)
+                utils.logIrcMessage(channel.ircChannel + '#blockurl-match.log',
+                                    log, now)
                 channel.sendMessage('.ban ' + nick, 0)
                 return
         except urllib.error.URLError as e:
