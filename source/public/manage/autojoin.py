@@ -5,6 +5,7 @@ import json
 def manageAutoJoin(db, send, nick, message, msgParts):
     if len(msgParts) < 3:
         return False
+    msgParts[2] = msgParts[2].lower()
     if msgParts[2] in ['reloadserver']:
         for channelRow in db.getAutoJoinsChats():
             uri = '/api/channels/' + channelRow['broadcaster']

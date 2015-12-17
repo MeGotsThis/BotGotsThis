@@ -3,6 +3,7 @@
 def manageBanned(db, send, nick, message, msgParts):
     if len(msgParts) < 3:
         return False
+    msgParts[2] = msgParts[2].lower()
     if msgParts[2] in ['list']:
         bannedChannels = db.listBannedChannels()
         if bannedChannels:
