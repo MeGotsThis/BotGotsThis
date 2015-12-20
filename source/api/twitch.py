@@ -41,15 +41,16 @@ def twitchCall(channel, method, uri, headers={}, data=None):
 
 def updateTwitchEmotes():
     globals.globalEmotesCache = datetime.datetime.utcnow()
-    emoteset = [str(i) for i in globals.emoteset]
+    emotesets = [str(i) for i in globals.emoteset]
     response, data = twitchCall(
         None, 'GET',
-        '/kraken/chat/emoticon_images?emotesets=' + ','.join(emoteset),
+        '/kraken/chat/emoticon_images?emotesets=' + ','.join(emotesets),
         headers = {
             'Accept': 'application/vnd.twitchtv.v3+json',
             })
     globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']
     emotes = {}
+    emoteSet = {}
     replaceGlobal = {
         1: ':)',
         2: ':(',
@@ -72,4 +73,6 @@ def updateTwitchEmotes():
                 emotes[emote['id']] = replaceGlobal[emote['id']]
             else:
                 emotes[emote['id']] = emote['code']
+            emoteSet[emote['id']] = int(emoteSetId)
     globals.globalEmotes = emotes
+    globals.globalEmoteSets = emoteSet
