@@ -74,8 +74,8 @@ def checkIfUrlMaybeBad(channel, nick, message, now):
         except urllib.error.URLError as e:
             try:
                 if e.reason.errno not in [-2, 11001]:
-                    utils.logException(message)
+                    utils.logException(message, now)
             except BaseException as e:
-                utils.logException(message)
+                utils.logException(message, now)
         except:
-            utils.logException(message)
+            utils.logException(message, now)

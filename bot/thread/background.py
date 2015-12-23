@@ -20,6 +20,7 @@ class BackgroundTasker(threading.Thread):
     
     def run(self):
         print(str(datetime.datetime.utcnow()) + ' Starting BackgroundTasker')
+        now = datetime.datetime.utcnow()
         try:
             while self.running:
                 now = datetime.datetime.utcnow()
@@ -30,7 +31,7 @@ class BackgroundTasker(threading.Thread):
                         t[2] = now
                 time.sleep(1 / 1000)
         except:
-            utils.logException()
+            utils.logException(None, now)
             raise
         finally:
             print(str(datetime.datetime.utcnow()) + ' Ending BackgroundTasker')

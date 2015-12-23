@@ -114,4 +114,4 @@ def threadParse(channel, tags, nick, message, msgParts, now):
                         break
     except:
         extra = 'Channel: ' + channel.channel + '\nMessage: ' + message
-        utils.logException(extra)
+        utils.logException(extra, now)

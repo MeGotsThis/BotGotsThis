@@ -51,10 +51,11 @@ def logIrcMessage(filename, message, timestamp=None):
     with open(fullfilename, 'a', encoding='utf-8') as file:
         file.write(timestampStr + message + '\n')
 
-def logException(extraMessage=None):
+def logException(extraMessage=None, now=None):
     if config.exceptionLog is None:
         return
-    now = datetime.datetime.utcnow()
+    if now is None:
+        now = datetime.datetime.utcnow()
     logDateFormat = '%Y-%m-%dT%H:%M:%S.%f '
     _ = traceback.format_exception(*sys.exc_info())
     with open(config.exceptionLog, 'a', encoding='utf-8') as file:

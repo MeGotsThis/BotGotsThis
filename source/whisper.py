@@ -73,4 +73,4 @@ def threadParse(tags, nick, message, msgParts, now):
                     complete = commInfo[0](*arguments)
     except:
         extra = 'From: ' + nick + '\nMessage: ' + message
-        utils.logException(extra)
+        utils.logException(extra, now)
