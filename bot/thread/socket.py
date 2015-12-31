@@ -171,7 +171,7 @@ class SocketThread(threading.Thread):
             self.sendIrcCommand(
                 IrcMessage(command='PART',
                            params=IrcMessageParams(
-                               middle=channelData.channel)))
+                               middle=channelData.ircChannel)))
             del self._channels[channelData.channel]
         globals.join.part(channelData.channel)
         print(str(datetime.datetime.utcnow()) + ' Parted ' +
