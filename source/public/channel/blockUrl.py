@@ -39,7 +39,8 @@ def checkIfUrlMaybeBad(channel, nick, message, now):
         return
     
     # Record all urls with users of no follows
-    utils.logIrcMessage(channel.ircChannel + '#blockurl.log', message, now)
+    log = nick + ': ' + message
+    utils.logIrcMessage(channel.ircChannel + '#blockurl.log', log, now)
 
     matches = re.findall(twitchUrlRegex, message)
     for originalUrl in matches:
