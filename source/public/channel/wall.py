@@ -38,7 +38,8 @@ def commandWall(db, channel, nick, message, msgParts, permissions, now):
     elif not permissions['globalMod']:
         length = min(length, 20)
         rows = min(rows, 500)
-    messages = [rep * length + ('' if i % 2 == 0 else ' \ufeff')
+    spacer = '' if permissions['channelModerator'] else ' \ufeff'
+    messages = [rep * length + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
     channel.sendMulipleMessages(messages, 2)
     return True
@@ -70,7 +71,8 @@ def commandWallLong(db, channel, nick, message, msgParts, permissions, now):
         channel.sessionData['modWall'] = currentTime
     elif not permissions['globalMod']:
         rows = min(rows, 500)
-    messages = [msgParts[1] + ('' if i % 2 == 0 else ' \ufeff')
+    spacer = '' if permissions['channelModerator'] else ' \ufeff'
+    messages = [msgParts[1] + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
     channel.sendMulipleMessages(messages, 2)
     return True
