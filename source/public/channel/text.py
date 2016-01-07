@@ -470,4 +470,39 @@ def _formatString(string, format, hasTextConvert):
             return charConvert.asciiToSmallCaps(string)
         if format == 'upsidedown':
             return charConvert.asciiToUpsideDown(string)
+        if format in ['serifbold', 'serif-bold']:
+            return charConvert.asciiToSerifBold(string)
+        if format in ['serifitalic', 'serif-italic']:
+            return charConvert.asciiToSerifItalic(string)
+        if format in ['serifbolditalic', 'serif-bold-italic',
+                      'serif-bolditalic', 'serifbold-italic',
+                      'serifitalicbold', 'serif-italic-bold',
+                      'serifitalic-bold', 'serif-italicbold',]:
+            return charConvert.asciiToSerifBoldItalic(string)
+        if format == 'sanserif':
+            return charConvert.asciiToSanSerif(string)
+        if format in ['sanserifbold', 'sanserif-bold', 'bold']:
+            return charConvert.asciiToSanSerifBold(string)
+        if format in ['sanserifitalic', 'sanserif-italic', 'italic']:
+            return charConvert.asciiToSanSerifItalic(string)
+        if format in ['sanserifbolditalic', 'sanserif-bold-italic',
+                      'sanserif-bolditalic', 'sanserifbold-italic',
+                      'sanserifitalicbold', 'sanserif-italic-bold',
+                      'sanserifitalic-bold', 'sanserif-italicbold',
+                      'bolditalic', 'bold-italic',
+                      'italicbold', 'italic-bold']:
+            return charConvert.asciiToSanSerifBoldItalic(string)
+        if format in ['script', 'cursive']:
+            return charConvert.asciiToScript(string)
+        if format in ['scriptbold', 'cursivebold',
+                      'script-bold', 'cursive-bold',]:
+            return charConvert.asciiToScriptBold(string)
+        if format == 'fraktur':
+            return charConvert.asciiToFraktur(string)
+        if format in ['frakturbold', 'fraktur-bold']:
+            return charConvert.asciiToFrakturBold(string)
+        if format == 'monospace':
+            return charConvert.asciiToMonospace(string)
+        if format == 'doublestruck':
+            return charConvert.asciiToDoubleStruck(string)
     return string
