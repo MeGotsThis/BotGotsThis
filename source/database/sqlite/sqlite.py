@@ -2,13 +2,15 @@
 import sqlite3
 
 class SQLiteDatabase(DatabaseBase):
-    __slots__ = DatabaseBase.__slots__ + ('_dbfile', '_oauthfile',)
+    __slots__ = DatabaseBase.__slots__ + (
+        '_dbfile', '_oauthfile', '_timeoutlogfile')
     
     def __init__(self, ini, *args):
         super().__init__(*args)
         self._engine = 'SQLite'
         self._dbfile = ini['file']
         self._oauthfile = ini['oauth']
+        self._timeoutlogfile = ini['timeoutlog']
     
     def __enter__(self):
         kwargs = {
@@ -398,3 +400,37 @@ class SQLiteDatabase(DatabaseBase):
             return False
         finally:
             cursor.close()
+    
+    def getTimeoutLengths(self, broadcaster):
+        cursor = self.connection.cursor()
+        query = 'SELECT timeoutLength1, timeoutLength2, timeoutLength3 '
+        query += 'FROM moderator_timeout WHERE broadcaster=?'
+        cursor.execute(query, (broadcaster,))
+        row = cursor.fetchone()
+        cursor.close()
+        if row is None:
+            return None
+        return int(row[0]), int(row[1]), int(row[2])
+
+    def recordTimeout(self, broadcaster, user, fromUser, module, level, length,
+                      message, reason):
+        cursor = self.connection.cursor()
+        try:
+            query = 'ATTACH DATABASE ? AS timeout'
+            cursor.execute(query, (self._timeoutlogfile,))
+            query = 'INSERT INTO timeout.timeout_logs '
+            query += '(broadcaster, twitchUser, fromUser, module, level, '
+            query += 'length, message, reason) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+            cursor.execute(query, (broadcaster, user, fromUser, module, level,
+                                   length, message, reason))
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        except:
+            return False
+        finally:
+            cursor.close()
+    

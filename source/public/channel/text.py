@@ -1,4 +1,4 @@
-﻿from ..common import charConvert
+﻿from ..common import charConvert, timeout
 from bot import config
 from lists import custom
 import datetime
@@ -66,7 +66,11 @@ def customCommands(db, channel, nick, originalMsg, msgParts, permissions, now):
                     final.append(str(original))
         except Exception as e:
             final.append(str(message))
-        channel.sendMessage(''.join(final))
+        msg = ''.join(final)
+        channel.sendMessage(msg)
+        if permissions['channelModerator']:
+            timeout.recordTimeoutFromCommand(db, channel, user, msg,
+                                             originalMsg, 'wall')
 
 def commandCommand(db, channel, nick, message, msgParts, permissions, now):
     if len(msgParts) < 3:

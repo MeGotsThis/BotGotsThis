@@ -54,7 +54,9 @@ CREATE TABLE chat_features (
     PRIMARY KEY (broadcaster, feature)
 );
 
-CREATE TABLE game_abbreviations (
-    abbreviation VARCHAR NOT NULL PRIMARY KEY,
-    twitchGame VARCHAR NOT NULL
+CREATE TABLE moderator_timeout (
+    broadcaster VARCHAR NOT NULL PRIMARY KEY,
+    timeoutLength1 INTEGER NULL,
+    timeoutLength2 INTEGER NULL,
+    timeoutLength3 INTEGER NULL
 );

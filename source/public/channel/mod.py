@@ -53,5 +53,7 @@ def commandGame(db, channel, nick, message, msgParts, permissions, now):
 def commandPurge(db, channel, nick, message, msgParts, permissions, now):
     if permissions['channelModerator'] and len(msgParts) > 1:
         channel.sendMessage('.timeout ' + msgParts[1] + ' 1')
+        db.recordTimeout(channel.channel, nick, None, 'purge', None, 1,
+                        message, None)
         return True
     return False

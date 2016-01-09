@@ -51,6 +51,20 @@ spamModeratorCooldown = float(ini['BOT']['spamModeratorCooldown'])
 if spamModeratorCooldown <= 0:
     spamModeratorCooldown = 20
 
+warningDuration = float(ini['BOT']['warningDuration'])
+if warningDuration <= 0:
+    warningDuration = 20
+moderatorDefaultTimeout = [0, 0, 0]
+moderatorDefaultTimeout[0] = int(ini['BOT']['moderatorDefaultTimeout0'])
+if moderatorDefaultTimeout[0] <= 0:
+    moderatorDefaultTimeout[0] = 0
+moderatorDefaultTimeout[1] = int(ini['BOT']['moderatorDefaultTimeout0'])
+if moderatorDefaultTimeout[1] <= 0:
+    moderatorDefaultTimeout[1] = 0
+moderatorDefaultTimeout[2] = int(ini['BOT']['moderatorDefaultTimeout0'])
+if moderatorDefaultTimeout[2] <= 0:
+    moderatorDefaultTimeout[2] = 0
+
 joinLimit = min(int(ini['BOT']['joinLimit']), 50)
 joinPerSecond = float(ini['BOT']['joinPerSecond'])
 joinPerSecond = joinPerSecond if joinPerSecond > 0 else 20

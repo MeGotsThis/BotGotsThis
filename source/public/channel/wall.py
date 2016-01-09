@@ -1,4 +1,5 @@
-﻿from bot import config
+﻿from ..common import timeout
+from bot import config
 import datetime
 
 def commandWall(db, channel, nick, message, msgParts, permissions, now):
@@ -75,4 +76,7 @@ def commandWallLong(db, channel, nick, message, msgParts, permissions, now):
     messages = [msgParts[1] + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
     channel.sendMulipleMessages(messages, 2)
+    if permissions['channelModerator']:
+        timeout.recordTimeoutFromCommand(db, channel, user, messages[0],
+                                         message, 'wall')
     return True

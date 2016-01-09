@@ -90,3 +90,10 @@ class DatabaseBase:
     
     def removeBannedChannel(self, broadcaster, reason, nick):
         return True
+    
+    def getTimeoutLengths(self, broadcaster):
+        return 1, 1, 1,
+    
+    def recordTimeout(self, broadcaster, user, fromUser, module, level, length,
+                      message, reason):
+        return False

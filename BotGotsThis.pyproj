@@ -11,8 +11,8 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>{9a7a9026-48c1-4688-9d5d-e5699d47d074}</InterpreterId>
-    <InterpreterVersion>3.4</InterpreterVersion>
+    <InterpreterId />
+    <InterpreterVersion />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -23,6 +23,7 @@
   <ItemGroup>
     <Content Include="config.dist.ini" />
     <Content Include="config.ini" />
+    <Content Include="source\database\sqlite\timeout.sql" />
     <Content Include="source\database\sqlite\database.sql" />
     <Content Include="source\database\sqlite\gamesabbreviation.sql" />
     <Content Include="source\database\sqlite\oauth.sql" />
@@ -134,6 +135,7 @@
     <Compile Include="source\public\common\managebot.py" />
     <Compile Include="source\public\common\reload.py" />
     <Compile Include="source\public\common\send.py" />
+    <Compile Include="source\public\common\timeout.py" />
     <Compile Include="source\public\common\__init__.py" />
     <Compile Include="source\public\custom\broadcaster.py" />
     <Compile Include="source\public\custom\countdown.py" />

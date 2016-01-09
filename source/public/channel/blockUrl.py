@@ -1,4 +1,5 @@
 ﻿from ...api import twitch
+from ..common import timeout
 from bot import config, utils
 import datetime
 import http.client
@@ -24,11 +25,11 @@ def filterNoUrlForBots(db, channel, nick, message, msgParts, permissions, now):
         return False
     match = re.search(twitchUrlRegex, message)
     if match is not None:
-        params = channel, nick, message, now
+        params = db, channel, nick, message, now
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
-def checkIfUrlMaybeBad(channel, nick, message, now):
+def checkIfUrlMaybeBad(db, channel, nick, message, now):
     try:
         uri = '/kraken/users/' + nick + '/follows/channels?limit=1'
         response, data = twitch.twitchCall(None, 'GET', uri)
@@ -60,7 +61,8 @@ def checkIfUrlMaybeBad(channel, nick, message, now):
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
                 utils.logIrcMessage(channel.ircChannel + '#blockurl-match.log',
                                     log, now)
-                channel.sendMessage('.ban ' + nick)
+                timeout.timeoutUser(db, channel, nick, 'redirectUrl', 1,
+                                    message)
                 return
         except urllib.error.HTTPError as e:
             parsedOriginal = urllib.parse.urlparse(url)
@@ -70,7 +72,8 @@ def checkIfUrlMaybeBad(channel, nick, message, now):
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
                 utils.logIrcMessage(channel.ircChannel + '#blockurl-match.log',
                                     log, now)
-                channel.sendMessage('.ban ' + nick, 0)
+                timeout.timeoutUser(db, channel, nick, 'redirectUrl', 1,
+                                    message)
                 return
         except urllib.error.URLError as e:
             try:
