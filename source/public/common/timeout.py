@@ -4,6 +4,8 @@ import datetime
 def timeoutUser(db, channel, user, module, baseLevel=0, message=None,
                 reason=None):
     timeouts = db.getTimeoutLengths(channel.channel)
+    if timeouts is None:
+        timeouts = config.moderatorDefaultTimeout
     
     if 'timeouts' not in channel.sessionData:
         channel.sessionData['timeouts'] = {}
