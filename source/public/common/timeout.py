@@ -36,13 +36,13 @@ def recordTimeoutFromCommand(db, channel, user, message, sourceMessage,
                              module='custom'):
     length = None
     who = None
-    if message.startswith('.ban'):
+    if message.startswith(('.ban', '/ban')):
         try:
             who = message.split()[1]
             length = 0
         except:
             pass
-    if message.startswith('.timeout'):
+    if message.startswith(('.timeout', '/timeout')):
         try:
             parts = message.split()
             length = int(parts[2])
