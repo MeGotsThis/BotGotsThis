@@ -7,16 +7,18 @@ def timeoutUser(db, channel, user, module, baseLevel=0, message=None,
     
     if 'timeouts' not in channel.sessionData:
         channel.sessionData['timeouts'] = {}
+    if module not in channel.sessionData['timeouts']:
+        channel.sessionData['timeouts'][module] = {}
     
     utcnow = datetime.datetime.utcnow()
     duration = datetime.timedelta(seconds=config.warningDuration)
-    if (user not in channel.sessionData['timeouts'] or
-        utcnow - channel.sessionData['timeouts'][user][0] >= duration):
+    if (user not in channel.sessionData['timeouts'][module] or
+        utcnow - channel.sessionData['timeouts'][module][user][0] >= duration):
         level = baseLevel
     else:
-        prevLevel = channel.sessionData['timeouts'][user][1]
+        prevLevel = channel.sessionData['timeouts'][module][user][1]
         level = min(max(baseLevel + 1, prevLevel + 1), 3)
-    channel.sessionData['timeouts'][user] = (utcnow, level)
+    channel.sessionData['timeouts'][module][user] = (utcnow, level)
     length = timeouts[level]
     if length:
         channel.sendMessage('.timeout ' + user + ' ' + str(length), 0)
