@@ -10,6 +10,13 @@ import datetime
 import time
 import sys
 
+disallowedCommands = (
+    '.ignore',
+    '/ignore',
+    '.disconnect',
+    '/disconnect',
+    )
+
 class MessageQueue(threading.Thread):
     def __init__(self, **args):
         threading.Thread.__init__(self, **args)
@@ -28,8 +35,10 @@ class MessageQueue(threading.Thread):
     def running(self, value):
         self._running = value
     
-    def queueMessage(self, channelData, message, priority=1):
+    def queueMessage(self, channelData, message, priority=1, bypass=False):
         if not message:
+            return
+        if not bypass and message.startswith(disallowedCommands):
             return
         if message.startswith('/w '):
             msgParts = message.split(' ', 2)
@@ -41,10 +50,13 @@ class MessageQueue(threading.Thread):
             param = (channelData, message[:config.messageLimit], None)
             self._queues[priority].append(param)
     
-    def queueMultipleMessages(self, channelData, messages, priority=1):
+    def queueMultipleMessages(self, channelData, messages, priority=1,
+                              bypass=False):
         with self._queueLock:
             for message in messages:
                 if not message:
+                    continue
+                if not bypass and message.startswith(disallowedCommands):
                     continue
                 if message.startswith('/w '):
                     msgParts = message.split(' ', 2)
