@@ -1,4 +1,6 @@
-﻿import threading
+﻿from ...database.factory import getDatabase
+from ..common import timeout
+import threading
 import datetime
 import time
 import json
@@ -39,7 +41,7 @@ def commandAutoRepeat(db, channel, nick, message, msgParts, permissions, now):
         return True
     
     thread = MessageRepeater(
-        channelData=channel,
+        channel=channel,
         message=messageToSend,
         duration=datetime.timedelta(minutes=minutesDuration),
         count=count)
@@ -50,10 +52,10 @@ def commandAutoRepeat(db, channel, nick, message, msgParts, permissions, now):
 
 class MessageRepeater(threading.Thread):
     def __init__(self, *args,
-                 channelData, message='',
+                 channel, message='',
                  duration=datetime.timedelta(), count=None):
         threading.Thread.__init__(self, *args)
-        self._channelData = channelData
+        self._channel = channel
         self._message = message
         self._count = count
         self._duration = max(duration, datetime.timedelta(seconds=1))
@@ -74,14 +76,19 @@ class MessageRepeater(threading.Thread):
         while self._continueRunning():
             if datetime.datetime.now() >= self._lastTime + self._duration:
                 self._lastTime = datetime.datetime.now()
-                self._channelData.sendMessage(self._message)
+                self._channel.sendMessage(self._message)
+                if self._channel.isMod:
+                    with getDatabase() as db:
+                        timeout.recordTimeoutFromCommand(
+                            db, self._channel, None, self._message, None,
+                            'autorepeat')
                 with self._countLock:
                     if self._count is not None:
                         self._count -= 1
             time.sleep(1/20)
-        if ('repeatThread' in self._channelData.sessionData
-            and self._channelData.sessionData['repeatThread'] is self):
-            del self._channelData.sessionData['repeatThread']
+        if ('repeatThread' in self._channel.sessionData
+            and self._channel.sessionData['repeatThread'] is self):
+            del self._channel.sessionData['repeatThread']
     
     def _continueRunning(self):
         with self._countLock:
