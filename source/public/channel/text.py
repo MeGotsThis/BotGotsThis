@@ -69,7 +69,7 @@ def customCommands(db, channel, nick, originalMsg, msgParts, permissions, now):
         msg = ''.join(final)
         channel.sendMessage(msg)
         if permissions['channelModerator']:
-            timeout.recordTimeoutFromCommand(db, channel, user, msg,
+            timeout.recordTimeoutFromCommand(db, channel, nick, msg,
                                              originalMsg, 'wall')
 
 def commandCommand(db, channel, nick, message, msgParts, permissions, now):

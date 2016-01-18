@@ -77,6 +77,6 @@ def commandWallLong(db, channel, nick, message, msgParts, permissions, now):
                 for i in range(rows)]
     channel.sendMulipleMessages(messages, 2)
     if permissions['channelModerator']:
-        timeout.recordTimeoutFromCommand(db, channel, user, messages[0],
+        timeout.recordTimeoutFromCommand(db, channel, nick, messages[0],
                                          message, 'wall')
     return True

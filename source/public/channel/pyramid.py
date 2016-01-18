@@ -107,7 +107,7 @@ def commandPyramidLong(db, channel, nick, message, msgParts, permissions, now):
     messages += [rep * i for i in range(count, 0, -1)]
     channel.sendMulipleMessages(messages, 2)
     if permissions['channelModerator']:
-        timeout.recordTimeoutFromCommand(db, channel, user,
+        timeout.recordTimeoutFromCommand(db, channel, nick,
                                          messages[len(messages)//2], message,
                                          'pyramid')
     return True
