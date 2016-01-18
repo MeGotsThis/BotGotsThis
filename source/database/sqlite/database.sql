@@ -54,13 +54,6 @@ CREATE TABLE chat_features (
     PRIMARY KEY (broadcaster, feature)
 );
 
-CREATE TABLE moderator_timeout (
-    broadcaster VARCHAR NOT NULL PRIMARY KEY,
-    timeoutLength1 INTEGER NULL,
-    timeoutLength2 INTEGER NULL,
-    timeoutLength3 INTEGER NULL
-);
-
 CREATE TABLE chat_properties (
     broadcaster VARCHAR NOT NULL,
     property VARCHAR NOT NULL,

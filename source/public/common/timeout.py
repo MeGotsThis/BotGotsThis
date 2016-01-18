@@ -4,8 +4,15 @@ import datetime
 def timeoutUser(db, channel, user, module, baseLevel=0, message=None,
                 reason=None):
     timeouts = db.getTimeoutLengths(channel.channel)
-    if timeouts is None:
-        timeouts = config.moderatorDefaultTimeout
+    properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2',]
+    defaults = {'timeoutLength0': config.moderatorDefaultTimeout[0],
+                'timeoutLength1': config.moderatorDefaultTimeout[1],
+                'timeoutLength2': config.moderatorDefaultTimeout[2],
+                }
+    chatProp = db.getChatProperties(db, channel.channel, properties,
+                                        defaults)
+    timeouts = chatProp['timeoutLength0'], chatProp['timeoutLength1'],
+    timeouts += chatProp['timeoutLength2'],
     
     if 'timeouts' not in channel.sessionData:
         channel.sessionData['timeouts'] = {}
