@@ -423,7 +423,7 @@ class SQLiteDatabase(DatabaseBase):
         finally:
             cursor.close()
         
-    def getChatProperty(self, broadcaster, property, default=None):
+    def getChatProperty(self, broadcaster, property, default=None, parse=None):
         cursor = self.connection.cursor()
         query = 'SELECT value FROM chat_properties '
         query += 'WHERE broadcaster=? AND property=?'
@@ -432,9 +432,12 @@ class SQLiteDatabase(DatabaseBase):
         cursor.close()
         if row is None:
             return default
+        if parse is not None:
+            return parse(row[0])
         return row[0]
     
-    def getChatProperties(self, broadcaster, properties=[], default={}):
+    def getChatProperties(self, broadcaster, properties=[], default=None,
+                          parse=None):
         cursor = self.connection.cursor()
         query = 'SELECT property, value FROM chat_properties '
         query += 'WHERE broadcaster=? AND property IN ('
@@ -442,11 +445,18 @@ class SQLiteDatabase(DatabaseBase):
         params = (broadcaster,) + properties
         values = {}
         for property, value in cursor.execute(query, params):
+            if isinstance(parse, dict) and property in parse:
+                value = parse[property](value)
+            elif parse is not None:
+                value = parse(value)
             values[property] = value
         cursor.close()
         for property in properties:
             if property not in values:
-                value = default[property] if property in default else None
+                if isinstance(default, dict) and property in default:
+                    value = default[property]
+                else:
+                    value = default
                 values[property] = value
         return values
     

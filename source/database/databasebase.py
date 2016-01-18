@@ -95,10 +95,11 @@ class DatabaseBase:
                       message, reason):
         return False
     
-    def getChatProperty(self, broadcaster, property, default=None):
+    def getChatProperty(self, broadcaster, property, default=None, parse=None):
         return default
     
-    def getChatProperties(self, broadcaster, properties=[], default={}):
+    def getChatProperties(self, broadcaster, properties=[], default=None,
+                          parse=None):
         return {}
     
     def setChatProperty(self, broadcaster, property, value=None):
