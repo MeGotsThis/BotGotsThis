@@ -97,3 +97,12 @@ class DatabaseBase:
     def recordTimeout(self, broadcaster, user, fromUser, module, level, length,
                       message, reason):
         return False
+    
+    def getChatProperty(self, broadcaster, property, default=None):
+        return default
+    
+    def getChatProperties(self, broadcaster, properties=[], default={}):
+        return {}
+    
+    def setChatProperty(self, broadcaster, property, value=None):
+        return False

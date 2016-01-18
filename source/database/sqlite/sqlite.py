@@ -433,4 +433,45 @@ class SQLiteDatabase(DatabaseBase):
             return False
         finally:
             cursor.close()
+        
+    def getChatProperty(self, broadcaster, property, default=None):
+        cursor = self.connection.cursor()
+        query = 'SELECT value FROM chat_properties '
+        query += 'WHERE broadcaster=? AND property=?'
+        cursor.execute(query, (broadcaster, property,))
+        row = cursor.fetchone()
+        cursor.close()
+        if row is None:
+            return default
+        return row[0]
     
+    def getChatProperties(self, broadcaster, properties=[], default={}):
+        cursor = self.connection.cursor()
+        query = 'SELECT property, value FROM chat_properties '
+        query += 'WHERE broadcaster=? AND property IN ('
+        query += ','.join('?' * len(properties)) + ')'
+        params = (broadcaster,) + properties
+        values = {}
+        for property, value in cursor.execute(query, params):
+            values[property] = value
+        cursor.close()
+        for property in properties:
+            if property not in values:
+                value = default[property] if property in default else None
+                values[property] = value
+        return values
+    
+    def setChatProperty(self, broadcaster, property, value=None):
+        cursor = self.connection.cursor()
+        try:
+            query = 'REPLACE INTO chat_properties '
+            query += '(broadcaster, property, value) VALUES (?, ?, ?)'
+            params = broadcaster, property, value,
+            cursor.execute(query, params)
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        finally:
+            cursor.close()

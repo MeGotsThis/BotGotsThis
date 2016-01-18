@@ -60,3 +60,10 @@ CREATE TABLE moderator_timeout (
     timeoutLength2 INTEGER NULL,
     timeoutLength3 INTEGER NULL
 );
+
+CREATE TABLE chat_properties (
+    broadcaster VARCHAR NOT NULL,
+    property VARCHAR NOT NULL,
+    value VARCHAR,
+    PRIMARY KEY (broadcaster, property)
+);
