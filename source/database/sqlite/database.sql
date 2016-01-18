@@ -57,6 +57,6 @@ CREATE TABLE chat_features (
 CREATE TABLE chat_properties (
     broadcaster VARCHAR NOT NULL,
     property VARCHAR NOT NULL,
-    value VARCHAR,
+    value VARCHAR NOT NULL,
     PRIMARY KEY (broadcaster, property)
 );

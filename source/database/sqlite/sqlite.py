@@ -463,9 +463,14 @@ class SQLiteDatabase(DatabaseBase):
     def setChatProperty(self, broadcaster, property, value=None):
         cursor = self.connection.cursor()
         try:
-            query = 'REPLACE INTO chat_properties '
-            query += '(broadcaster, property, value) VALUES (?, ?, ?)'
-            params = broadcaster, property, value,
+            if value is None:
+                query = 'DELETE FROM chat_properties '
+                query += 'WHERE broadcaster=? AND property=?'
+                params = broadcaster, property,
+            else:
+                query = 'REPLACE INTO chat_properties '
+                query += '(broadcaster, property, value) VALUES (?, ?, ?)'
+                params = broadcaster, property, value,
             cursor.execute(query, params)
 
             self.connection.commit()
