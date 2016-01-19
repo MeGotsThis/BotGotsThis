@@ -24,7 +24,7 @@ def parseMessage(socket, ircmsg, now):
         msg = message.params.trailing
         if where[0] == '#':
             utils.logIrcMessage(where + '#msg.log', nick + ': ' + msg, now)
-        if config.botnick in msg.split():
+        if config.botnick in msg.lower().split():
             file = config.botnick + '-Mentions.log'
             utils.logIrcMessage(file, nick + ' -> ' + where + ': ' + msg, now)
         if where[0] == '#' and where[1:] in channels:
