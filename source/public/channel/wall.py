@@ -2,8 +2,8 @@
 from bot import config
 import datetime
 
-def commandWall(db, channel, nick, message, msgParts, permissions, now):
-    if (not db.hasFeature(channel.channel, 'modwall') and
+def commandWall(db, chat, tags, nick, message, msgParts, permissions, now):
+    if (not db.hasFeature(chat.channel, 'modwall') and
         not permissions['broadcaster']):
         return False
     
@@ -31,22 +31,22 @@ def commandWall(db, channel, nick, message, msgParts, permissions, now):
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modWall' in channel.sessionData:
-            since = currentTime - channel.sessionData['modWall']
+        if 'modWall' in chat.sessionData:
+            since = currentTime - chat.sessionData['modWall']
             if since < cooldown:
                 return False
-        channel.sessionData['modWall'] = currentTime
+        chat.sessionData['modWall'] = currentTime
     elif not permissions['globalMod']:
         length = min(length, 20)
         rows = min(rows, 500)
     spacer = '' if permissions['channelModerator'] else ' \ufeff'
     messages = [rep * length + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
-    channel.sendMulipleMessages(messages, 2)
+    chat.sendMulipleMessages(messages, 2)
     return True
 
-def commandWallLong(db, channel, nick, message, msgParts, permissions, now):
-    if (not db.hasFeature(channel.channel, 'modwall') and
+def commandWallLong(db, chat, tags, nick, message, msgParts, permissions, now):
+    if (not db.hasFeature(chat.channel, 'modwall') and
         not permissions['broadcaster']):
         return False
     
@@ -65,18 +65,18 @@ def commandWallLong(db, channel, nick, message, msgParts, permissions, now):
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modWall' in channel.sessionData:
-            since = currentTime - channel.sessionData['modWall']
+        if 'modWall' in chat.sessionData:
+            since = currentTime - chat.sessionData['modWall']
             if since < cooldown:
                 return False
-        channel.sessionData['modWall'] = currentTime
+        chat.sessionData['modWall'] = currentTime
     elif not permissions['globalMod']:
         rows = min(rows, 500)
     spacer = '' if permissions['channelModerator'] else ' \ufeff'
     messages = [msgParts[1] + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
-    channel.sendMulipleMessages(messages, 2)
+    chat.sendMulipleMessages(messages, 2)
     if permissions['channelModerator']:
-        timeout.recordTimeoutFromCommand(db, channel, nick, messages[0],
+        timeout.recordTimeoutFromCommand(db, chat, nick, messages[0],
                                          message, 'wall')
     return True

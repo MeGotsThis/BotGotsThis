@@ -1,6 +1,6 @@
 ﻿from bot import config, globals
 
-def parse(channel, nick):
+def parse(chat, nick):
     if nick == config.botnick:
-        channel.isMod = False
-        globals.messaging.clearQueue(channel.channel)
+        chat.isMod = False
+        globals.messaging.clearQueue(chat.channel)

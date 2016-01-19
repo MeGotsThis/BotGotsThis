@@ -1,45 +1,45 @@
 from bot import config, globals
 import datetime
 
-def timeoutUser(db, channel, user, module, baseLevel=0, message=None,
+def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
                 reason=None):
-    timeouts = db.getTimeoutLengths(channel.channel)
+    timeouts = db.getTimeoutLengths(chat.channel)
     properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2',]
     defaults = {'timeoutLength0': config.moderatorDefaultTimeout[0],
                 'timeoutLength1': config.moderatorDefaultTimeout[1],
                 'timeoutLength2': config.moderatorDefaultTimeout[2],
                 }
-    chatProp = db.getChatProperties(db, channel.channel, properties,
+    chatProp = db.getChatProperties(db, chat.channel, properties,
                                     defaults, int)
     timeouts = chatProp['timeoutLength0'], chatProp['timeoutLength1'],
     timeouts += chatProp['timeoutLength2'],
     
-    if 'timeouts' not in channel.sessionData:
-        channel.sessionData['timeouts'] = {}
-    if module not in channel.sessionData['timeouts']:
-        channel.sessionData['timeouts'][module] = {}
+    if 'timeouts' not in chat.sessionData:
+        chat.sessionData['timeouts'] = {}
+    if module not in chat.sessionData['timeouts']:
+        chat.sessionData['timeouts'][module] = {}
     
     utcnow = datetime.datetime.utcnow()
     duration = datetime.timedelta(seconds=config.warningDuration)
-    if (user not in channel.sessionData['timeouts'][module] or
-        utcnow - channel.sessionData['timeouts'][module][user][0] >= duration):
+    if (user not in chat.sessionData['timeouts'][module] or
+        utcnow - chat.sessionData['timeouts'][module][user][0] >= duration):
         level = baseLevel
     else:
-        prevLevel = channel.sessionData['timeouts'][module][user][1]
+        prevLevel = chat.sessionData['timeouts'][module][user][1]
         level = min(max(baseLevel + 1, prevLevel + 1), 3)
-    channel.sessionData['timeouts'][module][user] = (utcnow, level)
+    chat.sessionData['timeouts'][module][user] = (utcnow, level)
     length = timeouts[level]
     if length:
-        channel.sendMessage('.timeout ' + user + ' ' + str(length), 0)
+        chat.sendMessage('.timeout ' + user + ' ' + str(length), 0)
     else:
-        channel.sendMessage('.ban ' + user, 0)
-    db.recordTimeout(channel.channel, user, None, module, level, length,
+        chat.sendMessage('.ban ' + user, 0)
+    db.recordTimeout(chat.channel, user, None, module, level, length,
                      message, reason)
     if reason is not None:
         l = str(length) + ' seconds' if length else 'Banned'
         globals.messaging.queueWhisper(user, reason + ' (' + l + ')')
 
-def recordTimeoutFromCommand(db, channel, user, message, sourceMessage,
+def recordTimeoutFromCommand(db, chat, user, message, sourceMessage,
                              module='custom'):
     length = None
     who = None
@@ -57,5 +57,5 @@ def recordTimeoutFromCommand(db, channel, user, message, sourceMessage,
         except:
             pass
     if length is not None:
-        db.recordTimeout(channel.channel, who, user, module, None, length,
+        db.recordTimeout(chat.channel, who, user, module, None, length,
                          sourceMessage, reason)

@@ -1,15 +1,15 @@
 ﻿from ..common import reload, send
 
-def commandReload(db, channel, nick, message, msgParts, permissions, now):
-    reload.botReload(send.channel(channel))
+def commandReload(db, chat, tags, nick, message, msgParts, permissions, now):
+    reload.botReload(send.channel(chat))
     return True
 
-def commandReloadCommands(db, channel, nick, message, msgParts, permissions,
+def commandReloadCommands(db, chat, tags, nick, message, msgParts, permissions,
                           now):
-    reload.botReloadCommands(send.channel(channel))
+    reload.botReloadCommands(send.channel(chat))
     return True
 
-def commandReloadConfig(db, channel, nick, message, msgParts, permissions,
+def commandReloadConfig(db, chat, tags, nick, message, msgParts, permissions,
                         now):
-    reload.botReloadConfig(send.channel(channel))
+    reload.botReloadConfig(send.channel(chat))
     return True

@@ -14,7 +14,7 @@ typeGlobalMod = ['staff', 'admin', 'global_mod']
 typeMod = ['staff', 'admin', 'global_mod', 'mod']
 
 # Set up our commands function
-def parse(channel, tags, nick, message, now):
+def parse(chat, tags, nick, message, now):
     if len(message) == 0:
         return
     
@@ -22,14 +22,14 @@ def parse(channel, tags, nick, message, now):
     if len(msgParts) == 0:
         return
     
-    name = channel.channel + '-' + str(msgParts[0]) + '-'
+    name = chat.channel + '-' + str(msgParts[0]) + '-'
     name += str(time.time())
-    params = channel, tags, nick, message, msgParts, now
+    params = chat, tags, nick, message, msgParts, now
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(channel, tags, nick, message, msgParts, now):
+def threadParse(chat, tags, nick, message, msgParts, now):
     if False: # Hints for Intellisense
-        channel = Channel('', None)
+        chat = Channel('', None)
         nick = str()
         message = str()
         msgParts = [str(), str()]
@@ -49,20 +49,20 @@ def threadParse(channel, tags, nick, message, msgParts, now):
             turbo = '0'
         if config.owner is not None:
             isOwner = nick == config.owner.lower()
-            _ = channel.channel == config.botnick
-            isOwnerChan = channel.channel == config.owner or _
+            _ = chat.channel == config.botnick
+            isOwnerChan = chat.channel == config.owner or _
         else:
             isOwner = False
             isOwnerChan = False
         isStaff = isOwner or userType in typeStaff
         isAdmin = isStaff or userType in typeAdmin
         isGlobalMod = isAdmin or userType in typeGlobalMod
-        isBroadcaster = nick == channel.channel
+        isBroadcaster = nick == chat.channel
         isBroadcaster = isGlobalMod or isAdmin or isBroadcaster
         isMod = isBroadcaster or userType in typeMod
         isSubscriber = isBroadcaster or bool(int(subscriber))
         isTurbo = isBroadcaster or bool(int(turbo))
-        isChanMod = channel.isMod
+        isChanMod = chat.isMod
         permissions = {
             'owner': isOwner,
             'ownerChan': isOwnerChan,
@@ -80,7 +80,8 @@ def threadParse(channel, tags, nick, message, msgParts, now):
     
         complete = False
         with getDatabase() as db:
-            arguments = db, channel, nick, message, msgParts, permissions, now
+            arguments = db, chat, tags, nick, message, msgParts, permissions,
+            arguments += now,
             for filter in commandList.filterMessage:
                 complete = filter(*arguments)
                 if complete:
@@ -113,5 +114,5 @@ def threadParse(channel, tags, nick, message, msgParts, now):
                     if complete:
                         break
     except:
-        extra = 'Channel: ' + channel.channel + '\nMessage: ' + message
+        extra = 'Channel: ' + chat.channel + '\nMessage: ' + message
         utils.logException(extra, now)

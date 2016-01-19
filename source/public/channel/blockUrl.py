@@ -15,21 +15,22 @@ twitchUrlRegex += r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)"
 #twitchUrlRegex = r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|" + twitchUrlRegex
 
 # This is for banning the users who post a URL with no follows
-def filterNoUrlForBots(db, channel, nick, message, msgParts, permissions, now):
+def filterNoUrlForBots(db, chat, tags, nick, message, msgParts, permissions,
+                       now):
     if not permissions['channelModerator']:
         return False
-    if not db.hasFeature(channel.channel, 'nourlredirect'):
+    if not db.hasFeature(chat.channel, 'nourlredirect'):
         return False
     
     if permissions['moderator']:
         return False
     match = re.search(twitchUrlRegex, message)
     if match is not None:
-        params = db, channel, nick, message, now
+        params = db, chat, nick, message, now
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
-def checkIfUrlMaybeBad(db, channel, nick, message, now):
+def checkIfUrlMaybeBad(db, chat, nick, message, now):
     try:
         uri = '/kraken/users/' + nick + '/follows/channels?limit=1'
         response, data = twitch.twitchCall(None, 'GET', uri)
@@ -41,7 +42,7 @@ def checkIfUrlMaybeBad(db, channel, nick, message, now):
     
     # Record all urls with users of no follows
     log = nick + ': ' + message
-    utils.logIrcMessage(channel.ircChannel + '#blockurl.log', log, now)
+    utils.logIrcMessage(chat.ircChannel + '#blockurl.log', log, now)
 
     matches = re.findall(twitchUrlRegex, message)
     for originalUrl in matches:
@@ -59,9 +60,9 @@ def checkIfUrlMaybeBad(db, channel, nick, message, now):
             parsedReponse = urllib.parse.urlparse(responseUrl)
             if parsedOriginal.netloc != parsedReponse.netloc:
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
-                utils.logIrcMessage(channel.ircChannel + '#blockurl-match.log',
+                utils.logIrcMessage(chat.ircChannel + '#blockurl-match.log',
                                     log, now)
-                timeout.timeoutUser(db, channel, nick, 'redirectUrl', 1,
+                timeout.timeoutUser(db, chat, nick, 'redirectUrl', 1,
                                     message)
                 return
         except urllib.error.HTTPError as e:
@@ -70,9 +71,9 @@ def checkIfUrlMaybeBad(db, channel, nick, message, now):
             parsedReponse = urllib.parse.urlparse(responseUrl)
             if parsedOriginal.netloc != parsedReponse.netloc:
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
-                utils.logIrcMessage(channel.ircChannel + '#blockurl-match.log',
+                utils.logIrcMessage(chat.ircChannel + '#blockurl-match.log',
                                     log, now)
-                timeout.timeoutUser(db, channel, nick, 'redirectUrl', 1,
+                timeout.timeoutUser(db, chat, nick, 'redirectUrl', 1,
                                     message)
                 return
         except urllib.error.URLError as e:
