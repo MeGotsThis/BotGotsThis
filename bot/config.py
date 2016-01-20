@@ -58,10 +58,10 @@ moderatorDefaultTimeout = [0, 0, 0]
 moderatorDefaultTimeout[0] = int(ini['BOT']['moderatorDefaultTimeout0'])
 if moderatorDefaultTimeout[0] <= 0:
     moderatorDefaultTimeout[0] = 0
-moderatorDefaultTimeout[1] = int(ini['BOT']['moderatorDefaultTimeout0'])
+moderatorDefaultTimeout[1] = int(ini['BOT']['moderatorDefaultTimeout1'])
 if moderatorDefaultTimeout[1] <= 0:
     moderatorDefaultTimeout[1] = 0
-moderatorDefaultTimeout[2] = int(ini['BOT']['moderatorDefaultTimeout0'])
+moderatorDefaultTimeout[2] = int(ini['BOT']['moderatorDefaultTimeout2'])
 if moderatorDefaultTimeout[2] <= 0:
     moderatorDefaultTimeout[2] = 0
 
