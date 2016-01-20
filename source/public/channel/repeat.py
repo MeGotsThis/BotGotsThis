@@ -17,7 +17,7 @@ def commandAutoRepeat(db, chat, tags, nick, message, msgParts, permissions,
     msgParts = msgParts = message.split(None, 2)
     if 'autorepeat-' in msgParts[0]:
         try:
-            count = int(msgParts[0].split('autorepeat-')[1])
+            count = int(msgParts[0].lower().split('autorepeat-')[1])
         except:
             count = 10
     else:

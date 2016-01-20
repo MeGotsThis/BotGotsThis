@@ -54,7 +54,7 @@ def commandWallLong(db, chat, tags, nick, message, msgParts, permissions, now):
     if len(msgParts) < 2:
         return False
     try:
-        rows = int(msgParts[0].split('wall-')[1])
+        rows = int(msgParts[0].lower().split('wall-')[1])
     except:
         if permissions['broadcaster']:
             rows = 20
