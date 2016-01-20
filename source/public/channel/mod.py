@@ -8,7 +8,7 @@ def commandStatus(db, chat, tags, nick, message, msgParts, permissions, now):
     
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
-        return False
+        msgParts.append(' ')
     
     if oauth.getOAuthTokenWithDB(db, chat.channel) is None:
         return False
