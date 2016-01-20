@@ -24,7 +24,7 @@ def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
         level = baseLevel
     else:
         prevLevel = chat.sessionData['timeouts'][module][user][1]
-        level = min(max(baseLevel + 1, prevLevel + 1), 3)
+        level = min(max(baseLevel + 1, prevLevel + 1), 2)
     chat.sessionData['timeouts'][module][user] = (utcnow, level)
     length = timeouts[level]
     if length:
