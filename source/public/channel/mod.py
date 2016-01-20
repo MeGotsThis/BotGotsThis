@@ -2,6 +2,10 @@
 import threading
 
 def commandStatus(db, chat, tags, nick, message, msgParts, permissions, now):
+    if (not permissions['broadcaster'] and
+        db.hasFeature(chat.channel, 'gamestatusbroadcaster')):
+        return False
+    
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         return False
@@ -22,6 +26,10 @@ def commandStatus(db, chat, tags, nick, message, msgParts, permissions, now):
     return True
 
 def commandGame(db, chat, tags, nick, message, msgParts, permissions, now):
+    if (not permissions['broadcaster'] and
+        db.hasFeature(chat.channel, 'gamestatusbroadcaster')):
+        return False
+    
     msgParts = message.split(None, 1)
     if len(msgParts) != 2:
         msgParts.append('')
