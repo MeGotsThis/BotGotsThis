@@ -127,4 +127,15 @@ def botSetTimeoutLevel(db, channel, send, msgParts):
     except:
         value = None
     db.setChatProperty(channel, propertyDict[k], value)
+    if value is None:
+        t = config.moderatorDefaultTimeout[int(k) - 1]
+        default = str(t) + ' seconds' if t else 'Banned'
+        send('Setting the timeout length for ' + ordinal[k] +
+             ' offense to defaulted amount (' + default + ')')
+    elif value:
+        send('Setting the timeout length for ' + ordinal[k] +
+             ' offense to ' + str(value) + ' seconds')
+    else:
+        send('Setting the timeout length for ' + ordinal[k] +
+             ' offense to banning')
     return True
