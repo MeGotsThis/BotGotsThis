@@ -114,7 +114,12 @@ def botSetTimeoutLevel(db, channel, send, msgParts):
         '2': 'timeoutLength1',
         '3': 'timeoutLength2',
         }
-    k = msgParts[0].lower().split('settimeoutlevel-')
+    ordinal = {
+        '1': '1st',
+        '2': '2nd',
+        '3': '3rd',
+        }
+    k = msgParts[0].lower().split('settimeoutlevel-')[1]
     if k not in propertyDict:
         return False
     try:
