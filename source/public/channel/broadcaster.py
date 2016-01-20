@@ -24,6 +24,12 @@ def commandAutoJoin(db, chat, tags, nick, message, msgParts, permissions, now):
     broadcaster.botAutoJoin(db, nick, send.channel(chat), msgParts)
     return True
 
+def commandSetTimeoutLevel(db, chat, tags, nick, message, msgParts,
+                           permissions, now):
+    broadcaster.botSetTimeoutLevel(db, chat.channel, send.channel(chat),
+                                   msgParts)
+    return True
+
 def commandUptime(db, chat, tags, nick, message, msgParts, permissions, now):
     currentTime = datetime.datetime.utcnow()
     if 'uptime' in chat.sessionData:

@@ -107,3 +107,19 @@ def botAutoJoin(db, channel, send, msgParts):
             msg += ' is already enabled and already in chat'
         send(msg)
     return True
+
+def botSetTimeoutLevel(db, channel, send, msgParts):
+    propertyDict = {
+        '1': 'timeoutLength0',
+        '2': 'timeoutLength1',
+        '3': 'timeoutLength2',
+        }
+    k = msgParts[0].lower().split('settimeoutlevel-')
+    if k not in propertyDict:
+        return False
+    try:
+        value = int(msgParts[1])
+    except:
+        value = None
+    db.setChatProperty(channel, propertyDict[k], value)
+    return True

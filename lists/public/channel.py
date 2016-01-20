@@ -96,6 +96,7 @@ commandsStartWith = {
     '!pyramid-': (pyramid.commandPyramidLong, 'moderator'),
     '!wall-': (wall.commandWallLong, 'moderator'),
     '!autorepeat-': (repeat.commandAutoRepeat, 'broadcaster'),
+    '!settimeoutlevel-': (broadcaster.commandSetTimeoutLevel, 'broadcaster'),
 }
 
 processNoCommand = [text.customCommands]
