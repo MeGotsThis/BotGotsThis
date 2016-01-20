@@ -3,7 +3,6 @@ import datetime
 
 def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
                 reason=None):
-    timeouts = db.getTimeoutLengths(chat.channel)
     properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2',]
     defaults = {'timeoutLength0': config.moderatorDefaultTimeout[0],
                 'timeoutLength1': config.moderatorDefaultTimeout[1],
