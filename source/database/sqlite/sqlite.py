@@ -442,7 +442,7 @@ class SQLiteDatabase(DatabaseBase):
         query = 'SELECT property, value FROM chat_properties '
         query += 'WHERE broadcaster=? AND property IN ('
         query += ','.join('?' * len(properties)) + ')'
-        params = (broadcaster,) + properties
+        params = (broadcaster,) + tuple(properties)
         values = {}
         for property, value in cursor.execute(query, params):
             if isinstance(parse, dict) and property in parse:
