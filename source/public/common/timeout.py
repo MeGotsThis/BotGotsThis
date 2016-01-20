@@ -9,8 +9,7 @@ def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
                 'timeoutLength1': config.moderatorDefaultTimeout[1],
                 'timeoutLength2': config.moderatorDefaultTimeout[2],
                 }
-    chatProp = db.getChatProperties(db, chat.channel, properties,
-                                    defaults, int)
+    chatProp = db.getChatProperties(chat.channel, properties, defaults, int)
     timeouts = chatProp['timeoutLength0'], chatProp['timeoutLength1'],
     timeouts += chatProp['timeoutLength2'],
     
