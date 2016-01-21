@@ -51,7 +51,7 @@ def recordTimeoutFromCommand(db, chat, user, message, sourceMessage,
         try:
             parts = message.split()
             length = int(parts[2])
-            who = parts[0]
+            who = parts[1]
         except:
             pass
     if length is not None:
