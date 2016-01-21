@@ -5,7 +5,7 @@ import datetime
 
 def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
     command = msgParts[0].lower()
-    message = None
+    custom = None
     
     if db.hasFeature(chat.channel, 'nocustom'):
         return False
@@ -18,11 +18,11 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
     for perm in permissionsSet:
         if not perm or permissions[perm]:
             if perm in commands['#global']:
-                message = commands['#global'][perm]
+                custom = commands['#global'][perm]
             if perm in commands[chat.channel]:
-                message = commands[chat.channel][perm]
+                custom = commands[chat.channel][perm]
     
-    if message:
+    if custom:
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.customMessageCooldown)
         if (not permissions['moderator'] and
@@ -43,17 +43,17 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
                 return
         chat.sessionData['customUserCommand'][nick] = currentTime
         
-        query = str(originalMsg.split(None, 1)[1]) if len(msgParts) > 1 else ''
+        query = str(message.split(None, 1)[1]) if len(msgParts) > 1 else ''
         final = []
         try:
-            for part in _parseFormatMessage(str(message)):
+            for part in _parseFormatMessage(str(custom)):
                 plain, field, format, prefix, suffix, *_ = part
                 param, default, original = _
                 final.append(plain)
                 try:
                     if field is not None:
                         params = str(field), str(param), str(prefix),
-                        params += str(suffix),str(default), originalMsg,
+                        params += str(suffix),str(default), message,
                         params += msgParts, chat.channel, nick, query, now
                         string = _getString(*params)
                         if string is not None:
@@ -65,12 +65,11 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
                 except Exception as e:
                     final.append(str(original))
         except Exception as e:
-            final.append(str(message))
+            final = [str(custom)]
         msg = ''.join(final)
         chat.sendMessage(msg)
         if permissions['channelModerator']:
-            timeout.recordTimeoutFromCommand(db, chat, nick, msg,
-                                             originalMsg, 'wall')
+            timeout.recordTimeoutFromCommand(db, chat, nick, msg, message)
 
 def commandCommand(db, chat, tags, nick, message, msgParts, permissions, now):
     if len(msgParts) < 3:
