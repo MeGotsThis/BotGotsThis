@@ -1,4 +1,5 @@
 ﻿from ...api import twitch
+from . import timeout
 from bot import config, globals, utils
 import json
 
@@ -34,8 +35,10 @@ def botPart(channel, send):
     utils.partChannel(channel)
     send('Leaving ' + channel)
 
-def botSay(channel, message):
+def botSay(db, nick, channel, message):
     if channel in globals.channels:
+        timeout.recordTimeoutFromCommand(db, globals.channels[channel], nick,
+                                         message, None, 'say')
         globals.channels[channel].sendMessage(message)
 
 def botEmptyAll(send):

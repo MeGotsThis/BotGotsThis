@@ -13,7 +13,7 @@ def commandSay(db, nick, message, msgParts, permissions, now):
     msgParts = message.split(None, 2)
     msgParts[1] = msgParts[1].lower()
     if msgParts[1] in globals.channels:
-        channel.botSay(msgParts[1], msgParts[2])
+        channel.botSay(db, nick, msgParts[1], msgParts[2])
     return True
 
 def commandJoin(db, nick, message, msgParts, permissions, now):
