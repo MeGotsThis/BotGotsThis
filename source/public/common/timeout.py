@@ -56,4 +56,4 @@ def recordTimeoutFromCommand(db, chat, user, message, sourceMessage,
             pass
     if length is not None:
         db.recordTimeout(chat.channel, who, user, module, None, length,
-                         sourceMessage, reason)
+                         sourceMessage, None)
