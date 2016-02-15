@@ -5,7 +5,55 @@ DELETE FROM game_abbreviations;
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gd', 'Game Development');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gamedev', 'Game Development');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('creative', 'Creative');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('music', 'Music');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gts', 'Gaming Talk Shows');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('talkshow', 'Gaming Talk Shows');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gametalkshow', 'Gaming Talk Shows');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('poker', 'Poker');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('blackjack', 'Blackjack');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pinball', 'Pinball');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('twitchplays', 'Twitch Plays');
 
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('bg', 'Board Games');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('boardgames', 'Board Games');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('bgl', 'Board Games Live');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('bgo', 'Board Game Online');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('bgc', 'Board Game Classics');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tabletop', 'Tabletop Simulator');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tabletops', 'Tabletop Simulator');
+
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('lol', 'League of Legends');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('heartstone', 'Hearthstone: Heroes of Warcraft');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('codbo3', 'Call of Duty: Black Ops III');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('dota2', 'Dota 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('minecraft', 'Minecraft');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('h1z1', 'H1Z1');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('destiny', 'Destiny');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('wot', 'World of Tanks');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('wow', 'World of Warcraft');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('smite', 'Smite');
+
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('cs', 'Half-Life: Counter-Strike');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('hfcs', 'Half-Life: Counter-Strike');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('cscz', 'Counter-Strike: Condition Zero');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('cssource', 'Counter-Strike: Source');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('csgo', 'Counter-Strike: Global Offensive');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('csneo', 'Counter-Strike Neo');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('csonline', 'Counter-Strike Online');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('csnexon', 'Counter-Strike Nexon: Zombies');
+
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('boi', 'The Binding of Isaac');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('boir', 'The Binding of Isaac: Rebirth');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('boia', 'The Binding of Isaac: Afterbirth');
+
+
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sc', 'StarCraft: Brood War');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sc2', 'StarCraft II');
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('aoe', 'Age of Empires');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('aoerr', 'Age of Empires: The Rise of Rome');
@@ -69,11 +117,13 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pm
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pmdeodt', 'Pokémon Mystery Dungeon: Explorers of Darkness/Time');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pmdeos', 'Pokémon Mystery Dungeon: Explorers of Sky');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pmdgti', 'Pokémon Mystery Dungeon: Gates to Infinity');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('psmd', 'Pokémon Super Mystery Dungeon');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnpinball', 'Pokémon Pinball');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnpbrs', 'Pokémon Pinball: Ruby & Sapphire');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnrumble', 'Pokémon Rumble');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnrumbleblast', 'Pokémon Rumble Blast');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnrumbleu', 'Pokémon Rumble U');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnrumbleworld', 'Pokémon Rumble World');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnranger', 'Pokémon Ranger');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnrangersoa', 'Pokémon Ranger: Shadows of Almia');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnrangergs', 'Pokémon Ranger: Guardian Signs');
@@ -81,6 +131,8 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('po
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pokepark2', 'PokéPark 2: Wonders Beyond');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmntcgo', 'Pokémon Trading Card Game Online');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pokemontcgo', 'Pokémon Trading Card Game Online');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('popi', 'Pokémon Picross');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pkmnpicross', 'Pokémon Picross');
 
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mm1', 'Mega Man');
@@ -162,6 +214,8 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ns
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('nslu', 'New Super Luigi U');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sm3dw', 'Super Mario 3D World');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('capttoadtt', 'Captain Toad: Treasure Tracker');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mariomaker', 'Super Mario Maker');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('smm', 'Super Mario Maker');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sml1', 'Super Mario Land');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sml2', 'Super Mario Land 2: 6 Golden Coins');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('smbdx', 'Super Mario Bros. Deluxe');
@@ -213,6 +267,7 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ph
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('spirittracks', 'The Legend of Zelda: Spirit Tracks');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tlozst', 'The Legend of Zelda: Spirit Tracks');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('albw', 'The Legend of Zelda: A Link Between Worlds');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tfh', 'The Legend of Zelda: Tri Force Heroes');
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ladx', 'The Legend of Zelda: Link''s Awakening DX');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ootmq', 'The Legend of Zelda: Ocarina of Time / Master Quest');
@@ -343,7 +398,57 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('sp
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('spyroetd', 'Spyro: Enter the Dragonfly');
 
 
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohfm', 'Yu-Gi-Oh! Forbidden Memories');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohdds', 'Yu-Gi-Oh! Dark Duel Stories');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohddm', 'Yu-Gi-Oh! Dungeon Dice Monsters');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohteds', 'Yu-Gi-Oh! The Eternal Duelist Soul');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohdor', 'Yu-Gi-Oh! Duelists of the Roses');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohtsc', 'Yu-Gi-Oh! The Sacred Cards');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohtfk', 'Yu-Gi-Oh!: The Falsebound Kingdom');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohrod', 'Yu-Gi-Oh! Reshef of Destruction');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohsttdd', 'Yu-Gi-Oh! Worldwide Edition: Stairway to the Destined Duel');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohwct2004', 'Yu-Gi-Oh! World Championship Tournament 2004');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh2004', 'Yu-Gi-Oh! World Championship Tournament 2004');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohdbt', 'Yu-Gi-Oh! Destiny Board Traveler');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohdod', 'Yu-Gi-Oh! The Dawn of Destiny');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohpockaiba', 'Yu-Gi-Oh! Power of Chaos: Kaiba the Revenge');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohpocjoey', 'Yu-Gi-Oh! Power of Chaos: Joey the Passion');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohcmc', 'Yu-Gi-Oh! Capsule Monster Coliseum');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh2005', 'Yu-Gi-Oh! 7 Trials to Glory: World Championship Tournament 2005');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohonline', 'Yu-Gi-Oh! Online');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioho', 'Yu-Gi-Oh! Online');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohnt', 'Yu-Gi-Oh! Nightmare Troubadour');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohgxda', 'Yu-Gi-Oh! GX Duel Academy');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh2006', 'Yu-Gi-Oh! Ultimate Masters: World Championship Tournament 2006');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohgxtf', 'Yu-Gi-Oh! GX Tag Force');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohgxtf1', 'Yu-Gi-Oh! GX Tag Force');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohgxsc', 'Yu-Gi-Oh! GX: Spirit Caller');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh2007', 'Yu-Gi-Oh! World Championship 2007');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohgxca', 'Yu-Gi-Oh! GX: Card Almanac');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohgxtf2', 'Yu-Gi-Oh! GX Tag Force 2');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohwc2008', 'Yu-Gi-Oh! World Championship 2008');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh2008', 'Yu-Gi-Oh! World Championship 2008');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohgxbod', 'Yu-Gi-Oh! GX: The Beginning of Destiny');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohgxtf3', 'Yu-Gi-Oh! GX: Tag Force 3');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh2009', 'Yu-Gi-Oh! 5D''s Stardust Accelerator: World Championship 2009');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh5dswb', 'Yu-Gi-Oh! 5D''s Wheelie Breakers');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh5dstf4', 'Yu-Gi-Oh! 5D''s Tag Force 4');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh2010', 'Yu-Gi-Oh! 5D''s World Championship 2010 Reverse of Arcadia');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh5dstf5', 'Yu-Gi-Oh! 5D''s Tag Force 5');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh5dsdd', 'Yu-Gi-Oh! 5D''s Decade Duels');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh5dsdd+', 'Yu-Gi-Oh! 5D''s Decade Duels Plus');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh5dsmotc', 'Yu-Gi-Oh! 5D''s Duel Transer');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh2011', 'Yu-Gi-Oh! 5D''s World Championship 2011: Over the Nexus');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugioh5dstf6', 'Yu-Gi-Oh! 5D''s Tag Force 6');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohzexal', 'Yu-Gi-Oh! Zexal: Clash! Duel Carnival!');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohmd', 'Yu-Gi-Oh! Millennium Duels');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohdg', 'Yu-Gi-Oh! Duel Generation');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohatfs', 'Yu-Gi-Oh! Arc-V Tag Force Special');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohlotd', 'Yu-Gi-Oh! Legacy of the Duelist');
+
+
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gdash', 'Geometry Dash');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('geometrydash', 'Geometry Dash');
+
 
 COMMIT TRANSACTION;
