@@ -19,6 +19,16 @@ CREATE TABLE custom_commands (
 
 CREATE INDEX command_broadcaster ON custom_commands (broadcaster, command);
 
+CREATE TABLE custom_command_properties (
+    broadcaster VARCHAR NOT NULL,
+    permission VARCHAR NOT NULL,
+    command VARCHAR NOT NULL,
+    property VARCHAR NOT NULL,
+    value VARCHAR NOT NULL,
+    PRIMARY KEY (broadcaster, permission, command, property),
+    FOREIGN KEY (broadcaster, permission, command) REFERENCES custom_commands(broadcaster, permission, command)
+);
+
 CREATE TABLE custom_commands_history (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     broadcaster VARCHAR NOT NULL,

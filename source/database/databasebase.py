@@ -70,6 +70,19 @@ class DatabaseBase:
     def deleteCustomCommand(self, broadcaster, permission, command, user):
         return True
     
+    def getCustomCommandProperty(self, broadcaster, permission, command,
+                                 property=None):
+        if property is None:
+            return {}
+        elif isinstance(property, list):
+            return {p: None for p in property}
+        else:
+            return None
+    
+    def processCustomCommandProperty(self, broadcaster, permission, command,
+                                     property, value):
+        return False
+    
     def hasFeature(self, broadcaster, feature):
         return False
     

@@ -102,8 +102,25 @@ def commandCommand(db, chat, tags, nick, message, msgParts, permissions, now):
             msg = nick + ' -> You do not have permission to set that level'
             chat.sendMessage(msg)
             return
-        
-    if action in ['add', 'insert', 'new']:
+    
+    if action in ['property'] and permissions['broadcaster'] and fullText:
+        parts = fullText.split(None, 1)
+        if len(parts) < 2:
+            parts.append(None)
+        prop, value = parts
+        result = db.processCustomCommandProperty(
+            broadcaster, level, command, prop, value)
+        if result:
+            if value is None:
+                chat.sendMessage(command + ' with ' + prop + ' has been unset')
+            else:
+                msg = command + ' with ' + prop + ' has been set with the '
+                msg += 'value of ' + value
+                chat.sendMessage(msg)
+        else:
+            msg = command + ' with ' + prop + ' could not be processed'
+            chat.sendMessage(msg)
+    elif action in ['add', 'insert', 'new']:
         result = db.insertCustomCommand(
             broadcaster, level, command, fullText, nick)
         if result:

@@ -282,6 +282,63 @@ class SQLiteDatabase(DatabaseBase):
         finally:
             cursor.close()
     
+    def getCustomCommandProperty(self, broadcaster, permission, command,
+                                 property=None):
+        cursor = self.connection.cursor()
+        if property is None:
+            values = {}
+            query = 'SELECT property, value FROM custom_command_properties '
+            query += 'WHERE broadcaster=? AND permission=? AND command=?'
+            params = broadcaster, permission, command,
+            for p, v in cursor.execute(query, params):
+                values[p] = v
+            return values
+        elif isinstance(property, list):
+            values = {}
+            query = 'SELECT property, value FROM custom_command_properties '
+            query += 'WHERE broadcaster=? AND permission=? AND command=? AND '
+            query += 'property IN (' + ','.join('?' * len(properties)) + ')'
+            params = (broadcaster, permission, command,) + tuple(property)
+            for p, v in cursor.execute(query, params):
+                values[p] = v
+            for p in property:
+                if p not in values:
+                    values[p] = None
+            return values
+        else:
+            query = 'SELECT value FROM custom_command_properties WHERE '
+            query += 'broadcaster=? AND permission=? AND command=? AND '
+            query += 'property=?'
+            params = broadcaster, permission, command, property
+            cursor.execute(query, params)
+            return (cursor.fetchone() or [None])[0]
+    
+    def processCustomCommandProperty(self, broadcaster, permission, command,
+                                     property, value):
+        cursor = self.connection.cursor()
+        try:
+            if value is None:
+                query = 'DELETE FROM custom_command_properties WHERE '
+                query += 'broadcaster=? AND permission=? AND command=? AND '
+                query += 'property=?'
+                params = broadcaster, permission, command, property
+                cursor.execute(query, params)
+            else:
+                query = 'REPLACE INTO custom_command_properties '
+                query += '(broadcaster, permission, command, property, value) '
+                query += 'VALUES (?, ?, ?, ?, ?)'
+                params = broadcaster, permission, command, property, value
+                cursor.execute(query, params)
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+            return True
+        except:
+            return False
+        finally:
+            cursor.close()
+    
     def hasFeature(self, broadcaster, feature):
         cursor = self.connection.cursor()
         try:
