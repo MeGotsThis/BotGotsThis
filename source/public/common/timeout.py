@@ -37,23 +37,26 @@ def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
         l = str(length) + ' seconds' if length else 'Banned'
         globals.messaging.queueWhisper(user, reason + ' (' + l + ')')
 
-def recordTimeoutFromCommand(db, chat, user, message, sourceMessage,
+def recordTimeoutFromCommand(db, chat, user, messages, sourceMessage,
                              module='custom'):
-    length = None
-    who = None
-    if message.startswith(('.ban', '/ban')):
-        try:
-            who = message.split()[1]
-            length = 0
-        except:
-            pass
-    if message.startswith(('.timeout', '/timeout')):
-        try:
-            parts = message.split()
-            length = int(parts[2])
-            who = parts[1]
-        except:
-            pass
-    if length is not None:
-        db.recordTimeout(chat.channel, who, user, module, None, length,
-                         sourceMessage, None)
+    if not isinstance(messages, (list, tuple)):
+        messages = [messages]
+    for message in messages:
+        length = None
+        who = None
+        if message.startswith(('.ban', '/ban')):
+            try:
+                who = message.split()[1]
+                length = 0
+            except:
+                pass
+        if message.startswith(('.timeout', '/timeout')):
+            try:
+                parts = message.split()
+                length = int(parts[2])
+                who = parts[1]
+            except:
+                pass
+        if length is not None:
+            db.recordTimeout(chat.channel, who, user, module, None, length,
+                             sourceMessage, None)

@@ -1,5 +1,5 @@
-﻿from source.public.custom import broadcaster, countdown, params, query, url
-from source.public.custom import user
+﻿from source.public.custom import broadcaster, countdown, multiple, params
+from source.public.custom import query, url, user
 
 fields = [broadcaster.fieldBroadcaster,
           user.fieldUser,
@@ -11,3 +11,5 @@ fields = [broadcaster.fieldBroadcaster,
           countdown.fieldPrevious,
           ]
 fieldsEnd = [params.fieldParams]
+properties = ['multiple', 'delimiter']
+postProcess = [multiple.propertyMultipleLines]

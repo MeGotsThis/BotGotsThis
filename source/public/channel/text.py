@@ -5,7 +5,7 @@ import datetime
 
 def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
     command = msgParts[0].lower()
-    custom = None
+    customMessage = None
     
     if db.hasFeature(chat.channel, 'nocustom'):
         return False
@@ -15,14 +15,17 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
     
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
                       'globalMod', 'admin', 'staff', 'owner',]
+    level = None
     for perm in permissionsSet:
         if not perm or permissions[perm]:
             if perm in commands['#global']:
-                custom = commands['#global'][perm]
+                customMessage = commands['#global'][perm]
+                level = perm
             if perm in commands[chat.channel]:
-                custom = commands[chat.channel][perm]
+                customMessage = commands[chat.channel][perm]
+                level = perm
     
-    if custom:
+    if customMessage:
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.customMessageCooldown)
         if (not permissions['moderator'] and
@@ -46,7 +49,7 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
         query = str(message.split(None, 1)[1]) if len(msgParts) > 1 else ''
         final = []
         try:
-            for part in _parseFormatMessage(str(custom)):
+            for part in _parseFormatMessage(str(customMessage)):
                 plain, field, format, prefix, suffix, *_ = part
                 param, default, original = _
                 final.append(plain)
@@ -65,11 +68,13 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
                 except Exception as e:
                     final.append(str(original))
         except Exception as e:
-            final = [str(custom)]
-        msg = ''.join(final)
-        chat.sendMessage(msg)
+            final = [str(customMessage)]
+        msgs = [''.join(final)]
+        for process in custom.postProcess:
+            process(db, chat, tags, nick, permissions, level, command, msgs)
+        chat.sendMulipleMessages(msgs)
         if permissions['channelModerator']:
-            timeout.recordTimeoutFromCommand(db, chat, nick, msg, message)
+            timeout.recordTimeoutFromCommand(db, chat, nick, msgs, message)
 
 def commandCommand(db, chat, tags, nick, message, msgParts, permissions, now):
     if len(msgParts) < 3:
@@ -108,6 +113,10 @@ def commandCommand(db, chat, tags, nick, message, msgParts, permissions, now):
         if len(parts) < 2:
             parts.append(None)
         prop, value = parts
+        if prop not in custom.properties:
+            msg = nick + ' -> That property does not exist'
+            chat.sendMessage(msg)
+            return
         result = db.processCustomCommandProperty(
             broadcaster, level, command, prop, value)
         if result:
