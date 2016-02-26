@@ -329,7 +329,7 @@ class SQLiteDatabase(DatabaseBase):
             values = {}
             query = 'SELECT property, value FROM custom_command_properties '
             query += 'WHERE broadcaster=? AND permission=? AND command=?'
-            params = broadcaster, permission, command,
+            params = broadcaster, permission, command.lower(),
             for p, v in cursor.execute(query, params):
                 values[p] = v
             return values
@@ -337,8 +337,9 @@ class SQLiteDatabase(DatabaseBase):
             values = {}
             query = 'SELECT property, value FROM custom_command_properties '
             query += 'WHERE broadcaster=? AND permission=? AND command=? AND '
-            query += 'property IN (' + ','.join('?' * len(properties)) + ')'
-            params = (broadcaster, permission, command,) + tuple(property)
+            query += 'property IN (' + ','.join('?' * len(property)) + ')'
+            params = broadcaster, permission, command.lower(),
+            params += tuple(property)
             for p, v in cursor.execute(query, params):
                 values[p] = v
             for p in property:
@@ -349,7 +350,7 @@ class SQLiteDatabase(DatabaseBase):
             query = 'SELECT value FROM custom_command_properties WHERE '
             query += 'broadcaster=? AND permission=? AND command=? AND '
             query += 'property=?'
-            params = broadcaster, permission, command, property
+            params = broadcaster, permission, command.lower(), property
             cursor.execute(query, params)
             return (cursor.fetchone() or [None])[0]
     
