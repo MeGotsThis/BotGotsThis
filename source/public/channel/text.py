@@ -157,6 +157,16 @@ def commandCommand(db, chat, tags, nick, message, msgParts, permissions, now):
             msg = command + ' was not updated successfully. The command might '
             msg += 'not exist'
             chat.sendMessage(msg)
+    elif action in ['append']:
+        params = broadcaster, level, command, fullText, nick
+        result = db.appendCustomCommand(*params)
+        if result:
+            msg = command + ' was appended successfully'
+            chat.sendMessage(msg)
+        else:
+            msg = command + ' was not appended successfully. The command might '
+            msg += 'not exist'
+            chat.sendMessage(msg)
     elif action in ['del', 'delete', 'rem', 'remove',]:
         result = db.deleteCustomCommand(broadcaster, level, command, nick)
         if result:

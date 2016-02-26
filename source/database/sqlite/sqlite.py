@@ -252,6 +252,46 @@ class SQLiteDatabase(DatabaseBase):
         finally:
             cursor.close()
     
+    def appendCustomCommand(self, broadcaster, permission, command,
+                            message, user):
+        cursor = self.connection.cursor()
+        try:
+            query = 'SELECT fullMessage FROM custom_commands '
+            query += 'WHERE broadcaster=? AND permission=? AND command=?'
+            cursor.execute(query, (broadcaster, permission, command.lower()))
+            messageRow = cursor.fetchone()
+            if messageRow is None:
+                return False
+            fullMessage = messageRow[0] + message
+
+            query = 'UPDATE custom_commands SET fullMessage=?, lastEditor=?, '
+            query += 'lastUpdated=CURRENT_TIMESTAMP '
+            query += 'WHERE broadcaster=? AND permission=? AND command=?'
+            display = None if command.lower() == command else command
+            params = fullMessage, user,
+            params += broadcaster, permission, command.lower()
+            cursor.execute(query, params)
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+
+            query = 'INSERT INTO custom_commands_history '
+            query += '(broadcaster, permission, command, '
+            query += 'commandDisplay, fullMessage, creator, created) '
+            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
+            display = None if command.lower() == command else command
+            params = broadcaster, permission, command.lower(),
+            params += display, fullMessage, user
+            cursor.execute(query, params)
+
+            self.connection.commit()
+            return True
+        except:
+            return False
+        finally:
+            cursor.close()
+    
     def deleteCustomCommand(self, broadcaster, permission, command, user):
         cursor = self.connection.cursor()
         try:

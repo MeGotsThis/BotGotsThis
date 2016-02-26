@@ -67,6 +67,10 @@ class DatabaseBase:
                              fullMessage, user):
         return False
     
+    def appendCustomCommand(self, broadcaster, permission, command,
+                             message, user):
+        return False
+    
     def deleteCustomCommand(self, broadcaster, permission, command, user):
         return True
     
