@@ -278,6 +278,7 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tl
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('oot3d', 'The Legend of Zelda: Ocarina of Time 3D');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('mm3d', 'The Legend of Zelda: Majora''s Mask 3D');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('twwhd', 'The Legend of Zelda: The Wind Waker HD');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('tphd', 'The Legend of Zelda: Twilight Princess HD');
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('lct', 'Link''s Crossbow Training');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('hw', 'Hyrule Warriors');
