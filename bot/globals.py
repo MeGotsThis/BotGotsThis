@@ -7,15 +7,17 @@ import traceback
 # Import some necessary libraries.
 messaging = None
 
-mainChat = None
-eventChat = None
-groupChat = None
-
 join = None
 groupChannel = None
 
 background = None
 
+clusters = {
+    'main': None,
+    'event': None,
+    'group': None,
+    'aws': None,
+    }
 channels = {}
 displayName = config.botnick
 isTwitchTurbo = False

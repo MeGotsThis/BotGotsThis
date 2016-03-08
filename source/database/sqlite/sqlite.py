@@ -22,13 +22,13 @@ class SQLiteDatabase(DatabaseBase):
     
     def getAutoJoinsChats(self):
         cursor = self.connection.cursor()
-        query = 'SELECT broadcaster, priority, useEvent FROM auto_join '
+        query = 'SELECT broadcaster, priority, cluster FROM auto_join '
         query += 'ORDER BY priority ASC'
         cursor.execute(query)
         rowMap = lambda r: {
             'broadcaster': r[0],
             'priority': r[1],
-            'eventServer': r[2],
+            'cluster': r[2],
             }
         chats = map(rowMap, cursor.fetchall())
         cursor.close()
@@ -46,12 +46,12 @@ class SQLiteDatabase(DatabaseBase):
         cursor.close()
         return priority
     
-    def saveAutoJoin(self, broadcaster, priority=0, useEvent=False):
+    def saveAutoJoin(self, broadcaster, priority=0, cluster='main'):
         cursor = self.connection.cursor()
         try:
-            query = 'INSERT INTO auto_join (broadcaster, priority, useEvent) '
+            query = 'INSERT INTO auto_join (broadcaster, priority, cluster) '
             query += 'VALUES (?, ?, ?)'
-            params = broadcaster, priority, useEvent
+            params = broadcaster, priority, cluster
             cursor.execute(query, params)
             self.connection.commit()
             return True
@@ -90,11 +90,11 @@ class SQLiteDatabase(DatabaseBase):
         finally:
             cursor.close()
     
-    def setAutoJoinServer(self, broadcaster, useEvent=False):
+    def setAutoJoinServer(self, broadcaster, cluster='main'):
         cursor = self.connection.cursor()
         try:
-            query = 'UPDATE auto_join SET useEvent=? WHERE broadcaster=?'
-            params = useEvent, broadcaster
+            query = 'UPDATE auto_join SET cluster=? WHERE broadcaster=?'
+            params = cluster, broadcaster
             cursor.execute(query, params)
             self.connection.commit()
             if cursor.rowcount == 0:
@@ -478,7 +478,7 @@ class SQLiteDatabase(DatabaseBase):
     def removeBannedChannel(self, broadcaster, reason, nick):
         cursor = self.connection.cursor()
         try:
-            query = 'DELETE FROM banned_channels FROM broadcaster=?'
+            query = 'DELETE FROM banned_channels WHERE broadcaster=?'
             params = broadcaster,
             cursor.execute(query, params)
 

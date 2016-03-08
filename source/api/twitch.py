@@ -76,3 +76,31 @@ def updateTwitchEmotes():
             emoteSet[emote['id']] = int(emoteSetId)
     globals.globalEmotes = emotes
     globals.globalEmoteSets = emoteSet
+
+def twitchChatServer(chat, headers={}, data=None):
+    conn = http.client.HTTPSConnection('tmi.twitch.tv')
+    
+    if chat is not None and 'Authorization' not in headers:
+        token = oauth.getOAuthToken(chat)
+        if token is not None:
+            headers['Authorization'] = 'OAuth ' + token
+        headers['Accept'] = 'application/vnd.twitchtv.v3+json'
+        clientId = getTwitchClientId()
+        if clientId is not None:
+            headers['Client-ID'] = clientId
+    
+    if data is not None:
+        if type(data) is dict:
+            data = urllib.parse.urlencode(data)
+    
+    uri = '/servers?channel=' + chat
+    conn.request('GET', uri, data, headers)
+    response = conn.getresponse()
+    responseData = response.read()
+    try:
+        jData = json.loads(responseData.decode('utf-8'))
+        return jData['cluster']
+    except:
+        return None
+    finally:
+        conn.close()

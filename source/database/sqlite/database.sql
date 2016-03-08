@@ -1,7 +1,8 @@
 CREATE TABLE auto_join (
     broadcaster VARCHAR NOT NULL PRIMARY KEY,
     priority INT NOT NULL DEFAULT 0,
-    useEvent BOOL NOT NULL DEFAULT 0
+    useEvent BOOL NOT NULL DEFAULT 0,
+    cluster VARCHAR NOT NULL DEFAULT 'main'
 );
 
 CREATE TABLE custom_commands (

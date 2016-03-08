@@ -19,26 +19,24 @@ import traceback
 print(str(datetime.datetime.utcnow()) + ' Starting')
 globals.messaging = MessageQueue(name='Message Queue')
 
-globals.mainChat = SocketThread(config.mainServer, config.mainPort,
-                                name='Main Chat')
-globals.eventChat = SocketThread(config.eventServer, config.eventPort,
-                         name='Event Chat')
-globals.groupChat = SocketThread(config.groupServer, config.groupPort,
-                         name='Group Chat')
+globals.clusters['main'] = SocketThread(config.mainServer, config.mainPort,
+                                        name='Main Chat')
+globals.clusters['event'] = SocketThread(config.eventServer, config.eventPort,
+                                         name='Event Chat')
+globals.clusters['group'] = SocketThread(config.groupServer, config.groupPort,
+                                         name='Group Chat')
+globals.clusters['aws'] = SocketThread(config.awsServer, config.awsPort,
+                                       name='AWS Chat')
 
 globals.join = JoinThread(name='Join Thread')
-globals.join.addSocket(globals.mainChat)
-globals.join.addSocket(globals.eventChat)
-globals.join.addSocket(globals.groupChat)
-globals.groupChannel = Channel(config.botnick, globals.groupChat,
+globals.groupChannel = Channel(config.botnick, 'group',
                                float('-inf'))
 
 globals.background = BackgroundTasker(name='Background Tasker')
 
 # Start the Threads
-globals.mainChat.start()
-globals.eventChat.start()
-globals.groupChat.start()
+for st in globals.clusters.values():
+    st.start()
 globals.messaging.start()
 globals.background.start()
 globals.join.start()
@@ -54,16 +52,13 @@ for _modules in _modulesList:
           importlib.import_module(modname)
 
 try:
-    utils.joinChannel(config.botnick, float('-inf'), globals.mainChat)
+    utils.joinChannel(config.botnick, float('-inf'), 'main')
     if config.owner:
-        utils.joinChannel(config.owner, float('-inf'), globals.mainChat)
+        utils.joinChannel(config.owner, float('-inf'), 'main')
     with getDatabase() as db:
         for channelRow in db.getAutoJoinsChats():
             params = channelRow['broadcaster'], channelRow['priority'],
-            if channelRow['eventServer']:
-                params += globals.eventChat,
-            else:
-                params += globals.mainChat,
+            params += channelRow['cluster'],
             utils.joinChannel(*params)
     
     globals.messaging.join()

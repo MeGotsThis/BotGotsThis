@@ -14,25 +14,15 @@ def botCome(db, channel, send):
         send('I am already in ' + channel)
         return True
     
-    response, data = twitch.twitchCall(
-        None, 'GET', '/api/channels/' + channel + '/chat_properties')
-    chatProperties = json.loads(data.decode('utf-8'))
-    
-    if chatProperties['eventchat']:
-        server = globals.eventChat
-    else:
-        server = globals.mainChat
-    if utils.joinChannel(channel, priority, server):
+    cluster = twitch.twitchChatServer(channel)
+    if utils.joinChannel(channel, priority, cluster):
         send('Joining ' + channel)
     else:
         result = utils.ensureServer(channel, priority, server)
         if result == utils.ENSURE_CORRECT:
             send('Already joined ' + channel)
-        elif result == utils.ENSURE_REJOIN_TO_MAIN:
-            msg = 'Moved ' + channel + ' to main chat server'
-            send(msg)
-        elif result == utils.ENSURE_REJOIN_TO_EVENT:
-            msg = 'Moved ' + channel + ' to event chat server'
+        elif result == utils.ENSURE_REJOIN:
+            msg = 'Moved ' + channel + ' to correct chat server'
             send(msg)
 
 def botLeave(channel, send):
@@ -64,24 +54,17 @@ def botAutoJoin(db, channel, send, msgParts):
                 send('Auto join for ' + channel + ' was never enabled')
             return True
     
-    response, data = twitch.twitchCall(
-        None, 'GET', '/api/channels/' + channel + '/chat_properties')
-    chatProperties = json.loads(data.decode('utf-8'))
-    
-    result = db.saveAutoJoin(channel, 0, chatProperties['eventchat'])
+    cluster = twitch.twitchChatServer(channel)
+    result = db.saveAutoJoin(channel, 0, cluster)
     priority = db.getAutoJoinsPriority(channel)
     if result == False:
-        db.setAutoJoinServer(channel, chatProperties['eventchat'])
+        db.setAutoJoinServer(channel, cluster)
     
     wasInChat = channel in globals.channels
-    if chatProperties['eventchat']:
-        server = globals.eventChat
-    else:
-        server = globals.mainChat
     if not wasInChat:
-        utils.joinChannel(channel, priority, server)
+        utils.joinChannel(channel, priority, cluster)
     else:
-        rejoin = utils.ensureServer(channel, priority, server)
+        rejoin = utils.ensureServer(channel, priority, cluster)
     
     if result and not wasInChat:
         send(

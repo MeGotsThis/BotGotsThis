@@ -1,4 +1,5 @@
 ﻿from .. import config
+from .. import globals
 from .. import utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
@@ -12,7 +13,6 @@ import sys
 class JoinThread(threading.Thread):
     def __init__(self, **args):
         threading.Thread.__init__(self, **args)
-        self._socketThreads = []
         self._joinTimes = []
         self._joinTimesLock = threading.Lock()
         self._channelJoined = set()
@@ -21,8 +21,8 @@ class JoinThread(threading.Thread):
     def run(self):
         print(str(datetime.datetime.utcnow()) + ' Starting SocketJoinThread')
         joinDuration = datetime.timedelta(seconds=10.05)
-        running = lambda st: st.running
-        while any(map(running, self._socketThreads)):
+        running = lambda c: globals.clusters[c].running
+        while any(map(running, globals.clusters)):
             try:
                 utcnow = datetime.datetime.utcnow()
                 with self._joinTimesLock:
@@ -33,7 +33,7 @@ class JoinThread(threading.Thread):
                         continue
                 
                 channels = {}
-                for socketThread in self._socketThreads:
+                for socketThread in globals.clusters.values():
                     if socketThread.isConnected:
                         chans = socketThread.channels
                         for chan in chans:

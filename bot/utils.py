@@ -1,20 +1,20 @@
 ﻿from bot import config
 from .channel import Channel
-from .globals import channels, mainChat
+from .globals import channels, clusters
 import datetime
 import os.path
 import sys
 import threading
 import traceback
 
-def joinChannel(channel, priority=float('inf'), server=mainChat):
+def joinChannel(channel, priority=float('inf'), cluster='main'):
     channel = channel.lower()
     if channel in channels:
         t = min(channels[channel].joinPriority, priority)
         channels[channel].joinPriority = t
         return False
-    channels[channel] = Channel(channel, server, priority)
-    server.joinChannel(channels[channel])
+    channels[channel] = Channel(channel, clusters[cluster], priority)
+    clusters[cluster].joinChannel(channels[channel])
     return True
 
 def partChannel(channel):
@@ -22,24 +22,20 @@ def partChannel(channel):
         channels[channel].part()
         del channels[channel]
 
-ENSURE_REJOIN_TO_MAIN = int(-2)
-ENSURE_REJOIN_TO_EVENT = int(-1)
+ENSURE_REJOIN = int(-1)
 ENSURE_CORRECT = int(0)
 ENSURE_NOT_JOINED = int(1)
 
-def ensureServer(channel, priority=float('inf'), server=mainChat):
+def ensureServer(channel, priority=float('inf'), cluster='main'):
     if channel not in channels:
         return ENSURE_NOT_JOINED
-    if server is channels[channel].socket:
+    if clusters[cluster] is channels[channel].socket:
         channels[channel].joinPriority = min(
             channels[channel].joinPriority, priority)
         return ENSURE_CORRECT
     partChannel(channel)
-    joinChannel(channel, priority, server)
-    if server is eventChat:
-        return ENSURE_REJOIN_TO_EVENT
-    else:
-        return ENSURE_REJOIN_TO_MAIN
+    joinChannel(channel, priority, clusters[cluster])
+    return ENSURE_REJOIN
 
 def logIrcMessage(filename, message, timestamp=None):
     if config.ircLogFolder is None:

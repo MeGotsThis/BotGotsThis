@@ -8,23 +8,13 @@ def manageAutoJoin(db, send, nick, message, msgParts):
     msgParts[2] = msgParts[2].lower()
     if msgParts[2] in ['reloadserver']:
         for channelRow in db.getAutoJoinsChats():
-            uri = '/api/channels/' + channelRow['broadcaster']
-            uri += '/chat_properties'
-            r = twitch.twitchCall(None, 'GET', uri)
-            response, data = r
-            chatProperties = json.loads(data.decode('utf-8'))
-                
-            if channelRow['eventServer'] != chatProperties['eventchat']:
-                params = channelRow['broadcaster'],
-                params += chatProperties['eventchat'],
+            cluster = twitch.twitchChatServer(channelRow['broadcaster'])
+            if channelRow['cluster'] != cluster['eventchat']:
+                params = channelRow['broadcaster'], cluster,
                 db.setAutoJoinServer(*params)
                     
-                if chatProperties['eventchat']:
-                    server = globals.eventChat
-                else:
-                    server = globals.mainChat
                 params = channelRow['broadcaster'], channelRow['priority'],
-                params += server,
+                params += cluster,
                 rejoin = utils.ensureServer(*params)
                     
                 print(str(datetime.datetime.utcnow()) + ' Set Server for ' +
@@ -36,32 +26,21 @@ def manageAutoJoin(db, send, nick, message, msgParts):
         return False
     msgParts[3] = msgParts[3].lower()
     if msgParts[2] in ['add', 'insert', 'join']:
-        response, data = twitch.twitchCall(
-            None, 'GET', '/api/channels/' + msgParts[3] + '/chat_properties')
-        chatProperties = json.loads(data.decode('utf-8'))
-        
         if db.isChannelBannedReason(msgParts[3]):
             send('Chat ' + msgParts[3] + ' is banned from joining')
             return True
-        if chatProperties['eventchat']:
-            server = globals.eventChat
-        else:
-            server = globals.mainChat
-        params = msgParts[3], 0, chatProperties['eventchat']
+        cluster = twitch.twitchChatServer(msgParts[3])
+        params = msgParts[3], 0, cluster
         result = db.saveAutoJoin(*params)
         priority = db.getAutoJoinsPriority(msgParts[3])
         if result == False:
-            db.setAutoJoinServer(msgParts[3], chatProperties['eventchat'])
+            db.setAutoJoinServer(msgParts[3], cluster)
             
         wasInChat = msgParts[3] in globals.channels
-        if chatProperties['eventchat']:
-            server = globals.eventChat
-        else:
-            server = globals.mainChat
         if not wasInChat:
-            utils.joinChannel(msgParts[3], priority, server)
+            utils.joinChannel(msgParts[3], priority, cluster)
         else:
-            rejoin = utils.ensureServer(msgParts[3], priority, server)
+            rejoin = utils.ensureServer(msgParts[3], priority, cluster)
         
         if result and not wasInChat:
             send('Auto join for ' + msgParts[3] + ' is now enabled and '

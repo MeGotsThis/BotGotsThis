@@ -28,6 +28,8 @@ eventServer = str(ini['TWITCH']['eventServer'])
 eventPort = int(ini['TWITCH']['eventPort'])
 groupServer = str(ini['TWITCH']['groupServer'])
 groupPort = int(ini['TWITCH']['groupPort'])
+awsServer = str(ini['TWITCH']['awsServer'])
+awsPort = int(ini['TWITCH']['awsPort'])
 
 messageLimit = int(ini['BOT']['messageLimit'])
 modLimit = min(int(ini['BOT']['modLimit']), 100)

@@ -101,9 +101,8 @@ class MessageQueue(threading.Thread):
             utils.logException()
             raise
         finally:
-            globals.mainChat.running = False
-            globals.eventChat.running = False
-            globals.groupChat.running = False
+            for c in globals.clusters.values():
+                c.running = False
             globals.join.running = False
             globals.background.running = False
             print(str(datetime.datetime.utcnow()) + ' Ending MessageQueue')
