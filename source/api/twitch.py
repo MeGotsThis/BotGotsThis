@@ -99,7 +99,7 @@ def twitchChatServer(chat, headers={}, data=None):
     responseData = response.read()
     try:
         jData = json.loads(responseData.decode('utf-8'))
-        return jData['cluster']
+        return str(jData['cluster'])
     except:
         return None
     finally:

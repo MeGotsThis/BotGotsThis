@@ -6,7 +6,7 @@ class Channel:
     __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',
                  '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
                  '_joinPriority', '_ffzEmotes', '_ffzCache', '_streamingSince',
-                 '_twitchStatus', '_twitchGame',
+                 '_twitchStatus', '_twitchGame', '_serverCheck',
                  ]
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
@@ -24,6 +24,7 @@ class Channel:
         self._streamingSince = None
         self._twitchStatus = None
         self._twitchGame = None
+        self._serverCheck = None
     
     @property
     def channel(self):
@@ -108,6 +109,14 @@ class Channel:
     @twitchGame.setter
     def twitchGame(self, value):
         self._twitchGame = value
+    
+    @property
+    def serverCheck(self):
+        return self._serverCheck
+    
+    @serverCheck.setter
+    def serverCheck(self, value):
+        self._serverCheck = value
     
     def onJoin(self):
         self._ircUsers.clear()

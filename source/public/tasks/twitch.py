@@ -1,8 +1,10 @@
 ﻿from ...api import twitch
-from bot import globals
+from ...database.factory import getDatabase
+from bot import globals, utils
 import copy
 import datetime
 import json
+import random
 
 def checkStreamsAndChannel(timestamp):
     if not globals.channels:
@@ -40,3 +42,22 @@ def checkStreamsAndChannel(timestamp):
         channelData.streamingSince = None
         channelData.twitchStatus = twitchStatus
         channelData.twitchGame = twitchGame
+
+def checkChatServers(timestamp):
+    cooldown = datetime.timedelta(seconds=3600)
+    channels = copy.copy(globals.channels)
+    toCheck = [c for c, ch in channels.items()
+               if (ch.serverCheck is None or
+                   timestamp - ch.serverCheck >= cooldown)]
+    if not toCheck:
+        return
+    channel = random.choice(toCheck)
+    channels[channel].serverCheck = timestamp
+    cluster = twitch.twitchChatServer(channel)
+    if (cluster is not None and
+        globals.clusters[cluster] is not channels[channel].socket):
+        with getDatabase() as db:
+            priority = db.getAutoJoinsPriority(channel)
+            priority = priority if priority is not None else float('inf')
+            utils.ensureServer(channel, priority, cluster)
+            db.setAutoJoinServer(channel, cluster)
