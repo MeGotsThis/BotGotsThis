@@ -29,7 +29,7 @@ globals.clusters['aws'] = SocketThread(config.awsServer, config.awsPort,
                                        name='AWS Chat')
 
 globals.join = JoinThread(name='Join Thread')
-globals.groupChannel = Channel(config.botnick, 'group',
+globals.groupChannel = Channel(config.botnick, globals.clusters['group'],
                                float('-inf'))
 
 globals.background = BackgroundTasker(name='Background Tasker')
