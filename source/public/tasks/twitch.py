@@ -54,7 +54,7 @@ def checkChatServers(timestamp):
     channel = random.choice(toCheck)
     channels[channel].serverCheck = timestamp
     cluster = twitch.twitchChatServer(channel)
-    if (cluster is not None and
+    if (cluster is not None and cluster in globals.clusters and
         globals.clusters[cluster] is not channels[channel].socket):
         with getDatabase() as db:
             priority = db.getAutoJoinsPriority(channel)

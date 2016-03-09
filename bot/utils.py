@@ -8,6 +8,8 @@ import threading
 import traceback
 
 def joinChannel(channel, priority=float('inf'), cluster='main'):
+    if cluster is None or cluster not in clusters:
+        return False
     channel = channel.lower()
     if channel in channels:
         t = min(channels[channel].joinPriority, priority)
@@ -22,6 +24,8 @@ def partChannel(channel):
         channels[channel].part()
         del channels[channel]
 
+ENSURE_CLUSTER_UNKNOWN = int(-3)
+ENSURE_CLUSTER_NONE = int(-2)
 ENSURE_REJOIN = int(-1)
 ENSURE_CORRECT = int(0)
 ENSURE_NOT_JOINED = int(1)
@@ -29,6 +33,11 @@ ENSURE_NOT_JOINED = int(1)
 def ensureServer(channel, priority=float('inf'), cluster='main'):
     if channel not in channels:
         return ENSURE_NOT_JOINED
+    if cluster is None:
+        return ENSURE_CLUSTER_NONE
+    if cluster not in clusters:
+        partChannel(channel)
+        return ENSURE_CLUSTER_UNKNOWN
     if clusters[cluster] is channels[channel].socket:
         channels[channel].joinPriority = min(
             channels[channel].joinPriority, priority)
