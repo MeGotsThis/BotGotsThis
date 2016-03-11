@@ -43,7 +43,7 @@ def ensureServer(channel, priority=float('inf'), cluster='main'):
             channels[channel].joinPriority, priority)
         return ENSURE_CORRECT
     partChannel(channel)
-    joinChannel(channel, priority, clusters[cluster])
+    joinChannel(channel, priority, cluster)
     return ENSURE_REJOIN
 
 def logIrcMessage(filename, message, timestamp=None):
