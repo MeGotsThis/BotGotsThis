@@ -362,13 +362,14 @@ class SQLiteDatabase(DatabaseBase):
                 query = 'DELETE FROM custom_command_properties WHERE '
                 query += 'broadcaster=? AND permission=? AND command=? AND '
                 query += 'property=?'
-                params = broadcaster, permission, command, property
+                params = broadcaster, permission, command.lower(), property
                 cursor.execute(query, params)
             else:
                 query = 'REPLACE INTO custom_command_properties '
                 query += '(broadcaster, permission, command, property, value) '
                 query += 'VALUES (?, ?, ?, ?, ?)'
-                params = broadcaster, permission, command, property, value
+                params = broadcaster, permission, command.lower(), property,
+                params += value,
                 cursor.execute(query, params)
 
             self.connection.commit()
