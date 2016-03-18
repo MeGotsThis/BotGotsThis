@@ -1,4 +1,5 @@
 ﻿from ...api import twitch
+from ...database import factory
 from ..common import timeout
 from bot import config, utils
 import datetime
@@ -26,11 +27,11 @@ def filterNoUrlForBots(db, chat, tags, nick, message, msgParts, permissions,
         return False
     match = re.search(twitchUrlRegex, message)
     if match is not None:
-        params = db, chat, nick, message, now
+        params = chat, nick, message, now
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
-def checkIfUrlMaybeBad(db, chat, nick, message, now):
+def checkIfUrlMaybeBad(chat, nick, message, now):
     try:
         uri = '/kraken/users/' + nick + '/follows/channels?limit=1'
         response, data = twitch.twitchCall(None, 'GET', uri)
@@ -62,8 +63,9 @@ def checkIfUrlMaybeBad(db, chat, nick, message, now):
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
                 utils.logIrcMessage(chat.ircChannel + '#blockurl-match.log',
                                     log, now)
-                timeout.timeoutUser(db, chat, nick, 'redirectUrl', 1,
-                                    message)
+                with factory.getDatabase() as db:
+                    timeout.timeoutUser(db, chat, nick, 'redirectUrl', 1,
+                                        message)
                 return
         except urllib.error.HTTPError as e:
             parsedOriginal = urllib.parse.urlparse(url)
@@ -73,8 +75,9 @@ def checkIfUrlMaybeBad(db, chat, nick, message, now):
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
                 utils.logIrcMessage(chat.ircChannel + '#blockurl-match.log',
                                     log, now)
-                timeout.timeoutUser(db, chat, nick, 'redirectUrl', 1,
-                                    message)
+                with factory.getDatabase() as db:
+                    timeout.timeoutUser(db, chat, nick, 'redirectUrl', 1,
+                                        message)
                 return
         except urllib.error.URLError as e:
             try:
