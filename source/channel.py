@@ -1,4 +1,4 @@
-﻿from .database.factory import getDatabase
+﻿from .database import factory
 from bot import config, utils
 from bot.channel import Channel
 from lists import channel as commandList
@@ -79,7 +79,7 @@ def threadParse(chat, tags, nick, message, msgParts, now):
         command = str(msgParts[0]).lower()
     
         complete = False
-        with getDatabase() as db:
+        with factory.getDatabase() as db:
             arguments = db, chat, tags, nick, message, msgParts, permissions,
             arguments += now,
             for filter in commandList.filterMessage:
