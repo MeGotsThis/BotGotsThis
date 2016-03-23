@@ -90,7 +90,7 @@ class SQLiteDatabase(DatabaseBase):
         finally:
             cursor.close()
     
-    def setAutoJoinServer(self, broadcaster, cluster='main'):
+    def setAutoJoinServer(self, broadcaster, cluster='aws'):
         cursor = self.connection.cursor()
         try:
             query = 'UPDATE auto_join SET cluster=? WHERE broadcaster=?'
