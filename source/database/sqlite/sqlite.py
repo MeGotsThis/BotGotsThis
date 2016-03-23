@@ -46,7 +46,7 @@ class SQLiteDatabase(DatabaseBase):
         cursor.close()
         return priority
     
-    def saveAutoJoin(self, broadcaster, priority=0, cluster='main'):
+    def saveAutoJoin(self, broadcaster, priority=0, cluster='aws'):
         cursor = self.connection.cursor()
         try:
             query = 'INSERT INTO auto_join (broadcaster, priority, cluster) '

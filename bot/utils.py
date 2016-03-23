@@ -7,7 +7,7 @@ import sys
 import threading
 import traceback
 
-def joinChannel(channel, priority=float('inf'), cluster='main'):
+def joinChannel(channel, priority=float('inf'), cluster='aws'):
     if cluster is None or cluster not in clusters:
         return False
     channel = channel.lower()
@@ -30,7 +30,7 @@ ENSURE_REJOIN = int(-1)
 ENSURE_CORRECT = int(0)
 ENSURE_NOT_JOINED = int(1)
 
-def ensureServer(channel, priority=float('inf'), cluster='main'):
+def ensureServer(channel, priority=float('inf'), cluster='aws'):
     if channel not in channels:
         return ENSURE_NOT_JOINED
     if cluster is None:

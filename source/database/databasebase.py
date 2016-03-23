@@ -31,7 +31,7 @@ class DatabaseBase:
     def getAutoJoinsPriority(self, broadcaster):
         return float('inf')
     
-    def saveAutoJoin(self, broadcaster, priority=0, cluster='main'):
+    def saveAutoJoin(self, broadcaster, priority=0, cluster='aws'):
         return False
     
     def discardAutoJoin(self, broadcaster):
@@ -40,7 +40,7 @@ class DatabaseBase:
     def setAutoJoinPriority(self, broadcaster, priority):
         return False
     
-    def setAutoJoinServer(self, broadcaster, cluster='main'):
+    def setAutoJoinServer(self, broadcaster, cluster='aws'):
         return False
     
     def getOAuthToken(self, broadcaster):

@@ -52,9 +52,9 @@ for _modules in _modulesList:
           importlib.import_module(modname)
 
 try:
-    utils.joinChannel(config.botnick, float('-inf'), 'main')
+    utils.joinChannel(config.botnick, float('-inf'), 'aws')
     if config.owner:
-        utils.joinChannel(config.owner, float('-inf'), 'main')
+        utils.joinChannel(config.owner, float('-inf'), 'aws')
     with getDatabase() as db:
         for channelRow in db.getAutoJoinsChats():
             params = channelRow['broadcaster'], channelRow['priority'],
