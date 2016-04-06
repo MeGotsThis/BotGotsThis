@@ -12,6 +12,7 @@ checkStreamLock = threading.Lock()
 isCheckStream = False
 
 def checkStreamsAndChannel(timestamp):
+    global isCheckStream
     if not globals.channels:
         return
     with checkStreamLock:
