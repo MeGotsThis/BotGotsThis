@@ -6,10 +6,17 @@ import datetime
 import json
 import random
 import socket
+import threading
+
+checkStreamLock = threading.Lock()
+isCheckStream = False
 
 def checkStreamsAndChannel(timestamp):
     if not globals.channels:
         return
+    with checkStreamLock:
+        if isCheckStream:
+            return
     try:
         channels = copy.copy(globals.channels)
         channelsList = ','.join([c for c in globals.channels])
@@ -30,6 +37,8 @@ def checkStreamsAndChannel(timestamp):
                 channelData.twitchGame = twitchGame
                 onlineStreams.append(channel)
         
+        with checkStreamLock:
+            isCheckStream = True
         for channel in channels:
             if channel in onlineStreams:
                 continue
@@ -46,6 +55,9 @@ def checkStreamsAndChannel(timestamp):
             channelData.twitchGame = twitchGame
     except socket.gaierror:
         pass
+    finally:
+        with checkStreamLock:
+            isCheckStream = False
 
 def checkChatServers(timestamp):
     cooldown = datetime.timedelta(seconds=3600)
