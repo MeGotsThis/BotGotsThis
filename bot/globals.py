@@ -13,10 +13,8 @@ groupChannel = None
 background = None
 
 clusters = {
-    'main': None,
-    'event': None,
-    'group': None,
     'aws': None,
+    'group': None,
     }
 channels = {}
 displayName = config.botnick

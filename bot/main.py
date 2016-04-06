@@ -19,14 +19,10 @@ import traceback
 print(str(datetime.datetime.utcnow()) + ' Starting')
 globals.messaging = MessageQueue(name='Message Queue')
 
-globals.clusters['main'] = SocketThread(config.mainServer, config.mainPort,
-                                        name='Main Chat')
-globals.clusters['event'] = SocketThread(config.eventServer, config.eventPort,
-                                         name='Event Chat')
-globals.clusters['group'] = SocketThread(config.groupServer, config.groupPort,
-                                         name='Group Chat')
 globals.clusters['aws'] = SocketThread(config.awsServer, config.awsPort,
                                        name='AWS Chat')
+globals.clusters['group'] = SocketThread(config.groupServer, config.groupPort,
+                                         name='Group Chat')
 
 globals.join = JoinThread(name='Join Thread')
 globals.groupChannel = Channel(config.botnick, globals.clusters['group'],
@@ -36,7 +32,8 @@ globals.background = BackgroundTasker(name='Background Tasker')
 
 # Start the Threads
 for st in globals.clusters.values():
-    st.start()
+    if st:
+        st.start()
 globals.messaging.start()
 globals.background.start()
 globals.join.start()
