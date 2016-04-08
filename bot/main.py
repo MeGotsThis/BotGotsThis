@@ -21,11 +21,9 @@ globals.messaging = MessageQueue(name='Message Queue')
 
 globals.clusters['aws'] = SocketThread(config.awsServer, config.awsPort,
                                        name='AWS Chat')
-globals.clusters['group'] = SocketThread(config.groupServer, config.groupPort,
-                                         name='Group Chat')
 
 globals.join = JoinThread(name='Join Thread')
-globals.groupChannel = Channel(config.botnick, globals.clusters['group'],
+globals.groupChannel = Channel('jtv', globals.clusters['aws'],
                                float('-inf'))
 
 globals.background = BackgroundTasker(name='Background Tasker')

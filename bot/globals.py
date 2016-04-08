@@ -14,7 +14,6 @@ background = None
 
 clusters = {
     'aws': None,
-    'group': None,
     }
 channels = {}
 displayName = config.botnick
