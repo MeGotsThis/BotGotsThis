@@ -40,7 +40,7 @@ class MessageQueue(threading.Thread):
             return
         if not bypass and message.startswith(disallowedCommands):
             return
-        if message.startswith('/w '):
+        if message.startswith(['/w ', '.w ']):
             msgParts = message.split(' ', 2)
             if len(msgParts) < 3:
                 return
@@ -58,12 +58,12 @@ class MessageQueue(threading.Thread):
                     continue
                 if not bypass and message.startswith(disallowedCommands):
                     continue
-                if message.startswith('/w '):
+                if message.startswith(['/w ', '.w ']):
                     msgParts = message.split(' ', 2)
                     if len(msgParts) < 3:
                         continue
                     param = (globals.groupChannel,
-                     '/w ' + msgParts[1] + ' ' + msgParts[2],
+                     '.w ' + msgParts[1] + ' ' + msgParts[2],
                      (msgParts[1].lower(), msgParts[2]))
                 else:
                     param = (channelData, message[:config.messageLimit], None)
@@ -74,7 +74,7 @@ class MessageQueue(threading.Thread):
             return
         with self._queueLock:
             param = (globals.groupChannel,
-                     ('/w ' + nick + ' ' + message)[:config.messageLimit],
+                     ('.w ' + nick + ' ' + message)[:config.messageLimit],
                      (nick.lower(), message))
             self._queues[priority].append(param)
     
