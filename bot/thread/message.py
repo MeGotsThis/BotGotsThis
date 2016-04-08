@@ -40,7 +40,7 @@ class MessageQueue(threading.Thread):
             return
         if not bypass and message.startswith(disallowedCommands):
             return
-        if message.startswith(['/w ', '.w ']):
+        if message.startswith(('/w ', '.w ')):
             msgParts = message.split(' ', 2)
             if len(msgParts) < 3:
                 return
@@ -58,7 +58,7 @@ class MessageQueue(threading.Thread):
                     continue
                 if not bypass and message.startswith(disallowedCommands):
                     continue
-                if message.startswith(['/w ', '.w ']):
+                if message.startswith(('/w ', '.w ')):
                     msgParts = message.split(' ', 2)
                     if len(msgParts) < 3:
                         continue
