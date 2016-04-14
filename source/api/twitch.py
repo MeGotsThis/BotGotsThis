@@ -104,3 +104,19 @@ def twitchChatServer(chat, headers={}, data=None):
         return None
     finally:
         conn.close()
+
+def checkValidTwitchUser(user):
+    user = user.lower()
+    currentTime = datetime.datetime.utcnow()
+    if 'validTwitchUser' not in globals.globalSessionData:
+        globals.globalSessionData['validTwitchUser'] = {}
+    validCache = globals.globalSessionData['validTwitchUser']
+    if (user not in validCache or
+        currentTime - validCache[user][1] > datetime.timedelta(minutes=1)):
+        response, data = twitchCall(
+            None, 'GET', '/kraken/channels/' + user,
+            headers = {
+                'Accept': 'application/vnd.twitchtv.v3+json',
+                })
+        validCache[user] = response.code == 200, currentTime
+    return validCache[user][0]
