@@ -20,9 +20,11 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
         if not perm or permissions[perm]:
             if perm in commands['#global']:
                 customMessage = commands['#global'][perm]
+                broadcaster = '#global'
                 level = perm
             if perm in commands[chat.channel]:
                 customMessage = commands[chat.channel][perm]
+                broadcaster = chat.channel
                 level = perm
     
     if customMessage:
@@ -71,7 +73,8 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
             final = [str(customMessage)]
         msgs = [''.join(final)]
         for process in custom.postProcess:
-            process(db, chat, tags, nick, permissions, level, command, msgs)
+            process(db, chat, tags, nick, permissions, broadcaster, level,
+                    command, msgs)
         chat.sendMulipleMessages(msgs)
         if permissions['channelModerator']:
             timeout.recordTimeoutFromCommand(db, chat, nick, msgs, message)

@@ -1,11 +1,11 @@
-def propertyMultipleLines(db, chat, tags, nick, permissions, level, command,
-                          messages):
-    if not db.getCustomCommandProperty(chat.channel, level, command,
+def propertyMultipleLines(db, chat, tags, nick, permissions, broadcaster,
+                          level, command, messages):
+    if not db.getCustomCommandProperty(broadcaster, level, command,
                                        'multiple'):
         return
     
     delimiter = db.getCustomCommandProperty(
-        chat.channel, level, command, 'delimiter') or '&&'
+        broadcaster, level, command, 'delimiter') or '&&'
     
     msgs = messages[:]
     messages.clear()
