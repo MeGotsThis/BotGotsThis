@@ -8,16 +8,9 @@ import random
 import socket
 import threading
 
-checkStreamLock = threading.Lock()
-isCheckStream = False
-
 def checkStreamsAndChannel(timestamp):
-    global isCheckStream
     if not globals.channels:
         return
-    with checkStreamLock:
-        if isCheckStream:
-            return
     try:
         channels = copy.copy(globals.channels)
         channelsList = ','.join([c for c in globals.channels])
@@ -30,35 +23,47 @@ def checkStreamsAndChannel(timestamp):
                 channel = stream['channel']['name'].lower()
                 params = stream['created_at'], '%Y-%m-%dT%H:%M:%SZ',
                 streamingSince = datetime.datetime.strptime(*params)
-                twitchStatus = stream['channel']['status']
-                twitchGame = stream['channel']['game']
                 channelData = channels[channel]
+                channelData.twitchCache = timestamp
                 channelData.streamingSince = streamingSince
-                channelData.twitchStatus = twitchStatus
-                channelData.twitchGame = twitchGame
+                channelData.twitchStatus = stream['channel']['status']
+                channelData.twitchGame = stream['channel']['game']
                 onlineStreams.append(channel)
         
-        with checkStreamLock:
-            isCheckStream = True
         for channel in channels:
             if channel in onlineStreams:
                 continue
-            uri = '/kraken/channels/' + channel
-            response, responseData = twitch.twitchCall(None, 'GET', uri)
-            if response.status != 200:
-                continue
-            stream = json.loads(responseData.decode('utf-8'))
-            twitchStatus = stream['status']
-            twitchGame = stream['game']
-            channelData = channels[channel]
-            channelData.streamingSince = None
-            channelData.twitchStatus = twitchStatus
-            channelData.twitchGame = twitchGame
+            channels[channel].streamingSince = None
     except socket.gaierror:
         pass
-    finally:
-        with checkStreamLock:
-            isCheckStream = False
+
+def checkOfflineChannels(timestamp):
+    if not globals.channels:
+        return
+    cacheDuration = datetime.timedelta(seconds=300)
+    channels = copy.copy(globals.channels)
+    offlineChannels = [c for c, ch in channels.items()
+                       if (channels[c].streamingSince is None and
+                           timestamp - ch.twitchCache >= cacheDuration)]
+    if not offlineChannels:
+        return
+    channel = random.choice(offlineChannels)
+    channelData = channels[channel]
+    channelData.twitchCache, old = timestamp, channelData.twitchCache
+    try:
+        uri = '/kraken/channels/' + channel
+        response, responseData = twitch.twitchCall(None, 'GET', uri)
+        if response.status != 200:
+            channelData.twitchCache = old
+            return
+        stream = json.loads(responseData.decode('utf-8'))
+        twitchStatus = stream['status']
+        twitchGame = stream['game']
+        channelData.streamingSince = None
+        channelData.twitchStatus = stream['status']
+        channelData.twitchGame = stream['game']
+    except socket.gaierror:
+        channelData.twitchCache = old
 
 def checkChatServers(timestamp):
     cooldown = datetime.timedelta(seconds=3600)

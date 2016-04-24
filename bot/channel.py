@@ -6,7 +6,8 @@ class Channel:
     __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',
                  '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
                  '_joinPriority', '_ffzEmotes', '_ffzCache', '_streamingSince',
-                 '_twitchStatus', '_twitchGame', '_serverCheck',
+                 '_twitchCache', '_twitchStatus', '_twitchGame',
+                 '_serverCheck',
                  ]
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
@@ -21,6 +22,7 @@ class Channel:
         self._sessionData = {}
         self._ffzEmotes = {}
         self._ffzCache = datetime.datetime.min
+        self._twitchCache = datetime.datetime.min
         self._streamingSince = None
         self._twitchStatus = None
         self._twitchGame = None
@@ -93,6 +95,14 @@ class Channel:
     @property
     def isStreaming(self):
         return self._streamingSince is not None
+    
+    @property
+    def twitchCache(self):
+        return self._twitchCache
+    
+    @twitchCache.setter
+    def twitchCache(self, value):
+        self._twitchCache = value
     
     @property
     def twitchStatus(self):
