@@ -1,10 +1,14 @@
 ﻿from ..tasks import twitch
 from bot.thread import background
 import datetime
+import threading
 
-background.addTask(twitch.checkStreamsAndChannel,
-                   datetime.timedelta(seconds=30))
-background.addTask(twitch.checkOfflineChannels,
-                   datetime.timedelta(seconds=0.05))
-background.addTask(twitch.checkChatServers,
-                   datetime.timedelta(seconds=0.05))
+threading.Timer(1, background.addTask, 
+                (twitch.checkStreamsAndChannel,
+                datetime.timedelta(seconds=30))).start()
+threading.Timer(10, background.addTask,
+                (twitch.checkOfflineChannels,
+                 datetime.timedelta(seconds=0.05))).start()
+threading.Timer(10, background.addTask,
+                (twitch.checkChatServers,
+                 datetime.timedelta(seconds=0.05))).start()
