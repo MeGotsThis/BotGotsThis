@@ -7,6 +7,7 @@ import json
 import random
 import socket
 import threading
+import time
 
 def checkStreamsAndChannel(timestamp):
     if not globals.channels:
@@ -14,21 +15,25 @@ def checkStreamsAndChannel(timestamp):
     try:
         channels = copy.copy(globals.channels)
         channelsList = ','.join([c for c in globals.channels])
-        uri = '/kraken/streams?channel=' + channelsList
+        uri = '/kraken/streams?limit=100&channel=' + channelsList
         response, responseData = twitch.twitchCall(None, 'GET', uri)
-        onlineStreams = []
+        onlineStreams = set()
         if response.status == 200:
             streamsData = json.loads(responseData.decode('utf-8'))
-            for stream in streamsData['streams']:
-                channel = stream['channel']['name'].lower()
-                params = stream['created_at'], '%Y-%m-%dT%H:%M:%SZ',
-                streamingSince = datetime.datetime.strptime(*params)
-                channelData = channels[channel]
-                channelData.twitchCache = timestamp
-                channelData.streamingSince = streamingSince
-                channelData.twitchStatus = stream['channel']['status']
-                channelData.twitchGame = stream['channel']['game']
-                onlineStreams.append(channel)
+            online = handleStreams(streamsData['streams'], timestamp)
+            onlineStreams.update(online)
+            if streamsData['_total'] > 100:
+                while streamsData['streams']:
+                    time.sleep(0.05)
+                    fullUrl = streamsData['_links']['next']
+                    uri = fullUrl[fullUrl.index('/kraken'):]
+                    r = twitch.twitchCall(None, 'GET', uri)
+                    response, responseData = r
+                    if response.status != 200:
+                        break
+                    streamsData = json.loads(responseData.decode('utf-8'))
+                    online = handleStreams(streamsData['streams'], timestamp)
+                    onlineStreams.update(online)
         
         for channel in channels:
             if channel in onlineStreams:
@@ -36,6 +41,22 @@ def checkStreamsAndChannel(timestamp):
             channels[channel].streamingSince = None
     except socket.gaierror:
         pass
+
+def handleStreams(streams, timestamp):
+    onlineStreams = set()
+    for stream in streams:
+        channel = stream['channel']['name'].lower()
+        if channel not in globals.channels:
+            continue
+        params = stream['created_at'], '%Y-%m-%dT%H:%M:%SZ',
+        streamingSince = datetime.datetime.strptime(*params)
+        channelData = globals.channels[channel]
+        channelData.twitchCache = timestamp
+        channelData.streamingSince = streamingSince
+        channelData.twitchStatus = stream['channel']['status']
+        channelData.twitchGame = stream['channel']['game']
+        onlineStreams.add(channel)
+    return onlineStreams
 
 def checkOfflineChannels(timestamp):
     if not globals.channels:
