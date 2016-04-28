@@ -78,3 +78,6 @@ globalFfzEmotes = {
     3: 'BeanieHipster',
     }
 globalFfzEmotesCache = datetime.datetime.min
+globalBttvEmotes = {
+    }
+globalBttvEmotesCache = datetime.datetime.min

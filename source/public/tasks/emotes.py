@@ -13,4 +13,10 @@ def refreshFrankerFaceZEmotes(timestamp):
         if since >= datetime.timedelta(hours=1):
             globals.channels[chan].updateFfzEmotes()
             return
-        
+
+def refreshBetterTwitchTvEmotes(timestamp):
+    for chan in globals.channels:
+        since = timestamp - globals.channels[chan].bttvCache
+        if since >= datetime.timedelta(hours=1):
+            globals.channels[chan].updateBttvEmotes()
+            return

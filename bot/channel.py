@@ -1,13 +1,14 @@
-﻿from source.api.ffz import getBroadcasterEmotes
+﻿from source.api.ffz import getBroadcasterEmotes as getFfzEmotes
+from source.api.bttv import getBroadcasterEmotes as getBttvEmotes
 from . import globals
 import datetime
 
 class Channel:
     __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',
                  '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
-                 '_joinPriority', '_ffzEmotes', '_ffzCache', '_streamingSince',
-                 '_twitchCache', '_twitchStatus', '_twitchGame',
-                 '_serverCheck',
+                 '_joinPriority', '_ffzEmotes', '_ffzCache', '_bttvEmotes',
+                 '_bttvCache', '_twitchCache', '_streamingSince',
+                 '_twitchStatus', '_twitchGame', '_serverCheck',
                  ]
     
     def __init__(self, channel, socket, joinPriority=float('inf')):
@@ -22,6 +23,8 @@ class Channel:
         self._sessionData = {}
         self._ffzEmotes = {}
         self._ffzCache = datetime.datetime.min
+        self._bttvEmotes = {}
+        self._bttvCache = datetime.datetime.min
         self._twitchCache = datetime.datetime.min
         self._streamingSince = None
         self._twitchStatus = None
@@ -85,6 +88,14 @@ class Channel:
         return self._ffzEmotes
     
     @property
+    def bttvCache(self):
+        return self._bttvCache
+    
+    @property
+    def bttvEmotes(self):
+        return self._bttvEmotes
+    
+    @property
     def streamingSince(self):
         return self._streamingSince
     
@@ -145,5 +156,10 @@ class Channel:
     
     def updateFfzEmotes(self):
         self._ffzCache = datetime.datetime.utcnow()
-        emotes = getBroadcasterEmotes(self._channel)
+        emotes = getFfzEmotes(self._channel)
         self._ffzEmotes = emotes or self._ffzEmotes
+    
+    def updateBttvEmotes(self):
+        self._bttvCache = datetime.datetime.utcnow()
+        emotes = getBttvEmotes(self._channel)
+        self._bttvEmotes = emotes or self._bttvEmotes
