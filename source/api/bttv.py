@@ -12,7 +12,7 @@ def updateGlobalEmotes():
             responseData = response.read()
             bttvData = json.loads(responseData.decode())
             emotes = {}
-            for emoteData in bttvData['emotes']:
+            for emote in bttvData['emotes']:
                 emotes[emote['id']] = emote['code']
             globals.globalBttvEmotes = emotes
     except:
