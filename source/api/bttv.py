@@ -3,25 +3,20 @@ import datetime
 import json
 import urllib.request
 
-def getGlobalEmotes():
-    currentTime = datetime.datetime.utcnow()
-    emotes = globals.globalBttvEmotes
-    since = currentTime - globals.globalBttvEmotesCache
+def updateGlobalEmotes():
+    globals.globalBttvEmotesCache = datetime.datetime.utcnow()
     url = 'https://api.betterttv.net/2/emotes'
-    if since > datetime.timedelta(hours=1):
-        globals.globalBttvEmotesCache = currentTime
-        try:
-            response = urllib.request.urlopen(url)
-            if response.status == 200:
-                responseData = response.read()
-                bttvData = json.loads(responseData.decode())
-                emotes = {}
-                for emoteData in bttvData['emotes']:
-                    emotes[emote['id']] = emote['code']
-                globals.globalBttvEmotes = emotes
-        except:
-            pass
-    return emotes
+    try:
+        response = urllib.request.urlopen(url)
+        if response.status == 200:
+            responseData = response.read()
+            bttvData = json.loads(responseData.decode())
+            emotes = {}
+            for emoteData in bttvData['emotes']:
+                emotes[emote['id']] = emote['code']
+            globals.globalBttvEmotes = emotes
+    except:
+        pass
 
 def getBroadcasterEmotes(broadcaster):
     url = 'https://api.betterttv.net/2/channels/' + broadcaster

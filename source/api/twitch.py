@@ -42,40 +42,43 @@ def twitchCall(channel, method, uri, headers={}, data=None):
 def updateTwitchEmotes():
     globals.globalEmotesCache = datetime.datetime.utcnow()
     emotesets = [str(i) for i in globals.emoteset]
-    response, data = twitchCall(
-        None, 'GET',
-        '/kraken/chat/emoticon_images?emotesets=' + ','.join(emotesets),
-        headers = {
-            'Accept': 'application/vnd.twitchtv.v3+json',
-            })
-    globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']
-    emotes = {}
-    emoteSet = {}
-    replaceGlobal = {
-        1: ':)',
-        2: ':(',
-        3: ':D',
-        4: '>(',
-        5: ':z',
-        6: 'o_O',
-        7: 'B)',
-        8: ':o',
-        9: '<3',
-        10: ':\\',
-        11: ';)',
-        12: ':P',
-        13: ';P',
-        14: 'R)',
-        }
-    for emoteSetId in globalEmotes:
-        for emote in globalEmotes[emoteSetId]:
-            if emote['id'] in replaceGlobal:
-                emotes[emote['id']] = replaceGlobal[emote['id']]
-            else:
-                emotes[emote['id']] = emote['code']
-            emoteSet[emote['id']] = int(emoteSetId)
-    globals.globalEmotes = emotes
-    globals.globalEmoteSets = emoteSet
+    try:
+        response, data = twitchCall(
+            None, 'GET',
+            '/kraken/chat/emoticon_images?emotesets=' + ','.join(emotesets),
+            headers = {
+                'Accept': 'application/vnd.twitchtv.v3+json',
+                })
+        globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']
+        emotes = {}
+        emoteSet = {}
+        replaceGlobal = {
+            1: ':)',
+            2: ':(',
+            3: ':D',
+            4: '>(',
+            5: ':z',
+            6: 'o_O',
+            7: 'B)',
+            8: ':o',
+            9: '<3',
+            10: ':\\',
+            11: ';)',
+            12: ':P',
+            13: ';P',
+            14: 'R)',
+            }
+        for emoteSetId in globalEmotes:
+            for emote in globalEmotes[emoteSetId]:
+                if emote['id'] in replaceGlobal:
+                    emotes[emote['id']] = replaceGlobal[emote['id']]
+                else:
+                    emotes[emote['id']] = emote['code']
+                emoteSet[emote['id']] = int(emoteSetId)
+        globals.globalEmotes = emotes
+        globals.globalEmoteSets = emoteSet
+    except:
+        pass
 
 def twitchChatServer(chat, headers={}, data=None):
     conn = http.client.HTTPSConnection('tmi.twitch.tv')
