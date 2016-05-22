@@ -5,7 +5,7 @@ import random
 
 def commandPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
-        not permissions['broadcaster']):
+        not permissions.broadcaster):
         return False
     
     if len(msgParts) < 2:
@@ -14,12 +14,12 @@ def commandPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
     try:
         count = int(msgParts[2])
     except:
-        if permissions['broadcaster']:
+        if permissions.broadcaster:
             count = 5
         else:
             count = 3
     count = min(count, config.messageLimit // len(rep))
-    if not permissions['broadcaster']:
+    if not permissions.broadcaster:
         count = min(count, 5)
         
         currentTime = datetime.datetime.utcnow()
@@ -29,7 +29,7 @@ def commandPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
             if since < cooldown:
                 return False
         chat.sessionData['modPyramid'] = currentTime
-    elif not permissions['globalMod']:
+    elif not permissions.globalModerator:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
@@ -38,7 +38,7 @@ def commandPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
 
 def commandRPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
-        not permissions['broadcaster']):
+        not permissions.broadcaster):
         return False
     
     emotes = globals.globalEmotes
@@ -46,12 +46,12 @@ def commandRPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
     try:
         count = int(msgParts[1])
     except:
-        if permissions['broadcaster']:
+        if permissions.broadcaster:
             count = 5
         else:
             count = 3
     rep = []
-    if not permissions['broadcaster']:
+    if not permissions.broadcaster:
         count = min(count, 5)
         
         currentTime = datetime.datetime.utcnow()
@@ -61,7 +61,7 @@ def commandRPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
             if since < cooldown:
                 return False
         chat.sessionData['modPyramid'] = currentTime
-    elif not permissions['globalMod']:
+    elif not permissions.globalModerator:
         count = min(count, 20)
     emoteIds = list(emotes.keys())
     for i in range(count):
@@ -77,7 +77,7 @@ def commandRPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
 def commandPyramidLong(db, chat, tags, nick, message, msgParts, permissions,
                        now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
-        not permissions['broadcaster']):
+        not permissions.broadcaster):
         return False
     
     msgParts = message.split(None, 1)
@@ -87,12 +87,12 @@ def commandPyramidLong(db, chat, tags, nick, message, msgParts, permissions,
     try:
         count = int(msgParts[0].lower().split('pyramid-')[1])
     except:
-        if permissions['broadcaster']:
+        if permissions.broadcaster:
             count = 5
         else:
             count = 3
     count = min(count, config.messageLimit // len(rep))
-    if not permissions['broadcaster']:
+    if not permissions.broadcaster:
         count = min(count, 5)
         
         currentTime = datetime.datetime.utcnow()
@@ -102,12 +102,12 @@ def commandPyramidLong(db, chat, tags, nick, message, msgParts, permissions,
             if since < cooldown:
                 return False
         chat.sessionData['modPyramid'] = currentTime
-    elif not permissions['globalMod']:
+    elif not permissions.globalModerator:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
     chat.sendMulipleMessages(messages, 2)
-    if permissions['channelModerator']:
+    if permissions.chatModerator:
         timeout.recordTimeoutFromCommand(db, chat, nick,
                                          messages[len(messages)//2], message,
                                          'pyramid')

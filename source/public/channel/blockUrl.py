@@ -18,12 +18,12 @@ twitchUrlRegex += r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)"
 # This is for banning the users who post a URL with no follows
 def filterNoUrlForBots(db, chat, tags, nick, message, msgParts, permissions,
                        now):
-    if not permissions['channelModerator']:
+    if not permissions.chatModerator:
         return False
     if not db.hasFeature(chat.channel, 'nourlredirect'):
         return False
     
-    if permissions['moderator']:
+    if permissions.moderator:
         return False
     match = re.search(twitchUrlRegex, message)
     if match is not None:

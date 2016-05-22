@@ -30,7 +30,7 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
     if customMessage:
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.customMessageCooldown)
-        if (not permissions['moderator'] and
+        if (not permissions.moderator and
             'customCommand' in chat.sessionData):
             since = currentTime - chat.sessionData['customCommand']
             if since < cooldown:
@@ -40,7 +40,7 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
         cooldown = datetime.timedelta(seconds=config.customMessageUserCooldown)
         if 'customUserCommand' not in chat.sessionData:
             chat.sessionData['customUserCommand'] = {}
-        if (not permissions['moderator'] and
+        if (not permissions.moderator and
             nick in chat.sessionData['customUserCommand']):
             oldTime = chat.sessionData['customUserCommand'][nick]
             since = currentTime - oldTime
@@ -76,7 +76,7 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
             process(db, chat, tags, nick, permissions, broadcaster, level,
                     command, msgs)
         chat.sendMulipleMessages(msgs)
-        if permissions['channelModerator']:
+        if permissions.chatModerator:
             timeout.recordTimeoutFromCommand(db, chat, nick, msgs, message)
 
 def commandCommand(db, chat, tags, nick, message, msgParts, permissions, now):
@@ -111,7 +111,7 @@ def commandCommand(db, chat, tags, nick, message, msgParts, permissions, now):
             chat.sendMessage(msg)
             return
     
-    if action in ['property'] and permissions['broadcaster'] and fullText:
+    if action in ['property'] and permissions.broadcaster and fullText:
         parts = fullText.split(None, 1)
         if len(parts) < 2:
             parts.append(None)

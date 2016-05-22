@@ -2,7 +2,7 @@
 import threading
 
 def commandStatus(db, chat, tags, nick, message, msgParts, permissions, now):
-    if (not permissions['broadcaster'] and
+    if (not permissions.broadcaster and
         db.hasFeature(chat.channel, 'gamestatusbroadcaster')):
         return False
     
@@ -26,7 +26,7 @@ def commandStatus(db, chat, tags, nick, message, msgParts, permissions, now):
     return True
 
 def commandGame(db, chat, tags, nick, message, msgParts, permissions, now):
-    if (not permissions['broadcaster'] and
+    if (not permissions.broadcaster and
         db.hasFeature(chat.channel, 'gamestatusbroadcaster')):
         return False
     
@@ -59,7 +59,7 @@ def commandGame(db, chat, tags, nick, message, msgParts, permissions, now):
     return True
 
 def commandPurge(db, chat, tags, nick, message, msgParts, permissions, now):
-    if permissions['channelModerator'] and len(msgParts) > 1:
+    if permissions.chatModerator and len(msgParts) > 1:
         chat.sendMessage('.timeout ' + msgParts[1] + ' 1')
         db.recordTimeout(chat.channel, msgParts[1], nick, 'purge', None, 1,
                         message, None)

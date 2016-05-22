@@ -4,13 +4,13 @@ import datetime
 
 def commandWall(db, chat, tags, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(chat.channel, 'modwall') and
-        not permissions['broadcaster']):
+        not permissions.broadcaster):
         return False
     
     if len(msgParts) < 2:
         return False
     rep = msgParts[1] + ' '
-    if permissions['broadcaster']:
+    if permissions.broadcaster:
         length = 5
         rows = 20
     else:
@@ -25,7 +25,7 @@ def commandWall(db, chat, tags, nick, message, msgParts, permissions, now):
     except:
         pass
     length = min(length, config.messageLimit // len(rep))
-    if not permissions['broadcaster']:
+    if not permissions.broadcaster:
         length = min(length, 5)
         rows = min(rows, 10)
         
@@ -36,10 +36,10 @@ def commandWall(db, chat, tags, nick, message, msgParts, permissions, now):
             if since < cooldown:
                 return False
         chat.sessionData['modWall'] = currentTime
-    elif not permissions['globalMod']:
+    elif not permissions.globalModerator:
         length = min(length, 20)
         rows = min(rows, 500)
-    spacer = '' if permissions['channelModerator'] else ' \ufeff'
+    spacer = '' if permissions.chatModerator else ' \ufeff'
     messages = [rep * length + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
     chat.sendMulipleMessages(messages, 2)
@@ -47,7 +47,7 @@ def commandWall(db, chat, tags, nick, message, msgParts, permissions, now):
 
 def commandWallLong(db, chat, tags, nick, message, msgParts, permissions, now):
     if (not db.hasFeature(chat.channel, 'modwall') and
-        not permissions['broadcaster']):
+        not permissions.broadcaster):
         return False
     
     msgParts = message.split(None, 1)
@@ -56,11 +56,11 @@ def commandWallLong(db, chat, tags, nick, message, msgParts, permissions, now):
     try:
         rows = int(msgParts[0].lower().split('wall-')[1])
     except:
-        if permissions['broadcaster']:
+        if permissions.broadcaster:
             rows = 20
         else:
             rows = 5
-    if not permissions['broadcaster']:
+    if not permissions.broadcaster:
         rows = min(rows, 10)
         
         currentTime = datetime.datetime.utcnow()
@@ -70,13 +70,13 @@ def commandWallLong(db, chat, tags, nick, message, msgParts, permissions, now):
             if since < cooldown:
                 return False
         chat.sessionData['modWall'] = currentTime
-    elif not permissions['globalMod']:
+    elif not permissions.globalModerator:
         rows = min(rows, 500)
-    spacer = '' if permissions['channelModerator'] else ' \ufeff'
+    spacer = '' if permissions.chatModerator else ' \ufeff'
     messages = [msgParts[1] + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
     chat.sendMulipleMessages(messages, 2)
-    if permissions['channelModerator']:
+    if permissions.chatModerator:
         timeout.recordTimeoutFromCommand(db, chat, nick, messages[0],
                                          message, 'wall')
     return True
