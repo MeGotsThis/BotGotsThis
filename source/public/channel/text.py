@@ -3,8 +3,8 @@ from bot import config
 from lists import custom
 import datetime
 
-def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
-    command = msgParts[0].lower()
+def customCommands(db, chat, tags, nick, message, tokens, permissions, now):
+    command = tokens[0].lower()
     customMessage = None
     
     if db.hasFeature(chat.channel, 'nocustom'):
@@ -48,7 +48,7 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
                 return
         chat.sessionData['customUserCommand'][nick] = currentTime
         
-        query = str(message.split(None, 1)[1]) if len(msgParts) > 1 else ''
+        query = str(message.split(None, 1)[1]) if len(tokens) > 1 else ''
         final = []
         try:
             for part in _parseFormatMessage(str(customMessage)):
@@ -59,7 +59,7 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
                     if field is not None:
                         params = str(field), str(param), str(prefix),
                         params += str(suffix),str(default), message,
-                        params += msgParts, chat.channel, nick, query, now
+                        params += tokens, chat.channel, nick, query, now
                         string = _getString(*params)
                         if string is not None:
                             string = _formatString(str(string), str(format),
@@ -79,8 +79,8 @@ def customCommands(db, chat, tags, nick, message, msgParts, permissions, now):
         if permissions.chatModerator:
             timeout.recordTimeoutFromCommand(db, chat, nick, msgs, message)
 
-def commandCommand(db, chat, tags, nick, message, msgParts, permissions, now):
-    if len(msgParts) < 3:
+def commandCommand(db, chat, tags, nick, message, tokens, permissions, now):
+    if len(tokens) < 3:
         return False
     
     r = parseCommandMessageInput(message)
@@ -487,11 +487,11 @@ def _parseFormatMessage(message):
         
     return parsed
 
-def _getString(field, param, prefix, suffix, default, message,  msgParts,
+def _getString(field, param, prefix, suffix, default, message,  tokens,
                channel, nick, query, now):
     for fieldConvert in custom.fields:
         result = fieldConvert(field, param, prefix, suffix, default, message,
-                              msgParts, channel, nick, query, now)
+                              tokens, channel, nick, query, now)
         if result is not None:
             return result
 

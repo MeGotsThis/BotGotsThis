@@ -1,10 +1,10 @@
 ﻿from bot import utils
 
-def manageBanned(db, send, nick, message, msgParts):
-    if len(msgParts) < 3:
+def manageBanned(db, send, nick, message, tokens):
+    if len(tokens) < 3:
         return False
-    msgParts[2] = msgParts[2].lower()
-    if msgParts[2] in ['list']:
+    tokens[2] = tokens[2].lower()
+    if tokens[2] in ['list']:
         bannedChannels = db.listBannedChannels()
         if bannedChannels:
             msg = 'Banned Channels: ' + ', '.join(bannedChannels)
@@ -13,20 +13,20 @@ def manageBanned(db, send, nick, message, msgParts):
             send('There are no banned channels')
         return True
     
-    if len(msgParts) < 5:
-        if msgParts[2] in ['add', 'insert', 'del', 'delete',
+    if len(tokens) < 5:
+        if tokens[2] in ['add', 'insert', 'del', 'delete',
                            'rem', 'remove', 'remove']:
             send(nick + ' -> Reason needs to be specified')
         return False
-    msgParts = message.split(None, 4)
-    channel = msgParts[3].lower()
-    if msgParts[2] in ['add', 'insert']:
+    tokens = message.split(None, 4)
+    channel = tokens[3].lower()
+    if tokens[2] in ['add', 'insert']:
         isBannedOrReason = db.isChannelBannedReason(channel)
         if isBannedOrReason:
             send(channel + ' is already banned for: ' +
                         isBannedOrReason)
             return False
-        params = channel, msgParts[4], nick
+        params = channel, tokens[4], nick
         result = db.addBannedChannel(*params)
         if result:
             db.discardAutoJoin(channel)
@@ -38,12 +38,12 @@ def manageBanned(db, send, nick, message, msgParts):
             send('Chat ' + channel + ' could not be banned. '
                         'Error has occured.')
         return True
-    if msgParts[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
+    if tokens[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
         isBannedOrReason = db.isChannelBannedReason(channel)
         if not isBannedOrReason:
             send(channel + ' is not banned')
             return False
-        params = channel, msgParts[4], nick
+        params = channel, tokens[4], nick
         result = db.removeBannedChannel(*params)
             
         if result:

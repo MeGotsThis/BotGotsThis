@@ -12,43 +12,43 @@ disable = {
     '0',
     }
 
-def botFeature(db, channel, msgParts, send):
-    if len(msgParts) < 2:
+def botFeature(db, channel, tokens, send):
+    if len(tokens) < 2:
         return False
     
-    if len(msgParts) < 3:
-        msgParts.append('')
+    if len(tokens) < 3:
+        tokens.append('')
     
-    msgParts[1] = msgParts[1].lower()
-    if msgParts[1] not in features or features[msgParts[1]] is None:
-        send('Unrecognized feature: ' + msgParts[1])
+    tokens[1] = tokens[1].lower()
+    if tokens[1] not in features or features[tokens[1]] is None:
+        send('Unrecognized feature: ' + tokens[1])
         return True
     
-    if msgParts[2] not in enable and msgParts[2] not in disable:
-        msg = 'Unrecognized second parameter: ' + msgParts[2]
+    if tokens[2] not in enable and tokens[2] not in disable:
+        msg = 'Unrecognized second parameter: ' + tokens[2]
         send(msg)
         return True
     
-    hasFeature = db.hasFeature(channel, msgParts[1])
-    if not hasFeature and msgParts[2] in enable:
-        db.addFeature(channel, msgParts[1])
-    if hasFeature and msgParts[2] in disable:
-        db.removeFeature(channel, msgParts[1])
+    hasFeature = db.hasFeature(channel, tokens[1])
+    if not hasFeature and tokens[2] in enable:
+        db.addFeature(channel, tokens[1])
+    if hasFeature and tokens[2] in disable:
+        db.removeFeature(channel, tokens[1])
     
     msg = None
     if hasFeature:
-        if msgParts[2] in enable:
-            msg = 'The feature ' + features[msgParts[1]]
+        if tokens[2] in enable:
+            msg = 'The feature ' + features[tokens[1]]
             msg += ' has already been enabled in ' + channel
-        if msgParts[2] in disable:
-            msg = 'The feature ' + features[msgParts[1]] + ' has been '
+        if tokens[2] in disable:
+            msg = 'The feature ' + features[tokens[1]] + ' has been '
             msg += 'disabled in ' + channel
     else:
-        if msgParts[2] in enable:
-            msg = 'The feature ' + features[msgParts[1]] + ' has been '
+        if tokens[2] in enable:
+            msg = 'The feature ' + features[tokens[1]] + ' has been '
             msg += 'enabled in ' + channel
-        if msgParts[2] in disable:
-            msg = 'The feature ' + features[msgParts[1]] + ' was not '
+        if tokens[2] in disable:
+            msg = 'The feature ' + features[tokens[1]] + ' was not '
             msg += 'enabled in ' + channel
     send(msg)
     return True

@@ -2,14 +2,14 @@
 from bot import config
 import datetime
 
-def commandWall(db, chat, tags, nick, message, msgParts, permissions, now):
+def commandWall(db, chat, tags, nick, message, tokens, permissions, now):
     if (not db.hasFeature(chat.channel, 'modwall') and
         not permissions.broadcaster):
         return False
     
-    if len(msgParts) < 2:
+    if len(tokens) < 2:
         return False
-    rep = msgParts[1] + ' '
+    rep = tokens[1] + ' '
     if permissions.broadcaster:
         length = 5
         rows = 20
@@ -17,11 +17,11 @@ def commandWall(db, chat, tags, nick, message, msgParts, permissions, now):
         length = 3
         rows = 5
     try:
-        if len(msgParts) == 3:
-            rows = int(msgParts[2])
+        if len(tokens) == 3:
+            rows = int(tokens[2])
         else:
-            length = int(msgParts[2])
-            rows = int(msgParts[3])
+            length = int(tokens[2])
+            rows = int(tokens[3])
     except:
         pass
     length = min(length, config.messageLimit // len(rep))
@@ -45,16 +45,16 @@ def commandWall(db, chat, tags, nick, message, msgParts, permissions, now):
     chat.sendMulipleMessages(messages, 2)
     return True
 
-def commandWallLong(db, chat, tags, nick, message, msgParts, permissions, now):
+def commandWallLong(db, chat, tags, nick, message, tokens, permissions, now):
     if (not db.hasFeature(chat.channel, 'modwall') and
         not permissions.broadcaster):
         return False
     
-    msgParts = message.split(None, 1)
-    if len(msgParts) < 2:
+    tokens = message.split(None, 1)
+    if len(tokens) < 2:
         return False
     try:
-        rows = int(msgParts[0].lower().split('wall-')[1])
+        rows = int(tokens[0].lower().split('wall-')[1])
     except:
         if permissions.broadcaster:
             rows = 20
@@ -73,7 +73,7 @@ def commandWallLong(db, chat, tags, nick, message, msgParts, permissions, now):
     elif not permissions.globalModerator:
         rows = min(rows, 500)
     spacer = '' if permissions.chatModerator else ' \ufeff'
-    messages = [msgParts[1] + ('' if i % 2 == 0 else spacer)
+    messages = [tokens[1] + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
     chat.sendMulipleMessages(messages, 2)
     if permissions.chatModerator:

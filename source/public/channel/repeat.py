@@ -5,7 +5,7 @@ import datetime
 import time
 import json
 
-def commandAutoRepeat(db, chat, tags, nick, message, msgParts, permissions,
+def commandAutoRepeat(db, chat, tags, nick, message, tokens, permissions,
                       now):
     """
     !autorepeat 1 MONEY MONEY
@@ -14,24 +14,24 @@ def commandAutoRepeat(db, chat, tags, nick, message, msgParts, permissions,
     !autorepeat-20 off
     """
 
-    msgParts = msgParts = message.split(None, 2)
-    if 'autorepeat-' in msgParts[0]:
+    tokens = tokens = message.split(None, 2)
+    if 'autorepeat-' in tokens[0]:
         try:
-            count = int(msgParts[0].lower().split('autorepeat-')[1])
+            count = int(tokens[0].lower().split('autorepeat-')[1])
         except:
             count = 10
     else:
         count = None
     try:
-        if msgParts[1].lower() == 'off':
+        if tokens[1].lower() == 'off':
             minutesDuration = 0
         else:
-            minutesDuration = float(msgParts[1])
+            minutesDuration = float(tokens[1])
     except:
         return False
     
     try:
-        messageToSend = msgParts[2]
+        messageToSend = tokens[2]
     except IndexError:
         messageToSend = None
     

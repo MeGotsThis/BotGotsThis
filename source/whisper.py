@@ -13,28 +13,28 @@ def parse(tags, nick, message, now):
     if len(message) == 0:
         return
     
-    msgParts = message.split(None)
-    if len(msgParts) == 0:
+    tokens = message.split(None)
+    if len(tokens) == 0:
         return
     
-    name = nick + '-' + str(msgParts[0]) + '-'
+    name = nick + '-' + str(tokens[0]) + '-'
     name += str(time.time())
-    params = tags, nick, message, msgParts, now
+    params = tags, nick, message, tokens, now
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(tags, nick, message, msgParts, now):
+def threadParse(tags, nick, message, tokens, now):
     if False: # Hints for Intellisense
         nick = str()
         message = str()
-        msgParts = [str(), str()]
+        tokens = [str(), str()]
     
     try:
         permissions = WhisperPermissionSet(tags, nick)
-        command = str(msgParts[0]).lower()
+        command = str(tokens[0]).lower()
     
         complete = False
         with getDatabase() as db:
-            arguments = db, nick, message, msgParts, permissions, now
+            arguments = db, nick, message, tokens, permissions, now
             if command in whisper.commands:
                 commInfo = whisper.commands[command]
                 hasPerm = True

@@ -3,16 +3,16 @@ from bot import config, globals
 import datetime
 import random
 
-def commandPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
+def commandPyramid(db, chat, tags, nick, message, tokens, permissions, now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
         not permissions.broadcaster):
         return False
     
-    if len(msgParts) < 2:
+    if len(tokens) < 2:
         return False
-    rep = msgParts[1] + ' '
+    rep = tokens[1] + ' '
     try:
-        count = int(msgParts[2])
+        count = int(tokens[2])
     except:
         if permissions.broadcaster:
             count = 5
@@ -36,7 +36,7 @@ def commandPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
     chat.sendMulipleMessages(messages, 2)
     return True
 
-def commandRPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
+def commandRPyramid(db, chat, tags, nick, message, tokens, permissions, now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
         not permissions.broadcaster):
         return False
@@ -44,7 +44,7 @@ def commandRPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
     emotes = globals.globalEmotes
     
     try:
-        count = int(msgParts[1])
+        count = int(tokens[1])
     except:
         if permissions.broadcaster:
             count = 5
@@ -74,18 +74,18 @@ def commandRPyramid(db, chat, tags, nick, message, msgParts, permissions, now):
     chat.sendMulipleMessages(messages, 2)
     return True
 
-def commandPyramidLong(db, chat, tags, nick, message, msgParts, permissions,
+def commandPyramidLong(db, chat, tags, nick, message, tokens, permissions,
                        now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
         not permissions.broadcaster):
         return False
     
-    msgParts = message.split(None, 1)
-    if len(msgParts) < 2:
+    tokens = message.split(None, 1)
+    if len(tokens) < 2:
         return False
-    rep = msgParts[1] + ' '
+    rep = tokens[1] + ' '
     try:
-        count = int(msgParts[0].lower().split('pyramid-')[1])
+        count = int(tokens[0].lower().split('pyramid-')[1])
     except:
         if permissions.broadcaster:
             count = 5

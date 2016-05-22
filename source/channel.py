@@ -14,29 +14,29 @@ def parse(chat, tags, nick, message, now):
     if len(message) == 0:
         return
     
-    msgParts = message.split(None)
-    if len(msgParts) == 0:
+    tokens = message.split(None)
+    if len(tokens) == 0:
         return
     
-    name = chat.channel + '-' + str(msgParts[0]) + '-'
+    name = chat.channel + '-' + str(tokens[0]) + '-'
     name += str(time.time())
-    params = chat, tags, nick, message, msgParts, now
+    params = chat, tags, nick, message, tokens, now
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(chat, tags, nick, message, msgParts, now):
+def threadParse(chat, tags, nick, message, tokens, now):
     if False: # Hints for Intellisense
         chat = Channel('', None)
         nick = str()
         message = str()
-        msgParts = [str(), str()]
+        tokens = [str(), str()]
     
     try:
         permissions = ChatPermissionSet(tags, nick, chat)
-        command = str(msgParts[0]).lower()
+        command = str(tokens[0]).lower()
     
         complete = False
         with factory.getDatabase() as db:
-            arguments = db, chat, tags, nick, message, msgParts, permissions,
+            arguments = db, chat, tags, nick, message, tokens, permissions,
             arguments += now,
             for filter in commandList.filterMessage:
                 complete = filter(*arguments)

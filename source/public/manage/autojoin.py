@@ -2,11 +2,11 @@
 from bot import globals, utils
 import json
 
-def manageAutoJoin(db, send, nick, message, msgParts):
-    if len(msgParts) < 3:
+def manageAutoJoin(db, send, nick, message, tokens):
+    if len(tokens) < 3:
         return False
-    msgParts[2] = msgParts[2].lower()
-    if msgParts[2] in ['reloadserver']:
+    tokens[2] = tokens[2].lower()
+    if tokens[2] in ['reloadserver']:
         for channelRow in db.getAutoJoinsChats():
             cluster = twitch.twitchChatServer(channelRow['broadcaster'])
             if channelRow['cluster'] != cluster['eventchat']:
@@ -22,68 +22,68 @@ def manageAutoJoin(db, send, nick, message, msgParts):
         send('Auto Join reload server complete')
         return True
     
-    if len(msgParts) < 4:
+    if len(tokens) < 4:
         return False
-    msgParts[3] = msgParts[3].lower()
-    if msgParts[2] in ['add', 'insert', 'join']:
-        if db.isChannelBannedReason(msgParts[3]):
-            send('Chat ' + msgParts[3] + ' is banned from joining')
+    tokens[3] = tokens[3].lower()
+    if tokens[2] in ['add', 'insert', 'join']:
+        if db.isChannelBannedReason(tokens[3]):
+            send('Chat ' + tokens[3] + ' is banned from joining')
             return True
-        cluster = twitch.twitchChatServer(msgParts[3])
-        params = msgParts[3], 0, cluster
+        cluster = twitch.twitchChatServer(tokens[3])
+        params = tokens[3], 0, cluster
         result = db.saveAutoJoin(*params)
-        priority = db.getAutoJoinsPriority(msgParts[3])
+        priority = db.getAutoJoinsPriority(tokens[3])
         if result == False:
-            db.setAutoJoinServer(msgParts[3], cluster)
+            db.setAutoJoinServer(tokens[3], cluster)
             
-        wasInChat = msgParts[3] in globals.channels
+        wasInChat = tokens[3] in globals.channels
         if not wasInChat:
-            utils.joinChannel(msgParts[3], priority, cluster)
+            utils.joinChannel(tokens[3], priority, cluster)
         else:
-            rejoin = utils.ensureServer(msgParts[3], priority, cluster)
+            rejoin = utils.ensureServer(tokens[3], priority, cluster)
         
         if result and not wasInChat:
-            send('Auto join for ' + msgParts[3] + ' is now enabled and '
-                        'joined ' + msgParts[3] + ' chat')
+            send('Auto join for ' + tokens[3] + ' is now enabled and '
+                        'joined ' + tokens[3] + ' chat')
         elif result:
             if rejoin < 0:
-                msg = 'Auto join for ' + msgParts[3]
+                msg = 'Auto join for ' + tokens[3]
                 msg += ' is now enabled and moved to the correct server'
             else:
-                msg = 'Auto join for ' + msgParts[3] + ' is now enabled'
+                msg = 'Auto join for ' + tokens[3] + ' is now enabled'
             send(msg)
         elif not wasInChat:
-            send('Auto join for ' + msgParts[3] + ' is already enabled '
-                        'but now joined ' + msgParts[3] + ' chat')
+            send('Auto join for ' + tokens[3] + ' is already enabled '
+                        'but now joined ' + tokens[3] + ' chat')
         else:
             if rejoin < 0:
-                msg = 'Auto join for ' + msgParts[3]
+                msg = 'Auto join for ' + tokens[3]
                 msg += ' is already enabled and moved to the correct server'
             else:
-                msg = 'Auto join for ' + msgParts[3]
+                msg = 'Auto join for ' + tokens[3]
                 msg += ' is already enabled and already in chat'
             send(msg)
         return True
-    if msgParts[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
-        result = db.discardAutoJoin(msgParts[3])
+    if tokens[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
+        result = db.discardAutoJoin(tokens[3])
         if result:
-            send('Auto join for ' + msgParts[3] + ' is now '
+            send('Auto join for ' + tokens[3] + ' is now '
                         'disabled')
         else:
-            send('Auto join for ' + msgParts[3] + ' was never '
+            send('Auto join for ' + tokens[3] + ' was never '
                         'enabled')
         return True
-    if msgParts[2] in ['pri', 'priority']:
+    if tokens[2] in ['pri', 'priority']:
         try:
-            priority = int(msgParts[4])
+            priority = int(tokens[4])
         except:
             priority = 0
-        result = db.setAutoJoinPriority(msgParts[3], priority)
+        result = db.setAutoJoinPriority(tokens[3], priority)
         if result:
-            send('Auto join for ' + msgParts[3] + ' is set to '
+            send('Auto join for ' + tokens[3] + ' is set to '
                         'priority ' + str(priority))
         else:
-            send('Auto join for ' + msgParts[3] + ' was never '
+            send('Auto join for ' + tokens[3] + ' was never '
                         'enabled')
         return True
     return False

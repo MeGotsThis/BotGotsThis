@@ -57,7 +57,7 @@ daysOfWeek = {
     }
 
 def fieldCountdown(field, param, prefix, suffix, default, message,
-                   msgParts, channel, nick, query, now):
+                   tokens, channel, nick, query, now):
     if field.lower() == 'countdown':
         cooldown = None
         dateInstances = []
@@ -89,7 +89,7 @@ def fieldCountdown(field, param, prefix, suffix, default, message,
     return None
 
 def fieldSince(field, param, prefix, suffix, default, message,
-               msgParts, channel, nick, query, now):
+               tokens, channel, nick, query, now):
     if field.lower() == 'since':
         cooldown = 0
         dateInstances = []
@@ -121,7 +121,7 @@ def fieldSince(field, param, prefix, suffix, default, message,
     return None
 
 def fieldNext(field, param, prefix, suffix, default, message,
-              msgParts, channel, nick, query, now):
+              tokens, channel, nick, query, now):
     if field.lower() in ['next', 'future']:
         dateInstances = []
         params = param.split(',')
@@ -146,7 +146,7 @@ def fieldNext(field, param, prefix, suffix, default, message,
     return None
 
 def fieldPrevious(field, param, prefix, suffix, default, message,
-                  msgParts, channel, nick, query, now):
+                  tokens, channel, nick, query, now):
     if field.lower() in ['prev', 'previous', 'past']:
         dateInstances = []
         params = param.split(',')

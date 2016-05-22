@@ -35,22 +35,22 @@ class MessageQueue(threading.Thread):
     def running(self, value):
         self._running = value
     
-    def queueMessage(self, channelData, message, priority=1, bypass=False):
+    def queueMessage(self, channel, message, priority=1, bypass=False):
         if not message:
             return
         if not bypass and message.startswith(disallowedCommands):
             return
         if message.startswith(('/w ', '.w ')):
-            msgParts = message.split(' ', 2)
-            if len(msgParts) < 3:
+            tokens = message.split(' ', 2)
+            if len(tokens) < 3:
                 return
-            self.queueWhisper(msgParts[1], msgParts[2])
+            self.queueWhisper(tokens[1], tokens[2])
             return
         with self._queueLock:
-            param = (channelData, message[:config.messageLimit], None)
+            param = (channel, message[:config.messageLimit], None)
             self._queues[priority].append(param)
     
-    def queueMultipleMessages(self, channelData, messages, priority=1,
+    def queueMultipleMessages(self, channel, messages, priority=1,
                               bypass=False):
         with self._queueLock:
             for message in messages:
@@ -59,14 +59,14 @@ class MessageQueue(threading.Thread):
                 if not bypass and message.startswith(disallowedCommands):
                     continue
                 if message.startswith(('/w ', '.w ')):
-                    msgParts = message.split(' ', 2)
-                    if len(msgParts) < 3:
+                    tokens = message.split(' ', 2)
+                    if len(tokens) < 3:
                         continue
                     param = (globals.groupChannel,
-                     '.w ' + msgParts[1] + ' ' + msgParts[2],
-                     (msgParts[1].lower(), msgParts[2]))
+                     '.w ' + tokens[1] + ' ' + tokens[2],
+                     (tokens[1].lower(), tokens[2]))
                 else:
-                    param = (channelData, message[:config.messageLimit], None)
+                    param = (channel, message[:config.messageLimit], None)
                 self._queues[priority].append(param)
     
     def queueWhisper(self, nick, message, priority=1):
