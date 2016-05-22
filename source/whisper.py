@@ -1,4 +1,5 @@
 ﻿from .database.factory import getDatabase
+from .params.permissions import WhisperPermissionSet
 from bot import config, utils
 from lists import whisper
 import datetime
@@ -6,11 +7,6 @@ import sys
 import threading
 import time
 import traceback
-
-typeStaff = ['staff']
-typeAdmin = ['staff', 'admin']
-typeGlobalMod = ['staff', 'admin', 'global_mod']
-typeMod = ['staff', 'admin', 'global_mod', 'mod']
 
 # Set up our commands function
 def parse(tags, nick, message, now):
@@ -33,30 +29,7 @@ def threadParse(tags, nick, message, msgParts, now):
         msgParts = [str(), str()]
     
     try:
-        if tags is not None and 'user-type' in tags:
-            userType = tags['user-type']
-        else:
-            userType = ''
-        if tags is not None and 'turbo' in tags:
-            turbo = tags['turbo']
-        else:
-            turbo = '0'
-        if config.owner is not None:
-            isOwner = nick == config.owner.lower()
-        else:
-            isOwner = False
-        isStaff = isOwner or userType in typeStaff
-        isAdmin = isStaff or userType in typeAdmin
-        isGlobalMod = isAdmin or userType in typeGlobalMod
-        isTurbo = isOwner or bool(int(turbo))
-        permissions = {
-            'owner': isOwner,
-            'staff': isStaff,
-            'admin': isAdmin,
-            'globalMod': isGlobalMod,
-            'turbo': isTurbo,
-            }
-    
+        permissions = WhisperPermissionSet(tags, nick)
         command = str(msgParts[0]).lower()
     
         complete = False

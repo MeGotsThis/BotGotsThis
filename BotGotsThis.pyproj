@@ -103,6 +103,8 @@
     <Compile Include="source\irccommand\userstate.py" />
     <Compile Include="source\irccommand\__init__.py" />
     <Compile Include="source\ircmessage.py" />
+    <Compile Include="source\params\permissions.py" />
+    <Compile Include="source\params\__init__.py" />
     <Compile Include="source\private\autoload\__init__.py" />
     <Compile Include="source\private\channel\__init__.py" />
     <Compile Include="source\private\common\__init__.py" />
@@ -180,6 +182,7 @@
     <Folder Include="source\database\" />
     <Folder Include="source\database\sqlite\" />
     <Folder Include="source\irccommand\" />
+    <Folder Include="source\params\" />
     <Folder Include="source\private\" />
     <Folder Include="source\private\autoload\" />
     <Folder Include="source\private\channel\" />
