@@ -3,16 +3,16 @@ from bot import config, globals
 import datetime
 import random
 
-def commandPyramid(db, chat, tags, nick, message, tokens, permissions, now):
+def commandPyramid(db, chat, tags, nick, message, permissions, now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
         not permissions.broadcaster):
         return False
     
-    if len(tokens) < 2:
+    if len(message) < 2:
         return False
-    rep = tokens[1] + ' '
+    rep = message[1] + ' '
     try:
-        count = int(tokens[2])
+        count = int(message[2])
     except:
         if permissions.broadcaster:
             count = 5
@@ -36,7 +36,7 @@ def commandPyramid(db, chat, tags, nick, message, tokens, permissions, now):
     chat.sendMulipleMessages(messages, 2)
     return True
 
-def commandRPyramid(db, chat, tags, nick, message, tokens, permissions, now):
+def commandRPyramid(db, chat, tags, nick, message, permissions, now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
         not permissions.broadcaster):
         return False
@@ -44,7 +44,7 @@ def commandRPyramid(db, chat, tags, nick, message, tokens, permissions, now):
     emotes = globals.globalEmotes
     
     try:
-        count = int(tokens[1])
+        count = int(message[1])
     except:
         if permissions.broadcaster:
             count = 5
@@ -74,18 +74,16 @@ def commandRPyramid(db, chat, tags, nick, message, tokens, permissions, now):
     chat.sendMulipleMessages(messages, 2)
     return True
 
-def commandPyramidLong(db, chat, tags, nick, message, tokens, permissions,
-                       now):
+def commandPyramidLong(db, chat, tags, nick, message, permissions, now):
     if (not db.hasFeature(chat.channel, 'modpyramid') and
         not permissions.broadcaster):
         return False
     
-    tokens = message.split(None, 1)
-    if len(tokens) < 2:
+    if len(message) < 2:
         return False
-    rep = tokens[1] + ' '
+    rep = message.query + ' '
     try:
-        count = int(tokens[0].lower().split('pyramid-')[1])
+        count = int(message.command.split('pyramid-')[1])
     except:
         if permissions.broadcaster:
             count = 5

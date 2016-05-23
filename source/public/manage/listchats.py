@@ -1,6 +1,6 @@
 ﻿from bot import config, globals
 
-def manageListChats(db, send, nick, message, tokens):
+def manageListChats(db, send, nick, message):
     prepend = 'Twitch Chats: '
     limit = config.messageLimit - len(prepend)
     channels = [c for c in globals.channels.keys()]

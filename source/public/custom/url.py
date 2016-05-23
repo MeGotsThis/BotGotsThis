@@ -2,9 +2,9 @@
 import urllib.request
 
 def fieldUrl(field, param, prefix, suffix, default, message,
-             tokens, channel, nick, query, now):
+             channel, nick, now):
     if field.lower() == 'url':
-        url = param.replace('{query}', query)
+        url = param.replace('{query}', message.query)
         url = url.replace('{user}', nick)
         url = url.replace('{nick}', nick)
         url = url.replace('{broadcaster}', channel)

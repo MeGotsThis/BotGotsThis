@@ -38,15 +38,15 @@ def botEmpty(channel, send):
         globals.messaging.clearQueue(channel)
         send('Cleared all queued messages for ' + channel)
 
-def botAutoJoin(db, channel, send, tokens):
+def botAutoJoin(db, channel, send, message):
     if db.isChannelBannedReason(channel):
         send('Chat ' + channel + ' is banned from joining')
         return
 
-    if len(tokens) >= 2:
+    if len(message) >= 2:
         removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
                       'leave', 'part']
-        if tokens[1].lower() in removeMsgs:
+        if message.lower[1] in removeMsgs:
             result = db.discardAutoJoin(channel)
             if result:
                 send('Auto join for ' + channel + ' is now disabled')
@@ -91,7 +91,7 @@ def botAutoJoin(db, channel, send, tokens):
         send(msg)
     return True
 
-def botSetTimeoutLevel(db, channel, send, tokens):
+def botSetTimeoutLevel(db, channel, send, message):
     propertyDict = {
         '1': 'timeoutLength0',
         '2': 'timeoutLength1',
@@ -102,11 +102,11 @@ def botSetTimeoutLevel(db, channel, send, tokens):
         '2': '2nd',
         '3': '3rd',
         }
-    k = tokens[0].lower().split('settimeoutlevel-')[1]
+    k = message.command.split('settimeoutlevel-')[1]
     if k not in propertyDict:
         return False
     try:
-        value = int(tokens[1])
+        value = int(message[1])
     except:
         value = None
     db.setChatProperty(channel, propertyDict[k], value)

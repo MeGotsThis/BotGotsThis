@@ -5,32 +5,31 @@ import email.utils
 import json
 import time
 
-def commandHello(db, chat, tags, nick, message, tokens, permissions, now):
+def commandHello(db, chat, tags, nick, message, permissions, now):
     chat.sendMessage('Hello Kappa')
     return True
 
-def commandCome(db, chat, tags, nick, message, tokens, permissions, now):
+def commandCome(db, chat, tags, nick, message, permissions, now):
     broadcaster.botCome(db, nick, send.channel(chat))
     return True
 
-def commandLeave(db, chat, tags, nick, message, tokens, permissions, now):
+def commandLeave(db, chat, tags, nick, message, permissions, now):
     return broadcaster.botLeave(chat.channel, send.channel(chat))
 
-def commandEmpty(db, chat, tags, nick, message, tokens, permissions, now):
+def commandEmpty(db, chat, tags, nick, message, permissions, now):
     broadcaster.botEmpty(chat.channel, send.channel(chat))
     return True
 
-def commandAutoJoin(db, chat, tags, nick, message, tokens, permissions, now):
-    broadcaster.botAutoJoin(db, nick, send.channel(chat), tokens)
+def commandAutoJoin(db, chat, tags, nick, message, permissions, now):
+    broadcaster.botAutoJoin(db, nick, send.channel(chat), message)
     return True
 
-def commandSetTimeoutLevel(db, chat, tags, nick, message, tokens,
-                           permissions, now):
+def commandSetTimeoutLevel(db, chat, tags, nick, message, permissions, now):
     broadcaster.botSetTimeoutLevel(db, chat.channel, send.channel(chat),
-                                   tokens)
+                                   message)
     return True
 
-def commandUptime(db, chat, tags, nick, message, tokens, permissions, now):
+def commandUptime(db, chat, tags, nick, message, permissions, now):
     currentTime = datetime.datetime.utcnow()
     if 'uptime' in chat.sessionData:
         since = currentTime - chat.sessionData['uptime']

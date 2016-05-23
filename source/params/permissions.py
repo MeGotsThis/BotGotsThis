@@ -78,7 +78,7 @@ class ChatPermissionSet:
     def subscriber(self):
         if self._isSubscriber is None:
             if 'subscriber' in self._tags:
-                subscriber = tags['subscriber']
+                subscriber = self._tags['subscriber']
             else:
                 subscriber = 0
             self._isSubscriber = self.broadcaster or bool(int(subscriber))
@@ -88,7 +88,7 @@ class ChatPermissionSet:
     def turbo(self):
         if self._isTurbo is None:
             if 'turbo' in self._tags:
-                turbo = tags['turbo']
+                turbo = self._tags['turbo']
             else:
                 turbo = 0
             self._isTurbo = self.broadcaster or bool(int(turbo))
@@ -169,7 +169,7 @@ class WhisperPermissionSet:
     def turbo(self):
         if self._isTurbo is None:
             if 'turbo' in self._tags:
-                turbo = tags['turbo']
+                turbo = self._tags['turbo']
             else:
                 turbo = 0
             self._isTurbo = self.broadcaster or bool(int(turbo))

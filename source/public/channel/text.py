@@ -3,14 +3,13 @@ from bot import config
 from lists import custom
 import datetime
 
-def customCommands(db, chat, tags, nick, message, tokens, permissions, now):
-    command = tokens[0].lower()
+def customCommands(db, chat, tags, nick, message, permissions, now):
     customMessage = None
     
     if db.hasFeature(chat.channel, 'nocustom'):
         return False
     
-    commands = db.getChatCommands(chat.channel, command)
+    commands = db.getChatCommands(chat.channel, message.command)
     hasTextConvert = db.hasFeature(chat.channel, 'textconvert')
     
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
@@ -48,7 +47,6 @@ def customCommands(db, chat, tags, nick, message, tokens, permissions, now):
                 return
         chat.sessionData['customUserCommand'][nick] = currentTime
         
-        query = str(message.split(None, 1)[1]) if len(tokens) > 1 else ''
         final = []
         try:
             for part in _parseFormatMessage(str(customMessage)):
@@ -59,7 +57,7 @@ def customCommands(db, chat, tags, nick, message, tokens, permissions, now):
                     if field is not None:
                         params = str(field), str(param), str(prefix),
                         params += str(suffix),str(default), message,
-                        params += tokens, chat.channel, nick, query, now
+                        params += chat.channel, nick, now
                         string = _getString(*params)
                         if string is not None:
                             string = _formatString(str(string), str(format),
@@ -74,13 +72,13 @@ def customCommands(db, chat, tags, nick, message, tokens, permissions, now):
         msgs = [''.join(final)]
         for process in custom.postProcess:
             process(db, chat, tags, nick, permissions, broadcaster, level,
-                    command, msgs)
+                    message.command, msgs)
         chat.sendMulipleMessages(msgs)
         if permissions.chatModerator:
             timeout.recordTimeoutFromCommand(db, chat, nick, msgs, message)
 
-def commandCommand(db, chat, tags, nick, message, tokens, permissions, now):
-    if len(tokens) < 3:
+def commandCommand(db, chat, tags, nick, message, permissions, now):
+    if len(message) < 3:
         return False
     
     r = parseCommandMessageInput(message)
@@ -209,22 +207,20 @@ def parseCommandMessageInput(message):
         }
     
     try:
-        m = message
-        originalCommand, action, m = m.split(None, 2)
+        action = message.lower[1]
+        i = 2
         level = None
-        if m.startswith('level='):
-            parseLevel, m = m.split(None, 1)
-            level = parseLevel[len('level='):]
+        if message[2].startswith('level='):
+            i = 3
+            level = message[2][len('level='):]
         if level in allowPermissions:
             level = allowPermissions[level]
         else:
             level = False
-        mparts = m.split(None, 1)
-        while len(mparts) < 2:
-            mparts.append('')
-        command, fullText = mparts
+        command = message[i]
+        fullText = message[i+1:]
         
-        return (originalCommand, action.lower(), level, command, fullText)
+        return (message.command, action, level, command, fullText)
     except:
         return None
 
@@ -487,11 +483,11 @@ def _parseFormatMessage(message):
         
     return parsed
 
-def _getString(field, param, prefix, suffix, default, message,  tokens,
-               channel, nick, query, now):
+def _getString(field, param, prefix, suffix, default, message, channel, nick,
+               now):
     for fieldConvert in custom.fields:
         result = fieldConvert(field, param, prefix, suffix, default, message,
-                              tokens, channel, nick, query, now)
+                              channel, nick, now)
         if result is not None:
             return result
 

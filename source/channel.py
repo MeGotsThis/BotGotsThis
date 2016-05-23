@@ -1,4 +1,5 @@
 ﻿from .database import factory
+from .params.message import Message
 from .params.permissions import ChatPermissionSet
 from bot import config, utils
 from bot.channel import Channel
@@ -10,40 +11,38 @@ import time
 import traceback
 
 # Set up our commands function
-def parse(chat, tags, nick, message, now):
+def parse(chat, tags, nick, rawMessage, now):
+    if len(rawMessage) == 0:
+        return
+    
+    message = Message(rawMessage)
     if len(message) == 0:
         return
     
-    tokens = message.split(None)
-    if len(tokens) == 0:
-        return
-    
-    name = chat.channel + '-' + str(tokens[0]) + '-'
+    name = chat.channel + '-' + str(message.command) + '-'
     name += str(time.time())
-    params = chat, tags, nick, message, tokens, now
+    params = chat, tags, nick, message, now
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(chat, tags, nick, message, tokens, now):
+def threadParse(chat, tags, nick, message, now):
     if False: # Hints for Intellisense
         chat = Channel('', None)
         nick = str()
-        message = str()
-        tokens = [str(), str()]
+        message = Message('')
     
     try:
         permissions = ChatPermissionSet(tags, nick, chat)
-        command = str(tokens[0]).lower()
     
         complete = False
         with factory.getDatabase() as db:
-            arguments = db, chat, tags, nick, message, tokens, permissions,
+            arguments = db, chat, tags, nick, message, permissions,
             arguments += now,
             for filter in commandList.filterMessage:
                 complete = filter(*arguments)
                 if complete:
                     break
-            if not complete and command in commandList.commands:
-                commInfo = commandList.commands[command]
+            if not complete and message.command in commandList.commands:
+                commInfo = commandList.commands[message.command]
                 hasPerm = True
                 if commInfo[1] is not None:
                     permissionSet = commInfo[1].split('+')
@@ -53,7 +52,7 @@ def threadParse(chat, tags, nick, message, tokens, now):
                     complete = commInfo[0](*arguments)
             if not complete:
                 for comm in commandList.commandsStartWith:
-                    if command.startswith(comm):
+                    if message.command.startswith(comm):
                         commInfo = commandList.commandsStartWith[comm]
                         hasPerm = True
                         if commInfo[1] is not None:
@@ -70,5 +69,5 @@ def threadParse(chat, tags, nick, message, tokens, now):
                     if complete:
                         break
     except:
-        extra = 'Channel: ' + chat.channel + '\nMessage: ' + message
+        extra = 'Channel: ' + chat.channel + '\nMessage: ' + str(message)
         utils.logException(extra, now)

@@ -16,8 +16,7 @@ twitchUrlRegex += r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)"
 #twitchUrlRegex = r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|" + twitchUrlRegex
 
 # This is for banning the users who post a URL with no follows
-def filterNoUrlForBots(db, chat, tags, nick, message, tokens, permissions,
-                       now):
+def filterNoUrlForBots(db, chat, tags, nick, message, permissions, now):
     if not permissions.chatModerator:
         return False
     if not db.hasFeature(chat.channel, 'nourlredirect'):
@@ -25,7 +24,7 @@ def filterNoUrlForBots(db, chat, tags, nick, message, tokens, permissions,
     
     if permissions.moderator:
         return False
-    match = re.search(twitchUrlRegex, message)
+    match = re.search(twitchUrlRegex, str(message))
     if match is not None:
         params = chat, nick, message, now
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
