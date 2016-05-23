@@ -103,6 +103,7 @@
     <Compile Include="source\irccommand\userstate.py" />
     <Compile Include="source\irccommand\__init__.py" />
     <Compile Include="source\ircmessage.py" />
+    <Compile Include="source\params\message.py" />
     <Compile Include="source\params\permissions.py" />
     <Compile Include="source\params\__init__.py" />
     <Compile Include="source\private\autoload\__init__.py" />
