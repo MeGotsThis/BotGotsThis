@@ -1,14 +1,14 @@
 ﻿from bot import config, globals
+from collections import deque
 
 def manageListChats(db, send, nick, message):
     prepend = 'Twitch Chats: '
     limit = config.messageLimit - len(prepend)
-    channels = [c for c in globals.channels.keys()]
-    channels.sort()
+    channels = deque(sorted(c for c in globals.channels.keys()))
     chanList = []
     length = 0
     while channels:
-        chan = channels.pop(0)
+        chan = channels.popleft()
         chanList.append(chan)
         if length:
             length += 2
