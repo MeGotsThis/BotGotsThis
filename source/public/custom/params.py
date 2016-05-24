@@ -1,8 +1,9 @@
-﻿import re
+﻿from contextlib import suppress
+import re
 
 def fieldParams(field, param, prefix, suffix, default, message,
                 channel, nick, now):
-    try:
+    with suppress(TypeError):
         match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', field)
         if match is not None:
             matchParts = match.groups()
@@ -26,6 +27,4 @@ def fieldParams(field, param, prefix, suffix, default, message,
                 return prefix + params + suffix
             else:
                 return default
-    except TypeError:
-        pass
     return None

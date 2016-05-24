@@ -1,5 +1,6 @@
 from bot import config, globals
 from collections import defaultdict
+from contextlib import suppress
 import datetime
 
 def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
@@ -45,18 +46,14 @@ def recordTimeoutFromCommand(db, chat, user, messages, sourceMessage,
         length = None
         who = None
         if message.startswith(('.ban', '/ban')):
-            try:
+            with suppress(ValueError, IndexError):
                 who = message.split()[1]
                 length = 0
-            except:
-                pass
         if message.startswith(('.timeout', '/timeout')):
-            try:
+            with suppress(ValueError, IndexError):
                 parts = message.split()
                 length = int(parts[2])
                 who = parts[1]
-            except:
-                pass
         if length is not None:
             db.recordTimeout(chat.channel, who, user, module, None, length,
                              sourceMessage, None)

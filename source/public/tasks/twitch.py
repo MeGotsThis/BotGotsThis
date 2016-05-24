@@ -1,6 +1,7 @@
 ﻿from ...api import twitch
 from ...database.factory import getDatabase
 from bot import globals, utils
+from contextlib import suppress
 import copy
 import datetime
 import json
@@ -12,7 +13,7 @@ import time
 def checkStreamsAndChannel(timestamp):
     if not globals.channels:
         return
-    try:
+    with suppress(socket.gaierror):
         channels = copy.copy(globals.channels)
         channelsList = ','.join([c for c in globals.channels])
         uri = '/kraken/streams?limit=100&channel=' + channelsList
@@ -39,8 +40,6 @@ def checkStreamsAndChannel(timestamp):
             if channel in onlineStreams:
                 continue
             channels[channel].streamingSince = None
-    except socket.gaierror:
-        pass
 
 def handleStreams(streams, timestamp):
     onlineStreams = set()

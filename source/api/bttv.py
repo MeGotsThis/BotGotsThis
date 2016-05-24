@@ -1,4 +1,5 @@
 ﻿from bot import globals
+from contextlib import suppress
 import datetime
 import json
 import urllib.request
@@ -6,7 +7,7 @@ import urllib.request
 def updateGlobalEmotes():
     globals.globalBttvEmotesCache = datetime.datetime.utcnow()
     url = 'https://api.betterttv.net/2/emotes'
-    try:
+    with suppress(urllib.request.URLError):
         response = urllib.request.urlopen(url)
         if response.status == 200:
             responseData = response.read()
@@ -15,12 +16,10 @@ def updateGlobalEmotes():
             for emote in bttvData['emotes']:
                 emotes[emote['id']] = emote['code']
             globals.globalBttvEmotes = emotes
-    except:
-        pass
 
 def getBroadcasterEmotes(broadcaster):
     url = 'https://api.betterttv.net/2/channels/' + broadcaster
-    try:
+    with suppress(urllib.request.URLError):
         response = urllib.request.urlopen(url)
         if response.status == 200:
             responseData = response.read()
@@ -29,6 +28,4 @@ def getBroadcasterEmotes(broadcaster):
             for emoteData in bttvData['emotes']:
                 emotes[emote['id']] = emote['code']
             return emotes
-    except:
-        pass
     return None

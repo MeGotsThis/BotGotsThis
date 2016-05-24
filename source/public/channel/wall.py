@@ -1,5 +1,6 @@
 ﻿from ..library import timeout
 from bot import config
+from contextlib import suppress
 import datetime
 
 def commandWall(db, chat, tags, nick, message, permissions, now):
@@ -16,14 +17,12 @@ def commandWall(db, chat, tags, nick, message, permissions, now):
     else:
         length = 3
         rows = 5
-    try:
+    with suppress(ValueError):
         if len(message) == 3:
             rows = int(message[2])
         else:
             length = int(message[2])
             rows = int(message[3])
-    except:
-        pass
     length = min(length, config.messageLimit // len(rep))
     if not permissions.broadcaster:
         length = min(length, 5)

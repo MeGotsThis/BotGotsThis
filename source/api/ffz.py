@@ -1,4 +1,5 @@
 ﻿from bot import globals
+from contextlib import suppress
 import datetime
 import json
 import urllib.request
@@ -6,7 +7,7 @@ import urllib.request
 def updateGlobalEmotes():
     globals.globalFfzEmotesCache = datetime.datetime.utcnow()
     url = 'https://api.frankerfacez.com/v1/set/global'
-    try:
+    with suppress(urllib.request.URLError):
         response = urllib.request.urlopen(url)
         if response.status == 200:
             responseData = response.read()
@@ -16,12 +17,10 @@ def updateGlobalEmotes():
                 for emote in ffzData['sets'][str(s)]['emoticons']:
                     emotes[emote['id']] = emote['name']
             globals.globalFfzEmotes = emotes
-    except:
-        pass
 
 def getBroadcasterEmotes(broadcaster):
     url = 'https://api.frankerfacez.com/v1/room/' + broadcaster
-    try:
+    with suppress(urllib.request.URLError):
         response = urllib.request.urlopen(url)
         if response.status == 200:
             responseData = response.read()
@@ -31,6 +30,4 @@ def getBroadcasterEmotes(broadcaster):
             for emote in ffzData['sets'][str(ffzSet)]['emoticons']:
                 emotes[emote['id']] = emote['name']
             return emotes
-    except:
-        pass
     return None

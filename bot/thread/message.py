@@ -4,6 +4,7 @@ from .. import globals
 from .. import utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
+from contextlib import suppress
 import threading
 import traceback
 import datetime
@@ -91,11 +92,9 @@ class MessageQueue(threading.Thread):
                                    params=IrcMessageParams(
                                        middle=msg[0].ircChannel,
                                        trailing=msg[1]))
-                    try:
+                    with suppress(OSError):
                         params = _, msg[0].ircChannel, msg[2]
                         msg[0].socket.sendIrcCommand(*params)
-                    except OSError:
-                        pass
                 time.sleep(1 / config.messagePerSecond)
         except:
             utils.logException()

@@ -1,5 +1,6 @@
 ﻿from . import oauth
 from bot import globals
+from contextlib import suppress
 import configparser
 import datetime
 import http.client
@@ -42,7 +43,7 @@ def twitchCall(channel, method, uri, headers={}, data=None):
 def updateTwitchEmotes():
     globals.globalEmotesCache = datetime.datetime.utcnow()
     emotesets = [str(i) for i in globals.emoteset]
-    try:
+    with suppress(OSError):
         response, data = twitchCall(
             None, 'GET',
             '/kraken/chat/emoticon_images?emotesets=' + ','.join(emotesets),
@@ -77,8 +78,6 @@ def updateTwitchEmotes():
                 emoteSet[emote['id']] = int(emoteSetId)
         globals.globalEmotes = emotes
         globals.globalEmoteSets = emoteSet
-    except:
-        pass
 
 def twitchChatServer(chat, headers={}, data=None):
     conn = http.client.HTTPSConnection('tmi.twitch.tv')

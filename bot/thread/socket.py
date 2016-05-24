@@ -1,6 +1,7 @@
 ﻿from .. import config, error, globals, utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
+from contextlib import suppress
 import datetime
 import socket
 import source.ircmessage
@@ -60,7 +61,7 @@ class SocketThread(threading.Thread):
             self._isConnected = True
             try:
                 while self.running:
-                    try:
+                    with suppress(socket.timeout):
                         ircmsgs = lastRecv = bytes(self._ircsock.recv(2048))
                         while lastRecv != b'' and lastRecv[-2:] != b'\r\n':
                             lastRecv = bytes(self._ircsock.recv(2048))
@@ -74,8 +75,6 @@ class SocketThread(threading.Thread):
                             file = config.botnick + '-' + self.name + '.log'
                             utils.logIrcMessage(file, '< ' + ircmsg)
                             source.ircmessage.parseMessage(self, ircmsg, now)
-                    except socket.timeout:
-                        pass
                     sinceLastSend = datetime.datetime.now() - self.lastSentPing
                     sinceLast = datetime.datetime.now() - self.lastPing
                     if sinceLastSend >= datetime.timedelta(minutes=1):
@@ -86,9 +85,7 @@ class SocketThread(threading.Thread):
                         self.lastSentPing = datetime.datetime.now()
                     elif sinceLast >= datetime.timedelta(minutes=1,seconds=15):
                         raise error.NoPingException()
-            except error.NoPingException:
-                pass
-            except error.LoginUnsuccessfulException:
+            except (error.NoPingException, error.LoginUnsuccessfulException):
                 pass
             except:
                 utils.logException()
