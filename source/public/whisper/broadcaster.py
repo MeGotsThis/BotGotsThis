@@ -1,4 +1,4 @@
-﻿from ..common import broadcaster, send
+﻿from ..library import broadcaster, send
 from bot import globals
 
 def commandCome(db, nick, message, permissions, now):

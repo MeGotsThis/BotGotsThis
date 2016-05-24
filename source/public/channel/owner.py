@@ -1,5 +1,5 @@
 ﻿from bot import config, globals
-from ..common import channel, exit, managebot, send
+from ..library import channel, exit, managebot, send
 import datetime
 import json
 import sys

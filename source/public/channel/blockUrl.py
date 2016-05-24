@@ -1,6 +1,6 @@
 ﻿from ...api import twitch
 from ...database import factory
-from ..common import timeout
+from ..library import timeout
 from bot import config, utils
 import datetime
 import http.client

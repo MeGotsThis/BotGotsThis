@@ -1,5 +1,5 @@
 ﻿from ...api import twitch
-from ..common import broadcaster, send
+from ..library import broadcaster, send
 import datetime
 import email.utils
 import json

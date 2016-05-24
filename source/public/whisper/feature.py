@@ -1,4 +1,4 @@
-﻿from ..common import feature, send
+﻿from ..library import feature, send
 from bot import globals
 
 def commandFeature(db, nick, message, permissions, now):

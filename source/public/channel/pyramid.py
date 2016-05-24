@@ -1,4 +1,4 @@
-﻿from ..common import timeout
+﻿from ..library import timeout
 from bot import config, globals
 import datetime
 import random

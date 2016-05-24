@@ -1,4 +1,4 @@
-﻿from ..common import charConvert
+﻿from ..library import charConvert
 
 def commandFull(db, chat, tags, nick, message, permissions, now):
     if not db.hasFeature(chat.channel, 'textconvert'):

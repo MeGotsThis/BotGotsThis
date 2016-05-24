@@ -1,4 +1,4 @@
-﻿from ..common import channel, exit, managebot, send
+﻿from ..library import channel, exit, managebot, send
 from bot import globals
 
 def commandHello(db, nick, message, permissions, now):

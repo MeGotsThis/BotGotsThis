@@ -1,4 +1,4 @@
-﻿from ..common import reload, send
+﻿from ..library import reload, send
 from bot import globals
 
 def commandReload(db, nick, message, permissions, now):

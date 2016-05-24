@@ -1,4 +1,4 @@
-﻿from ..common import charConvert, timeout
+﻿from ..library import charConvert, timeout
 from bot import config
 from lists import custom
 import datetime

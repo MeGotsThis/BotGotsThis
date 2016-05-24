@@ -3,7 +3,7 @@ import importlib
 
 def loadThisModule(module):
     include = module.startswith('source') or module.startswith('lists')
-    exclude = module == 'source.public.common.reload'
+    exclude = module == 'source.public.library.reload'
     exclude = exclude or module.startswith('source.private.autoload')
     exclude = exclude or module.startswith('source.public.autoload')
     return include and not exclude
@@ -13,9 +13,9 @@ def moduleKey(module):
         return (90, module)
     if module == 'source.public.channel.text':
         return (96, module)
-    if module == 'source.public.common.feature':
+    if module == 'source.public.library.feature':
         return (96, module)
-    if module == 'source.public.common.managebot':
+    if module == 'source.public.library.managebot':
         return (96, module)
     if module == 'source.channel':
         return (97, module)
@@ -37,9 +37,9 @@ def moduleKey(module):
         return (10, module)
     if module.startswith('source.data'):
         return (11, module)
-    if module.startswith('source.public.common'):
+    if module.startswith('source.public.library'):
         return (18, module)
-    if module.startswith('source.private.common'):
+    if module.startswith('source.private.library'):
         return (19, module)
     
     if module.startswith('source.public.tasks'):
