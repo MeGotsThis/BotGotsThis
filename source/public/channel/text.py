@@ -1,5 +1,6 @@
 ﻿from ..library import charConvert, timeout
 from bot import config
+from collections import defaultdict
 from lists import custom
 import datetime
 
@@ -38,9 +39,9 @@ def customCommands(db, chat, tags, nick, message, permissions, now):
 
         cooldown = datetime.timedelta(seconds=config.customMessageUserCooldown)
         if 'customUserCommand' not in chat.sessionData:
-            chat.sessionData['customUserCommand'] = {}
-        if (not permissions.moderator and
-            nick in chat.sessionData['customUserCommand']):
+            chat.sessionData['customUserCommand'] = defaultdict(
+                lambda: datetime.datetime.min)
+        if not permissions.moderator:
             oldTime = chat.sessionData['customUserCommand'][nick]
             since = currentTime - oldTime
             if since < cooldown:

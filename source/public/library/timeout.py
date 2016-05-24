@@ -1,4 +1,5 @@
 from bot import config, globals
+from collections import defaultdict
 import datetime
 
 def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
@@ -13,14 +14,13 @@ def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
     timeouts += chatProp['timeoutLength2'],
     
     if 'timeouts' not in chat.sessionData:
-        chat.sessionData['timeouts'] = {}
-    if module not in chat.sessionData['timeouts']:
-        chat.sessionData['timeouts'][module] = {}
+        chat.sessionData['timeouts'] = defaultdict(
+            lambda: defaultdict(
+                lambda: (datetime.datetime.min, 0)))
     
     utcnow = datetime.datetime.utcnow()
     duration = datetime.timedelta(seconds=config.warningDuration)
-    if (user not in chat.sessionData['timeouts'][module] or
-        utcnow - chat.sessionData['timeouts'][module][user][0] >= duration):
+    if utcnow - chat.sessionData['timeouts'][module][user][0] >= duration:
         level = baseLevel
     else:
         prevLevel = chat.sessionData['timeouts'][module][user][1]
