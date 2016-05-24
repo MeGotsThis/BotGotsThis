@@ -135,3 +135,4 @@ _connection.close()
 abbreviations = { tz.zone().lower(): tz for tz in timezones }
 
 del _ini, _connection, _cursor, _row, _z, _zones, _transitions
+del configparser, datetime, sqlite3
