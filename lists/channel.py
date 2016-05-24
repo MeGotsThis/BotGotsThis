@@ -1,4 +1,5 @@
 ﻿from .public import channel as publicList
+from collections import ChainMap
 try:
     from .private import channel as privateList
 except:
@@ -20,11 +21,9 @@ if privateList.disableFilters:
     filterMessage = privateList.filterMessage
 else:
     filterMessage = publicList.filterMessage + privateList.filterMessage
-commands = dict(list(publicList.commands.items()) +
-                list(privateList.commands.items()))
-commandsStartWith = dict(
-    list(publicList.commandsStartWith.items()) +
-    list(privateList.commandsStartWith.items()))
+commands = ChainMap(privateList.commands, publicList.commands)
+commandsStartWith = ChainMap(privateList.commandsStartWith,
+                             publicList.commandsStartWith)
 processNoCommand = privateList.noCommandPreCustom
 if not privateList.disableCustomMessage:
     processNoCommand += publicList.processNoCommand

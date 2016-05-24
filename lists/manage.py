@@ -1,4 +1,5 @@
 ﻿from .public import manage as publicList
+from collections import ChainMap
 try:
     from .private import manage as privateList
 except:
@@ -8,5 +9,4 @@ if False: # Hints for Intellisense
     methods = privateList.methods
     methods = publicList.methods
 
-methods = dict(list(publicList.methods.items()) +
-               list(privateList.methods.items()))
+methods = ChainMap(privateList.methods, publicList.methods)

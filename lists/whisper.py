@@ -1,4 +1,5 @@
 ﻿from .public import whisper as publicList
+from collections import ChainMap
 try:
     from .private import whisper as privateList
 except:
@@ -8,5 +9,4 @@ if False: # Hints for Intellisense
     commands = privateList.commands
     commands = publicList.commands
 
-commands = dict(list(publicList.commands.items()) +
-                list(privateList.commands.items()))
+commands = ChainMap(privateList.commands, publicList.commands)
