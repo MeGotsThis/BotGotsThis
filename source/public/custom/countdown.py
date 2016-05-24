@@ -56,18 +56,17 @@ daysOfWeek = {
     'sat': SATURDAY,
     }
 
-def fieldCountdown(field, param, prefix, suffix, default, message,
+def fieldCountdown(field, params, prefix, suffix, default, message,
                    channel, nick, now):
     if field.lower() == 'countdown':
         cooldown = None
         dateInstances = []
-        params = param.split(',')
-        for i in range(len(params)):
+        for i, param in enumerate(params.split(',')):
             if i == 0:
-                cooldown = _getCooldown(params[i])
+                cooldown = _getCooldown(param)
                 if cooldown is not None:
                     continue
-            pds = _parseDateString(params[i].strip())
+            pds = _parseDateString(param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
@@ -88,18 +87,17 @@ def fieldCountdown(field, param, prefix, suffix, default, message,
             return prefix + timedeltaFormat(next - now) + suffix
     return None
 
-def fieldSince(field, param, prefix, suffix, default, message,
+def fieldSince(field, params, prefix, suffix, default, message,
                channel, nick, now):
     if field.lower() == 'since':
         cooldown = 0
         dateInstances = []
-        params = param.split(',')
-        for i in range(len(params)):
+        for i, param in enumerate(params.split(',')):
             if i == 0:
-                cooldown = _getCooldown(params[i])
+                cooldown = _getCooldown(param)
                 if cooldown is not None:
                     continue
-            pds = _parseDateString(params[i].strip())
+            pds = _parseDateString(param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
@@ -120,17 +118,16 @@ def fieldSince(field, param, prefix, suffix, default, message,
             return prefix + timedeltaFormat(now - past) + suffix
     return None
 
-def fieldNext(field, param, prefix, suffix, default, message,
+def fieldNext(field, params, prefix, suffix, default, message,
               channel, nick, now):
     if field.lower() in ['next', 'future']:
         dateInstances = []
-        params = param.split(',')
-        for i in range(len(params)):
+        for i, param in enumerate(params.split(',')):
             if i == 0:
-                match = re.match(_cooldownPattern, params[i].strip())
+                match = re.match(_cooldownPattern, param.strip())
                 if match is not None:
                     continue
-            pds = _parseDateString(params[i].strip())
+            pds = _parseDateString(param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
@@ -145,17 +142,16 @@ def fieldNext(field, param, prefix, suffix, default, message,
             return prefix + nextDateTime[0].strftime(format) + suffix
     return None
 
-def fieldPrevious(field, param, prefix, suffix, default, message,
+def fieldPrevious(field, params, prefix, suffix, default, message,
                   channel, nick, now):
     if field.lower() in ['prev', 'previous', 'past']:
         dateInstances = []
-        params = param.split(',')
-        for i in range(len(params)):
+        for i, param in enumerate(params.split(',')):
             if i == 0:
-                match = re.match(_cooldownPattern, params[i].strip())
+                match = re.match(_cooldownPattern, param.strip())
                 if match is not None:
                     continue
-            pds = _parseDateString(params[i].strip())
+            pds = _parseDateString(param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:

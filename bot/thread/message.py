@@ -167,9 +167,8 @@ class MessageQueue(threading.Thread):
     
     @staticmethod
     def _selectMsg(queue, condition):
-        for i in range(len(queue)):
+        for i, msg in enumerate(queue):
             if condition(i):
-                msg = queue[i]
                 del queue[i]
                 return msg
         return None
