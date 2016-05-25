@@ -1,7 +1,7 @@
 ﻿from bot import config, globals
 from collections import deque
 
-def manageListChats(db, send, nick, message):
+def manageListChats(database, send, nick, message):
     prepend = 'Twitch Chats: '
     limit = config.messageLimit - len(prepend)
     channels = deque(sorted(c for c in globals.channels.keys()))

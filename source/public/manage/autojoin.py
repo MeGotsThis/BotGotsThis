@@ -2,15 +2,15 @@
 from bot import globals, utils
 import json
 
-def manageAutoJoin(db, send, nick, message):
-    if len(message) < 3:
+def manageAutoJoin(args):
+    if len(args.message) < 3:
         return False
-    if message.lower[2] in ['reloadserver']:
-        for channelRow in db.getAutoJoinsChats():
+    if args.message.lower[2] in ['reloadserver']:
+        for channelRow in args.database.getAutoJoinsChats():
             cluster = twitch.twitchChatServer(channelRow['broadcaster'])
             if channelRow['cluster'] != cluster['eventchat']:
                 params = channelRow['broadcaster'], cluster,
-                db.setAutoJoinServer(*params)
+                args.database.setAutoJoinServer(*params)
                     
                 params = channelRow['broadcaster'], channelRow['priority'],
                 params += cluster,
@@ -18,70 +18,75 @@ def manageAutoJoin(db, send, nick, message):
                     
                 print(str(datetime.datetime.utcnow()) + ' Set Server for ' +
                       channelRow['broadcaster'])
-        send('Auto Join reload server complete')
+        args.send('Auto Join reload server complete')
         return True
     
-    if len(message) < 4:
+    if len(args.message) < 4:
         return False
-    if message.lower[2] in ['add', 'insert', 'join']:
-        if db.isChannelBannedReason(message.lower[3]):
-            send('Chat ' + message.lower[3] + ' is banned from joining')
+    if args.message.lower[2] in ['add', 'insert', 'join']:
+        if args.database.isChannelBannedReason(args.message.lower[3]):
+            args.send('Chat ' + args.message.lower[3]
+                      + ' is banned from joining')
             return True
-        cluster = twitch.twitchChatServer(message.lower[3])
-        params = message.lower[3], 0, cluster
-        result = db.saveAutoJoin(*params)
-        priority = db.getAutoJoinsPriority(message.lower[3])
+        cluster = twitch.twitchChatServer(args.message.lower[3])
+        params = args.message.lower[3], 0, cluster
+        result = args.database.saveAutoJoin(*params)
+        priority = args.database.getAutoJoinsPriority(args.message.lower[3])
         if result == False:
-            db.setAutoJoinServer(message.lower[3], cluster)
+            args.database.setAutoJoinServer(args.message.lower[3], cluster)
             
-        wasInChat = message.lower[3] in globals.channels
+        wasInChat = args.message.lower[3] in globals.channels
         if not wasInChat:
-            utils.joinChannel(message.lower[3], priority, cluster)
+            utils.joinChannel(args.message.lower[3], priority, cluster)
         else:
-            rejoin = utils.ensureServer(message.lower[3], priority, cluster)
+            rejoin = utils.ensureServer(
+                args.message.lower[3], priority, cluster)
         
         if result and not wasInChat:
-            send('Auto join for ' + message.lower[3] + ' is now enabled and '
-                        'joined ' + message.lower[3] + ' chat')
+            args.send('Auto join for ' + args.message.lower[3] + ' is now '
+                      'enabled and joined ' + args.message.lower[3] + ' chat')
         elif result:
             if rejoin < 0:
-                msg = 'Auto join for ' + message.lower[3]
+                msg = 'Auto join for ' + args.message.lower[3]
                 msg += ' is now enabled and moved to the correct server'
             else:
-                msg = 'Auto join for ' + message.lower[3] + ' is now enabled'
-            send(msg)
+                msg = 'Auto join for ' + args.message.lower[3] + ' is now'
+                msg += ' enabled'
+            args.send(msg)
         elif not wasInChat:
-            send('Auto join for ' + message.lower[3] + ' is already enabled '
-                        'but now joined ' + message.lower[3] + ' chat')
+            args.send('Auto join for ' + args.message.lower[3] + ' is already '
+                      'enabled but now joined ' + args.message.lower[3] +
+                      ' chat')
         else:
             if rejoin < 0:
-                msg = 'Auto join for ' + message.lower[3]
+                msg = 'Auto join for ' + args.message.lower[3]
                 msg += ' is already enabled and moved to the correct server'
             else:
-                msg = 'Auto join for ' + message.lower[3]
+                msg = 'Auto join for ' + args.message.lower[3]
                 msg += ' is already enabled and already in chat'
-            send(msg)
+            args.send(msg)
         return True
-    if message.lower[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
-        result = db.discardAutoJoin(message.lower[3])
+    if args.message.lower[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
+        result = args.database.discardAutoJoin(args.message.lower[3])
         if result:
-            send('Auto join for ' + message.lower[3] + ' is now '
-                        'disabled')
+            args.send('Auto join for ' + args.message.lower[3]
+                      + ' is now disabled')
         else:
-            send('Auto join for ' + message.lower[3] + ' was never '
-                        'enabled')
+            args.send('Auto join for ' + args.message.lower[3]
+                      + ' was never enabled')
         return True
-    if message.lower[2] in ['pri', 'priority']:
+    if args.message.lower[2] in ['pri', 'priority']:
         try:
-            priority = int(message[4])
+            priority = int(args.message[4])
         except:
             priority = 0
-        result = db.setAutoJoinPriority(message.lower[3], priority)
+        result = args.database.setAutoJoinPriority(
+            args.message.lower[3], priority)
         if result:
-            send('Auto join for ' + message.lower[3] + ' is set to '
-                        'priority ' + str(priority))
+            args.send('Auto join for ' + args.message.lower[3]
+                       + ' is set to priority ' + str(priority))
         else:
-            send('Auto join for ' + message.lower[3] + ' was never '
-                        'enabled')
+            args.send('Auto join for ' + args.message.lower[3]
+                      + ' was never enabled')
         return True
     return False

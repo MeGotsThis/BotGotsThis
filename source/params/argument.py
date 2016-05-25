@@ -16,3 +16,6 @@ CustomProcessArgs = namedtuple('CustomProcessArgs',
                                ['database', 'chat', 'tags', 'nick',
                                 'permissions', 'broadcaster', 'level',
                                 'command', 'messages'])
+
+ManageBotArgs = namedtuple('ManageBotArgs',
+                           ['database', 'send', 'nick', 'message'])

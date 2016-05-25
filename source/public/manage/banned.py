@@ -1,10 +1,10 @@
 ﻿from bot import utils
 
-def manageBanned(db, send, nick, message):
+def manageBanned(database, send, nick, message):
     if len(message) < 3:
         return False
     if message.lower[2] in ['list']:
-        bannedChannels = db.listBannedChannels()
+        bannedChannels = database.listBannedChannels()
         if bannedChannels:
             msg = 'Banned Channels: ' + ', '.join(bannedChannels)
             send(msg)
@@ -19,15 +19,15 @@ def manageBanned(db, send, nick, message):
         return False
     channel = message.lower[3]
     if message.lower[2] in ['add', 'insert']:
-        isBannedOrReason = db.isChannelBannedReason(channel)
+        isBannedOrReason = database.isChannelBannedReason(channel)
         if isBannedOrReason:
             send(channel + ' is already banned for: ' +
                         isBannedOrReason)
             return False
         params = channel, message[4:], nick
-        result = db.addBannedChannel(*params)
+        result = database.addBannedChannel(*params)
         if result:
-            db.discardAutoJoin(channel)
+            database.discardAutoJoin(channel)
             utils.partChannel(channel)
             
         if result:
@@ -37,12 +37,12 @@ def manageBanned(db, send, nick, message):
                         'Error has occured.')
         return True
     if message.lower[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
-        isBannedOrReason = db.isChannelBannedReason(channel)
+        isBannedOrReason = database.isChannelBannedReason(channel)
         if not isBannedOrReason:
             send(channel + ' is not banned')
             return False
         params = channel, message[4:], nick
-        result = db.removeBannedChannel(*params)
+        result = database.removeBannedChannel(*params)
             
         if result:
             send(channel + ' is now unbanned')
