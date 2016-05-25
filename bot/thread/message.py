@@ -80,7 +80,8 @@ class MessageQueue(threading.Thread):
             self._queues[priority].append(param)
     
     def run(self):
-        print(str(datetime.datetime.utcnow()) + ' Starting MessageQueue')
+        print('{time} Starting {name}'.format(
+            time=datetime.datetime.utcnow(), name=self.__class__.__name__))
         try:
             while self.running:
                 msg = self._getMessage()
@@ -104,7 +105,8 @@ class MessageQueue(threading.Thread):
                 c.running = False
             globals.join.running = False
             globals.background.running = False
-            print(str(datetime.datetime.utcnow()) + ' Ending MessageQueue')
+            print('{time} Ending {name}'.format(
+                time=datetime.datetime.utcnow(), name=self.__class__.__name__))
     
     def _getMessage(self):
         msgDuration = datetime.timedelta(seconds=30.1)

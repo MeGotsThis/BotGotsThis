@@ -39,8 +39,9 @@ class SocketThread(threading.Thread):
         self._running = value
     
     def run(self):
-        print(str(datetime.datetime.utcnow()) + ' Starting SocketThread ' +
-              self.name)
+        print('{time} Starting {name} {thread}'.format(
+            time=datetime.datetime.utcnow(), name=self.__class__.__name__,
+            thread=self.name))
         
         while self.running:
             self._ircsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,14 +49,16 @@ class SocketThread(threading.Thread):
             try:
                 self._connect()
             except socket.error as e:
-                print(str(datetime.datetime.utcnow()) + ' ' + self.name + 
-                      ' ' + str(e))
+                print('{time} {thread} Connect Exception\n{exception}'.format(
+                    time=datetime.datetime.utcnow(), thread=self.name,
+                    exception=e))
                 time.sleep(5)
                 continue
             self.lastSentPing = datetime.datetime.now()
             self.lastPing = datetime.datetime.now()
-            print(str(datetime.datetime.utcnow()) + ' ' + self.name +
-                  ' Connected ' + self._server)
+            print('{time} {thread} Connected {server}'.format(
+                time=datetime.datetime.utcnow(), thread=self.name,
+                server=self._server))
             
             globals.join.connected(self)
             self._isConnected = True
@@ -93,11 +96,13 @@ class SocketThread(threading.Thread):
                 self._ircsock.close()
             self._isConnected = False
             globals.join.disconnected(self)
-            print(str(datetime.datetime.utcnow()) + ' ' +  self.name +
-                  ' Disconnected ' + self._server)
+            print('{time} {thread} Disconnected {server}'.format(
+                time=datetime.datetime.utcnow(), thread=self.name,
+                server=self._server))
             time.sleep(5)
-        print(str(datetime.datetime.utcnow()) + ' Ending SocketThread ' +
-              self.name)
+        print('{time} Ending {name} {thread}'.format(
+            time=datetime.datetime.utcnow(), name=self.__class__.__name__,
+            thread=self.name))
     
     def sendIrcCommand(self, message, channel=None, whisper=None):
         if isinstance(message, IrcMessage):
@@ -171,8 +176,8 @@ class SocketThread(threading.Thread):
                                middle=channelData.ircChannel)))
             del self._channels[channelData.channel]
         globals.join.part(channelData.channel)
-        print(str(datetime.datetime.utcnow()) + ' Parted ' +
-              channelData.channel)
+        print('{time} Parted {channel}'.format(
+            time=datetime.datetime.utcnow(), channel=channelData.channel))
     
     def ping(self, message='ping'):
         self.sendIrcCommand(

@@ -19,7 +19,8 @@ class BackgroundTasker(threading.Thread):
         self._running = value
     
     def run(self):
-        print(str(datetime.datetime.utcnow()) + ' Starting BackgroundTasker')
+        print('{time} Starting {name}'.format(
+            time=datetime.datetime.utcnow(), name=self.__class__.__name__))
         now = datetime.datetime.utcnow()
         try:
             while self.running:
@@ -34,7 +35,8 @@ class BackgroundTasker(threading.Thread):
             utils.logException(None, now)
             raise
         finally:
-            print(str(datetime.datetime.utcnow()) + ' Ending BackgroundTasker')
+            print('{time} Ending {name}'.format(
+                time=datetime.datetime.utcnow(), name=self.__class__.__name__))
 
 def addTask(task, interval=datetime.timedelta(seconds=60)):
     t = [task, interval, datetime.datetime.min]

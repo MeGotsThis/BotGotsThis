@@ -1,5 +1,6 @@
 ﻿from ...api import twitch
 from bot import globals, utils
+import datetime
 import json
 
 def manageAutoJoin(args):
@@ -15,9 +16,10 @@ def manageAutoJoin(args):
                 params = channelRow['broadcaster'], channelRow['priority'],
                 params += cluster,
                 rejoin = utils.ensureServer(*params)
-                    
-                print(str(datetime.datetime.utcnow()) + ' Set Server for ' +
-                      channelRow['broadcaster'])
+                
+                print('{time} Set Server for {channel}'.format(
+                    time=datetime.datetime.utcnow(),
+                    channel=channelRow['broadcaster']))
         args.send('Auto Join reload server complete')
         return True
     

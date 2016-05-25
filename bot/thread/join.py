@@ -19,7 +19,8 @@ class JoinThread(threading.Thread):
         self._channelsLock = threading.Lock()
     
     def run(self):
-        print(str(datetime.datetime.utcnow()) + ' Starting SocketJoinThread')
+        print('{time} Starting {name}'.format(
+            time=datetime.datetime.utcnow(), name=self.__class__.__name__))
         joinDuration = datetime.timedelta(seconds=10.05)
         running = lambda c: globals.clusters[c].running
         while any(map(running, globals.clusters)):
@@ -61,14 +62,15 @@ class JoinThread(threading.Thread):
                         with self._joinTimesLock:
                             self._joinTimes.append(datetime.datetime.utcnow())
                         
-                        print(str(datetime.datetime.utcnow()) + ' Joined ' +
-                              chat.channel + ' on ' +
-                              chat.socket.name)
+                        print('{time} Joined {channel} on {socket}'.format(
+                            time=datetime.datetime.utcnow(),
+                            channel=chat.channel, socket=chat.socket.name))
                 
                 time.sleep(1 / config.joinPerSecond)
             except:
                 utils.logException()
-        print(str(datetime.datetime.utcnow()) + ' Ending SocketJoinThread')
+        print('{time} Ending {name}'.format(
+            time=datetime.datetime.utcnow(), name=self.__class__.__name__))
     
     def addSocket(self, socketThread):
         self._socketThreads.append(socketThread)

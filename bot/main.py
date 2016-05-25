@@ -16,7 +16,7 @@ import threading
 import time
 import traceback
 
-print(str(datetime.datetime.utcnow()) + ' Starting')
+print('{time} Starting'.format(time=datetime.datetime.utcnow()))
 globals.messaging = MessageQueue(name='Message Queue')
 
 globals.clusters['aws'] = SocketThread(config.awsServer, config.awsPort,
@@ -61,4 +61,4 @@ except:
     utils.logException()
     raise
 finally:
-    print(str(datetime.datetime.utcnow()) + ' Ended')
+    print('{time} Ended'.format(time=datetime.datetime.utcnow()))
