@@ -1,5 +1,5 @@
 ﻿from ..library import charConvert, timeout
-from ...params.argument import CustomFieldsArgs
+from ...params.argument import CustomFieldsArgs, CustomProcessArgs
 from bot import config
 from collections import defaultdict
 from lists import custom
@@ -58,11 +58,11 @@ def customCommands(args):
                 final.append(plain)
                 try:
                     if field is not None:
-                        argument = CustomFieldArgs(
+                        fieldArgument = CustomFieldArgs(
                             str(field), str(param), str(prefix), str(suffix),
                             str(default), args.message, args.chat.channel,
                             args.nick, args.timestamp)
-                        string = _getString(argument)
+                        string = _getString(fieldArgument)
                         if string is not None:
                             string = _formatString(str(string), str(format),
                                                     hasTextConvert)
@@ -74,10 +74,11 @@ def customCommands(args):
         except Exception as e:
             final = [str(customMessage)]
         msgs = [''.join(final)]
+        processArgument = CustomProcessArgs(
+            args.database, args.chat, args.tags, args.nick, args.permissions,
+            broadcaster, level, args.message.command, msgs)
         for process in custom.postProcess:
-            process(args.database, args.chat, args.tags, args.nick,
-                    args.permissions, broadcaster, level, args.message.command,
-                    msgs)
+            process(processArgument)
         args.chat.sendMulipleMessages(msgs)
         if args.permissions.chatModerator:
             timeout.recordTimeoutFromCommand(args.database, args.chat, nick,
