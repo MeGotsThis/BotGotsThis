@@ -1,5 +1,5 @@
 ﻿from ..library import charConvert, timeout
-from ...params.argument import CustomFieldsArgs, CustomProcessArgs
+from ...params.argument import CustomFieldArgs, CustomProcessArgs
 from bot import config
 from collections import defaultdict
 from lists import custom
