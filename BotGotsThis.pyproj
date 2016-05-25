@@ -122,7 +122,6 @@
     <Compile Include="source\public\autoload\__init__.py" />
     <Compile Include="source\public\channel\blockUrl.py" />
     <Compile Include="source\public\channel\broadcaster.py" />
-    <Compile Include="source\public\channel\charConvert.py" />
     <Compile Include="source\public\channel\custom.py" />
     <Compile Include="source\public\channel\feature.py" />
     <Compile Include="source\public\channel\mod.py" />
@@ -130,6 +129,7 @@
     <Compile Include="source\public\channel\pyramid.py" />
     <Compile Include="source\public\channel\reload.py" />
     <Compile Include="source\public\channel\repeat.py" />
+    <Compile Include="source\public\channel\textformat.py" />
     <Compile Include="source\public\channel\wall.py" />
     <Compile Include="source\public\channel\__init__.py" />
     <Compile Include="source\public\custom\multiple.py" />
@@ -144,12 +144,12 @@
     <Compile Include="source\public\default\__init__.py" />
     <Compile Include="source\public\library\broadcaster.py" />
     <Compile Include="source\public\library\channel.py" />
-    <Compile Include="source\public\library\charConvert.py" />
     <Compile Include="source\public\library\exit.py" />
     <Compile Include="source\public\library\feature.py" />
     <Compile Include="source\public\library\managebot.py" />
     <Compile Include="source\public\library\reload.py" />
     <Compile Include="source\public\library\send.py" />
+    <Compile Include="source\public\library\textformat.py" />
     <Compile Include="source\public\library\timeout.py" />
     <Compile Include="source\public\library\__init__.py" />
     <Compile Include="source\public\manage\autojoin.py" />
