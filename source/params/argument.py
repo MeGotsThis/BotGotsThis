@@ -7,3 +7,7 @@ ChatCommandArgs = namedtuple('ChatCommandArgs',
 WhisperCommandArgs = namedtuple('WhisperCommandArgs',
                                 ['database', 'nick', 'message', 'permissions',
                                  'timestamp',])
+
+CustomFieldArgs = namedtuple('CustomFieldArgs',
+                             ['field', 'param', 'prefix', 'suffix', 'default',
+                              'message', 'channel', 'nick', 'timestamp'])

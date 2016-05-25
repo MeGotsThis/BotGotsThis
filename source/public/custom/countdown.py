@@ -56,114 +56,118 @@ daysOfWeek = {
     'sat': SATURDAY,
     }
 
-def fieldCountdown(field, params, prefix, suffix, default, message,
-                   channel, nick, now):
-    if field.lower() == 'countdown':
+def fieldCountdown(args):
+    if args.field.lower() == 'countdown':
         cooldown = None
         dateInstances = []
-        for i, param in enumerate(params.split(',')):
+        for i, args.param in enumerate(params.split(',')):
             if i == 0:
-                cooldown = _getCooldown(param)
+                cooldown = _getCooldown(args.param)
                 if cooldown is not None:
                     continue
-            pds = _parseDateString(param.strip())
+            pds = _parseDateString(args.param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
             return None
-        nextDateTimes = [_getNextDateTime(now, *i) for i in dateInstances]
-        pastDateTimes = [_getPastDateTime(now, *i) for i in dateInstances]
+        nextDateTimes = [_getNextDateTime(args.timestamp, *i)
+                         for i in dateInstances]
+        pastDateTimes = [_getPastDateTime(args.timestamp, *i)
+                         for i in dateInstances]
         nextDateTimes = [dt for dt in nextDateTimes if dt is not None]
         pastDateTimes = [dt for dt in pastDateTimes if dt is not None]
         if len(nextDateTimes) == 0:
-            return default if default else 'has passed'
+            return args.default if args.default else 'has passed'
         else:
             next = min(dt[0] for dt in nextDateTimes)
-            now = now.replace(tzinfo=timezones.utc)
+            timestamp = args.timestamp.replace(tzinfo=timezones.utc)
             if len(pastDateTimes) > 0 and cooldown:
                 past = max(dt[0] for dt in pastDateTimes)
-                if _testCooldown(cooldown, past, next, now) < 0:
-                    return default if default else 'has passed'
-            return prefix + timedeltaFormat(next - now) + suffix
+                if _testCooldown(cooldown, past, next, timestamp) < 0:
+                    return args.default if args.default else 'has passed'
+            delta = timedeltaFormat(next - timestamp)
+            return args.prefix + delta + args.suffix
     return None
 
-def fieldSince(field, params, prefix, suffix, default, message,
-               channel, nick, now):
-    if field.lower() == 'since':
+def fieldSince(args):
+    if args.field.lower() == 'since':
         cooldown = 0
         dateInstances = []
-        for i, param in enumerate(params.split(',')):
+        for i, args.param in enumerate(params.split(',')):
             if i == 0:
-                cooldown = _getCooldown(param)
+                cooldown = _getCooldown(args.param)
                 if cooldown is not None:
                     continue
-            pds = _parseDateString(param.strip())
+            pds = _parseDateString(args.param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
             return None
-        nextDateTimes = [_getNextDateTime(now, *i) for i in dateInstances]
-        pastDateTimes = [_getPastDateTime(now, *i) for i in dateInstances]
+        nextDateTimes = [_getNextDateTime(args.timestamp, *i)
+                         for i in dateInstances]
+        pastDateTimes = [_getPastDateTime(args.timestamp, *i)
+                         for i in dateInstances]
         nextDateTimes = [dt for dt in nextDateTimes if dt is not None]
         pastDateTimes = [dt for dt in pastDateTimes if dt is not None]
         if len(pastDateTimes) == 0:
-            return default if default else 'is coming'
+            return args.default if args.default else 'is coming'
         else:
             past = max(dt[0] for dt in pastDateTimes)
-            now = now.replace(tzinfo=timezones.utc)
+            timestamp = args.timestamp.replace(tzinfo=timezones.utc)
             if len(nextDateTimes) > 0 and cooldown:
                 next = min(dt[0] for dt in nextDateTimes)
-                if _testCooldown(cooldown, past, next, now) >= 0:
-                    return default if default else 'is coming'
-            return prefix + timedeltaFormat(now - past) + suffix
+                if _testCooldown(cooldown, past, next, timestamp) >= 0:
+                    return args.default if args.default else 'is coming'
+            delta = timedeltaFormat(timestamp - past)
+            return args.prefix + delta + args.suffix
     return None
 
-def fieldNext(field, params, prefix, suffix, default, message,
-              channel, nick, now):
-    if field.lower() in ['next', 'future']:
+def fieldNext(args):
+    if args.field.lower() in ['next', 'future']:
         dateInstances = []
-        for i, param in enumerate(params.split(',')):
+        for i, args.param in enumerate(params.split(',')):
             if i == 0:
-                match = re.match(_cooldownPattern, param.strip())
+                match = re.match(_cooldownPattern, args.param.strip())
                 if match is not None:
                     continue
-            pds = _parseDateString(param.strip())
+            pds = _parseDateString(args.param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
             return None
-        nextDateTimes = [_getNextDateTime(now, *i) for i in dateInstances]
+        nextDateTimes = [_getNextDateTime(args.timestamp, *i)
+                         for i in dateInstances]
         nextDateTimes = [dt for dt in nextDateTimes if dt is not None]
         if len(nextDateTimes) == 0:
-            return default if default else 'None'
+            return args.default if args.default else 'None'
         else:
             nextDateTime = min(nextDateTimes, key=lambda dt: dt[0])
             format = _24HourFormat if nextDateTime[1] else _12HourFormat
-            return prefix + nextDateTime[0].strftime(format) + suffix
+            return args.prefix + nextDateTime[0].strftime(format) + args.suffix
     return None
 
-def fieldPrevious(field, params, prefix, suffix, default, message,
-                  channel, nick, now):
-    if field.lower() in ['prev', 'previous', 'past']:
+def fieldPrevious(args):
+    if args.field.lower() in ['prev', 'previous', 'past']:
         dateInstances = []
-        for i, param in enumerate(params.split(',')):
+        for i, args.param in enumerate(params.split(',')):
             if i == 0:
-                match = re.match(_cooldownPattern, param.strip())
+                match = re.match(_cooldownPattern, args.param.strip())
                 if match is not None:
                     continue
-            pds = _parseDateString(param.strip())
+            pds = _parseDateString(args.param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
             return None
-        pastDateTimes = [_getPastDateTime(now, *i) for i in dateInstances]
+        pastDateTimes = [_getPastDateTime(args.timestamp, *i)
+                         for i in dateInstances]
         pastDateTimes = [dt for dt in pastDateTimes if dt is not None]
         if len(pastDateTimes) == 0:
-            return default if default else 'has passed'
+            return args.default if args.default else 'has passed'
         else:
             pastDateTime = max(pastDateTimes, key=lambda dt: dt[0])
             format = _24HourFormat if pastDateTime[1] else _12HourFormat
-            return prefix + pastDateTime[0].strftime(format) + suffix
+            return args.prefix + pastDateTime[0].strftime(format) + args.suffix
     return None
 
 def _parseDateString(string):

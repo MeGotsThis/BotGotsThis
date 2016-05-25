@@ -1,4 +1,5 @@
 ﻿from ..library import charConvert, timeout
+from ...params.argument import CustomFieldsArgs
 from bot import config
 from collections import defaultdict
 from lists import custom
@@ -57,10 +58,11 @@ def customCommands(args):
                 final.append(plain)
                 try:
                     if field is not None:
-                        params = str(field), str(param), str(prefix),
-                        params += str(suffix),str(default), args.message,
-                        params += args.chat.channel, args.nick, args.timestamp
-                        string = _getString(*params)
+                        argument = CustomFieldArgs(
+                            str(field), str(param), str(prefix), str(suffix),
+                            str(default), args.message, args.chat.channel,
+                            args.nick, args.timestamp)
+                        string = _getString(argument)
                         if string is not None:
                             string = _formatString(str(string), str(format),
                                                     hasTextConvert)
@@ -489,11 +491,9 @@ def _parseFormatMessage(message):
         
     return parsed
 
-def _getString(field, param, prefix, suffix, default, message, channel, nick,
-               now):
+def _getString(args):
     for fieldConvert in custom.fields:
-        result = fieldConvert(field, param, prefix, suffix, default, message,
-                              channel, nick, now)
+        result = fieldConvert(args)
         if result is not None:
             return result
 

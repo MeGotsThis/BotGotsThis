@@ -1,10 +1,9 @@
 ﻿from contextlib import suppress
 import re
 
-def fieldParams(field, param, prefix, suffix, default, message,
-                channel, nick, now):
+def fieldParams(args):
     with suppress(TypeError):
-        match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', field)
+        match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', args.field)
         if match is not None:
             matchParts = match.groups()
             start = None
@@ -14,17 +13,17 @@ def fieldParams(field, param, prefix, suffix, default, message,
                 if matchParts[2] is not None:
                     stop = int(matchParts[2])
                 else:
-                    if start < len(message):
-                        return prefix + message[start] + suffix
+                    if start < len(args.message):
+                        return args.prefix + args.message[start] + args.suffix
                     else:
-                        return default
+                        return args.default
             elif matchParts[3] is not None:
                 start = int(matchParts[3])
             elif matchParts[4] is not None:
                 stop = int(matchParts[4])
-            params = message[start:stop]
+            params = args.message[start:stop]
             if params:
-                return prefix + params + suffix
+                return args.prefix + params + args.suffix
             else:
-                return default
+                return args.default
     return None
