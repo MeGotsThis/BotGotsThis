@@ -123,13 +123,13 @@
     <Compile Include="source\public\channel\blockUrl.py" />
     <Compile Include="source\public\channel\broadcaster.py" />
     <Compile Include="source\public\channel\charConvert.py" />
+    <Compile Include="source\public\channel\custom.py" />
     <Compile Include="source\public\channel\feature.py" />
     <Compile Include="source\public\channel\mod.py" />
     <Compile Include="source\public\channel\owner.py" />
     <Compile Include="source\public\channel\pyramid.py" />
     <Compile Include="source\public\channel\reload.py" />
     <Compile Include="source\public\channel\repeat.py" />
-    <Compile Include="source\public\channel\text.py" />
     <Compile Include="source\public\channel\wall.py" />
     <Compile Include="source\public\channel\__init__.py" />
     <Compile Include="source\public\custom\multiple.py" />
