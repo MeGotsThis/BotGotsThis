@@ -81,8 +81,8 @@ def customCommands(args):
             process(processArgument)
         args.chat.sendMulipleMessages(msgs)
         if args.permissions.chatModerator:
-            timeout.recordTimeoutFromCommand(args.database, args.chat, nick,
-                                             msgs, args.message)
+            timeout.recordTimeoutFromCommand(args.database, args.chat,
+                                             args.nick, msgs, args.message)
 
 def commandCommand(args):
     if len(args.message) < 3:
