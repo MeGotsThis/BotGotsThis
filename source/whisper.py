@@ -1,4 +1,5 @@
 ﻿from .database.factory import getDatabase
+from .params.argument import WhisperCommandArgs
 from .params.message import Message
 from .params.permissions import WhisperPermissionSet
 from bot import config, utils
@@ -10,7 +11,7 @@ import time
 import traceback
 
 # Set up our commands function
-def parse(tags, nick, rawMessage, now):
+def parse(tags, nick, rawMessage, timestamp):
     if len(rawMessage) == 0:
         return
     
@@ -18,22 +19,23 @@ def parse(tags, nick, rawMessage, now):
     if len(message) == 0:
         return
     
-    name = nick + '-' + str(tokens[0]) + '-'
+    name = nick + '-' + str(message.command) + '-'
     name += str(time.time())
-    params = tags, nick, message, now
+    params = tags, nick, message, timestamp
     threading.Thread(target=threadParse, args=params, name=name).start()
     
-def threadParse(tags, nick, message, now):
+def threadParse(tags, nick, message, timestamp):
     if False: # Hints for Intellisense
         nick = str()
-        message = str()
+        message = Message('')
     
     try:
         permissions = WhisperPermissionSet(tags, nick)
     
         complete = False
-        with getDatabase() as db:
-            arguments = db, nick, message, permissions, now
+        with getDatabase() as database:
+            arguments = WhisperCommandArgs(database, nick, message,
+                                           permissions, timestamp)
             if message.command in whisper.commands:
                 commInfo = whisper.commands[message.command]
                 hasPerm = True
@@ -42,7 +44,7 @@ def threadParse(tags, nick, message, now):
                     for perm in permissionSet:
                         hasPerm = hasPerm and permissions[perm]
                 if hasPerm and commInfo[0] is not None:
-                    complete = commInfo[0](*arguments)
+                    complete = commInfo[0](arguments)
     except:
         extra = 'From: ' + nick + '\nMessage: ' + str(message)
-        utils.logException(extra, now)
+        utils.logException(extra, timestamp)

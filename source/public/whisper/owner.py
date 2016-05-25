@@ -1,46 +1,48 @@
 ﻿from ..library import channel, exit, managebot, send
 from bot import globals
 
-def commandHello(db, nick, message, permissions, now):
-    globals.messaging.queueWhisper(nick, 'Hello Kappa')
+def commandHello(args):
+    globals.messaging.queueWhisper(args.nick, 'Hello Kappa')
     return True
 
-def commandExit(db, nick, message, permissions, now):
-    exit.botExit(send.whisper(nick))
+def commandExit(args):
+    exit.botExit(send.whisper(args.nick))
     return True
 
-def commandSay(db, nick, message, permissions, now):
-    if message.lower[1] in globals.channels:
-        channel.botSay(db, nick, message.lower[1], message[2:])
+def commandSay(args):
+    if args.message.lower[1] in globals.channels:
+        channel.botSay(args.database, args.nick, args.message.lower[1],
+                       args.message[2:])
     return True
 
-def commandJoin(db, nick, message, permissions, now):
-    if len(message) < 2:
+def commandJoin(args):
+    if len(args.message) < 2:
         return False
 
-    chan = message.lower[1]
+    chan = args.message.lower[1]
     
-    channel.botJoin(db, chan, send.whisper(nick))
+    channel.botJoin(args.database, chan, send.whisper(args.nick))
     return True
 
-def commandPart(db, nick, message, permissions, now):
-    if len(message) < 2:
+def commandPart(args):
+    if len(args.message) < 2:
         return False
-    channel.botPart(message.lower[1], send.whisper(nick))
+    channel.botPart(args.message.lower[1], send.whisper(args.nick))
     return True
 
-def commandEmptyAll(db, nick, message, permissions, now):
-    channel.botEmptyAll(send.whisper(nick))
+def commandEmptyAll(args):
+    channel.botEmptyAll(send.whisper(args.nick))
     return True
 
-def commandEmpty(db, nick, message, permissions, now):
-    if len(message) < 2:
+def commandEmpty(args):
+    if len(args.message) < 2:
         return False
-    channel.botEmpty(message.lower[1], send.whisper(nick))
+    channel.botEmpty(args.message.lower[1], send.whisper(args.nick))
     return True
 
-def commandManageBot(db, nick, message, permissions, now):
-    if len(message) < 2:
+def commandManageBot(args):
+    if len(args.message) < 2:
         return False
     
-    return managebot.botManageBot(db, send.whisper(nick), nick, message)
+    return managebot.botManageBot(args.database, send.whisper(args.nick),
+                                  args.nick, args.message)

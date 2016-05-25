@@ -1,14 +1,14 @@
 ﻿from ..library import reload, send
 from bot import globals
 
-def commandReload(db, nick, message, permissions, now):
-    reload.botReload(send.whisper(nick))
+def commandReload(args):
+    reload.botReload(send.whisper(args.nick))
     return True
 
-def commandReloadCommands(db, nick, message, permissions, now):
-    reload.botReloadCommands(send.whisper(nick))
+def commandReloadCommands(args):
+    reload.botReloadCommands(send.whisper(args.nick))
     return True
 
-def commandReloadConfig(db, nick, message, permissions, now):
-    reload.botReloadConfig(send.whisper(nick))
+def commandReloadConfig(args):
+    reload.botReloadConfig(send.whisper(args.nick))
     return True
