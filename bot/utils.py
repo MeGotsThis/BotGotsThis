@@ -49,24 +49,22 @@ def ensureServer(channel, priority=float('inf'), cluster='aws'):
 def logIrcMessage(filename, message, timestamp=None):
     if config.ircLogFolder is None:
         return
-    logDateFormat = '%Y-%m-%dT%H:%M:%S.%f '
-    timestamp = datetime.datetime.utcnow() if timestamp is None else timestamp
-    timestampStr = timestamp.strftime(logDateFormat)
-    fullfilename = os.path.join(config.ircLogFolder, filename)
-    with open(fullfilename, 'a', encoding='utf-8') as file:
-        file.write(timestampStr + message + '\n')
+    timestamp = timestamp or datetime.datetime.utcnow()
+    with open(os.path.join(config.ircLogFolder, filename), 'a',
+              encoding='utf-8') as file:
+        file.write('{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
+            time=timestamp, message=message))
 
-def logException(extraMessage=None, now=None):
+def logException(extraMessage=None, timestamp=None):
     if config.exceptionLog is None:
         return
-    if now is None:
-        now = datetime.datetime.utcnow()
-    logDateFormat = '%Y-%m-%dT%H:%M:%S.%f '
-    _ = traceback.format_exception(*sys.exc_info())
+    timestamp = timestamp or datetime.datetime.utcnow()
+    excep = traceback.format_exception(*sys.exc_info())
     with open(config.exceptionLog, 'a', encoding='utf-8') as file:
-        file.write(now.strftime(logDateFormat))
-        file.write('Exception in thread ')
-        file.write(threading.current_thread().name + ':\n')
-        if extraMessage:
-            file.write(extraMessage + '\n')
-        file.write(''.join(_))
+        if extraMessage and extraMessage[-1] != '\n':
+            extraMessage += '\n'
+        file.write(
+            '{time:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {thread}:\n'
+            '{extra}{exception}'.format(
+                time=timestamp, thread=threading.current_thread().name,
+                extra=extraMessage, exception=''.join(excep)))
