@@ -217,3 +217,54 @@ def _translateAsciiChain(c):
     c = _translate(c, monospace, ascii)
     c = _translate(c, doubleStruck, ascii)
     return c
+
+def format(string, format):
+    format = format.lower()
+    if format == 'ascii':
+        return textformat.allToAscii(string)
+    if format == 'full':
+        return textformat.asciiToFullWidth(string)
+    if format == 'parenthesized':
+        return textformat.asciiToParenthesized(string)
+    if format == 'circled':
+        return textformat.asciiToCircled(string)
+    if format == 'smallcaps':
+        return textformat.asciiToSmallCaps(string)
+    if format == 'upsidedown':
+        return textformat.asciiToUpsideDown(string)
+    if format in ['serifbold', 'serif-bold']:
+        return textformat.asciiToSerifBold(string)
+    if format in ['serifitalic', 'serif-italic']:
+        return textformat.asciiToSerifItalic(string)
+    if format in ['serifbolditalic', 'serif-bold-italic',
+                    'serif-bolditalic', 'serifbold-italic',
+                    'serifitalicbold', 'serif-italic-bold',
+                    'serifitalic-bold', 'serif-italicbold',]:
+        return textformat.asciiToSerifBoldItalic(string)
+    if format == 'sanserif':
+        return textformat.asciiToSanSerif(string)
+    if format in ['sanserifbold', 'sanserif-bold', 'bold']:
+        return textformat.asciiToSanSerifBold(string)
+    if format in ['sanserifitalic', 'sanserif-italic', 'italic']:
+        return textformat.asciiToSanSerifItalic(string)
+    if format in ['sanserifbolditalic', 'sanserif-bold-italic',
+                    'sanserif-bolditalic', 'sanserifbold-italic',
+                    'sanserifitalicbold', 'sanserif-italic-bold',
+                    'sanserifitalic-bold', 'sanserif-italicbold',
+                    'bolditalic', 'bold-italic',
+                    'italicbold', 'italic-bold']:
+        return textformat.asciiToSanSerifBoldItalic(string)
+    if format in ['script', 'cursive']:
+        return textformat.asciiToScript(string)
+    if format in ['scriptbold', 'cursivebold',
+                    'script-bold', 'cursive-bold',]:
+        return textformat.asciiToScriptBold(string)
+    if format == 'fraktur':
+        return textformat.asciiToFraktur(string)
+    if format in ['frakturbold', 'fraktur-bold']:
+        return textformat.asciiToFrakturBold(string)
+    if format == 'monospace':
+        return textformat.asciiToMonospace(string)
+    if format == 'doublestruck':
+        return textformat.asciiToDoubleStruck(string)
+    return string

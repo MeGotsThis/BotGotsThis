@@ -1,9 +1,9 @@
-﻿from ..library import textformat, timeout
+﻿from ..library import custom, timeout
 from ...params.argument import CustomFieldArgs, CustomProcessArgs
 from bot import config
 from collections import defaultdict
-from lists import custom
 import datetime
+import lists.custom
 
 def customCommands(args):
     customMessage = None
@@ -52,7 +52,7 @@ def customCommands(args):
         
         final = []
         try:
-            for part in _parseFormatMessage(str(customMessage)):
+            for part in custom.parseFormatMessage(str(customMessage)):
                 plain, field, format, prefix, suffix, *_ = part
                 param, default, original = _
                 final.append(plain)
@@ -62,10 +62,10 @@ def customCommands(args):
                             str(field), str(param), str(prefix), str(suffix),
                             str(default), args.message, args.chat.channel,
                             args.nick, args.timestamp)
-                        string = _getString(fieldArgument)
+                        string = custom.fieldString(fieldArgument)
                         if string is not None:
-                            string = _formatString(str(string), str(format),
-                                                    hasTextConvert)
+                            string = custom.format(str(string), str(format),
+                                                   hasTextConvert)
                         else:
                             string = str(original)
                         final.append(str(string))
@@ -77,7 +77,7 @@ def customCommands(args):
         processArgument = CustomProcessArgs(
             args.database, args.chat, args.tags, args.nick, args.permissions,
             broadcaster, level, args.message.command, msgs)
-        for process in custom.postProcess:
+        for process in lists.custom.postProcess:
             process(processArgument)
         args.chat.sendMulipleMessages(msgs)
         if args.permissions.chatModerator:
@@ -88,7 +88,7 @@ def commandCommand(args):
     if len(args.message) < 3:
         return False
     
-    r = parseCommandMessageInput(args.message)
+    r = custom.parseCommandMessageInput(args.message)
     if r is None:
         return
     
@@ -185,369 +185,3 @@ def commandCommand(args):
             msg = command + ' was not removed successfully. The command might '
             msg += 'not exist'
             args.chat.sendMessage(msg)
-
-def parseCommandMessageInput(message):
-    allowPermissions = {
-        None: '',
-        '': '',
-        'any': '',
-        'all': '',
-        'public': '',
-        'turbo': 'turbo',
-        'twitchturbo': 'turbo',
-        'subscriber': 'subscriber',
-        'sub': 'subscriber',
-        'moderator': 'moderator',
-        'mod': 'moderator',
-        'broadcaster': 'broadcaster',
-        'streamer': 'broadcaster',
-        'me': 'broadcaster',
-        'globalMod': 'globalMod',
-        'globalmod': 'globalMod',
-        'global_mod': 'globalMod',
-        'gmod': 'globalMod',
-        'admin': 'admin',
-        'twitchadmin': 'admin',
-        'staff': 'staff',
-        'twitchstaff': 'staff',
-        'owner': 'owner',
-        'self': 'owner',
-        'bot': 'owner',
-        }
-    
-    try:
-        action = message.lower[1]
-        i = 2
-        level = None
-        if message[2].startswith('level='):
-            i = 3
-            level = message[2][len('level='):]
-        if level in allowPermissions:
-            level = allowPermissions[level]
-        else:
-            level = False
-        command = message[i]
-        fullText = message[i+1:]
-        
-        return (message.command, action, level, command, fullText)
-    except:
-        return None
-
-def _parseFormatMessage(message):
-    # Format: {field:format<prefix>suffix@param!default}
-    parsed = []
-    i = 0
-    length = len(message)
-    
-    while True:
-        noFormat = []
-        while i < length:
-            char = message[i]
-            i += 1
-            
-            if char == '}':
-                if i < length and message[i] == '}':
-                    i += 1
-                else:
-                    raise ValueError()
-            elif char == '{':
-                if i < length and message[i] == '{':
-                    i += 1
-                else:
-                    i -= 1
-                    break
-            
-            noFormat.append(char)
-        
-        if i == length:
-            if noFormat:
-                p = (''.join(noFormat),) + (None,) * 7
-                parsed.append(p)
-            break
-        
-        s = i
-        i += 1
-        if i == length:
-            raise ValueError()
-        
-        field = []
-        while True:
-            if i == length:
-                raise ValueError()
-            
-            char = message[i]
-            i += 1
-            
-            if char == ':':
-                if i < length and message[i] == ':':
-                    i += 1
-                else:
-                    break
-            if char == '<':
-                if i < length and message[i] == '<':
-                    i += 1
-                else:
-                    break
-            if char == '>':
-                if i < length and message[i] == '>':
-                    i += 1
-                else:
-                    break
-            if char == '@':
-                if i < length and message[i] == '@':
-                    i += 1
-                else:
-                    break
-            if char == '!':
-                if i < length and message[i] == '!':
-                    i += 1
-                else:
-                    break
-            if char == '{':
-                if i < length and message[i] == '{':
-                    i += 1
-                else:
-                    raise ValueError()
-            if char == '}':
-                if i < length and message[i] == '}':
-                    i += 1
-                else:
-                    i -= 1
-                    break
-            field.append(char)
-
-        format = []
-        if char == ':':
-            while True:
-                if i == length:
-                    raise ValueError()
-                
-                char = message[i]
-                i += 1
-                
-                if char == '@':
-                    if i < length and message[i] == '@':
-                        i += 1
-                    else:
-                        break
-                if char == '<':
-                    if i < length and message[i] == '<':
-                        i += 1
-                    else:
-                        break
-                if char == '>':
-                    if i < length and message[i] == '>':
-                        i += 1
-                    else:
-                        break
-                if char == '!':
-                    if i < length and message[i] == '!':
-                        i += 1
-                    else:
-                        break
-                if char == '{':
-                    if i < length and message[i] == '{':
-                        i += 1
-                    else:
-                        raise ValueError()
-                if char == '}':
-                    if i < length and message[i] == '}':
-                        i += 1
-                    else:
-                        i -= 1
-                        break
-                format.append(char)
-
-        prefix = []
-        if char == '<':
-            while True:
-                if i == length:
-                    raise ValueError()
-                
-                char = message[i]
-                i += 1
-                
-                if char == '>':
-                    if i < length and message[i] == '>':
-                        i += 1
-                    else:
-                        break
-                if char == '@':
-                    if i < length and message[i] == '@':
-                        i += 1
-                    else:
-                        break
-                if char == '!':
-                    if i < length and message[i] == '!':
-                        i += 1
-                    else:
-                        break
-                if char == '{':
-                    if i < length and message[i] == '{':
-                        i += 1
-                    else:
-                        raise ValueError()
-                if char == '}':
-                    if i < length and message[i] == '}':
-                        i += 1
-                    else:
-                        i -= 1
-                        break
-                prefix.append(char)
-
-        suffix = []
-        if char == '>':
-            while True:
-                if i == length:
-                    raise ValueError()
-                
-                char = message[i]
-                i += 1
-                
-                if char == '@':
-                    if i < length and message[i] == '@':
-                        i += 1
-                    else:
-                        break
-                if char == '!':
-                    if i < length and message[i] == '!':
-                        i += 1
-                    else:
-                        break
-                if char == '{':
-                    if i < length and message[i] == '{':
-                        i += 1
-                    else:
-                        raise ValueError()
-                if char == '}':
-                    if i < length and message[i] == '}':
-                        i += 1
-                    else:
-                        i -= 1
-                        break
-                suffix.append(char)
-
-        param = []
-        if char == '@':
-            while True:
-                if i == length:
-                    raise ValueError()
-                
-                char = message[i]
-                i += 1
-                
-                if char == '!':
-                    if i < length and message[i] == '!':
-                        i += 1
-                    else:
-                        break
-                if char == '{':
-                    if i < length and message[i] == '{':
-                        i += 1
-                    else:
-                        raise ValueError()
-                if char == '}':
-                    if i < length and message[i] == '}':
-                        i += 1
-                    else:
-                        i -= 1
-                        break
-                param.append(char)
-
-        default = []
-        if char == '!':
-            while True:
-                if i == length:
-                    raise ValueError()
-                
-                char = message[i]
-                i += 1
-                
-                if char == '{':
-                    if i < length and message[i] == '{':
-                        i += 1
-                    else:
-                        raise ValueError()
-                if char == '}':
-                    if i < length and message[i] == '}':
-                        i += 1
-                    else:
-                        i -= 1
-                        break
-                default.append(char)
-
-        if char != '}':
-            raise ValueError()
-        i += 1
-        original = message[s:i]
-        
-        parsed.append((''.join(noFormat),
-                       ''.join(field),
-                       ''.join(format),
-                       ''.join(prefix),
-                       ''.join(suffix),
-                       ''.join(param),
-                       ''.join(default),
-                       original))
-        
-    return parsed
-
-def _getString(args):
-    for fieldConvert in custom.fields:
-        result = fieldConvert(args)
-        if result is not None:
-            return result
-
-    return None
-
-def _formatString(string, format, hasTextConvert):
-    format = format.lower()
-    if hasTextConvert:
-        if format == 'ascii':
-            return textformat.allToAscii(string)
-        if format == 'full':
-            return textformat.asciiToFullWidth(string)
-        if format == 'parenthesized':
-            return textformat.asciiToParenthesized(string)
-        if format == 'circled':
-            return textformat.asciiToCircled(string)
-        if format == 'smallcaps':
-            return textformat.asciiToSmallCaps(string)
-        if format == 'upsidedown':
-            return textformat.asciiToUpsideDown(string)
-        if format in ['serifbold', 'serif-bold']:
-            return textformat.asciiToSerifBold(string)
-        if format in ['serifitalic', 'serif-italic']:
-            return textformat.asciiToSerifItalic(string)
-        if format in ['serifbolditalic', 'serif-bold-italic',
-                      'serif-bolditalic', 'serifbold-italic',
-                      'serifitalicbold', 'serif-italic-bold',
-                      'serifitalic-bold', 'serif-italicbold',]:
-            return textformat.asciiToSerifBoldItalic(string)
-        if format == 'sanserif':
-            return textformat.asciiToSanSerif(string)
-        if format in ['sanserifbold', 'sanserif-bold', 'bold']:
-            return textformat.asciiToSanSerifBold(string)
-        if format in ['sanserifitalic', 'sanserif-italic', 'italic']:
-            return textformat.asciiToSanSerifItalic(string)
-        if format in ['sanserifbolditalic', 'sanserif-bold-italic',
-                      'sanserif-bolditalic', 'sanserifbold-italic',
-                      'sanserifitalicbold', 'sanserif-italic-bold',
-                      'sanserifitalic-bold', 'sanserif-italicbold',
-                      'bolditalic', 'bold-italic',
-                      'italicbold', 'italic-bold']:
-            return textformat.asciiToSanSerifBoldItalic(string)
-        if format in ['script', 'cursive']:
-            return textformat.asciiToScript(string)
-        if format in ['scriptbold', 'cursivebold',
-                      'script-bold', 'cursive-bold',]:
-            return textformat.asciiToScriptBold(string)
-        if format == 'fraktur':
-            return textformat.asciiToFraktur(string)
-        if format in ['frakturbold', 'fraktur-bold']:
-            return textformat.asciiToFrakturBold(string)
-        if format == 'monospace':
-            return textformat.asciiToMonospace(string)
-        if format == 'doublestruck':
-            return textformat.asciiToDoubleStruck(string)
-    return string
