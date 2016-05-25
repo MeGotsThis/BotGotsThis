@@ -1,163 +1,166 @@
 ﻿from ..library import charConvert
 
-def commandFull(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandFull(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToFullWidth(message.query))
+    args.chat.sendMessage(charConvert.asciiToFullWidth(args.message.query))
     return True
 
-def commandParenthesized(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandParenthesized(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToParenthesized(message.query))
+    args.chat.sendMessage(charConvert.asciiToParenthesized(args.message.query))
     return True
 
-def commandCircled(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandCircled(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToCircled(message.query))
+    args.chat.sendMessage(charConvert.asciiToCircled(args.message.query))
     return True
 
-def commandSmallCaps(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandSmallCaps(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToSmallCaps(message.query))
+    args.chat.sendMessage(charConvert.asciiToSmallCaps(args.message.query))
     return True
 
-def commandUpsideDown(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandUpsideDown(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToUpsideDown(message.query))
+    args.chat.sendMessage(charConvert.asciiToUpsideDown(args.message.query))
     return True
 
-def commandSerifBold(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandSerifBold(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToSerifBold(message.query))
+    args.chat.sendMessage(charConvert.asciiToSerifBold(args.message.query))
     return True
 
-def commandSerifItalic(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandSerifItalic(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToSerifItalic(message.query))
+    args.chat.sendMessage(charConvert.asciiToSerifItalic(args.message.query))
     return True
 
-def commandSerifBoldItalic(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandSerifBoldItalic(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToSerifBoldItalic(message.query))
+    msg = charConvert.asciiToSerifBoldItalic(args.message.query)
+    args.chat.sendMessage(msg)
     return True
 
-def commandSanSerif(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandSanSerif(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToSanSerif(message.query))
+    args.chat.sendMessage(charConvert.asciiToSanSerif(args.message.query))
     return True
 
-def commandSanSerifBold(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandSanSerifBold(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToSanSerifBold(message.query))
+    args.chat.sendMessage(charConvert.asciiToSanSerifBold(args.message.query))
     return True
 
-def commandSanSerifItalic(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandSanSerifItalic(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToSanSerifItalic(message.query))
+    msg = charConvert.asciiToSanSerifItalic(args.message.query)
+    args.chat.sendMessage(msg)
     return True
 
-def commandSanSerifBoldItalic(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandSanSerifBoldItalic(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToSanSerifBoldItalic(message.query))
+    msg = charConvert.asciiToSanSerifBoldItalic(args.message.query)
+    args.chat.sendMessage(msg)
     return True
 
-def commandScript(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandScript(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToScript(message.query))
+    args.chat.sendMessage(charConvert.asciiToScript(args.message.query))
     return True
 
-def commandScriptBold(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandScriptBold(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToScriptBold(message.query))
+    args.chat.sendMessage(charConvert.asciiToScriptBold(args.message.query))
     return True
 
-def commandFraktur(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandFraktur(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToFraktur(message.query))
+    args.chat.sendMessage(charConvert.asciiToFraktur(args.message.query))
     return True
 
-def commandFrakturBold(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandFrakturBold(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToFrakturBold(message.query))
+    args.chat.sendMessage(charConvert.asciiToFrakturBold(args.message.query))
     return True
 
-def commandMonospace(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandMonospace(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToMonospace(message.query))
+    args.chat.sendMessage(charConvert.asciiToMonospace(args.message.query))
     return True
 
-def commandDoubleStruck(db, chat, tags, nick, message, permissions, now):
-    if not db.hasFeature(chat.channel, 'textconvert'):
+def commandDoubleStruck(args):
+    if not args.database.hasFeature(args.chat.channel, 'textconvert'):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    chat.sendMessage(charConvert.asciiToDoubleStruck(message.query))
+    args.chat.sendMessage(charConvert.asciiToDoubleStruck(args.message.query))
     return True

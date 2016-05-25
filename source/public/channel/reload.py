@@ -1,13 +1,13 @@
 ﻿from ..library import reload, send
 
-def commandReload(db, chat, tags, nick, message, permissions, now):
-    reload.botReload(send.channel(chat))
+def commandReload(args):
+    reload.botReload(send.channel(args.chat))
     return True
 
-def commandReloadCommands(db, chat, tags, nick, message, permissions, now):
-    reload.botReloadCommands(send.channel(chat))
+def commandReloadCommands(args):
+    reload.botReloadCommands(send.channel(args.chat))
     return True
 
-def commandReloadConfig(db, chat, tags, nick, message, permissions, now):
-    reload.botReloadConfig(send.channel(chat))
+def commandReloadConfig(args):
+    reload.botReloadConfig(send.channel(args.chat))
     return True

@@ -16,17 +16,17 @@ twitchUrlRegex += r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)"
 #twitchUrlRegex = r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|" + twitchUrlRegex
 
 # This is for banning the users who post a URL with no follows
-def filterNoUrlForBots(db, chat, tags, nick, message, permissions, now):
-    if not permissions.chatModerator:
+def filterNoUrlForBots(args):
+    if not args.permissions.chatModerator:
         return False
-    if not db.hasFeature(chat.channel, 'nourlredirect'):
+    if not args.database.hasFeature(args.chat.channel, 'nourlredirect'):
         return False
     
-    if permissions.moderator:
+    if args.permissions.moderator:
         return False
-    match = re.search(twitchUrlRegex, str(message))
+    match = re.search(twitchUrlRegex, str(args.message))
     if match is not None:
-        params = chat, nick, message, now
+        params = args.chat, args.nick, args.message, args.timestamp
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
@@ -62,8 +62,8 @@ def checkIfUrlMaybeBad(chat, nick, message, now):
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
                 utils.logIrcMessage(chat.ircChannel + '#blockurl-match.log',
                                     log, now)
-                with factory.getDatabase() as db:
-                    timeout.timeoutUser(db, chat, nick, 'redirectUrl', 1,
+                with factory.getDatabase() as database:
+                    timeout.timeoutUser(database, chat, nick, 'redirectUrl', 1,
                                         message)
                 return
         except urllib.error.HTTPError as e:
@@ -74,8 +74,8 @@ def checkIfUrlMaybeBad(chat, nick, message, now):
                 log = nick + ': ' + originalUrl + ' -> ' + responseUrl
                 utils.logIrcMessage(chat.ircChannel + '#blockurl-match.log',
                                     log, now)
-                with factory.getDatabase() as db:
-                    timeout.timeoutUser(db, chat, nick, 'redirectUrl', 1,
+                with factory.getDatabase() as database:
+                    timeout.timeoutUser(database, chat, nick, 'redirectUrl', 1,
                                         message)
                 return
         except urllib.error.URLError as e:

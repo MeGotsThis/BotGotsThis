@@ -5,44 +5,47 @@ import json
 import sys
 import time
 
-def commandExit(db, chat, tags, nick, message, permissions, now):
-    exit.botExit(send.channel(chat))
+def commandExit(args):
+    exit.botExit(send.channel(args.chat))
     return True
 
-def commandSay(db, chat, tags, nick, message, permissions, now):
-    if len(message) < 3:
+def commandSay(args):
+    if len(args.message) < 3:
         return False
-    if message.lower[1] in globals.channels:
-        channel.botSay(db, nick, message.lower[1], message[2:])
+    if args.message.lower[1] in globals.channels:
+        channel.botSay(args.database, args.nick, args.message.lower[1],
+                       args.message[2:])
     return True
 
-def commandJoin(db, chat, tags, nick, message, permissions, now):
-    if len(message) < 2:
+def commandJoin(args):
+    if len(args.message) < 2:
         return False
 
-    channel.botJoin(db, message.lower[1], send.channel(chat))
+    channel.botJoin(args.database, args.message.lower[1],
+                    send.channel(args.chat))
     return True
 
-def commandPart(db, chat, tags, nick, message, permissions, now):
-    if len(message) < 2:
-        return False
-    
-    channel.botPart(message.lower[1], send.channel(chat))
-    return True
-
-def commandEmptyAll(db, chat, tags, nick, message, permissions, now):
-    channel.botEmptyAll(send.channel(chat))
-    return True
-
-def commandEmpty(db, chat, tags, nick, message, permissions, now):
-    if len(message) < 2:
+def commandPart(args):
+    if len(args.message) < 2:
         return False
     
-    channel.botEmpty(message.lower[1], send.channel(chat))
+    channel.botPart(args.message.lower[1], send.channel(args.chat))
     return True
 
-def commandManageBot(db, chat, tags, nick, message, permissions, now):
-    if len(message) < 2:
+def commandEmptyAll(args):
+    channel.botEmptyAll(send.channel(args.chat))
+    return True
+
+def commandEmpty(args):
+    if len(args.message) < 2:
         return False
     
-    return managebot.botManageBot(db, send.channel(chat), nick, message)
+    channel.botEmpty(args.message.lower[1], send.channel(args.chat))
+    return True
+
+def commandManageBot(args):
+    if len(args.message) < 2:
+        return False
+    
+    return managebot.botManageBot(args.database, send.channel(args.chat),
+                                  args.nick, args.message)

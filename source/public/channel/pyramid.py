@@ -3,65 +3,65 @@ from bot import config, globals
 import datetime
 import random
 
-def commandPyramid(db, chat, tags, nick, message, permissions, now):
-    if (not db.hasFeature(chat.channel, 'modpyramid') and
-        not permissions.broadcaster):
+def commandPyramid(args):
+    if (not args.database.hasFeature(args.chat.channel, 'modpyramid') and
+        not args.permissions.broadcaster):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    rep = message[1] + ' '
+    rep = args.message[1] + ' '
     try:
-        count = int(message[2])
+        count = int(args.message[2])
     except:
-        if permissions.broadcaster:
+        if args.permissions.broadcaster:
             count = 5
         else:
             count = 3
     count = min(count, config.messageLimit // len(rep))
-    if not permissions.broadcaster:
+    if not args.permissions.broadcaster:
         count = min(count, 5)
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
         if 'modPyramid' in chat.sessionData:
-            since = currentTime - chat.sessionData['modPyramid']
+            since = currentTime - args.chat.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        chat.sessionData['modPyramid'] = currentTime
-    elif not permissions.globalModerator:
+        args.chat.sessionData['modPyramid'] = currentTime
+    elif not args.permissions.globalModerator:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
-    chat.sendMulipleMessages(messages, 2)
+    args.chat.sendMulipleMessages(messages, 2)
     return True
 
-def commandRPyramid(db, chat, tags, nick, message, permissions, now):
-    if (not db.hasFeature(chat.channel, 'modpyramid') and
-        not permissions.broadcaster):
+def commandRPyramid(args):
+    if (not args.database.hasFeature(args.chat.channel, 'modpyramid') and
+        not args.permissions.broadcaster):
         return False
     
     emotes = globals.globalEmotes
     
     try:
-        count = int(message[1])
+        count = int(args.message[1])
     except:
-        if permissions.broadcaster:
+        if args.permissions.broadcaster:
             count = 5
         else:
             count = 3
     rep = []
-    if not permissions.broadcaster:
+    if not args.permissions.broadcaster:
         count = min(count, 5)
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modPyramid' in chat.sessionData:
-            since = currentTime - chat.sessionData['modPyramid']
+        if 'modPyramid' in args.chat.sessionData:
+            since = currentTime - args.chat.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        chat.sessionData['modPyramid'] = currentTime
-    elif not permissions.globalModerator:
+        args.chat.sessionData['modPyramid'] = currentTime
+    elif not args.permissions.globalModerator:
         count = min(count, 20)
     emoteIds = list(emotes.keys())
     for i in range(count):
@@ -71,42 +71,42 @@ def commandRPyramid(db, chat, tags, nick, message, permissions, now):
             break
     messages = [' '.join(rep[0:i]) for i in range(1, count)]
     messages += [' '.join(rep[0:i]) for i in range(count, 0, -1)]
-    chat.sendMulipleMessages(messages, 2)
+    args.chat.sendMulipleMessages(messages, 2)
     return True
 
-def commandPyramidLong(db, chat, tags, nick, message, permissions, now):
-    if (not db.hasFeature(chat.channel, 'modpyramid') and
-        not permissions.broadcaster):
+def commandPyramidLong(args):
+    if (not args.database.hasFeature(chat.channel, 'modpyramid') and
+        not args.permissions.broadcaster):
         return False
     
-    if len(message) < 2:
+    if len(args.message) < 2:
         return False
-    rep = message.query + ' '
+    rep = args.message.query + ' '
     try:
-        count = int(message.command.split('pyramid-')[1])
+        count = int(args.message.command.split('pyramid-')[1])
     except:
-        if permissions.broadcaster:
+        if args.permissions.broadcaster:
             count = 5
         else:
             count = 3
     count = min(count, config.messageLimit // len(rep))
-    if not permissions.broadcaster:
+    if not args.permissions.broadcaster:
         count = min(count, 5)
         
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
         if 'modPyramid' in chat.sessionData:
-            since = currentTime - chat.sessionData['modPyramid']
+            since = currentTime - args.chat.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        chat.sessionData['modPyramid'] = currentTime
-    elif not permissions.globalModerator:
+        args.chat.sessionData['modPyramid'] = currentTime
+    elif not args.permissions.globalModerator:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
-    chat.sendMulipleMessages(messages, 2)
-    if permissions.chatModerator:
-        timeout.recordTimeoutFromCommand(db, chat, nick,
-                                         messages[len(messages)//2], message,
-                                         'pyramid')
+    args.chat.sendMulipleMessages(messages, 2)
+    if args.permissions.chatModerator:
+        timeout.recordTimeoutFromCommand(args.database, args.chat, args.nick,
+                                         messages[len(messages)//2], 
+                                         str(args.message), 'pyramid')
     return True

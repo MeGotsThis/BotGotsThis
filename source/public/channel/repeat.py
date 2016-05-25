@@ -5,7 +5,7 @@ import datetime
 import time
 import json
 
-def commandAutoRepeat(db, chat, tags, nick, message, permissions, now):
+def commandAutoRepeat(args):
     """
     !autorepeat 1 MONEY MONEY
     !autorepeat-20 0.5 MONEY MONEY 
@@ -13,38 +13,38 @@ def commandAutoRepeat(db, chat, tags, nick, message, permissions, now):
     !autorepeat-20 off
     """
 
-    if 'autorepeat-' in message.command:
+    if 'autorepeat-' in args.message.command:
         try:
-            count = int(message.command.split('autorepeat-')[1])
+            count = int(args.message.command.split('autorepeat-')[1])
         except:
             count = 10
     else:
         count = None
     try:
-        if message.lower[1] == 'off':
+        if args.message.lower[1] == 'off':
             minutesDuration = 0
         else:
-            minutesDuration = float(message[1])
+            minutesDuration = float(args.message[1])
     except:
         return False
     
     try:
-        messageToSend = message[2:]
+        messageToSend = args.message[2:]
     except IndexError:
         messageToSend = None
     
-    if 'repeatThread' in chat.sessionData:
-        chat.sessionData['repeatThread'].count = 0
+    if 'repeatThread' in args.chat.sessionData:
+        args.chat.sessionData['repeatThread'].count = 0
     
     if minutesDuration <= 0 or count == 0 or not messageToSend:
         return True
     
     thread = MessageRepeater(
-        chat=chat,
+        chat=args.chat,
         message=messageToSend,
         duration=datetime.timedelta(minutes=minutesDuration),
         count=count)
-    chat.sessionData['repeatThread'] = thread
+    args.chat.sessionData['repeatThread'] = thread
     thread.start()
     
     return True
@@ -76,9 +76,9 @@ class MessageRepeater(threading.Thread):
                 self._lastTime = datetime.datetime.now()
                 self._chat.sendMessage(self._message)
                 if self._chat.isMod:
-                    with getDatabase() as db:
+                    with getDatabase() as database:
                         timeout.recordTimeoutFromCommand(
-                            db, self._chat, None, self._message, None,
+                            database, self._chat, None, self._message, None,
                             'autorepeat')
                 with self._countLock:
                     if self._count is not None:

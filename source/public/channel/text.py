@@ -4,49 +4,50 @@ from collections import defaultdict
 from lists import custom
 import datetime
 
-def customCommands(db, chat, tags, nick, message, permissions, now):
+def customCommands(args):
     customMessage = None
     
-    if db.hasFeature(chat.channel, 'nocustom'):
+    if args.database.hasFeature(args.chat.channel, 'nocustom'):
         return False
     
-    commands = db.getChatCommands(chat.channel, message.command)
-    hasTextConvert = db.hasFeature(chat.channel, 'textconvert')
+    commands = args.database.getChatCommands(args.chat.channel,
+                                             args.message.command)
+    hasTextConvert = args.database.hasFeature(args.chat.channel, 'textconvert')
     
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
                       'globalMod', 'admin', 'staff', 'owner',]
     level = None
     for perm in permissionsSet:
-        if not perm or permissions[perm]:
+        if not perm or args.permissions[perm]:
             if perm in commands['#global']:
                 customMessage = commands['#global'][perm]
                 broadcaster = '#global'
                 level = perm
-            if perm in commands[chat.channel]:
-                customMessage = commands[chat.channel][perm]
-                broadcaster = chat.channel
+            if perm in commands[args.chat.channel]:
+                customMessage = commands[args.chat.channel][perm]
+                broadcaster = args.chat.channel
                 level = perm
     
     if customMessage:
         currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.customMessageCooldown)
-        if (not permissions.moderator and
-            'customCommand' in chat.sessionData):
-            since = currentTime - chat.sessionData['customCommand']
+        if (not args.permissions.moderator and
+            'customCommand' in args.chat.sessionData):
+            since = currentTime - args.chat.sessionData['customCommand']
             if since < cooldown:
                 return
-        chat.sessionData['customCommand'] = currentTime
+        args.chat.sessionData['customCommand'] = currentTime
 
         cooldown = datetime.timedelta(seconds=config.customMessageUserCooldown)
-        if 'customUserCommand' not in chat.sessionData:
-            chat.sessionData['customUserCommand'] = defaultdict(
+        if 'customUserCommand' not in args.chat.sessionData:
+            args.chat.sessionData['customUserCommand'] = defaultdict(
                 lambda: datetime.datetime.min)
-        if not permissions.moderator:
-            oldTime = chat.sessionData['customUserCommand'][nick]
+        if not args.permissions.moderator:
+            oldTime = args.chat.sessionData['customUserCommand'][args.nick]
             since = currentTime - oldTime
             if since < cooldown:
                 return
-        chat.sessionData['customUserCommand'][nick] = currentTime
+        args.chat.sessionData['customUserCommand'][args.nick] = currentTime
         
         final = []
         try:
@@ -57,8 +58,8 @@ def customCommands(db, chat, tags, nick, message, permissions, now):
                 try:
                     if field is not None:
                         params = str(field), str(param), str(prefix),
-                        params += str(suffix),str(default), message,
-                        params += chat.channel, nick, now
+                        params += str(suffix),str(default), args.message,
+                        params += args.chat.channel, args.nick, args.timestamp
                         string = _getString(*params)
                         if string is not None:
                             string = _formatString(str(string), str(format),
@@ -72,111 +73,115 @@ def customCommands(db, chat, tags, nick, message, permissions, now):
             final = [str(customMessage)]
         msgs = [''.join(final)]
         for process in custom.postProcess:
-            process(db, chat, tags, nick, permissions, broadcaster, level,
-                    message.command, msgs)
-        chat.sendMulipleMessages(msgs)
-        if permissions.chatModerator:
-            timeout.recordTimeoutFromCommand(db, chat, nick, msgs, message)
+            process(args.database, args.chat, args.tags, args.nick,
+                    args.permissions, broadcaster, level, args.message.command,
+                    msgs)
+        args.chat.sendMulipleMessages(msgs)
+        if args.permissions.chatModerator:
+            timeout.recordTimeoutFromCommand(args.database, args.chat, nick,
+                                             msgs, args.message)
 
-def commandCommand(db, chat, tags, nick, message, permissions, now):
-    if len(message) < 3:
+def commandCommand(args):
+    if len(args.message) < 3:
         return False
     
-    r = parseCommandMessageInput(message)
+    r = parseCommandMessageInput(args.message)
     if r is None:
         return
     
     com, action, level, command, fullText = r
-    broadcaster = chat.channel
+    broadcaster = args.chat.channel
     if com == '!global':
         broadcaster = '#global'
     
-    if (db.hasFeature(chat.channel, 'nocustom') and
+    if (args.database.hasFeature(args.chat.channel, 'nocustom') and
         broadcaster != '#global'):
         return False
         
     msg = None
     if level == False:
-        msg = nick + ' -> Invalid level, command ignored'
-        chat.sendMessage(msg)
+        msg = args.nick + ' -> Invalid level, command ignored'
+        args.chat.sendMessage(msg)
         return
     if level:
-        if level not in permissions:
-            msg = nick + ' -> Invalid level, command ignored'
-            chat.sendMessage(msg)
+        if level not in args.permissions:
+            msg = args.nick + ' -> Invalid level, command ignored'
+            args.chat.sendMessage(msg)
             return
-        elif not permissions[level]:
-            msg = nick + ' -> You do not have permission to set that level'
-            chat.sendMessage(msg)
+        elif not args.permissions[level]:
+            msg = args.nick + ' -> You do not have permission to set that level'
+            args.chat.sendMessage(msg)
             return
     
-    if action in ['property'] and permissions.broadcaster and fullText:
+    if action in ['property'] and args.permissions.broadcaster and fullText:
         parts = fullText.split(None, 1)
         if len(parts) < 2:
             parts.append(None)
         prop, value = parts
         if prop not in custom.properties:
-            msg = nick + ' -> That property does not exist'
-            chat.sendMessage(msg)
+            msg = args.nick + ' -> That property does not exist'
+            args.chat.sendMessage(msg)
             return
-        result = db.processCustomCommandProperty(
+        result = args.database.processCustomCommandProperty(
             broadcaster, level, command, prop, value)
         if result:
             if value is None:
-                chat.sendMessage(command + ' with ' + prop + ' has been unset')
+                msg = command + ' with ' + prop + ' has been unset'
+                args.chat.sendMessage(msg)
             else:
                 msg = command + ' with ' + prop + ' has been set with the '
                 msg += 'value of ' + value
-                chat.sendMessage(msg)
+                args.chat.sendMessage(msg)
         else:
             msg = command + ' with ' + prop + ' could not be processed'
-            chat.sendMessage(msg)
+            args.chat.sendMessage(msg)
     elif action in ['add', 'insert', 'new']:
-        result = db.insertCustomCommand(
-            broadcaster, level, command, fullText, nick)
+        result = args.database.insertCustomCommand(
+            broadcaster, level, command, fullText, args.nick)
         if result:
-            chat.sendMessage(command + ' was added successfully')
+            args.chat.sendMessage(command + ' was added successfully')
         else:
             msg = command + ' was not added successfully. There might be an '
             msg += 'existing command'
-            chat.sendMessage(msg)
+            args.chat.sendMessage(msg)
     elif action in ['edit', 'update']:
-        params = broadcaster, level, command, fullText, nick
-        result = db.updateCustomCommand(*params)
+        params = broadcaster, level, command, fullText, args.nick
+        result = args.database.updateCustomCommand(*params)
         if result:
             msg = command + ' was updated successfully'
-            chat.sendMessage(msg)
+            args.chat.sendMessage(msg)
         else:
             msg = command + ' was not updated successfully. The command might '
             msg += 'not exist'
-            chat.sendMessage(msg)
+            args.chat.sendMessage(msg)
     elif action in ['replace', 'override']:
-        params = broadcaster, level, command, fullText, nick
-        result = db.replaceCustomCommand(*params)
+        params = broadcaster, level, command, fullText, args.nick
+        result = args.database.replaceCustomCommand(*params)
         if result:
-            chat.sendMessage(command + ' was updated successfully')
+            args.chat.sendMessage(command + ' was updated successfully')
         else:
             msg = command + ' was not updated successfully. The command might '
             msg += 'not exist'
-            chat.sendMessage(msg)
+            args.chat.sendMessage(msg)
     elif action in ['append']:
-        params = broadcaster, level, command, fullText, nick
-        result = db.appendCustomCommand(*params)
+        params = broadcaster, level, command, fullText, args.nick
+        result = args.database.appendCustomCommand(*params)
         if result:
             msg = command + ' was appended successfully'
-            chat.sendMessage(msg)
+            args.chat.sendMessage(msg)
         else:
             msg = command + ' was not appended successfully. The command might '
             msg += 'not exist'
-            chat.sendMessage(msg)
+            args.chat.sendMessage(msg)
     elif action in ['del', 'delete', 'rem', 'remove',]:
-        result = db.deleteCustomCommand(broadcaster, level, command, nick)
+        params = broadcaster, level, command, args.nick
+        result = args.database.deleteCustomCommand(*params)
         if result:
-            chat.sendMessage(command + ' was removed successfully')
+            args.chat.sendMessage(command + ' was removed successfully')
         else:
             msg = command + ' was not removed successfully. The command might '
             msg += 'not exist'
-            chat.sendMessage(msg)
+            args.chat.sendMessage(msg)
 
 def parseCommandMessageInput(message):
     allowPermissions = {

@@ -5,46 +5,47 @@ import email.utils
 import json
 import time
 
-def commandHello(db, chat, tags, nick, message, permissions, now):
+def commandHello(args):
     chat.sendMessage('Hello Kappa')
     return True
 
-def commandCome(db, chat, tags, nick, message, permissions, now):
-    broadcaster.botCome(db, nick, send.channel(chat))
+def commandCome(args):
+    broadcaster.botCome(args.database, args.nick, send.channel(args.chat))
     return True
 
-def commandLeave(db, chat, tags, nick, message, permissions, now):
-    return broadcaster.botLeave(chat.channel, send.channel(chat))
+def commandLeave(args):
+    return broadcaster.botLeave(args.chat.channel, send.channel(args.chat))
 
-def commandEmpty(db, chat, tags, nick, message, permissions, now):
-    broadcaster.botEmpty(chat.channel, send.channel(chat))
+def commandEmpty(args):
+    broadcaster.botEmpty(args.chat.channel, send.channel(args.chat))
     return True
 
-def commandAutoJoin(db, chat, tags, nick, message, permissions, now):
-    broadcaster.botAutoJoin(db, nick, send.channel(chat), message)
+def commandAutoJoin(args):
+    broadcaster.botAutoJoin(args.database, args.nick, send.channel(args.chat),
+                            args.message)
     return True
 
-def commandSetTimeoutLevel(db, chat, tags, nick, message, permissions, now):
-    broadcaster.botSetTimeoutLevel(db, chat.channel, send.channel(chat),
-                                   message)
+def commandSetTimeoutLevel(args):
+    broadcaster.botSetTimeoutLevel(args.database, args.chat.channel,
+                                   send.channel(args.chat), args.message)
     return True
 
-def commandUptime(db, chat, tags, nick, message, permissions, now):
+def commandUptime(args):
     currentTime = datetime.datetime.utcnow()
-    if 'uptime' in chat.sessionData:
-        since = currentTime - chat.sessionData['uptime']
+    if 'uptime' in args.chat.sessionData:
+        since = currentTime - args.chat.sessionData['uptime']
         if since < datetime.timedelta(seconds=60):
             return False
-    chat.sessionData['uptime'] = currentTime
+    args.chat.sessionData['uptime'] = currentTime
 
-    if not chat.isStreaming:
-        msg = chat.channel + ' is currently not streaming or has not '
+    if not args.chat.isStreaming:
+        msg = args.chat.channel + ' is currently not streaming or has not '
         msg += 'been for a minute'
-        chat.sendMessage(msg)
+        args.chat.sendMessage(msg)
         return True
 
     response, data = twitch.twitchCall(
-        chat.channel, 'GET', '/kraken/',
+        args.chat.channel, 'GET', '/kraken/',
         headers = {
             'Accept': 'application/vnd.twitchtv.v3+json',
             })
@@ -56,13 +57,11 @@ def commandUptime(db, chat, tags, nick, message, permissions, now):
             unixTimestamp = time.mktime(dateStruct)
             currentTime = datetime.datetime.fromtimestamp(unixTimestamp)
                 
-            msg = 'Uptime: ' + str(currentTime - chat.streamingSince)
-            chat.sendMessage(msg)
+            msg = 'Uptime: ' + str(currentTime - args.chat.streamingSince)
+            args.chat.sendMessage(msg)
             return True
         raise ValueError()
     except (ValueError, KeyError) as e:
-        msg = 'Fail to get information from Twitch.tv'
-        chat.sendMessage(msg)
+        args.chat.sendMessage('Fail to get information from Twitch.tv')
     except:
-        msg = 'Unknown Error'
-        chat.sendMessage(msg)
+        args.chat.sendMessage('Unknown Error')
