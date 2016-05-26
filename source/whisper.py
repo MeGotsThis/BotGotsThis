@@ -19,8 +19,8 @@ def parse(tags, nick, rawMessage, timestamp):
     if len(message) == 0:
         return
     
-    name = nick + '-' + str(message.command) + '-'
-    name += str(time.time())
+    name = '{nick}-{command}-{time}'.format(
+        nick=nick, command=message.command, time=time.time())
     params = tags, nick, message, timestamp
     threading.Thread(target=threadParse, args=params, name=name).start()
     
@@ -46,5 +46,6 @@ def threadParse(tags, nick, message, timestamp):
                 if hasPerm and commInfo[0] is not None:
                     complete = commInfo[0](arguments)
     except:
-        extra = 'From: ' + nick + '\nMessage: ' + str(message)
+        extra = 'From: {nick}\nMessage: {message}'.format(
+            nick=nick, message=message)
         utils.logException(extra, timestamp)

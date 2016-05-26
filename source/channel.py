@@ -20,8 +20,8 @@ def parse(chat, tags, nick, rawMessage, timestamp):
     if len(message) == 0:
         return
     
-    name = chat.channel + '-' + str(message.command) + '-'
-    name += str(time.time())
+    name = '{channel}-{command}-{time}'.format(
+        channel=chat.channel, command=message.command, time=time.time())
     params = chat, tags, nick, message, timestamp
     threading.Thread(target=threadParse, args=params, name=name).start()
     
@@ -70,5 +70,6 @@ def threadParse(chat, tags, nick, message, timestamp):
                     if complete:
                         break
     except:
-        extra = 'Channel: ' + chat.channel + '\nMessage: ' + str(message)
+        extra = 'Channel: {channel}\nMessage: {message}'.format(
+            channel=chat.channel, message=message)
         utils.logException(extra, timestamp)
