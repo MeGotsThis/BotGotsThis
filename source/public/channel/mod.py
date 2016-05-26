@@ -16,9 +16,10 @@ def commandStatus(args):
             },
         data = {'channel[status]': args.message.query or ' '})
     if response.status == 200:
-        args.chat.sendMessage('Channel Status set as: ' + args.message.query)
+        msg = 'Channel Status set as: ' + args.message.query
     else:
-        args.chat.sendMessage('Channel Status failed to set')
+        msg = 'Channel Status failed to set'
+    args.chat.sendMessage(msg)
     return True
 
 def commandGame(args):
@@ -44,11 +45,12 @@ def commandGame(args):
         data = {'channel[game]': gameToSet})
     if response.status == 200:
         if gameToSet:
-            args.chat.sendMessage('Channel Game set as: ' + gameToSet)
+            msg = 'Channel Game set as: ' + gameToSet
         else:
-            args.chat.sendMessage('Channel Game has been unset')
+            msg = 'Channel Game has been unset'
     else:
-        args.chat.sendMessage('Channel Game failed to set')
+        msg = 'Channel Game failed to set'
+    args.chat.sendMessage(msg)
     return True
 
 def commandPurge(args):
