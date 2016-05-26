@@ -90,7 +90,7 @@ def commandCommand(args):
     
     r = custom.parseCommandMessageInput(args.message)
     if r is None:
-        return
+        return False
     
     com, action, level, command, fullText = r
     broadcaster = args.chat.channel
@@ -103,18 +103,18 @@ def commandCommand(args):
         
     msg = None
     if level == False:
-        msg = args.nick + ' -> Invalid level, command ignored'
-        args.chat.sendMessage(msg)
-        return
+        args.chat.sendMessage('{user} -> Invalid level, command '
+                              'ignored'.format(user=args.nick))
+        return True
     if level:
         if level not in args.permissions:
-            msg = args.nick + ' -> Invalid level, command ignored'
-            args.chat.sendMessage(msg)
-            return
+            args.chat.sendMessage('{user} -> Invalid level, command '
+                                  'ignored'.format(user=args.nick))
+            return True
         elif not args.permissions[level]:
-            msg = args.nick + ' -> You do not have permission to set that level'
-            args.chat.sendMessage(msg)
-            return
+            args.chat.sendMessage('{user} -> You do not have permission to '
+                                  'set that level'.format(user=args.nick))
+            return True
     
     if action in ['property'] and args.permissions.broadcaster and fullText:
         parts = fullText.split(None, 1)
@@ -122,66 +122,57 @@ def commandCommand(args):
             parts.append(None)
         prop, value = parts
         if prop not in custom.properties:
-            msg = args.nick + ' -> That property does not exist'
-            args.chat.sendMessage(msg)
-            return
-        result = args.database.processCustomCommandProperty(
-            broadcaster, level, command, prop, value)
-        if result:
+            args.chat.sendMessage('{user} -> That property does not '
+                                  'exist'.format(user=args.nick))
+            return True
+        if args.database.processCustomCommandProperty(
+                broadcaster, level, command, prop, value):
             if value is None:
-                msg = command + ' with ' + prop + ' has been unset'
-                args.chat.sendMessage(msg)
+                msg = '{command} with {property} has been unset'
             else:
-                msg = command + ' with ' + prop + ' has been set with the '
-                msg += 'value of ' + value
-                args.chat.sendMessage(msg)
+                msg = ('{command} with {property} has been set with the value '
+                       'of {value}')
         else:
-            msg = command + ' with ' + prop + ' could not be processed'
-            args.chat.sendMessage(msg)
+            msg = '{command} with {property} could not be processed'
+        args.chat.sendMessage(
+            msg.format(command=command, property=prop, value=value))
+        return True
     elif action in ['add', 'insert', 'new']:
-        result = args.database.insertCustomCommand(
-            broadcaster, level, command, fullText, args.nick)
-        if result:
-            args.chat.sendMessage(command + ' was added successfully')
+        if args.database.insertCustomCommand(
+                broadcaster, level, command, fullText, args.nick):
+            msg = '{command} was added successfully'
         else:
-            msg = command + ' was not added successfully. There might be an '
-            msg += 'existing command'
-            args.chat.sendMessage(msg)
+            msg = ('{command} was not added successfully. There might be an '
+                   'existing command')
     elif action in ['edit', 'update']:
-        params = broadcaster, level, command, fullText, args.nick
-        result = args.database.updateCustomCommand(*params)
-        if result:
-            msg = command + ' was updated successfully'
-            args.chat.sendMessage(msg)
+        if args.database.updateCustomCommand(
+                broadcaster, level, command, fullText, args.nick):
+            msg = '{command} was updated successfully'
         else:
-            msg = command + ' was not updated successfully. The command might '
-            msg += 'not exist'
-            args.chat.sendMessage(msg)
+            msg = ('{command} was not updated successfully. The command might '
+                   'not exist')
     elif action in ['replace', 'override']:
-        params = broadcaster, level, command, fullText, args.nick
-        result = args.database.replaceCustomCommand(*params)
-        if result:
-            args.chat.sendMessage(command + ' was updated successfully')
+        if args.database.replaceCustomCommand(
+                broadcaster, level, command, fullText, args.nick):
+            msg = '{command} was updated successfully'
         else:
-            msg = command + ' was not updated successfully. The command might '
-            msg += 'not exist'
-            args.chat.sendMessage(msg)
+            msg = ('{command} was not updated successfully. The command might '
+                   'not exist')
     elif action in ['append']:
-        params = broadcaster, level, command, fullText, args.nick
-        result = args.database.appendCustomCommand(*params)
-        if result:
-            msg = command + ' was appended successfully'
-            args.chat.sendMessage(msg)
+        if args.database.appendCustomCommand(
+                broadcaster, level, command, fullText, args.nick):
+            msg = '{command} was appended successfully'
         else:
-            msg = command + ' was not appended successfully. The command might '
-            msg += 'not exist'
-            args.chat.sendMessage(msg)
+            msg = ('{command} was not appended successfully. The command '
+                   'might not exist')
     elif action in ['del', 'delete', 'rem', 'remove',]:
-        params = broadcaster, level, command, args.nick
-        result = args.database.deleteCustomCommand(*params)
-        if result:
-            args.chat.sendMessage(command + ' was removed successfully')
+        if args.database.deleteCustomCommand(
+                broadcaster, level, command, args.nick):
+            msg = '{command} was removed successfully'
         else:
-            msg = command + ' was not removed successfully. The command might '
-            msg += 'not exist'
-            args.chat.sendMessage(msg)
+            msg = ('{command} was not removed successfully. The command might '
+                   'not exist')
+    else:
+        return False
+    args.chat.sendMessage(msg.format(command=command))
+    return True
