@@ -35,8 +35,6 @@ def moduleKey(module):
 
     if module.startswith('source.api'):
         return (10, module)
-    if module.startswith('source.data'):
-        return (11, module)
     if module.startswith('source.public.library'):
         return (18, module)
     if module.startswith('source.private.library'):

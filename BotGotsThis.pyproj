@@ -34,6 +34,12 @@
   <ItemGroup>
     <Compile Include="bot\config.py" />
     <Compile Include="bot\channel.py" />
+    <Compile Include="bot\data\argument.py" />
+    <Compile Include="bot\data\message.py" />
+    <Compile Include="bot\data\permissions.py" />
+    <Compile Include="bot\data\timedelta.py" />
+    <Compile Include="bot\data\timezones.py" />
+    <Compile Include="bot\data\__init__.py" />
     <Compile Include="bot\error.py" />
     <Compile Include="bot\globals.py" />
     <Compile Include="bot\main.py" />
@@ -90,12 +96,6 @@
     <Compile Include="source\api\twitch.py" />
     <Compile Include="source\api\__init__.py" />
     <Compile Include="source\channel.py" />
-    <Compile Include="source\data\argument.py" />
-    <Compile Include="source\data\message.py" />
-    <Compile Include="source\data\permissions.py" />
-    <Compile Include="source\data\timedelta.py" />
-    <Compile Include="source\data\timezones.py" />
-    <Compile Include="source\data\__init__.py" />
     <Compile Include="source\database\databasebase.py" />
     <Compile Include="source\database\factory.py" />
     <Compile Include="source\database\sqlite\sqlite.py" />
@@ -171,8 +171,9 @@
     <Compile Include="twitchOauth.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bot\thread\" />
     <Folder Include="bot\" />
+    <Folder Include="bot\data\" />
+    <Folder Include="bot\thread\" />
     <Folder Include="bot\twitchmessage\" />
     <Folder Include="lists\" />
     <Folder Include="lists\private\" />
@@ -180,7 +181,6 @@
     <Folder Include="lists\public\" />
     <Folder Include="source\" />
     <Folder Include="source\api\" />
-    <Folder Include="source\data\" />
     <Folder Include="source\database\" />
     <Folder Include="source\database\sqlite\" />
     <Folder Include="source\irccommand\" />

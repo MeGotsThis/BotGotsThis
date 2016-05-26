@@ -9,8 +9,8 @@
 # {countdown@1/20/2015 0:00,1/21/2015 0:00,1/22/2015 0:00}
 # {countdown@15:00,Friday 6:00PM,1/1 7:00 PST,12/22/2015 9:00 PM}
 
-from ...data.timedelta import format as timedeltaFormat
-from ...data import timezones
+from bot.data import timezones
+from bot.data.timedelta import format as timedeltaFormat
 import datetime
 import re
 

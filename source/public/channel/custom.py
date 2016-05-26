@@ -1,6 +1,6 @@
 ﻿from ..library import custom, timeout
-from ...data.argument import CustomFieldArgs, CustomProcessArgs
 from bot import config
+from bot.data.argument import CustomFieldArgs, CustomProcessArgs
 from collections import defaultdict
 import datetime
 import lists.custom

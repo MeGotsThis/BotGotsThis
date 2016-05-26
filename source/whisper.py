@@ -1,8 +1,8 @@
 ﻿from .database.factory import getDatabase
-from .data.argument import WhisperCommandArgs
-from .data.message import Message
-from .data.permissions import WhisperPermissionSet
 from bot import config, utils
+from bot.data.argument import WhisperCommandArgs
+from bot.data.message import Message
+from bot.data.permissions import WhisperPermissionSet
 from lists import whisper
 import datetime
 import sys

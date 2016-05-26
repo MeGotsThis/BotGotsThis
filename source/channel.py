@@ -1,9 +1,9 @@
 ﻿from .database import factory
-from .data.argument import ChatCommandArgs
-from .data.message import Message
-from .data.permissions import ChatPermissionSet
 from bot import config, utils
 from bot.channel import Channel
+from bot.data.argument import ChatCommandArgs
+from bot.data.message import Message
+from bot.data.permissions import ChatPermissionSet
 from lists import channel as commandList
 import datetime
 import sys
