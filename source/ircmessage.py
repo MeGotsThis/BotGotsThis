@@ -25,8 +25,8 @@ def parseMessage(socket, ircmsg, now):
         if where[0] == '#':
             utils.logIrcMessage(where + '#msg.log', nick + ': ' + msg, now)
         if config.botnick in msg.lower().split():
-            file = config.botnick + '-Mentions.log'
-            utils.logIrcMessage(file, nick + ' -> ' + where + ': ' + msg, now)
+            utils.logIrcMessage(config.botnick + '-Mentions.log',
+                                nick + ' -> ' + where + ': ' + msg, now)
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
             channel.parse(chan, tags, nick, msg, now)
@@ -35,13 +35,12 @@ def parseMessage(socket, ircmsg, now):
         tags = message.tags
         nick = message.prefix.nick
         msg = message.params.trailing
-        file = '@' + nick + '@whisper.log'
-        utils.logIrcMessage(file, nick + ': ' + msg, now)
-        file = config.botnick + '-All Whisper.log'
-        utils.logIrcMessage(file, nick + ' -> ' + config.botnick + ': ' + msg,
-                            now)
-        file = config.botnick + '-Raw Whisper.log'
-        utils.logIrcMessage(file, '< ' + ircmsg, now)
+        utils.logIrcMessage('@' + nick + '@whisper.log',
+                            nick + ': ' + msg, now)
+        utils.logIrcMessage(config.botnick + '-All Whisper.log',
+                            nick + ' -> ' + config.botnick + ': ' + msg, now)
+        utils.logIrcMessage(config.botnick + '-Raw Whisper.log',
+                            '< ' + ircmsg, now)
         whisper.parse(tags, nick, msg, now)
         
     if message.command == 'NOTICE':
