@@ -90,6 +90,9 @@
     <Compile Include="source\api\twitch.py" />
     <Compile Include="source\api\__init__.py" />
     <Compile Include="source\channel.py" />
+    <Compile Include="source\data\argument.py" />
+    <Compile Include="source\data\message.py" />
+    <Compile Include="source\data\permissions.py" />
     <Compile Include="source\data\timedelta.py" />
     <Compile Include="source\data\timezones.py" />
     <Compile Include="source\data\__init__.py" />
@@ -103,10 +106,6 @@
     <Compile Include="source\irccommand\userstate.py" />
     <Compile Include="source\irccommand\__init__.py" />
     <Compile Include="source\ircmessage.py" />
-    <Compile Include="source\params\argument.py" />
-    <Compile Include="source\params\message.py" />
-    <Compile Include="source\params\permissions.py" />
-    <Compile Include="source\params\__init__.py" />
     <Compile Include="source\private\autoload\__init__.py" />
     <Compile Include="source\private\channel\__init__.py" />
     <Compile Include="source\private\custom\__init__.py" />
@@ -185,7 +184,6 @@
     <Folder Include="source\database\" />
     <Folder Include="source\database\sqlite\" />
     <Folder Include="source\irccommand\" />
-    <Folder Include="source\params\" />
     <Folder Include="source\private\" />
     <Folder Include="source\private\autoload\" />
     <Folder Include="source\private\channel\" />

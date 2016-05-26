@@ -1,7 +1,7 @@
 ﻿from .database.factory import getDatabase
-from .params.argument import WhisperCommandArgs
-from .params.message import Message
-from .params.permissions import WhisperPermissionSet
+from .data.argument import WhisperCommandArgs
+from .data.message import Message
+from .data.permissions import WhisperPermissionSet
 from bot import config, utils
 from lists import whisper
 import datetime

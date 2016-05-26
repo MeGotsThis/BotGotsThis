@@ -1,7 +1,7 @@
 ﻿from .database import factory
-from .params.argument import ChatCommandArgs
-from .params.message import Message
-from .params.permissions import ChatPermissionSet
+from .data.argument import ChatCommandArgs
+from .data.message import Message
+from .data.permissions import ChatPermissionSet
 from bot import config, utils
 from bot.channel import Channel
 from lists import channel as commandList

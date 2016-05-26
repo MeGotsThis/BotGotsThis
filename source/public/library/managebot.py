@@ -1,4 +1,4 @@
-﻿from ...params.argument import ManageBotArgs
+﻿from ...data.argument import ManageBotArgs
 from lists.manage import methods
 
 def botManageBot(database, send, nick, message):
