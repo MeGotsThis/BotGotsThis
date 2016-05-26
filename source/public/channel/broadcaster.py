@@ -39,9 +39,9 @@ def commandUptime(args):
     args.chat.sessionData['uptime'] = currentTime
 
     if not args.chat.isStreaming:
-        msg = args.chat.channel + ' is currently not streaming or has not '
-        msg += 'been for a minute'
-        args.chat.sendMessage(msg)
+        args.chat.sendMessage(
+            '{channel} is currently not streaming or has not been for a '
+            'minute'.format(channel=args.chat.channel))
         return True
 
     response, data = twitch.twitchCall(
@@ -57,8 +57,9 @@ def commandUptime(args):
             unixTimestamp = time.mktime(dateStruct)
             currentTime = datetime.datetime.fromtimestamp(unixTimestamp)
                 
-            msg = 'Uptime: ' + str(currentTime - args.chat.streamingSince)
-            args.chat.sendMessage(msg)
+            args.chat.sendMessage(
+                'Uptime: {uptime}'.format(
+                    uptime=currentTime - args.chat.streamingSince))
             return True
         raise ValueError()
     except (ValueError, KeyError) as e:
