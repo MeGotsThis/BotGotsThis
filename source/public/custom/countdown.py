@@ -60,12 +60,12 @@ def fieldCountdown(args):
     if args.field.lower() == 'countdown':
         cooldown = None
         dateInstances = []
-        for i, args.param in enumerate(params.split(',')):
+        for i, param in enumerate(args.param.split(',')):
             if i == 0:
-                cooldown = _getCooldown(args.param)
+                cooldown = _getCooldown(param)
                 if cooldown is not None:
                     continue
-            pds = _parseDateString(args.param.strip())
+            pds = _parseDateString(param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
@@ -93,12 +93,12 @@ def fieldSince(args):
     if args.field.lower() == 'since':
         cooldown = 0
         dateInstances = []
-        for i, args.param in enumerate(params.split(',')):
+        for i, param in enumerate(args.param.split(',')):
             if i == 0:
-                cooldown = _getCooldown(args.param)
+                cooldown = _getCooldown(param)
                 if cooldown is not None:
                     continue
-            pds = _parseDateString(args.param.strip())
+            pds = _parseDateString(param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
@@ -125,12 +125,12 @@ def fieldSince(args):
 def fieldNext(args):
     if args.field.lower() in ['next', 'future']:
         dateInstances = []
-        for i, args.param in enumerate(params.split(',')):
+        for i, param in enumerate(args.param.split(',')):
             if i == 0:
-                match = re.match(_cooldownPattern, args.param.strip())
+                match = re.match(_cooldownPattern, param.strip())
                 if match is not None:
                     continue
-            pds = _parseDateString(args.param.strip())
+            pds = _parseDateString(param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
@@ -149,12 +149,12 @@ def fieldNext(args):
 def fieldPrevious(args):
     if args.field.lower() in ['prev', 'previous', 'past']:
         dateInstances = []
-        for i, args.param in enumerate(params.split(',')):
+        for i, param in enumerate(args.param.split(',')):
             if i == 0:
-                match = re.match(_cooldownPattern, args.param.strip())
+                match = re.match(_cooldownPattern, param.strip())
                 if match is not None:
                     continue
-            pds = _parseDateString(args.param.strip())
+            pds = _parseDateString(param.strip())
             if pds is not None:
                 dateInstances.append(pds)
         if dateInstances is None:
