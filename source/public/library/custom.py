@@ -1,5 +1,5 @@
 from ..library import textformat
-from bot.data.return_ import CustomCommandTokens
+from bot.data.return_ import CustomCommandTokens, CustomFieldParts
 import lists.custom
 
 def parseCommandMessageInput(message):
@@ -78,8 +78,7 @@ def parseFormatMessage(message):
         
         if i == length:
             if noFormat:
-                p = (''.join(noFormat),) + (None,) * 7
-                parsed.append(p)
+                parsed.append(CustomFieldParts(''.join(noFormat)))
             break
         
         s = i
@@ -298,14 +297,15 @@ def parseFormatMessage(message):
         i += 1
         original = message[s:i]
         
-        parsed.append((''.join(noFormat),
-                       ''.join(field),
-                       ''.join(format),
-                       ''.join(prefix),
-                       ''.join(suffix),
-                       ''.join(param),
-                       ''.join(default),
-                       original))
+        parsed.append(
+            CustomFieldParts(''.join(noFormat),
+                             ''.join(field),
+                             ''.join(format),
+                             ''.join(prefix),
+                             ''.join(suffix),
+                             ''.join(param),
+                             ''.join(default),
+                             original))
         
     return parsed
 

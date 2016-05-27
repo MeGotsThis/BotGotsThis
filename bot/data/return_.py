@@ -6,3 +6,7 @@ AutoJoinChannel = namedtuple('AutoJoinChannel',
 CustomCommandTokens = namedtuple('CustomCommandTokens',
                                  ['called', 'action', 'level', 'command',
                                   'text'])
+
+CustomFieldParts = namedtuple('CustomFieldParts',
+                              ['plainText', 'field', 'format', 'prefix',
+                               'suffix', 'param', 'default', 'original'])

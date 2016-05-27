@@ -52,25 +52,23 @@ def customCommands(args):
         
         final = []
         try:
-            for part in custom.parseFormatMessage(str(customMessage)):
-                plain, field, format, prefix, suffix, *_ = part
-                param, default, original = _
-                final.append(plain)
+            for formats in custom.parseFormatMessage(customMessage):
+                final.append(formats.plainText)
                 try:
-                    if field is not None:
+                    if formats.field is not None:
                         fieldArgument = CustomFieldArgs(
-                            str(field), str(param), str(prefix), str(suffix),
-                            str(default), args.message, args.chat.channel,
-                            args.nick, args.timestamp)
+                            formats.field, formats.param, formats.prefix,
+                            formats.suffix, formats.default, args.message,
+                            args.chat.channel, args.nick, args.timestamp)
                         string = custom.fieldString(fieldArgument)
                         if string is not None:
-                            string = custom.format(str(string), str(format),
+                            string = custom.format(string, formats.format,
                                                    hasTextConvert)
                         else:
-                            string = str(original)
-                        final.append(str(string))
+                            string = formats.original
+                        final.append(string)
                 except Exception as e:
-                    final.append(str(original))
+                    final.append(formats.original)
         except Exception as e:
             final = [str(customMessage)]
         msgs = [''.join(final)]
