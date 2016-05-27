@@ -1,4 +1,5 @@
 ﻿from ..databasebase import DatabaseBase
+from bot.data.return_ import AutoJoinChannel
 import sqlite3
 
 class SQLiteDatabase(DatabaseBase):
@@ -25,11 +26,7 @@ class SQLiteDatabase(DatabaseBase):
         query = 'SELECT broadcaster, priority, cluster FROM auto_join '
         query += 'ORDER BY priority ASC'
         cursor.execute(query)
-        rowMap = lambda r: {
-            'broadcaster': r[0],
-            'priority': r[1],
-            'cluster': r[2],
-            }
+        rowMap = lambda r: AutoJoinChannel(*r)
         chats = map(rowMap, cursor.fetchall())
         cursor.close()
         return list(chats)

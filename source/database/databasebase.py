@@ -1,3 +1,5 @@
+from bot.data.return_ import AutoJoinChannel
+
 class DatabaseBase:
     __slots__ = ('_engine', '_connection')
     
@@ -24,9 +26,7 @@ class DatabaseBase:
     def getAutoJoinsChats(self):
         return []
         # How to trick Intellisense
-        return [{'broadcaster': '',
-                 'priority': float('inf'),
-                 'eventserver': False}]
+        return [AutoJoinChannel('', float('inf'), 'aws')]
     
     def getAutoJoinsPriority(self, broadcaster):
         return float('inf')

@@ -51,10 +51,9 @@ try:
     if config.owner:
         utils.joinChannel(config.owner, float('-inf'), 'aws')
     with getDatabase() as db:
-        for channelRow in db.getAutoJoinsChats():
-            params = channelRow['broadcaster'], channelRow['priority'],
-            params += channelRow['cluster'],
-            utils.joinChannel(*params)
+        for channel in db.getAutoJoinsChats():
+            utils.joinChannel(channel.broadcaster, channel.priority,
+                              channel.cluster)
     
     globals.messaging.join()
 except:
