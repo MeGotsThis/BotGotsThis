@@ -1,4 +1,5 @@
 from ..library import textformat
+from bot.data.return_ import CustomCommandTokens
 import lists.custom
 
 def parseCommandMessageInput(message):
@@ -44,7 +45,8 @@ def parseCommandMessageInput(message):
         command = message[i]
         fullText = message[i+1:]
         
-        return (message.command, action, level, command, fullText)
+        return CustomCommandTokens(message.command, action, level, command,
+                                   fullText)
     except:
         return None
 
