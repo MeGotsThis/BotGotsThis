@@ -37,6 +37,7 @@
     <Compile Include="bot\data\argument.py" />
     <Compile Include="bot\data\message.py" />
     <Compile Include="bot\data\permissions.py" />
+    <Compile Include="bot\data\return_.py" />
     <Compile Include="bot\data\timedelta.py" />
     <Compile Include="bot\data\timezones.py" />
     <Compile Include="bot\data\__init__.py" />
