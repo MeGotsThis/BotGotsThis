@@ -1,7 +1,8 @@
 ﻿from bot import globals
+import functools
 
 def whisper(nick):
-    return lambda m, p=1: globals.messaging.queueWhisper(nick, m, p)
+    return functools.partial(globals.messaging.queueWhisper, nick)
 
 def channel(chat):
     return chat.sendMessage
