@@ -3,11 +3,11 @@ import datetime
 import threading
 import time
 
-_tasks = []
 
 class BackgroundTasker(threading.Thread):
     def __init__(self, **args):
         threading.Thread.__init__(self, **args)
+        self._tasks = []
         self._running = True
     
     @property
@@ -25,7 +25,7 @@ class BackgroundTasker(threading.Thread):
         try:
             while self.running:
                 now = datetime.datetime.utcnow()
-                for t in _tasks:
+                for t in self._tasks:
                     task, interval, last = t
                     if now >= last + interval:
                         threading.Thread(target=task, args=(now,)).start()
@@ -37,7 +37,7 @@ class BackgroundTasker(threading.Thread):
         finally:
             print('{time} Ending {name}'.format(
                 time=datetime.datetime.utcnow(), name=self.__class__.__name__))
-
-def addTask(task, interval=datetime.timedelta(seconds=60)):
-    t = [task, interval, datetime.datetime.min]
-    _tasks.append(t)
+    
+    def addTask(self, task, interval=datetime.timedelta(seconds=60)):
+        t = [task, interval, datetime.datetime.min]
+        self._tasks.append(t)

@@ -1,5 +1,5 @@
 ﻿from ..tasks import emotes
-from bot.thread import background
+from bot.globals import background
 import datetime
 
 background.addTask(emotes.refreshTwitchGlobalEmotes,

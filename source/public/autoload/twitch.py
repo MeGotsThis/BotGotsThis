@@ -1,5 +1,5 @@
 ﻿from ..tasks import twitch
-from bot.thread import background
+from bot.globals import background
 import datetime
 import threading
 
