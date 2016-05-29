@@ -2,7 +2,7 @@
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
 from contextlib import suppress
-import datetime
+from datetime import datetime, timedelta
 import socket
 import source.ircmessage
 import threading
@@ -40,7 +40,7 @@ class SocketThread(threading.Thread):
     
     def run(self):
         print('{time} Starting {name} {thread}'.format(
-            time=datetime.datetime.utcnow(), name=self.__class__.__name__,
+            time=datetime.utcnow(), name=self.__class__.__name__,
             thread=self.name))
         
         while self.running:
@@ -50,14 +50,14 @@ class SocketThread(threading.Thread):
                 self._connect()
             except socket.error as e:
                 print('{time} {thread} Connect Exception\n{exception}'.format(
-                    time=datetime.datetime.utcnow(), thread=self.name,
+                    time=datetime.utcnow(), thread=self.name,
                     exception=e))
                 time.sleep(5)
                 continue
-            self.lastSentPing = datetime.datetime.now()
-            self.lastPing = datetime.datetime.now()
+            self.lastSentPing = datetime.utcnow()
+            self.lastPing = datetime.utcnow()
             print('{time} {thread} Connected {server}'.format(
-                time=datetime.datetime.utcnow(), thread=self.name,
+                time=datetime.utcnow(), thread=self.name,
                 server=self._server))
             
             globals.join.connected(self)
@@ -74,19 +74,19 @@ class SocketThread(threading.Thread):
                             if not ircmsg:
                                 continue
                             ircmsg = bytes(ircmsg).decode('utf-8')
-                            now = datetime.datetime.utcnow()
+                            now = datetime.utcnow()
                             file = config.botnick + '-' + self.name + '.log'
                             utils.logIrcMessage(file, '< ' + ircmsg)
                             source.ircmessage.parseMessage(self, ircmsg, now)
-                    sinceLastSend = datetime.datetime.now() - self.lastSentPing
-                    sinceLast = datetime.datetime.now() - self.lastPing
-                    if sinceLastSend >= datetime.timedelta(minutes=1):
+                    sinceLastSend = datetime.utcnow() - self.lastSentPing
+                    sinceLast = datetime.utcnow() - self.lastPing
+                    if sinceLastSend >= timedelta(minutes=1):
                         self.sendIrcCommand(
                             IrcMessage(command='PING',
                                        params=IrcMessageParams(
                                            middle=config.botnick)))
-                        self.lastSentPing = datetime.datetime.now()
-                    elif sinceLast >= datetime.timedelta(minutes=1,seconds=15):
+                        self.lastSentPing = datetime.now()
+                    elif sinceLast >= timedelta(minutes=1,seconds=15):
                         raise error.NoPingException()
             except (error.NoPingException, error.LoginUnsuccessfulException):
                 pass
@@ -97,11 +97,11 @@ class SocketThread(threading.Thread):
             self._isConnected = False
             globals.join.disconnected(self)
             print('{time} {thread} Disconnected {server}'.format(
-                time=datetime.datetime.utcnow(), thread=self.name,
+                time=datetime.utcnow(), thread=self.name,
                 server=self._server))
             time.sleep(5)
         print('{time} Ending {name} {thread}'.format(
-            time=datetime.datetime.utcnow(), name=self.__class__.__name__,
+            time=datetime.utcnow(), name=self.__class__.__name__,
             thread=self.name))
     
     def sendIrcCommand(self, message, channel=None, whisper=None):
@@ -119,7 +119,7 @@ class SocketThread(threading.Thread):
             utils.logException(extra)
             self._isConnected = False
         
-        now = datetime.datetime.utcnow()
+        now = datetime.utcnow()
         if message.command == 'PASS':
             message = IrcMessage(command='PASS')
         file = config.botnick + '-' + self.name + '.log'
@@ -177,10 +177,10 @@ class SocketThread(threading.Thread):
             del self._channels[channelData.channel]
         globals.join.part(channelData.channel)
         print('{time} Parted {channel}'.format(
-            time=datetime.datetime.utcnow(), channel=channelData.channel))
+            time=datetime.utcnow(), channel=channelData.channel))
     
     def ping(self, message='ping'):
         self.sendIrcCommand(
             IrcMessage(command='PONG',
                        params=IrcMessageParams(trailing=message)))
-        self.lastPing = datetime.datetime.now()
+        self.lastPing = datetime.utcnow()
