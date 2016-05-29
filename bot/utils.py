@@ -52,8 +52,9 @@ def logIrcMessage(filename, message, timestamp=None):
     timestamp = timestamp or datetime.datetime.utcnow()
     with open(os.path.join(config.ircLogFolder, filename), 'a',
               encoding='utf-8') as file:
-        file.write('{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
-            time=timestamp, message=message))
+        file.write(
+            '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
+                time=timestamp, message=message))
 
 def logException(extraMessage=None, timestamp=None):
     if config.exceptionLog is None:
