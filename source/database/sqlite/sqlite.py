@@ -1,5 +1,6 @@
 ﻿from ..databasebase import DatabaseBase
 from bot.data.return_ import AutoJoinChannel
+from contextlib import closing
 import sqlite3
 
 class SQLiteDatabase(DatabaseBase):
@@ -22,556 +23,421 @@ class SQLiteDatabase(DatabaseBase):
         return self
     
     def getAutoJoinsChats(self):
-        cursor = self.connection.cursor()
-        query = 'SELECT broadcaster, priority, cluster FROM auto_join '
-        query += 'ORDER BY priority ASC'
-        cursor.execute(query)
+        query = '''
+SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC'''
         rowMap = lambda r: AutoJoinChannel(*r)
-        chats = map(rowMap, cursor.fetchall())
-        cursor.close()
-        return list(chats)
+        with closing(self.connection.cursor()) as cursor:
+            yield from map(rowMap, cursor.execute(query))
     
     def getAutoJoinsPriority(self, broadcaster):
-        cursor = self.connection.cursor()
-        query = 'SELECT priority FROM auto_join WHERE broadcaster=?'
-        cursor.execute(query, (broadcaster,))
-        autoJoinRow = cursor.fetchone()
-        if autoJoinRow is not None:
-            priority = int(autoJoinRow[0])
-        else:
-            priority = float('inf')
-        cursor.close()
-        return priority
+        query = '''SELECT priority FROM auto_join WHERE broadcaster=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster,))
+            autoJoinRow = cursor.fetchone()
+            if autoJoinRow is not None:
+                return int(autoJoinRow[0])
+            else:
+                return float('inf')
+            return priority
     
     def saveAutoJoin(self, broadcaster, priority=0, cluster='aws'):
-        cursor = self.connection.cursor()
-        try:
-            query = 'INSERT INTO auto_join (broadcaster, priority, cluster) '
-            query += 'VALUES (?, ?, ?)'
-            params = broadcaster, priority, cluster
-            cursor.execute(query, params)
-            self.connection.commit()
-            return True
-        except:
-            return False
-        finally:
-            cursor.close()
+        query = '''
+INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''
+        with closing(self.connection.cursor()) as cursor:
+            try:
+                cursor.execute(query, (broadcaster, priority, cluster))
+                self.connection.commit()
+                return True
+            except sqlite3.IntegrityError:
+                return False
     
     def discardAutoJoin(self, broadcaster):
-        cursor = self.connection.cursor()
-        try:
-            query = 'DELETE FROM auto_join WHERE broadcaster=?'
-            params = broadcaster,
-            cursor.execute(query, params)
+        query = '''DELETE FROM auto_join WHERE broadcaster=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster,))
             self.connection.commit()
-            if cursor.rowcount == 0:
-                return False
-            return True
-        except:
-            return False
-        finally:
-            cursor.close()
+            return cursor.rowcount != 0
     
     def setAutoJoinPriority(self, broadcaster, priority):
-        cursor = self.connection.cursor()
-        try:
-            query = 'UPDATE auto_join SET priority=? WHERE broadcaster=?'
-            params = priority, broadcaster
-            cursor.execute(query, params)
+        query = '''UPDATE auto_join SET priority=? WHERE broadcaster=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (priority, broadcaster))
             self.connection.commit()
-            if cursor.rowcount == 0:
-                return False
-            return True
-        except:
-            return False
-        finally:
-            cursor.close()
+            return cursor.rowcount != 0
     
     def setAutoJoinServer(self, broadcaster, cluster='aws'):
-        cursor = self.connection.cursor()
-        try:
-            query = 'UPDATE auto_join SET cluster=? WHERE broadcaster=?'
-            params = cluster, broadcaster
-            cursor.execute(query, params)
+        query = '''UPDATE auto_join SET cluster=? WHERE broadcaster=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (cluster, broadcaster))
             self.connection.commit()
-            if cursor.rowcount == 0:
-                return False
-            return True
-        except:
-            return False
-        finally:
-            cursor.close()
+            return cursor.rowcount != 0
     
     def getOAuthToken(self, broadcaster):
-        cursor = self.connection.cursor()
-        query = 'ATTACH DATABASE ? AS oauth'
-        cursor.execute(query, (self._oauthfile,))
-        query = 'SELECT token FROM oauth.oauth_tokens WHERE broadcaster=?'
-        cursor.execute(query, (broadcaster,))
-        tokenRow = cursor.fetchone()
-        token = tokenRow[0] if tokenRow is not None else None
-        cursor.close()
-        return token
+        attach = '''ATTACH DATABASE ? AS oauth'''
+        query = '''SELECT token FROM oauth.oauth_tokens WHERE broadcaster=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(attach, (self._oauthfile,))
+            cursor.execute(query, (broadcaster,))
+            token = cursor.fetchone()
+            return token and token[0]
     
     def saveBroadcasterToken(self, broadcaster, token):
-        cursor = self.connection.cursor()
-        query = 'REPLACE INTO oauth_tokens (broadcaster, token) VALUES (?, ?)'
-        cursor.execute(query, (broadcaster, token))
-        self.connection.commit()
-        cursor.close()
+        query = '''
+REPLACE INTO oauth_tokens (broadcaster, token) VALUES (?, ?)'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster, token))
+            self.connection.commit()
     
     def getChatCommands(self, broadcaster, command):
-        cursor = self.connection.cursor()
-        query = 'SELECT broadcaster, permission, fullMessage '
-        query += 'FROM custom_commands '
-        query += 'WHERE broadcaster IN (?, \'#global\') AND command=?'
-        commands = {broadcaster: {}, '#global': {}}
-        for row in cursor.execute(query, (broadcaster, command)):
-            commands[row[0]][row[1]] = row[2]
-        cursor.close()
-        return commands
+        query = '''
+SELECT broadcaster, permission, fullMessage
+    FROM custom_commands WHERE broadcaster IN (?, \'#global\') AND command=?'''
+        with closing(self.connection.cursor()) as cursor:
+            commands = {broadcaster: {}, '#global': {}}
+            for row in cursor.execute(query, (broadcaster, command)):
+                commands[row[0]][row[1]] = row[2]
+            cursor.close()
+            return commands
     
     def getFullGameTitle(self, abbreviation):
-        cursor = self.connection.cursor()
-        query = 'SELECT twitchGame FROM game_abbreviations '
-        query += 'WHERE abbreviation=?'
-        cursor.execute(query, (abbreviation,))
-        gameRow = cursor.fetchone()
-        game = gameRow[0] if gameRow is not None else None
-        cursor.close()
-        return game
+        query = '''
+SELECT twitchGame FROM game_abbreviations WHERE abbreviation=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (abbreviation,))
+            game = cursor.fetchone()
+            return game and game[0]
     
     def insertCustomCommand(self, broadcaster, permission, command,
                             fullMessage, user):
-        cursor = self.connection.cursor()
-        try:
-            query = 'INSERT INTO custom_commands '
-            query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullMessage, creator, created, '
-            query += 'lastEditor, lastUpdated) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, '
-            query += 'CURRENT_TIMESTAMP)'
-            display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower(),
-            params += display, fullMessage, user, user
-            cursor.execute(query, params)
-
-            query = 'INSERT INTO custom_commands_history '
-            query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullMessage, creator, created) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
-            display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower(),
-            params += display, fullMessage, user
-            cursor.execute(query, params)
-
+        query = '''
+INSERT INTO custom_commands
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created, lastEditor, lastUpdated)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''
+        history = '''
+INSERT INTO custom_commands_history
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        with closing(self.connection.cursor()) as cursor:
+            try:
+                display = None if command.lower() == command else command
+                cursor.execute(query, (broadcaster, permission,
+                                       command.lower(), display, fullMessage,
+                                       user, user))
+            except sqlite3.IntegrityError:
+                return False
+            
+            cursor.execute(history, (broadcaster, permission, command.lower(),
+                                     history, fullMessage, user))
             self.connection.commit()
             return True
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def updateCustomCommand(self, broadcaster, permission, command,
                             fullMessage, user):
-        cursor = self.connection.cursor()
-        try:
-            query = 'UPDATE custom_commands SET commandDisplay=?, '
-            query += 'fullMessage=?, lastEditor=?, '
-            query += 'lastUpdated=CURRENT_TIMESTAMP '
-            query += 'WHERE broadcaster=? AND permission=? AND command=?'
+        query = '''
+UPDATE custom_commands
+    SET commandDisplay=?, fullMessage=?, lastEditor=?,
+        lastUpdated=CURRENT_TIMESTAMP
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        history = '''
+INSERT INTO custom_commands_history
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        with closing(self.connection.cursor()) as cursor:
             display = None if command.lower() == command else command
-            params = display, fullMessage, user,
-            params += broadcaster, permission, command.lower()
-            cursor.execute(query, params)
-
+            cursor.execute(query, (display, fullMessage, user,broadcaster,
+                                    permission, command.lower()))
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
-
-            query = 'INSERT INTO custom_commands_history '
-            query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullMessage, creator, created) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
-            display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower(),
-            params += display, fullMessage, user
-            cursor.execute(query, params)
-
+            
+            cursor.execute(history, (broadcaster, permission, command.lower(),
+                                     display, fullMessage, user))
             self.connection.commit()
             return True
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def replaceCustomCommand(self, broadcaster, permission, command,
                              fullMessage, user):
-        cursor = self.connection.cursor()
-        try:
-            query = 'REPLACE INTO custom_commands '
-            query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullMessage, creator, created, '
-            query += 'lastEditor, lastUpdated) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, '
-            query += 'CURRENT_TIMESTAMP)'
+        query = '''
+REPLACE INTO custom_commands
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created, lastEditor, lastUpdated)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''
+        history = '''
+INSERT INTO custom_commands_history 
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        with closing(self.connection.cursor()) as cursor:
             display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower(),
-            params += display, fullMessage, user, user
-            cursor.execute(query, params)
-
+            cursor.execute(query, (broadcaster, permission, command.lower(),
+                                   display, fullMessage, user, user))
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
-
-            query = 'INSERT INTO custom_commands_history '
-            query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullMessage, creator, created) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
-            display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower(),
-            params += display, None, user
-            cursor.execute(query, params)
-
-            query = 'INSERT INTO custom_commands_history '
-            query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullMessage, creator, created) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
-            display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower(),
-            params += display, fullMessage, user
-            cursor.execute(query, params)
-
+            
+            cursor.execute(history, (broadcaster, permission, command.lower(),
+                                     display, None, user))
+            cursor.execute(history, (broadcaster, permission, command.lower(),
+                                     display, fullMessage, user))
             self.connection.commit()
             return True
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def appendCustomCommand(self, broadcaster, permission, command,
                             message, user):
-        cursor = self.connection.cursor()
-        try:
-            query = 'SELECT fullMessage FROM custom_commands '
-            query += 'WHERE broadcaster=? AND permission=? AND command=?'
-            cursor.execute(query, (broadcaster, permission, command.lower()))
-            messageRow = cursor.fetchone()
-            if messageRow is None:
+        find = '''
+SELECT fullMessage FROM custom_commands
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        query = '''
+UPDATE custom_commands
+    SET fullMessage=?, lastEditor=?, lastUpdated=CURRENT_TIMESTAMP
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        history = '''
+INSERT INTO custom_commands_history
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(find, (broadcaster, permission, command.lower()))
+            original = cursor.fetchone()
+            if original is None:
                 return False
-            fullMessage = messageRow[0] + message
-
-            query = 'UPDATE custom_commands SET fullMessage=?, lastEditor=?, '
-            query += 'lastUpdated=CURRENT_TIMESTAMP '
-            query += 'WHERE broadcaster=? AND permission=? AND command=?'
+            fullMessage = original[0] + message
+            
             display = None if command.lower() == command else command
-            params = fullMessage, user,
-            params += broadcaster, permission, command.lower()
-            cursor.execute(query, params)
-
+            cursor.execute(query, (fullMessage, user, broadcaster, permission,
+                                   command.lower()))
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
-
-            query = 'INSERT INTO custom_commands_history '
-            query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullMessage, creator, created) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
-            display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower(),
-            params += display, fullMessage, user
-            cursor.execute(query, params)
-
+            
+            cursor.execute(history, (broadcaster, permission, command.lower(),
+                                     display, fullMessage, user))
             self.connection.commit()
             return True
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def deleteCustomCommand(self, broadcaster, permission, command, user):
-        cursor = self.connection.cursor()
-        try:
-            query = 'DELETE FROM custom_commands WHERE '
-            query += 'broadcaster=? AND permission=? AND command=?'
-            params = broadcaster, permission, command.lower()
-            cursor.execute(query, params)
-
+        query = '''
+DELETE FROM custom_commands
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        history = '''
+INSERT INTO custom_commands_history
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster, permission, command.lower()))
+            
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
-
-            query = 'INSERT INTO custom_commands_history '
-            query += '(broadcaster, permission, command, '
-            query += 'commandDisplay, fullMessage, creator, created) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'
+            
             display = None if command.lower() == command else command
-            params = broadcaster, permission, command.lower(),
-            params += display, None, user
-            cursor.execute(query, params)
-
+            cursor.execute(history, (broadcaster, permission, command.lower(),
+                                     display, None, user))
             self.connection.commit()
-            if cursor.rowcount == 0:
-                return False
             return True
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def getCustomCommandProperty(self, broadcaster, permission, command,
                                  property=None):
-        cursor = self.connection.cursor()
-        if property is None:
-            values = {}
-            query = 'SELECT property, value FROM custom_command_properties '
-            query += 'WHERE broadcaster=? AND permission=? AND command=?'
-            params = broadcaster, permission, command.lower(),
-            for p, v in cursor.execute(query, params):
-                values[p] = v
-            return values
-        elif isinstance(property, list):
-            values = {}
-            query = 'SELECT property, value FROM custom_command_properties '
-            query += 'WHERE broadcaster=? AND permission=? AND command=? AND '
-            query += 'property IN (' + ','.join('?' * len(property)) + ')'
-            params = broadcaster, permission, command.lower(),
-            params += tuple(property)
-            for p, v in cursor.execute(query, params):
-                values[p] = v
-            for p in property:
-                if p not in values:
-                    values[p] = None
-            return values
-        else:
-            query = 'SELECT value FROM custom_command_properties WHERE '
-            query += 'broadcaster=? AND permission=? AND command=? AND '
-            query += 'property=?'
-            params = broadcaster, permission, command.lower(), property
-            cursor.execute(query, params)
-            return (cursor.fetchone() or [None])[0]
+        with closing(self.connection.cursor()) as cursor:
+            if property is None:
+                query = '''
+SELECT property, value FROM custom_command_properties
+    WHERE broadcaster=? AND permission=? AND command=?'''
+                values = {}
+                for p, v in cursor.execute(query, (broadcaster, permission,
+                                                   command.lower())):
+                    values[p] = v
+                return values
+            elif isinstance(property, list):
+                query = '''
+SELECT property, value FROM custom_command_properties
+    WHERE broadcaster=? AND permission=? AND command=?
+        AND property IN (%s)''' % ','.join('?' * len(property))
+                values = {}
+                params = (broadcaster, permission, command.lower(),
+                          ) + tuple(property)
+                for p, v in cursor.execute(query, params):
+                    values[p] = v
+                for p in property:
+                    if p not in values:
+                        values[p] = None
+                return values
+            else:
+                query = '''
+SELECT value FROM custom_command_properties 
+    WHERE broadcaster=? AND permission=? AND command=? AND property=?'''
+                cursor.execute(query, (broadcaster, permission,
+                                       command.lower(), property))
+                row = cursor.fetchone()
+                return row or row[0]
     
     def processCustomCommandProperty(self, broadcaster, permission, command,
                                      property, value):
-        cursor = self.connection.cursor()
-        try:
-            if value is None:
-                query = 'DELETE FROM custom_command_properties WHERE '
-                query += 'broadcaster=? AND permission=? AND command=? AND '
-                query += 'property=?'
-                params = broadcaster, permission, command.lower(), property
-                cursor.execute(query, params)
-            else:
-                query = 'REPLACE INTO custom_command_properties '
-                query += '(broadcaster, permission, command, property, value) '
-                query += 'VALUES (?, ?, ?, ?, ?)'
-                params = broadcaster, permission, command.lower(), property,
-                params += value,
-                cursor.execute(query, params)
-
-            self.connection.commit()
-            if cursor.rowcount == 0:
+        with closing(self.connection.cursor()) as cursor:
+            try:
+                if value is None:
+                    query = '''
+DELETE FROM custom_command_properties
+    WHERE broadcaster=? AND permission=? AND command=? AND property=?'''
+                    cursor.execute(query, (broadcaster, permission,
+                                           command.lower(), property))
+                else:
+                    query = '''
+REPLACE INTO custom_command_properties
+    (broadcaster, permission, command, property, value)
+    VALUES (?, ?, ?, ?, ?)'''
+                    cursor.execute(query, (broadcaster, permission,
+                                           command.lower(), property, value))
+                self.connection.commit()
+                return cursor.rowcount != 0
+            except:
                 return False
-            return True
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def hasFeature(self, broadcaster, feature):
-        cursor = self.connection.cursor()
-        try:
-            query = 'SELECT 1 FROM chat_features '
-            query += 'WHERE broadcaster=? AND feature=?'
-            params = broadcaster, feature
-            cursor.execute(query, params)
+        query = '''
+SELECT 1 FROM chat_features WHERE broadcaster=? AND feature=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster, feature))
             return cursor.fetchone() is not None
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def addFeature(self, broadcaster, feature):
-        cursor = self.connection.cursor()
-        try:
-            query = 'INSERT INTO chat_features (broadcaster, feature) '
-            query += 'VALUES (?, ?)'
-            params = broadcaster, feature
-            cursor.execute(query, params)
-            self.connection.commit()
-            return True
-        except:
-            return False
-        finally:
-            cursor.close()
+        query = '''
+INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)'''
+        with closing(self.connection.cursor()) as cursor:
+            try:
+                cursor.execute(query, (broadcaster, feature))
+                self.connection.commit()
+                return True
+            except sqlite3.IntegrityError:
+                return False
     
     def removeFeature(self, broadcaster, feature):
-        cursor = self.connection.cursor()
-        try:
-            query = 'DELETE FROM chat_features '
-            query += 'WHERE broadcaster=? AND feature=?'
-            params = broadcaster, feature
-            cursor.execute(query, params)
+        query = '''
+DELETE FROM chat_features WHERE broadcaster=? AND feature=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster, feature))
             self.connection.commit()
-            if cursor.rowcount == 0:
-                return False
-            return True
-        except:
-            return False
-        finally:
-            cursor.close()
+            return cursor.rowcount != 0
     
     def listBannedChannels(self):
-        cursor = self.connection.cursor()
-        try:
-            query = 'SELECT broadcaster FROM banned_channels'
-            cursor.execute(query)
-            return [r[0] for r in cursor.fetchall()]
-        except:
-            return []
-        finally:
-            cursor.close()
+        query = '''SELECT broadcaster FROM banned_channels'''
+        with closing(self.connection.cursor()) as cursor:
+            for row in cursor.execute(query):
+                yield row[0]
     
     def isChannelBannedReason(self, broadcaster):
-        cursor = self.connection.cursor()
-        try:
-            query = 'SELECT reason FROM banned_channels WHERE broadcaster=?'
-            params = broadcaster,
-            cursor.execute(query, params)
+        query = '''
+SELECT reason FROM banned_channels WHERE broadcaster=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster,))
             row = cursor.fetchone()
-            if row is not None:
-                return row[0]
-            return False
-        except:
-            return False
-        finally:
-            cursor.close()
+            return row and row[0]
     
     def addBannedChannel(self, broadcaster, reason, nick):
-        cursor = self.connection.cursor()
-        try:
-            query = 'INSERT INTO banned_channels '
-            query += '(broadcaster, currentTime, reason, who) '
-            query += 'VALUES (?, CURRENT_TIMESTAMP, ?, ?)'
-            params = broadcaster, reason, nick
-            cursor.execute(query, params)
-
-            self.connection.commit()
-            if cursor.rowcount == 0:
+        query = '''
+INSERT INTO banned_channels 
+    (broadcaster, currentTime, reason, who)
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?)'''
+        history = '''
+INSERT INTO banned_channels_log
+    (broadcaster, currentTime, reason, who, actionLog) 
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'''
+        with closing(self.connection.cursor()) as cursor:
+            try:
+                cursor.execute(query, (broadcaster, reason, nick))
+                self.connection.commit()
+            except sqlite3.IntegrityError:
                 return False
-
-            query = 'INSERT INTO banned_channels_log '
-            query += '(broadcaster, currentTime, reason, who, actionLog) '
-            query += 'VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'
-            params = broadcaster, reason, nick, 'add'
-            cursor.execute(query, params)
-
+            
+            cursor.execute(history, (broadcaster, reason, nick, 'add'))
             self.connection.commit()
             return True
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def removeBannedChannel(self, broadcaster, reason, nick):
-        cursor = self.connection.cursor()
-        try:
-            query = 'DELETE FROM banned_channels WHERE broadcaster=?'
-            params = broadcaster,
-            cursor.execute(query, params)
-
+        query = '''
+DELETE FROM banned_channels WHERE broadcaster=?'''
+        history = '''
+INSERT INTO banned_channels_log
+    (broadcaster, currentTime, reason, who, actionLog) 
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster,))
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
 
-            query = 'INSERT INTO banned_channels_log '
-            query += '(broadcaster, currentTime, reason, who, actionLog) '
-            query += 'VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'
-            params = broadcaster, reason, nick, 'remove'
-            cursor.execute(query, params)
-
+            cursor.execute(history, (broadcaster, reason, nick, 'remove'))
             self.connection.commit()
             return True
-        except:
-            return False
-        finally:
-            cursor.close()
     
     def recordTimeout(self, broadcaster, user, fromUser, module, level, length,
                       message, reason):
-        cursor = self.connection.cursor()
-        try:
-            query = 'ATTACH DATABASE ? AS timeout'
-            cursor.execute(query, (self._timeoutlogfile,))
-            query = 'INSERT INTO timeout.timeout_logs '
-            query += '(broadcaster, twitchUser, fromUser, module, level, '
-            query += 'length, message, reason) '
-            query += 'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-            cursor.execute(query, (broadcaster, user, fromUser, module, level,
-                                   length, message, reason))
-
-            self.connection.commit()
-            if cursor.rowcount == 0:
+        attach = '''
+ATTACH DATABASE ? AS timeout'''
+        query = '''
+INSERT INTO timeout.timeout_logs 
+    (broadcaster, twitchUser, fromUser, module, level, length, message, reason)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(attach, (self._timeoutlogfile,))
+            try:
+                cursor.execute(query, (broadcaster, user, fromUser, module,
+                                       level, length, message, reason))
+                self.connection.commit()
+                return True
+            except sqlite3.IntegrityError:
                 return False
-            return True
-        except:
-            return False
-        finally:
-            cursor.close()
         
     def getChatProperty(self, broadcaster, property, default=None, parse=None):
-        cursor = self.connection.cursor()
-        query = 'SELECT value FROM chat_properties '
-        query += 'WHERE broadcaster=? AND property=?'
-        cursor.execute(query, (broadcaster, property,))
-        row = cursor.fetchone()
-        cursor.close()
-        if row is None:
-            return default
-        if parse is not None:
-            return parse(row[0])
-        return row[0]
+        query = '''
+SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''
+        with closing(self.connection.cursor()) as cursor:
+            cursor.execute(query, (broadcaster, property,))
+            row = cursor.fetchone()
+            if row is None:
+                return default
+            if parse is not None:
+                return parse(row[0])
+            return row[0]
     
     def getChatProperties(self, broadcaster, properties=[], default=None,
                           parse=None):
-        cursor = self.connection.cursor()
-        query = 'SELECT property, value FROM chat_properties '
-        query += 'WHERE broadcaster=? AND property IN ('
-        query += ','.join('?' * len(properties)) + ')'
-        params = (broadcaster,) + tuple(properties)
-        values = {}
-        for property, value in cursor.execute(query, params):
-            if isinstance(parse, dict) and property in parse:
-                value = parse[property](value)
-            elif parse is not None:
-                value = parse(value)
-            values[property] = value
-        cursor.close()
-        for property in properties:
-            if property not in values:
-                if isinstance(default, dict) and property in default:
-                    value = default[property]
-                else:
-                    value = default
+        query = '''
+SELECT property, value FROM chat_properties
+    WHERE broadcaster=? AND property IN (%s)
+''' % ','.join('?' * len(properties)) + ')'
+        with closing(self.connection.cursor()) as cursor:
+            values = {}
+            params = (broadcaster,) + tuple(properties)
+            for property, value in cursor.execute(query, params):
+                if isinstance(parse, dict) and property in parse:
+                    value = parse[property](value)
+                elif parse is not None:
+                    value = parse(value)
                 values[property] = value
-        return values
+            for property in properties:
+                if property not in values:
+                    if isinstance(default, dict) and property in default:
+                        value = default[property]
+                    else:
+                        value = default
+                    values[property] = value
+            return values
     
     def setChatProperty(self, broadcaster, property, value=None):
-        cursor = self.connection.cursor()
-        try:
+        with closing(self.connection.cursor()) as cursor:
             if value is None:
-                query = 'DELETE FROM chat_properties '
-                query += 'WHERE broadcaster=? AND property=?'
+                query = '''
+DELETE FROM chat_properties WHERE broadcaster=? AND property=?'''
                 params = broadcaster, property,
             else:
-                query = 'REPLACE INTO chat_properties '
-                query += '(broadcaster, property, value) VALUES (?, ?, ?)'
+                query = '''
+REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)'''
                 params = broadcaster, property, value,
             cursor.execute(query, params)
-
             self.connection.commit()
-            if cursor.rowcount == 0:
-                return False
-            return True
-        finally:
-            cursor.close()
+            return cursor.rowcount != 0

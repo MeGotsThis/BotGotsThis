@@ -24,9 +24,7 @@ class DatabaseBase:
             self.connection.close()
     
     def getAutoJoinsChats(self):
-        return []
-        # How to trick Intellisense
-        return [AutoJoinChannel('', float('inf'), 'aws')]
+        yield from []
     
     def getAutoJoinsPriority(self, broadcaster):
         return float('inf')
@@ -97,10 +95,10 @@ class DatabaseBase:
         return True
     
     def listBannedChannels(self):
-        return []
+        yield from []
     
     def isChannelBannedReason(self, broadcaster):
-        return False
+        return None
     
     def addBannedChannel(self, broadcaster, reason, nick):
         return True
