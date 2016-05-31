@@ -36,7 +36,7 @@ class SocketsThread(threading.Thread):
                 socketConnection.sendPing()
         
         for socketConnection in self._socketConnections:
-            socketConnection.cleanup()
+            socketConnection.disconnect()
         print('{time} Ending {name} {thread}'.format(
             time=datetime.utcnow(), name=self.__class__.__name__,
             thread=self.name))

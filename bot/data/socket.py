@@ -76,7 +76,7 @@ class Socket:
         self.lastSentPing = datetime.utcnow()
         self.lastPing = datetime.utcnow()
 
-    def cleanup(self):
+    def disconnect(self):
         self._socket.close()
         globals.join.disconnected(self)
         self._socket = None
@@ -102,7 +102,7 @@ class Socket:
             self._logWrite(command, channel, whisper)
         except socket.error:
             utils.logException()
-            self.cleanup()
+            self.disconnect()
     
     def flushWrite(self):
         while self.writeQueue:
@@ -123,7 +123,7 @@ class Socket:
                 timestamp = datetime.utcnow()
                 source.ircmessage.parseMessage(self, ircmsg, timestamp)
         except error.LoginUnsuccessfulException:
-            self.cleanup()
+            self.disconnect()
             globals.running = False
     
     def ping(self, message='ping'):
@@ -143,7 +143,7 @@ class Socket:
                                 middle=config.botnick)),
                 prepend=True)
         elif sinceLast >= timedelta(minutes=1,seconds=15):
-            self.cleanup()
+            self.disconnect()
     
     def _logRead(self, message):
         file = '{nick}-{server}.log'.format(nick=config.botnick,
