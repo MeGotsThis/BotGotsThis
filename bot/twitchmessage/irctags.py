@@ -3,14 +3,14 @@ import collections.abc
 
 ParsedKeyVendor = namedtuple('ParsedKey', ['key', 'vendor'])
 
-_escapedValue = {
+escapedValue = {
     ';': '\:',
     ' ': '\\s',
     '\\': '\\\\',
     '\r': '\\r',
     '\n': '\\n'
     }
-_unescapedValue = {
+unescapedValue = {
     ':': ';',
     's': ' ',
     '\\': '\\',
@@ -177,8 +177,8 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
         s = []
         
         for char in value:
-            if char in _escapedValue:
-                char = _escapedValue[char]
+            if char in escapedValue:
+                char = escapedValue[char]
             s.append(char)
         return ''.join(s)
     
@@ -260,9 +260,8 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
                     if char in '\0\r\n; ':
                         raise ValueError()
                     if char == '\\':
-                        if (i < length and
-                            tags[i] in _unescapedValue):
-                            char = _unescapedValue[tags[i]]
+                        if i < length and tags[i] in unescapedValue:
+                            char = unescapedValue[tags[i]]
                             v.append(char)
                             i += 1
                         else:

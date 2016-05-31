@@ -1,6 +1,7 @@
-from . import ircparams
-from . import ircprefix
-from . import irctags
+from .ircparams import IrcMessageParams
+from .ircprefix import IrcMessagePrefix, nickSpecials
+from .irctags import IrcMessageTagsReadOnly, IrcMessageTags, IrcMessageTagsKey
+from .irctags import unescapedValue
 from collections import namedtuple
 import string
 
@@ -11,13 +12,12 @@ class IrcMessage:
     __slots__ = ('_tags', '_prefix', '_command', '_params')
     
     def __init__(self, tags=None, prefix=None, command=0,
-                 params=ircparams.IrcMessageParams()):
-        if isinstance(tags, irctags.IrcMessageTagsReadOnly):
-            tags = irctags.IrcMessageTagsReadOnly(tags)
-        elif not isinstance(tags,
-                            (type(None), irctags.IrcMessageTagsReadOnly)):
+                 params=IrcMessageParams()):
+        if isinstance(tags, IrcMessageTagsReadOnly):
+            tags = IrcMessageTagsReadOnly(tags)
+        elif tags is not None:
             raise TypeError()
-        if not isinstance(prefix, (type(None), ircprefix.IrcMessagePrefix)):
+        if not isinstance(prefix, (type(None), IrcMessagePrefix)):
             raise TypeError()
         if isinstance(command, str):
             if not command.isalpha():
@@ -27,7 +27,7 @@ class IrcMessage:
                 raise ValueError()
         else:
             raise TypeError()
-        if not isinstance(params, ircparams.IrcMessageParams):
+        if not isinstance(params, IrcMessageParams):
             raise TypeError()
         
         self._tags = tags
@@ -104,7 +104,7 @@ class IrcMessage:
             if i == length:
                 raise ValueError()
             
-            tags = irctags.IrcMessageTags()
+            tags = IrcMessageTags()
             while True:
                 if message[i] == ' ':
                     raise ValueError()
@@ -182,8 +182,8 @@ class IrcMessage:
                             raise ValueError()
                         if char == '\\':
                             if (i < length and
-                                message[i] in irctags._unescapedValue):
-                                char = irctags._unescapedValue[message[i]]
+                                message[i] in unescapedValue):
+                                char = unescapedValue[message[i]]
                                 v.append(char)
                                 i += 1
                             else:
@@ -192,7 +192,7 @@ class IrcMessage:
                             v.append(char)
                     value = ''.join(v)
                 
-                tagkey = irctags.IrcMessageTagsKey(key=key, vendor=vendor)
+                tagkey = IrcMessageTagsKey(key, vendor)
                 
                 if tagkey in tags:
                     raise ValueError()
@@ -242,7 +242,7 @@ class IrcMessage:
                     if (char in string.ascii_letters or char.isdigit() or
                         char == '-'):
                         s.append(char)
-                    elif char in ircprefix._nickSpecials:
+                    elif char in nickSpecials:
                         if isServerName:
                             raise ValueError()
                         s.append(char)
@@ -325,10 +325,7 @@ class IrcMessage:
                         s.append(char)
                 host = ''.join(h)
             
-            prefix = ircprefix.IrcMessagePrefix(servername=servername,
-                                                nick=nick,
-                                                user=user,
-                                                host=host)
+            prefix = IrcMessagePrefix(servername, nick, user, host)
         
         # Command
         if i == length:
@@ -396,6 +393,6 @@ class IrcMessage:
             
             middle = ''.join(m) if m else None
             trailing = ''.join(t) if t else None
-        params = ircparams.IrcMessageParams(middle=middle, trailing=trailing)
+        params = IrcMessageParams(middle, trailing)
         
         return ParsedMessage(tags, prefix, command, params)

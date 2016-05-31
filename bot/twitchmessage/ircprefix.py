@@ -4,7 +4,7 @@ import string
 ParsedPrefix = namedtuple('ParsedPrefix',
                           ['servername', 'nick', 'user', 'host'])
 
-_nickSpecials = '-_'
+nickSpecials = '-_'
 
 class IrcMessagePrefix:
     __slots__ = ('_servername', '_nick', '_user', '_host')
@@ -120,7 +120,7 @@ class IrcMessagePrefix:
                 if (char in string.ascii_letters or char.isdigit() or
                     char == '-'):
                     s.append(char)
-                elif char in _nickSpecials:
+                elif char in nickSpecials:
                     if isServerName:
                         raise ValueError()
                     s.append(char)
