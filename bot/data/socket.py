@@ -47,10 +47,9 @@ class Socket:
             connection.connect((self._server, self._port))
         except:
             raise
-        self._socket = connection
         print('{time} {name} Connected {server}'.format(
             time=datetime.utcnow(), name=self.name, server=self._server))
-        comms = [
+        commands = [
             IrcMessage(command='PASS',
                        params=IrcMessageParams(middle=config.password)),
             IrcMessage(command='NICK',
@@ -69,10 +68,11 @@ class Socket:
                        params=IrcMessageParams(
                            middle='REQ', trailing='twitch.tv/tags')),
                  ]
-        for comm in comms:
-            if self._socket is None:
-                break
-            self.write(comm)
+        for command in commands:
+            message = (str(command) + '\r\n').encode('utf-8')
+            connection.send(message)
+            self._logWrite(command)
+        self._socket = connection
         self.lastSentPing = datetime.utcnow()
         self.lastPing = datetime.utcnow()
 
