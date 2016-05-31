@@ -22,7 +22,7 @@ class JoinThread(threading.Thread):
         print('{time} Starting {name}'.format(
             time=datetime.datetime.utcnow(), name=self.__class__.__name__))
         joinDuration = datetime.timedelta(seconds=10.05)
-        while any(globals.sockets.socketConnections):
+        while globals.running:
             try:
                 utcnow = datetime.datetime.utcnow()
                 with self._joinTimesLock:

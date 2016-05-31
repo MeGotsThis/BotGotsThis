@@ -16,7 +16,6 @@ class Socket:
         self._channels = {}
         self._channelsLock = threading.Lock()
         self._isConnected = False
-        self._running = True
         self._socket = None
     
     @property

@@ -7,20 +7,11 @@ import threading
 class SocketsThread(threading.Thread):
     def __init__(self, **args):
         threading.Thread.__init__(self, **args)
-        self._running = True
         self._socketConnections = []
     
     @property
     def socketConnections(self):
         return self._socketConnections
-    
-    @property
-    def running(self):
-        return self._running
-    
-    @running.setter
-    def running(self, value):
-        self._running = value
     
     def run(self):
         print('{time} Starting {name} {thread}'.format(
@@ -28,7 +19,7 @@ class SocketsThread(threading.Thread):
             thread=self.name))
         
         isActive = lambda s: s.socket
-        while self.running:
+        while globals.running:
             for socketConnection in filterfalse(isActive,
                                                 self._socketConnections):
                 socketConnection.connect()

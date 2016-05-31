@@ -4,6 +4,8 @@ import sys
 import threading
 import traceback
 
+running = True
+
 # Import some necessary libraries.
 messaging = None
 sockets = None

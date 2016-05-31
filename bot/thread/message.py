@@ -26,15 +26,6 @@ class MessageQueue(threading.Thread):
         self._timesSent = []
         self._publicTime = datetime.datetime.min
         self._queueLock = threading.Lock()
-        self._running = True
-    
-    @property
-    def running(self):
-        return self._running
-    
-    @running.setter
-    def running(self, value):
-        self._running = value
     
     def queueMessage(self, channel, message, priority=1, bypass=False):
         if not message:
@@ -83,7 +74,7 @@ class MessageQueue(threading.Thread):
         print('{time} Starting {name}'.format(
             time=datetime.datetime.utcnow(), name=self.__class__.__name__))
         try:
-            while self.running:
+            while globals.running:
                 msg = self._getMessage()
                 if msg is not None:
                     if (not msg[0].isMod and config.botnick != msg[0].channel):
@@ -101,10 +92,7 @@ class MessageQueue(threading.Thread):
             utils.logException()
             raise
         finally:
-            for c in globals.clusters.values():
-                c.running = False
-            globals.join.running = False
-            globals.background.running = False
+            globals.running = False
             print('{time} Ending {name}'.format(
                 time=datetime.datetime.utcnow(), name=self.__class__.__name__))
     

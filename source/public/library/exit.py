@@ -6,4 +6,4 @@ def botExit(send):
     time.sleep(0.5)
     for channel in set(globals.channels.keys()):
         utils.partChannel(channel)
-    globals.messaging.running = False
+    globals.running = False
