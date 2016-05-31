@@ -126,7 +126,14 @@ class Socket:
             self.cleanup()
             globals.running = False
     
-    def ping(self):
+    def ping(self, message='ping'):
+        self.queueWrite(
+            IrcMessage(command='PONG',
+                       params=IrcMessageParams(trailing=message)),
+            prepend=True)
+        self.lastPing = datetime.utcnow()
+
+    def sendPing(self):
         sinceLastSend = datetime.utcnow() - self.lastSentPing
         sinceLast = datetime.utcnow() - self.lastPing
         if sinceLastSend >= timedelta(minutes=1):
@@ -136,7 +143,7 @@ class Socket:
                                 middle=config.botnick)),
                 prepend=True)
         elif sinceLast >= timedelta(minutes=1,seconds=15):
-            raise error.NoPingException()
+            self.cleanup()
     
     def _logRead(self, message):
         file = '{nick}-{server}.log'.format(nick=config.botnick,

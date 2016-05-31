@@ -32,9 +32,9 @@ class SocketsThread(threading.Thread):
                     socketConnection.read()
                 for socketConnection in write:
                     socketConnection.flushWrite()
-            for socketConnection in filterfalse(isActive,
-                                                self._socketConnections):
-                socketConnection.ping()
+            for socketConnection in filter(isActive, self._socketConnections):
+                socketConnection.sendPing()
+        
         for socketConnection in self._socketConnections:
             socketConnection.cleanup()
         print('{time} Ending {name} {thread}'.format(
