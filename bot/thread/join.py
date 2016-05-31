@@ -48,8 +48,7 @@ class JoinThread(threading.Thread):
                     params = channels, notJoined
                     broadcaster = self._getJoinWithLowestPriority(*params)
                     chat = channels[broadcaster]
-                    socket = chat.socket
-                    if socket is not None:
+                    if chat.socket is not None:
                         ircCommand = IrcMessage(
                             command='JOIN',
                             params=IrcMessageParams(
@@ -57,10 +56,6 @@ class JoinThread(threading.Thread):
                         params = ircCommand, chat.ircChannel
                         chat.socket.queueWrite(*params)
                         self._channelJoined.add(chat.channel)
-                        
-                        print('{time} Joined {channel} on {socket}'.format(
-                            time=datetime.datetime.utcnow(),
-                            channel=chat.channel, socket=chat.socket.name))
                 
                 time.sleep(1 / config.joinPerSecond)
             except:

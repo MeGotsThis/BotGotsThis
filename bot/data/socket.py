@@ -77,6 +77,8 @@ class Socket:
         self.lastPing = datetime.utcnow()
 
     def disconnect(self):
+        if self._socket is None:
+            return
         self._socket.close()
         globals.join.disconnected(self)
         self._socket = None
@@ -93,13 +95,16 @@ class Socket:
             return
         try:
             message = (str(command) + '\r\n').encode('utf-8')
+            timestamp = datetime.utcnow()
             self._socket.send(message)
             if command.command == 'PING':
                 self.lastSentPing = datetime.now()
-            if command.command == 'join':
-                chat.onJoin()
+            if command.command == 'JOIN':
+                globals.channels[channel[1:]].onJoin()
                 globals.join.recordJoin()
-            self._logWrite(command, channel, whisper)
+                print('{time} Joined {channel} on {socket}'.format(
+                    time=timestamp, channel=channel[1:], socket=self.name))
+            self._logWrite(command, channel, whisper, timestamp)
         except socket.error:
             utils.logException()
             self.disconnect()
@@ -150,8 +155,8 @@ class Socket:
                                             server=self.name)
         utils.logIrcMessage(file, '< ' + message)
     
-    def _logWrite(self, command, channel=None, whisper=None):
-        timestamp = datetime.utcnow()
+    def _logWrite(self, command, channel=None, whisper=None, timestamp=None):
+        timestamp = timestamp or datetime.utcnow()
         if command.command == 'PASS':
             command = IrcMessage(command='PASS')
         file = config.botnick + '-' + self.name + '.log'
