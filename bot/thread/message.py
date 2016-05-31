@@ -95,7 +95,7 @@ class MessageQueue(threading.Thread):
                                        trailing=msg[1]))
                     with suppress(OSError):
                         params = _, msg[0].ircChannel, msg[2]
-                        msg[0].socket.sendIrcCommand(*params)
+                        msg[0].socket.queueWrite(*params)
                 time.sleep(1 / config.messagePerSecond)
         except:
             utils.logException()

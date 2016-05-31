@@ -1,4 +1,6 @@
-﻿ascii = (''' !"#$%&'()*+,-./'''
+﻿import re
+
+ascii = (''' !"#$%&'()*+,-./'''
           '0123456789'
           ':;<=>?@'
           'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -232,36 +234,27 @@ def format(string, format):
         return textformat.asciiToSmallCaps(string)
     if format == 'upsidedown':
         return textformat.asciiToUpsideDown(string)
-    if format in ['serifbold', 'serif-bold']:
+    if re.fullmatch(r'serif-?bold', format):
         return textformat.asciiToSerifBold(string)
-    if format in ['serifitalic', 'serif-italic']:
+    if re.fullmatch(r'serif-?italic', format):
         return textformat.asciiToSerifItalic(string)
-    if format in ['serifbolditalic', 'serif-bold-italic',
-                    'serif-bolditalic', 'serifbold-italic',
-                    'serifitalicbold', 'serif-italic-bold',
-                    'serifitalic-bold', 'serif-italicbold',]:
+    if re.fullmatch(r'serif-?bold-?italic', format):
         return textformat.asciiToSerifBoldItalic(string)
     if format == 'sanserif':
         return textformat.asciiToSanSerif(string)
-    if format in ['sanserifbold', 'sanserif-bold', 'bold']:
+    if re.fullmatch(r'sanserif-?bold', format):
         return textformat.asciiToSanSerifBold(string)
-    if format in ['sanserifitalic', 'sanserif-italic', 'italic']:
+    if re.fullmatch(r'sanserif-?italic', format):
         return textformat.asciiToSanSerifItalic(string)
-    if format in ['sanserifbolditalic', 'sanserif-bold-italic',
-                    'sanserif-bolditalic', 'sanserifbold-italic',
-                    'sanserifitalicbold', 'sanserif-italic-bold',
-                    'sanserifitalic-bold', 'sanserif-italicbold',
-                    'bolditalic', 'bold-italic',
-                    'italicbold', 'italic-bold']:
+    if re.fullmatch(r'(sanserif-?)?(bold-?italic|italic-?bold)', format):
         return textformat.asciiToSanSerifBoldItalic(string)
     if format in ['script', 'cursive']:
         return textformat.asciiToScript(string)
-    if format in ['scriptbold', 'cursivebold',
-                    'script-bold', 'cursive-bold',]:
+    if re.fullmatch(r'(script|cursive)-?bold', format):
         return textformat.asciiToScriptBold(string)
     if format == 'fraktur':
         return textformat.asciiToFraktur(string)
-    if format in ['frakturbold', 'fraktur-bold']:
+    if re.fullmatch(r'fraktur-?bold', format):
         return textformat.asciiToFrakturBold(string)
     if format == 'monospace':
         return textformat.asciiToMonospace(string)

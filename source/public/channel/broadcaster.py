@@ -6,7 +6,7 @@ import json
 import time
 
 def commandHello(args):
-    chat.sendMessage('Hello Kappa')
+    args.chat.sendMessage('Hello Kappa')
     return True
 
 def commandCome(args):

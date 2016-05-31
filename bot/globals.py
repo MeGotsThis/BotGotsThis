@@ -6,6 +6,7 @@ import traceback
 
 # Import some necessary libraries.
 messaging = None
+sockets = None
 
 join = None
 groupChannel = None

@@ -1,10 +1,11 @@
 ﻿# Import some necessary libraries.
 from . import config, globals, utils
 from .channel import Channel
+from .data.socket import Socket
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.message import MessageQueue
-from .thread.socket import SocketThread
+from .thread.socket import SocketsThread
 from source.database.factory import getDatabase
 import source.private.autoload as privateAuto
 import source.public.autoload as publicAuto
@@ -19,9 +20,11 @@ import traceback
 def main(argv):
     print('{time} Starting'.format(time=datetime.datetime.utcnow()))
     globals.messaging = MessageQueue(name='Message Queue')
+    globals.sockets = SocketsThread(name='Message Queue')
 
-    globals.clusters['aws'] = SocketThread(config.awsServer, config.awsPort,
-                                           name='AWS Chat')
+    globals.clusters['aws'] = Socket(
+        'AWS Chat', config.awsServer, config.awsPort)
+    globals.sockets.register(globals.clusters['aws'])
 
     globals.join = JoinThread(name='Join Thread')
     globals.groupChannel = Channel('jtv', globals.clusters['aws'],
@@ -30,9 +33,7 @@ def main(argv):
     globals.background = BackgroundTasker(name='Background Tasker')
 
     # Start the Threads
-    for st in globals.clusters.values():
-        if st:
-            st.start()
+    globals.sockets.start()
     globals.messaging.start()
     globals.background.start()
     globals.join.start()

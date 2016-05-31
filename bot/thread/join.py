@@ -22,8 +22,7 @@ class JoinThread(threading.Thread):
         print('{time} Starting {name}'.format(
             time=datetime.datetime.utcnow(), name=self.__class__.__name__))
         joinDuration = datetime.timedelta(seconds=10.05)
-        running = lambda c: globals.clusters[c].running
-        while any(map(running, globals.clusters)):
+        while any(globals.sockets.socketConnections):
             try:
                 utcnow = datetime.datetime.utcnow()
                 with self._joinTimesLock:
@@ -56,11 +55,8 @@ class JoinThread(threading.Thread):
                             params=IrcMessageParams(
                                 middle=chat.ircChannel))
                         params = ircCommand, chat.ircChannel
-                        chat.socket.sendIrcCommand(*params)
-                        chat.onJoin()
+                        chat.socket.queueWrite(*params)
                         self._channelJoined.add(chat.channel)
-                        with self._joinTimesLock:
-                            self._joinTimes.append(datetime.datetime.utcnow())
                         
                         print('{time} Joined {channel} on {socket}'.format(
                             time=datetime.datetime.utcnow(),
@@ -86,6 +82,11 @@ class JoinThread(threading.Thread):
     def part(self, channel):
         with self._channelsLock:
             self._channelJoined.discard(channel)
+    
+    def recordJoin(self):
+        timestamp = datetime.datetime.utcnow()
+        with self._joinTimesLock:
+            self._joinTimes.append(timestamp)
     
     @staticmethod
     def _getJoinWithLowestPriority(channelsData, notJoinedChannels):
