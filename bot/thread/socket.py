@@ -2,6 +2,7 @@
 from datetime import datetime
 from itertools import filterfalse
 import select
+import socket
 import threading
 
 class SocketsThread(threading.Thread):
@@ -34,6 +35,8 @@ class SocketsThread(threading.Thread):
             for socketConnection in filterfalse(isActive,
                                                 self._socketConnections):
                 socketConnection.ping()
+        for socketConnection in self._socketConnections:
+            socketConnection.cleanup()
         print('{time} Ending {name} {thread}'.format(
             time=datetime.utcnow(), name=self.__class__.__name__,
             thread=self.name))
