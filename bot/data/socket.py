@@ -89,6 +89,8 @@ class Socket:
     def write(self, command, channel=None, whisper=None):
         if not isinstance(command, IrcMessage):
             raise TypeError()
+        if self._socket is None:
+            return
         try:
             message = (str(command) + '\r\n').encode('utf-8')
             self._socket.send(message)
@@ -112,13 +114,17 @@ class Socket:
             lastRecv = bytes(self._socket.recv(2048))
             ircmsgs += lastRecv
         
-        for ircmsg in ircmsgs.split(b'\r\n'):
-            if not ircmsg:
-                continue
-            ircmsg = bytes(ircmsg).decode('utf-8')
-            self._logRead(ircmsg)
-            timestamp = datetime.utcnow()
-            source.ircmessage.parseMessage(self, ircmsg, timestamp)
+        try:
+            for ircmsg in ircmsgs.split(b'\r\n'):
+                if not ircmsg:
+                    continue
+                ircmsg = bytes(ircmsg).decode('utf-8')
+                self._logRead(ircmsg)
+                timestamp = datetime.utcnow()
+                source.ircmessage.parseMessage(self, ircmsg, timestamp)
+        except error.LoginUnsuccessfulException:
+            self.cleanup()
+            globals.running = False
     
     def ping(self):
         sinceLastSend = datetime.utcnow() - self.lastSentPing

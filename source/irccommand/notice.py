@@ -7,7 +7,7 @@ messageIdentical = 'Your message was not sent because it is identical to the '
 messageIdentical += 'previous one you sent, less than 30 seconds ago.'
 
 def parse(chat, nick, message):
-    if message == 'Error logging in':
+    if message == 'Login unsuccessful':
         raise bot.error.LoginUnsuccessfulException()
     if message.startswith('You are permanently banned from talking in '):
         chat.isMod = False
