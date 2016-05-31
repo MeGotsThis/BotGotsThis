@@ -5,26 +5,15 @@ _nickSpecials = '-_'
 class IrcMessagePrefix:
     __slots__ = ('_servername', '_nick', '_user', '_host')
     
-    def __init__(self, *, prefix=None, servername=None, nick=None, user=None,
+    def __init__(self, servername=None, nick=None, user=None,
                  host=None):
-        if isinstance(prefix, str):
-            servername, nick, user, host = IrcMessagePrefix._parse(prefix)
-        
-        if servername is None or isinstance(servername, str):
-            pass
-        else:
+        if not isinstance(servername, (type(None), str)):
             raise TypeError()
-        if nick is None or isinstance(nick, str):
-            pass
-        else:
+        if not isinstance(nick, (type(None), str)):
             raise TypeError()
-        if user is None or isinstance(user, str):
-            pass
-        else:
+        if not isinstance(user, (type(None), str)):
             raise TypeError()
-        if host is None or isinstance(host, str):
-            pass
-        else:
+        if not isinstance(host, (type(None), str)):
             raise TypeError()
         
         if servername is None and nick is None:
@@ -41,6 +30,12 @@ class IrcMessagePrefix:
         self._nick = nick
         self._user = user
         self._host = host
+    
+    @classmethod
+    def fromPrefix(cls, prefix):
+        if not isinstance(prefix, str):
+            raise TypeError()
+        return cls(*cls.parse(prefix))
     
     @property
     def servername(self):
@@ -82,7 +77,7 @@ class IrcMessagePrefix:
         return not (self == other)
     
     @staticmethod
-    def _parse(params):
+    def parse(params):
         if isinstance(params, str):
             pass
         else:

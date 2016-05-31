@@ -16,7 +16,7 @@ _unescapedValue = {
 class IrcMessageTags:
     __slots__ = ('_items')
     
-    def __init__(self, *, items=None):
+    def __init__(self, items=None):
         self._items = {}
         if items is not None:
             validDict = (dict, IrcMessageTags, IrcMessageTagsReadOnly,
@@ -24,13 +24,13 @@ class IrcMessageTags:
             validList = (list, tuple)
             validSet = (set,)
             if isinstance(items, str):
-                self._items = _parseTags(items)
+                self._items = parseTags(items)
             elif isinstance(items, validDict):
                 for key in items:
                     if isinstance(key, IrcMessageTagsKey):
                         k = key
                     else:
-                        k = IrcMessageTagsKey(keyOrVendorKey=key)
+                        k = IrcMessageTagsKey.fromKeyVendor(key)
                     if items[key] is True or isinstance(items[key], str):
                         self._items[k] = items[key]
                     else:
@@ -53,7 +53,7 @@ class IrcMessageTags:
     
     def __getitem__(self, key):
         if isinstance(key, str):
-            key = IrcMessageTagsKey(keyOrVendorKey=key)
+            key = IrcMessageTagsKey.fromKeyVendor(key)
         elif isinstance(key, IrcMessageTagsKey):
             pass
         else:
@@ -62,7 +62,7 @@ class IrcMessageTags:
     
     def __setitem__(self, key, value):
         if isinstance(key, str):
-            key = IrcMessageTagsKey(keyOrVendorKey=key)
+            key = IrcMessageTagsKey.fromKeyVendor(key)
         elif isinstance(key, IrcMessageTagsKey):
             pass
         else:
@@ -79,7 +79,7 @@ class IrcMessageTags:
     
     def __contains__(self, item):
         if isinstance(item, str):
-            item = IrcMessageTagsKey(keyOrVendorKey=item)
+            item = IrcMessageTagsKey.fromKeyVendor(item)
         elif isinstance(item, IrcMessageTagsKey):
             pass
         else:
@@ -96,7 +96,7 @@ class IrcMessageTags:
             if self._items[k] is True:
                 s.append(str(k))
             else:
-                s.append(str(k) + '=' + _formatValue(self._items[k]))
+                s.append(str(k) + '=' + formatValue(self._items[k]))
         return ';'.join(s)
     
     def __eq__(self, other):
@@ -118,13 +118,13 @@ class IrcMessageTagsReadOnly:
             validList = (list, tuple)
             validSet = (set,)
             if isinstance(items, str):
-                self._items = _parseTags(items)
+                self._items = parseTags(items)
             elif isinstance(items, validDict):
                 for key in items:
                     if isinstance(key, IrcMessageTagsKey):
                         k = key
                     else:
-                        k = IrcMessageTagsKey(keyOrVendorKey=key)
+                        k = IrcMessageTagsKey.fromKeyVendor(key)
                     self._items[k] = items[key]
             elif isinstance(items, validList):
                 for key in items:
@@ -144,7 +144,7 @@ class IrcMessageTagsReadOnly:
     
     def __getitem__(self, key):
         if isinstance(key, str):
-            key = IrcMessageTagsKey(keyOrVendorKey=key)
+            key = IrcMessageTagsKey.fromKeyVendor(key)
         elif isinstance(key, IrcMessageTagsKey):
             pass
         else:
@@ -153,7 +153,7 @@ class IrcMessageTagsReadOnly:
     
     def __contains__(self, item):
         if isinstance(item, str):
-            item = IrcMessageTagsKey(keyOrVendorKey=item)
+            item = IrcMessageTagsKey.fromKeyVendor(key)
         elif isinstance(item, IrcMessageTagsKey):
             pass
         else:
@@ -170,7 +170,7 @@ class IrcMessageTagsReadOnly:
             if self._items[k] is True:
                 s.append(str(k))
             else:
-                s.append(str(k) + '=' + _formatValue(self._items[k]))
+                s.append(str(k) + '=' + formatValue(self._items[k]))
         return ';'.join(s)
     
     def __eq__(self, other):
@@ -184,10 +184,7 @@ class IrcMessageTagsReadOnly:
 class IrcMessageTagsKey:
     __slots__ = ('_vendor', '_key')
     
-    def __init__(self, *, keyOrVendorKey=None, key='', vendor=None):
-        if isinstance(keyOrVendorKey, str):
-            key, vendor = IrcMessageTagsKey._parse(keyOrVendorKey)
-        
+    def __init__(self, key='', vendor=None):
         if isinstance(key, str):
             pass
         else:
@@ -198,6 +195,12 @@ class IrcMessageTagsKey:
             raise TypeError()
         self._key = key
         self._vendor = vendor
+    
+    @classmethod
+    def fromKeyVendor(cls, keyVendor):
+        if not isinstance(keyVendor, str):
+            raise TypeError()
+        return cls(*cls.parse(keyVendor))
     
     def __str__(self):
         s = self._key
@@ -219,7 +222,7 @@ class IrcMessageTagsKey:
         return str(self).__hash__()
     
     @staticmethod
-    def _parse(keyToParse):
+    def parse(keyToParse):
         if isinstance(keyToParse, IrcMessageTagsKey):
             return keyToParse
         if isinstance(keyToParse, str):
@@ -278,7 +281,7 @@ class IrcMessageTagsKey:
         vendor = ''.join(v) if v else None
         return (key, vendor)
 
-def _formatValue(value):
+def formatValue(value):
     if isinstance(value, str):
         pass
     else:
@@ -292,11 +295,9 @@ def _formatValue(value):
         s.append(char)
     return ''.join(s)
 
-def _parseTags(tags):
-    if isinstance(tags, str):
-        pass
-    else:
-        raise ValueError()
+def parseTags(tags):
+    if not isinstance(tags, str):
+        raise TypeError()
         
     length = len(tags)
     i = 0
@@ -382,7 +383,7 @@ def _parseTags(tags):
                     v.append(char)
             value = ''.join(v)
         
-        tagkey = IrcMessageTagsKey(key=key, vendor=vendor)
+        tagkey = IrcMessageTagsKey(key, vendor)
         
         if tagkey in items:
             raise ValueError()

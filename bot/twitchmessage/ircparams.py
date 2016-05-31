@@ -1,17 +1,10 @@
 class IrcMessageParams:
     __slots__ = ('_middle', '_trailing')
     
-    def __init__(self, *, params=None, middle=None, trailing=None):
-        if isinstance(params, str):
-            middle, trailing = IrcMessageParams._parse(params)
-        
-        if middle is None or isinstance(middle, str):
-            pass
-        else:
+    def __init__(self, middle=None, trailing=None):
+        if not isinstance(middle, (type(None), str)):
             raise TypeError()
-        if trailing is None or isinstance(trailing, str):
-            pass
-        else:
+        if not isinstance(trailing, (type(None), str)):
             raise TypeError()
         
         if middle is not None:
@@ -20,6 +13,12 @@ class IrcMessageParams:
         
         self._middle = middle
         self._trailing = trailing
+    
+    @classmethod
+    def fromParams(cls, params):
+        if not isinstance(message, params):
+            raise TypeError()
+        return cls(*cls.parse(params))
     
     @property
     def isEmpty(self):
@@ -53,7 +52,7 @@ class IrcMessageParams:
         return not self.__eq__(other)
     
     @staticmethod
-    def _parse(params):
+    def parse(params):
         if isinstance(params, str):
             pass
         else:
@@ -102,4 +101,4 @@ class IrcMessageParams:
         middle = ''.join(m) if m else None
         trailing = ''.join(t) if t else None
         
-        return (servername, nick, user, host)
+        return (middle, trailing)

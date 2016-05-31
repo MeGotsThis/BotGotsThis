@@ -16,7 +16,7 @@ _logCommandPerChannel = [
 
 def parseMessage(socket, ircmsg, now):
     channels = socket.channels
-    message = IrcMessage(message=ircmsg)
+    message = IrcMessage.fromMessage(ircmsg)
     if message.command == 'PRIVMSG':
         tags = message.tags
         nick = message.prefix.nick

@@ -6,19 +6,14 @@ import string
 class IrcMessage:
     __slots__ = ('_tags', '_prefix', '_command', '_params')
     
-    def __init__(self, *, message=None, tags=None, prefix=None, command=0,
+    def __init__(self, tags=None, prefix=None, command=0,
                  params=ircparams.IrcMessageParams()):
-        if isinstance(message, str):
-            tags, prefix, command, params = IrcMessage._parse(message)
-        if tags is None or isinstance(tags, irctags.IrcMessageTagsReadOnly):
-            pass
-        elif isinstance(tags, irctags.IrcMessageTags):
-            tags = irctags.IrcMessageTagsReadOnly(items=tags)
-        else:
+        if isinstance(tags, irctags.IrcMessageTagsReadOnly):
+            tags = irctags.IrcMessageTagsReadOnly(tags)
+        elif not isinstance(tags,
+                            (type(None), irctags.IrcMessageTagsReadOnly)):
             raise TypeError()
-        if prefix is None or isinstance(prefix, ircprefix.IrcMessagePrefix):
-            pass
-        else:
+        if not isinstance(prefix, (type(None), ircprefix.IrcMessagePrefix)):
             raise TypeError()
         if isinstance(command, str):
             if not command.isalpha():
@@ -28,15 +23,19 @@ class IrcMessage:
                 raise ValueError()
         else:
             raise TypeError()
-        if isinstance(params, ircparams.IrcMessageParams):
-            pass
-        else:
+        if not isinstance(params, ircparams.IrcMessageParams):
             raise TypeError()
         
         self._tags = tags
         self._prefix = prefix
         self._command = command
         self._params = params
+    
+    @classmethod
+    def fromMessage(cls, message):
+        if not isinstance(message, str):
+            raise TypeError()
+        return cls(*cls.parse(message))
     
     @property
     def tags(self):
@@ -80,7 +79,7 @@ class IrcMessage:
         return not self.__eq__(other)
     
     @staticmethod
-    def _parse(message):
+    def parse(message):
         if isinstance(message, str):
             pass
         else:
