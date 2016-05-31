@@ -1,3 +1,5 @@
+import collections.abc
+
 _escapedValue = {
     ';': '\:',
     ' ': '\\s',
@@ -13,185 +15,13 @@ _unescapedValue = {
     'n': '\n'
     }
 
-class IrcMessageTags:
-    __slots__ = ('_items')
-    
-    def __init__(self, items=None):
-        self._items = {}
-        if items is not None:
-            validDict = (dict, IrcMessageTags, IrcMessageTagsReadOnly,
-                         IrcMessageTags,)
-            validList = (list, tuple)
-            validSet = (set,)
-            if isinstance(items, str):
-                self._items = parseTags(items)
-            elif isinstance(items, validDict):
-                for key in items:
-                    if isinstance(key, IrcMessageTagsKey):
-                        k = key
-                    else:
-                        k = IrcMessageTagsKey.fromKeyVendor(key)
-                    if items[key] is True or isinstance(items[key], str):
-                        self._items[k] = items[key]
-                    else:
-                        raise TypeError()
-            elif isinstance(items, validList):
-                for key in items:
-                    if isinstance(key, validList) and len(key) >= 2:
-                        k = IrcMessageTagsKey.parse(key[0])
-                        self._items[k] = key[1]
-                    else:
-                        k = IrcMessageTagsKey.parse(key)
-                        self._items[k] = True
-            elif isinstance(items, validSet):
-                for key in items:
-                    k = IrcMessageTagsKey.parse(key)
-                    self._items[k] = True
-   
-    def __len__(self):
-        return len(self._items)
-    
-    def __getitem__(self, key):
-        if isinstance(key, str):
-            key = IrcMessageTagsKey.fromKeyVendor(key)
-        elif isinstance(key, IrcMessageTagsKey):
-            pass
-        else:
-            raise TypeError()
-        return self._items[key]
-    
-    def __setitem__(self, key, value):
-        if isinstance(key, str):
-            key = IrcMessageTagsKey.fromKeyVendor(key)
-        elif isinstance(key, IrcMessageTagsKey):
-            pass
-        else:
-            raise TypeError()
-        if value == True:
-            self._items[key] = value
-        elif isinstance(value, str):
-            self._items[key] = value
-        else:
-            raise ValueError()
-    
-    def __delitem__(self, key):
-        del self._items[key]
-    
-    def __contains__(self, item):
-        if isinstance(item, str):
-            item = IrcMessageTagsKey.fromKeyVendor(item)
-        elif isinstance(item, IrcMessageTagsKey):
-            pass
-        else:
-            raise TypeError()
-        return item in self._items
-    
-    def __iter__(self):
-        for i in self._items:
-            yield i
-    
-    def __str__(self):
-        s = []
-        for k in self._items:
-            if self._items[k] is True:
-                s.append(str(k))
-            else:
-                s.append(str(k) + '=' + formatValue(self._items[k]))
-        return ';'.join(s)
-    
-    def __eq__(self, other):
-        if isinstance(other, (IrcMessageTags, IrcMessageTagsReadOnly)):
-            return self._items == other._items
-        return False
-    
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-class IrcMessageTagsReadOnly:
-    __slots__ = ('_items')
-    
-    def __init__(self, *, items=None):
-        self._items = {}
-        if items is not None:
-            validDict = (dict, IrcMessageTags, IrcMessageTagsReadOnly,
-                         IrcMessageTags,)
-            validList = (list, tuple)
-            validSet = (set,)
-            if isinstance(items, str):
-                self._items = parseTags(items)
-            elif isinstance(items, validDict):
-                for key in items:
-                    if isinstance(key, IrcMessageTagsKey):
-                        k = key
-                    else:
-                        k = IrcMessageTagsKey.fromKeyVendor(key)
-                    self._items[k] = items[key]
-            elif isinstance(items, validList):
-                for key in items:
-                    if isinstance(k, validList) and len(k) >= 2:
-                        k = IrcMessageTagsKey.parse(k[0])
-                        self._items[k] = key[1]
-                    else:
-                        k = IrcMessageTagsKey.parse(key)
-                        self._items[k] = True
-            elif isinstance(items, validSet):
-                for key in items:
-                    k = IrcMessageTagsKey.parse(key)
-                    self._items[k] = True
-   
-    def __len__(self):
-        return len(self._items)
-    
-    def __getitem__(self, key):
-        if isinstance(key, str):
-            key = IrcMessageTagsKey.fromKeyVendor(key)
-        elif isinstance(key, IrcMessageTagsKey):
-            pass
-        else:
-            raise TypeError()
-        return self._items[key]
-    
-    def __contains__(self, item):
-        if isinstance(item, str):
-            item = IrcMessageTagsKey.fromKeyVendor(key)
-        elif isinstance(item, IrcMessageTagsKey):
-            pass
-        else:
-            raise TypeError()
-        return item in self._items
-    
-    def __iter__(self):
-        for i in self._items:
-            yield i
-    
-    def __str__(self):
-        s = []
-        for k in self._items:
-            if self._items[k] is True:
-                s.append(str(k))
-            else:
-                s.append(str(k) + '=' + formatValue(self._items[k]))
-        return ';'.join(s)
-    
-    def __eq__(self, other):
-        if isinstance(other, (IrcMessageTags, IrcMessageTagsReadOnly)):
-            return self._items == other._items
-        return False
-    
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-class IrcMessageTagsKey:
+class IrcMessageTagsKey(collections.abc.Hashable):
     __slots__ = ('_vendor', '_key')
     
     def __init__(self, key='', vendor=None):
-        if isinstance(key, str):
-            pass
-        else:
+        if not isinstance(key, str):
             raise TypeError()
-        if vendor is None or isinstance(vendor, str):
-            pass
-        else:
+        if not isinstance(vendor, (type(None), str)):
             raise TypeError()
         self._key = key
         self._vendor = vendor
@@ -281,116 +111,191 @@ class IrcMessageTagsKey:
         vendor = ''.join(v) if v else None
         return (key, vendor)
 
-def formatValue(value):
-    if isinstance(value, str):
-        pass
-    else:
-        raise ValueError
+class IrcMessageTagsReadOnly(collections.abc.Mapping):
+    __slots__ = ('_items')
     
-    s = []
-        
-    for char in value:
-        if char in _escapedValue:
-            char = _escapedValue[char]
-        s.append(char)
-    return ''.join(s)
-
-def parseTags(tags):
-    if not isinstance(tags, str):
-        raise TypeError()
-        
-    length = len(tags)
-    i = 0
-        
-    if i == length:
-        raise ValueError()
-    
-    items = {}
-    while True:
-        if tags[i] == ';':
-            raise ValueError()
-        
-        v = []
-        key = ''
-        isVendor = False
-        isKey = False
-        value = True
-        s = []
-        while i < length:
-            char = tags[i]
-            i += 1
-                
-            if char == ';':
-                break
-            elif char == '=':
-                break
-            elif char == '.':
-                if len(s) == 0:
-                    raise ValueError()
-                if s[-1] == '-':
-                    raise ValueError()
-                if not s[0].isalpha():
-                    raise ValueError()
-                if not isVendor and v:
-                    raise ValueError()
-                v.extend(s)
-                v.append(char)
-                s = []
-                isVendor = True
-            elif char == '/':
-                if isKey:
-                    raise ValueError()
-                if len(s) == 0:
-                    raise ValueError()
-                if s[-1] == '-':
-                    raise ValueError()
-                if not s[0].isalpha():
-                    raise ValueError()
-                v.extend(s)
-                s = []
-                isVendor = False
-                isKey = True
+    def __init__(self, items=None):
+        self._items = {}
+        if items is not None:
+            if isinstance(items, str):
+                self._items = parseTags(items)
+            elif isinstance(items, collections.abc.Mapping):
+                for key in items:
+                    if (items[key] is not True
+                            and not isinstance(items[key], str)):
+                        raise TypeError()
+                    self._items[self.__class__._getKey(key)] = items[key]
+            elif isinstance(items, collections.abc.Iterable):
+                for key in items:
+                    if (isinstance(key, collections.abc.Sequence)
+                            and len(key) >= 2):
+                        if (items[key[1]] is not True
+                                and not isinstance(items[key[1]], str)):
+                            raise TypeError()
+                        self._items[self.__class__._getKey(key[0])] = key[1]
+                    else:
+                        self._items[self.__class__._getKey(key)] = True
             else:
-                if not char.isalnum() and char != '-' and char != '_':
-                    raise ValueError()
-                s.append(char)
+                raise TypeError()
+    
+    def _getKey(key):
+        if isinstance(key, IrcMessageTagsKey):
+            return key
+        else:
+            return IrcMessageTagsKey.fromKeyVendor(key)
+    
+    def __getitem__(self, key):
+        if not isinstance(key, IrcMessageTagsKey):
+            key = IrcMessageTagsKey.fromKeyVendor(key)
+        return self._items[key]
+    
+    def __iter__(self):
+        for i in self._items:
+            yield i
+    
+    def __len__(self):
+        return len(self._items)
+    
+    def __str__(self):
+        s = []
+        for k in self._items:
+            if self._items[k] is True:
+                s.append(str(k))
+            else:
+                s.append(str(k) + '='
+                         + self.__class__.formatValue(self._items[k]))
+        return ';'.join(s)
+    
+    @staticmethod
+    def formatValue(value):
+        if not isinstance(value, str):
+            raise ValueError
         
-        if isVendor:
+        s = []
+        
+        for char in value:
+            if char in _escapedValue:
+                char = _escapedValue[char]
+            s.append(char)
+        return ''.join(s)
+    
+    @staticmethod
+    def parseTags(tags):
+        if not isinstance(tags, str):
+            raise TypeError()
+        
+        length = len(tags)
+        i = 0
+        
+        if i == length:
             raise ValueError()
         
-        key = ''.join(s)
-        vendor = ''.join(v) if v else None
-        
-        if char == '=':
+        items = {}
+        while True:
+            if tags[i] == ';':
+                raise ValueError()
+            
             v = []
+            key = ''
+            isVendor = False
+            isKey = False
+            value = True
+            s = []
             while i < length:
                 char = tags[i]
                 i += 1
                 
                 if char == ';':
                     break
-                if char in '\0\r\n; ':
-                    raise ValueError()
-                if char == '\\':
-                    if (i < length and
-                        tags[i] in _unescapedValue):
-                        char = _unescapedValue[tags[i]]
-                        v.append(char)
-                        i += 1
-                    else:
+                elif char == '=':
+                    break
+                elif char == '.':
+                    if len(s) == 0:
                         raise ValueError()
-                else:
+                    if s[-1] == '-':
+                        raise ValueError()
+                    if not s[0].isalpha():
+                        raise ValueError()
+                    if not isVendor and v:
+                        raise ValueError()
+                    v.extend(s)
                     v.append(char)
-            value = ''.join(v)
+                    s = []
+                    isVendor = True
+                elif char == '/':
+                    if isKey:
+                        raise ValueError()
+                    if len(s) == 0:
+                        raise ValueError()
+                    if s[-1] == '-':
+                        raise ValueError()
+                    if not s[0].isalpha():
+                        raise ValueError()
+                    v.extend(s)
+                    s = []
+                    isVendor = False
+                    isKey = True
+                else:
+                    if not char.isalnum() and char != '-' and char != '_':
+                        raise ValueError()
+                    s.append(char)
+            
+            if isVendor:
+                raise ValueError()
+            
+            key = ''.join(s)
+            vendor = ''.join(v) if v else None
+            
+            if char == '=':
+                v = []
+                while i < length:
+                    char = tags[i]
+                    i += 1
+                
+                    if char == ';':
+                        break
+                    if char in '\0\r\n; ':
+                        raise ValueError()
+                    if char == '\\':
+                        if (i < length and
+                            tags[i] in _unescapedValue):
+                            char = _unescapedValue[tags[i]]
+                            v.append(char)
+                            i += 1
+                        else:
+                            raise ValueError()
+                    else:
+                        v.append(char)
+                value = ''.join(v)
+            
+            tagkey = IrcMessageTagsKey(key, vendor)
+            
+            if tagkey in items:
+                raise ValueError()
+            
+            items[tagkey] = value
+            
+            if i == length:
+                break
         
-        tagkey = IrcMessageTagsKey(key, vendor)
-        
-        if tagkey in items:
-            raise ValueError()
-        
-        items[tagkey] = value
-        
-        if i == length:
-            break
+        return items
+
+class IrcMessageTags(IrcMessageTagsReadOnly, collections.abc.MutableMapping):
+    __slots__ = ('_items')
     
-    return items
+    def __setitem__(self, key, value):
+        if isinstance(key, str):
+            key = IrcMessageTagsKey.fromKeyVendor(key)
+        elif isinstance(key, IrcMessageTagsKey):
+            pass
+        else:
+            raise TypeError()
+        if value == True:
+            self._items[key] = value
+        elif isinstance(value, str):
+            self._items[key] = value
+        else:
+            raise ValueError()
+    
+    def __delitem__(self, key):
+        del self._items[key]
