@@ -1,4 +1,8 @@
+from collections import namedtuple
 import string
+
+ParsedPrefix = namedtuple('ParsedPrefix',
+                          ['servername', 'nick', 'user', 'host'])
 
 _nickSpecials = '-_'
 
@@ -186,4 +190,4 @@ class IrcMessagePrefix:
         if i != length:
             raise ValueError()
         
-        return (servername, nick, user, host)
+        return ParsedPrefix(servername, nick, user, host)

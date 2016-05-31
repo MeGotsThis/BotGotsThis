@@ -1,3 +1,7 @@
+from collections import namedtuple
+
+ParsedParams = namedtuple('ParsedParams', ['middle', 'trailing'])
+
 class IrcMessageParams:
     __slots__ = ('_middle', '_trailing')
     
@@ -101,4 +105,4 @@ class IrcMessageParams:
         middle = ''.join(m) if m else None
         trailing = ''.join(t) if t else None
         
-        return (middle, trailing)
+        return ParsedParams(middle, trailing)

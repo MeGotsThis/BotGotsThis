@@ -1,4 +1,7 @@
+from collections import namedtuple
 import collections.abc
+
+ParsedKeyVendor = namedtuple('ParsedKey', ['key', 'vendor'])
 
 _escapedValue = {
     ';': '\:',
@@ -109,7 +112,7 @@ class IrcMessageTagsKey(collections.abc.Hashable):
         
         key = ''.join(s)
         vendor = ''.join(v) if v else None
-        return (key, vendor)
+        return ParsedKeyVendor(key, vendor)
 
 class IrcMessageTagsReadOnly(collections.abc.Mapping):
     __slots__ = ('_items')

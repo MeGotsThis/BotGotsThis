@@ -1,7 +1,11 @@
 from . import ircparams
 from . import ircprefix
 from . import irctags
+from collections import namedtuple
 import string
+
+ParsedMessage = namedtuple('ParsedMessage',
+                           ['tags', 'prefix', 'command', 'params'])
 
 class IrcMessage:
     __slots__ = ('_tags', '_prefix', '_command', '_params')
@@ -394,4 +398,4 @@ class IrcMessage:
             trailing = ''.join(t) if t else None
         params = ircparams.IrcMessageParams(middle=middle, trailing=trailing)
         
-        return (tags, prefix, command, params)
+        return ParsedMessage(tags, prefix, command, params)
