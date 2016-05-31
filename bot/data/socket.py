@@ -86,7 +86,7 @@ class Socket:
             time=datetime.utcnow(), name=self.name, server=self._server))
     
     def fileno(self):
-        return self._socket.fileno()
+        return self._socket and self._socket.fileno()
 
     def write(self, command, channel=None, whisper=None):
         if not isinstance(command, IrcMessage):
