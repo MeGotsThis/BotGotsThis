@@ -117,7 +117,17 @@ class IrcMessageTagsKey(collections.abc.Hashable):
 class IrcMessageTagsReadOnly(collections.abc.Mapping):
     __slots__ = ('_items')
     
+    def __new__(cls, items=None):
+        # This returns itself, only for read only
+        if cls is type(items) and cls is IrcMessageTagsReadOnly:
+            return items
+        return super().__new__(cls)
+    
     def __init__(self, items=None):
+        # This returns itself, only for read only
+        if self is items:
+            return
+        
         self._items = {}
         if items is not None:
             if isinstance(items, str):
