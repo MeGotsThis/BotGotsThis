@@ -137,7 +137,7 @@ class Socket:
         sinceLastSend = datetime.utcnow() - self.lastSentPing
         sinceLast = datetime.utcnow() - self.lastPing
         if sinceLastSend >= timedelta(minutes=1):
-            self.writeQueue(
+            self.queueWrite(
                 IrcMessage(command='PING',
                             params=IrcMessageParams(
                                 middle=config.botnick)),
