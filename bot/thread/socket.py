@@ -15,9 +15,8 @@ class SocketsThread(threading.Thread):
         return self._socketConnections
     
     def run(self):
-        print('{time} Starting {name} {thread}'.format(
-            time=datetime.utcnow(), name=self.__class__.__name__,
-            thread=self.name))
+        print('{time} Starting {name}'.format(
+            time=datetime.utcnow(), name=self.__class__.__name__))
         
         isActive = lambda s: s.socket
         while globals.running:
@@ -37,9 +36,8 @@ class SocketsThread(threading.Thread):
         
         for socketConnection in self._socketConnections:
             socketConnection.disconnect()
-        print('{time} Ending {name} {thread}'.format(
-            time=datetime.utcnow(), name=self.__class__.__name__,
-            thread=self.name))
+        print('{time} Ending {name}'.format(
+            time=datetime.utcnow(), name=self.__class__.__name__))
     
     def register(self, socketConn):
         self._socketConnections.append(socketConn)

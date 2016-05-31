@@ -20,7 +20,7 @@ import traceback
 def main(argv):
     print('{time} Starting'.format(time=datetime.datetime.utcnow()))
     globals.messaging = MessageQueue(name='Message Queue')
-    globals.sockets = SocketsThread(name='Message Queue')
+    globals.sockets = SocketsThread(name='Sockets Thread')
 
     globals.clusters['aws'] = Socket(
         'AWS Chat', config.awsServer, config.awsPort)
