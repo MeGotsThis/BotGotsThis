@@ -147,6 +147,7 @@ class Socket:
                             params=IrcMessageParams(
                                 middle=config.botnick)),
                 prepend=True)
+            self.lastSentPing = datetime.now()
         elif sinceLast >= timedelta(minutes=1,seconds=15):
             self.disconnect()
     
