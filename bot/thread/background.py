@@ -1,5 +1,5 @@
 ﻿from .. import globals, utils
-import datetime
+from datetime import datetime, timedelta
 import threading
 import time
 
@@ -11,24 +11,40 @@ class BackgroundTasker(threading.Thread):
     
     def run(self):
         print('{time} Starting {name}'.format(
-            time=datetime.datetime.utcnow(), name=self.__class__.__name__))
-        now = datetime.datetime.utcnow()
+            time=datetime.utcnow(), name=self.__class__.__name__))
+        now = datetime.utcnow()
         try:
             while globals.running:
-                now = datetime.datetime.utcnow()
-                for t in self._tasks:
-                    task, interval, last = t
-                    if now >= last + interval:
-                        threading.Thread(target=task, args=(now,)).start()
-                        t[2] = now
+                self.runTasks()
                 time.sleep(1 / 1000)
         except:
             utils.logException(None, now)
             raise
         finally:
             print('{time} Ending {name}'.format(
-                time=datetime.datetime.utcnow(), name=self.__class__.__name__))
+                time=datetime.utcnow(), name=self.__class__.__name__))
     
-    def addTask(self, task, interval=datetime.timedelta(seconds=60)):
-        t = [task, interval, datetime.datetime.min]
-        self._tasks.append(t)
+    def addTask(self, task, interval=timedelta(seconds=60)):
+        self._tasks.append(Task(task, interval))
+    
+    def runTasks(self):
+        timestamp = datetime.utcnow()
+        for task in self._tasks:
+            if timestamp >= task.timestamp + task.interval:
+                threading.Thread(
+                    target=task.task, args=(timestamp,)).start()
+                task.timestamp = timestamp
+
+class Task:
+    def __init__(self, task, interval):
+        self._task = task
+        self._interval = interval
+        self.timestamp = datetime.min
+
+    @property
+    def task(self):
+        return self._task
+    
+    @property
+    def interval(self):
+        return self._interval
