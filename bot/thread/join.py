@@ -10,6 +10,8 @@ import os.path
 import time
 import sys
 
+joinDuration = datetime.timedelta(seconds=10.05)
+
 class JoinThread(threading.Thread):
     def __init__(self, **args):
         threading.Thread.__init__(self, **args)
@@ -21,47 +23,43 @@ class JoinThread(threading.Thread):
     def run(self):
         print('{time} Starting {name}'.format(
             time=datetime.datetime.utcnow(), name=self.__class__.__name__))
-        joinDuration = datetime.timedelta(seconds=10.05)
         while globals.running:
             try:
-                utcnow = datetime.datetime.utcnow()
-                with self._joinTimesLock:
-                    self._joinTimes = [t for t in self._joinTimes
-                                       if utcnow - t <= joinDuration]
-                    if len(self._joinTimes) >= config.joinLimit:
-                        time.sleep(1 / config.joinPerSecond)
-                        continue
-                
-                channels = {}
-                for socketThread in globals.clusters.values():
-                    if socketThread.isConnected:
-                        chans = socketThread.channels
-                        for chan in chans:
-                            channels[chan] = chans[chan]
-                with self._channelsLock:
-                    notJoined = set(channels.keys() - self._channelJoined)
-                    
-                    if not notJoined:
-                        time.sleep(1 / config.joinPerSecond)
-                        continue
-                    
-                    params = channels, notJoined
-                    broadcaster = self._getJoinWithLowestPriority(*params)
-                    chat = channels[broadcaster]
-                    if chat.socket is not None:
-                        ircCommand = IrcMessage(
-                            command='JOIN',
-                            params=IrcMessageParams(
-                                middle=chat.ircChannel))
-                        params = ircCommand, chat.ircChannel
-                        chat.socket.queueWrite(*params)
-                        self._channelJoined.add(chat.channel)
-                
+                self.process()
                 time.sleep(1 / config.joinPerSecond)
             except:
                 utils.logException()
         print('{time} Ending {name}'.format(
             time=datetime.datetime.utcnow(), name=self.__class__.__name__))
+
+    def process(self):
+        timestamp = datetime.datetime.utcnow()
+        with self._joinTimesLock:
+            self._joinTimes = [t for t in self._joinTimes
+                               if timestamp - t <= joinDuration]
+            if len(self._joinTimes) >= config.joinLimit:
+                return
+        
+        channels = {}
+        for socketThread in globals.clusters.values():
+            if socketThread.isConnected:
+                chans = socketThread.channels
+                for chan in chans:
+                    channels[chan] = chans[chan]
+        with self._channelsLock:
+            notJoined = set(channels.keys() - self._channelJoined)
+            if not notJoined:
+                return
+            
+            params = channels, notJoined
+            broadcaster = self._getJoinWithLowestPriority(*params)
+            chat = channels[broadcaster]
+            if chat.socket is not None:
+                ircCommand = IrcMessage(
+                    None, None, 'JOIN', IrcMessageParams(chat.ircChannel))
+                params = ircCommand, chat.ircChannel
+                chat.socket.queueWrite(*params)
+                self._channelJoined.add(chat.channel)
     
     def addSocket(self, socketThread):
         self._socketThreads.append(socketThread)
