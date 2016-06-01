@@ -99,7 +99,7 @@ class Socket:
             timestamp = datetime.utcnow()
             self._socket.send(message)
             if command.command == 'PING':
-                self.lastSentPing = datetime.now()
+                self.lastSentPing = datetime.utcnow()
             if command.command == 'JOIN':
                 globals.channels[channel[1:]].onJoin()
                 globals.join.recordJoin()
@@ -148,7 +148,7 @@ class Socket:
                             params=IrcMessageParams(
                                 middle=config.botnick)),
                 prepend=True)
-            self.lastSentPing = datetime.now()
+            self.lastSentPing = datetime.utcnow()
         elif sinceLast >= timedelta(minutes=1,seconds=15):
             self.disconnect()
     
