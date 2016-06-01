@@ -52,24 +52,18 @@ class Socket:
         print('{time} {name} Connected {server}'.format(
             time=datetime.utcnow(), name=self.name, server=self._server))
         commands = [
-            IrcMessage(command='PASS',
-                       params=IrcMessageParams(middle=config.password)),
-            IrcMessage(command='NICK',
-                       params=IrcMessageParams(middle=config.botnick)),
-            IrcMessage(command='USER',
-                       params=IrcMessageParams(
-                           middle=config.botnick + ' 0 *',
-                           trailing=config.botnick)),
-            IrcMessage(command='CAP',
-                       params=IrcMessageParams(
-                           middle='REQ', trailing='twitch.tv/membership')),
-            IrcMessage(command='CAP',
-                       params=IrcMessageParams(
-                           middle='REQ', trailing='twitch.tv/commands')),
-            IrcMessage(command='CAP',
-                       params=IrcMessageParams(
-                           middle='REQ', trailing='twitch.tv/tags')),
-                 ]
+            IrcMessage(None, None, 'PASS', IrcMessageParams(config.password)),
+            IrcMessage(None, None, 'NICK', IrcMessageParams(config.botnick)),
+            IrcMessage(None, None, 'USER',
+                       IrcMessageParams(config.botnick + ' 0 *', 
+                                        config.botnick)),
+            IrcMessage(None, None, 'CAP',
+                       IrcMessageParams('REQ', 'twitch.tv/membership')),
+            IrcMessage(None, None, 'CAP',
+                       IrcMessageParams('REQ', 'twitch.tv/commands')),
+            IrcMessage(None, None, 'CAP',
+                       IrcMessageParams('REQ', 'twitch.tv/tags')),
+            ]
         for command in commands:
             message = (str(command) + '\r\n').encode('utf-8')
             connection.send(message)
@@ -137,21 +131,18 @@ class Socket:
             globals.running = False
     
     def ping(self, message='ping'):
-        self.queueWrite(
-            IrcMessage(command='PONG',
-                       params=IrcMessageParams(trailing=message)),
-            prepend=True)
+        self.queueWrite(IrcMessage(None, None, 'PONG',
+                                   IrcMessageParams(None, message)),
+                        prepend=True)
         self.lastPing = datetime.utcnow()
 
     def sendPing(self):
         sinceLastSend = datetime.utcnow() - self.lastSentPing
         sinceLast = datetime.utcnow() - self.lastPing
         if sinceLastSend >= timedelta(minutes=1):
-            self.queueWrite(
-                IrcMessage(command='PING',
-                            params=IrcMessageParams(
-                                middle=config.botnick)),
-                prepend=True)
+            self.queueWrite(IrcMessage(None, None, 'PING',
+                                       IrcMessageParams(config.botnick)),
+                            prepend=True)
             self.lastSentPing = datetime.utcnow()
         elif sinceLast >= timedelta(minutes=1,seconds=15):
             self.disconnect()
@@ -198,10 +189,8 @@ class Socket:
     
     def partChannel(self, channel):
         with self._channelsLock:
-            self.queueWrite(
-                IrcMessage(command='PART',
-                           params=IrcMessageParams(
-                               middle=channel.ircChannel)))
+            self.queueWrite(IrcMessage(None, None, 'PART',
+                                       IrcMessageParams(channel.ircChannel)))
             del self._channels[channel.channel]
         globals.join.part(channel.channel)
         print('{time} Parted {channel}'.format(
