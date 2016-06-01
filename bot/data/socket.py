@@ -17,6 +17,8 @@ class Socket:
         self._channelsLock = threading.Lock()
         self._isConnected = False
         self._socket = None
+        self.lastSentPing = datetime.max
+        self.lastPing = datetime.max
     
     @property
     def name(self):
@@ -83,6 +85,8 @@ class Socket:
         self._socket.close()
         globals.join.disconnected(self)
         self._socket = None
+        self.lastSentPing = datetime.max
+        self.lastPing = datetime.max
         print('{time} {name} Disconnected {server}'.format(
             time=datetime.utcnow(), name=self.name, server=self._server))
     
