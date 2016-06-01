@@ -123,7 +123,7 @@ def parseMessage(socket, ircmsg, now):
         not message.params.isEmpty and
         message.params.middle == 'tmi.twitch.tv' and
         message.params.trailing == config.botnick):
-        socket.lastPing = datetime.datetime.now()
+        socket.lastPing = datetime.datetime.utcnow()
         
     if message.command == 'USERSTATE':
         where = message.params.middle
