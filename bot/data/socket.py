@@ -75,6 +75,7 @@ class Socket:
         self._socket = connection
         self.lastSentPing = datetime.utcnow()
         self.lastPing = datetime.utcnow()
+        globals.join.connected(self)
 
     def disconnect(self):
         if self._socket is None:
