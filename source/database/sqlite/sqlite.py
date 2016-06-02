@@ -273,7 +273,7 @@ SELECT value FROM custom_command_properties
                 cursor.execute(query, (broadcaster, permission,
                                        command.lower(), property))
                 row = cursor.fetchone()
-                return row or row[0]
+                return row and row[0]
     
     def processCustomCommandProperty(self, broadcaster, permission, command,
                                      property, value):
