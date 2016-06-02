@@ -153,6 +153,7 @@
     <Compile Include="source\public\library\send.py" />
     <Compile Include="source\public\library\textformat.py" />
     <Compile Include="source\public\library\timeout.py" />
+    <Compile Include="source\public\library\whisper.py" />
     <Compile Include="source\public\library\__init__.py" />
     <Compile Include="source\public\manage\autojoin.py" />
     <Compile Include="source\public\manage\banned.py" />
