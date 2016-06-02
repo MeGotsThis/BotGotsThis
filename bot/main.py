@@ -18,6 +18,7 @@ import traceback
 
 def main(argv):
     print('{time} Starting'.format(time=datetime.datetime.utcnow()))
+    globals.running = True
     globals.sockets = SocketsThread(name='Sockets Thread')
 
     globals.clusters['aws'] = Socket(
@@ -57,6 +58,7 @@ def main(argv):
         globals.sockets.join()
         return 0
     except:
+        globals.running = False
         utils.logException()
         raise
     finally:
