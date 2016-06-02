@@ -23,9 +23,9 @@ def parse(chat, tags, nick, rawMessage, timestamp):
     name = '{channel}-{command}-{time}'.format(
         channel=chat.channel, command=message.command, time=time.time())
     params = chat, tags, nick, message, timestamp
-    threading.Thread(target=threadParse, args=params, name=name).start()
+    threading.Thread(target=chatCommand, args=params, name=name).start()
     
-def threadParse(chat, tags, nick, message, timestamp):
+def chatCommand(chat, tags, nick, message, timestamp):
     if False: # Hints for Intellisense
         chat = Channel('', None)
         nick = str()
@@ -34,33 +34,24 @@ def threadParse(chat, tags, nick, message, timestamp):
     try:
         permissions = ChatPermissionSet(tags, nick, chat)
     
-        complete = False
         with factory.getDatabase() as database:
             arguments = ChatCommandArgs(database, chat, tags, nick, message,
                                         permissions, timestamp)
-            for filter in commandList.filterMessage:
-                complete = filter(arguments)
-                if complete:
-                    break
-            if not complete and message.command in commandList.commands:
-                command = commandList.commands[message.command]
-                if command is not None:
-                    complete = command(arguments)
-            if not complete:
-                for comm in commandList.commandsStartWith:
-                    if message.command.startswith(comm):
-                        command = commandList.commandsStartWith[comm]
-                        hasPerm = True
-                        if command is not None:
-                            complete = command(arguments)
-                            if complete:
-                                break
-            if not complete:
-                for process in commandList.processNoCommand:
-                    complete = process(arguments)
-                    if complete:
-                        break
+            for command in commandsToProcess(message.command):
+                if command(arguments):
+                    return
     except:
         extra = 'Channel: {channel}\nMessage: {message}'.format(
             channel=chat.channel, message=message)
         utils.logException(extra, timestamp)
+
+def commandsToProcess(command):
+    yield from commandList.filterMessage
+    if command in commandList.commands:
+        if commandList.commands[command] is not None:
+            yield commandList.commands[command]
+    for starting in commandList.commandsStartWith:
+        if command.startswith(starting):
+            if commandList.commandsStartWith[starting] is not None:
+                yield commandList.commandsStartWith[starting]
+    yield from commandList.processNoCommand
