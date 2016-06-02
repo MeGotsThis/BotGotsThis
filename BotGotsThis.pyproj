@@ -144,6 +144,7 @@
     <Compile Include="source\public\default\__init__.py" />
     <Compile Include="source\public\library\broadcaster.py" />
     <Compile Include="source\public\library\channel.py" />
+    <Compile Include="source\public\library\chat.py" />
     <Compile Include="source\public\library\custom.py" />
     <Compile Include="source\public\library\exit.py" />
     <Compile Include="source\public\library\feature.py" />
