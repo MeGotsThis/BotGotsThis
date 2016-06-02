@@ -1,8 +1,10 @@
 ﻿from ..library import timeout
+from ..library.chat import permission
 from bot import config
 from contextlib import suppress
 import datetime
 
+@permission('moderator')
 def commandWall(args):
     if (not args.database.hasFeature(args.chat.channel, 'modwall') and
         not args.permissions.broadcaster):
@@ -44,6 +46,7 @@ def commandWall(args):
     args.chat.sendMulipleMessages(messages, 2)
     return True
 
+@permission('moderator')
 def commandWallLong(args):
     if (not args.database.hasFeature(args.chat.channel, 'modwall') and
         not args.permissions.broadcaster):

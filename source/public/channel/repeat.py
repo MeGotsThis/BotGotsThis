@@ -1,10 +1,12 @@
 ﻿from ...database.factory import getDatabase
 from ..library import timeout
+from ..library.chat import permission
 import threading
 import datetime
 import time
 import json
 
+@permission('broadcaster')
 def commandAutoRepeat(args):
     """
     !autorepeat 1 MONEY MONEY

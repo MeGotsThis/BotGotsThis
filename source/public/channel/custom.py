@@ -1,4 +1,5 @@
 ﻿from ..library import custom, timeout
+from ..library.chat import permission, ownerChannel
 from bot import config
 from bot.data.argument import CustomFieldArgs, CustomProcessArgs
 from collections import defaultdict
@@ -82,7 +83,16 @@ def customCommands(args):
             timeout.recordTimeoutFromCommand(args.database, args.chat,
                                              args.nick, msgs, args.message)
 
+@ownerChannel
+@permission('admin')
+def commandGlobal(args):
+    return processCommand(args)
+
+@permission('moderator')
 def commandCommand(args):
+    return processCommand(args)
+
+def processCommand(args):
     if len(args.message) < 3:
         return False
     

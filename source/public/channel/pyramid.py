@@ -1,8 +1,10 @@
 ﻿from ..library import timeout
+from ..library.chat import permission
 from bot import config, globals
 import datetime
 import random
 
+@permission('moderator')
 def commandPyramid(args):
     if (not args.database.hasFeature(args.chat.channel, 'modpyramid') and
         not args.permissions.broadcaster):
@@ -36,6 +38,7 @@ def commandPyramid(args):
     args.chat.sendMulipleMessages(messages, 2)
     return True
 
+@permission('moderator')
 def commandRPyramid(args):
     if (not args.database.hasFeature(args.chat.channel, 'modpyramid') and
         not args.permissions.broadcaster):
@@ -74,6 +77,7 @@ def commandRPyramid(args):
     args.chat.sendMulipleMessages(messages, 2)
     return True
 
+@permission('moderator')
 def commandPyramidLong(args):
     if (not args.database.hasFeature(chat.channel, 'modpyramid') and
         not args.permissions.broadcaster):

@@ -1,6 +1,8 @@
 ﻿from ...api import oauth, twitch
+from ..library.chat import permission
 import threading
 
+@permission('moderator')
 def commandStatus(args):
     if (not args.permissions.broadcaster and
         args.database.hasFeature(args.chat.channel, 'gamestatusbroadcaster')):
@@ -22,6 +24,7 @@ def commandStatus(args):
     args.chat.sendMessage(msg)
     return True
 
+@permission('moderator')
 def commandGame(args):
     if (not args.permissions.broadcaster and
         args.database.hasFeature(args.chat.channel, 'gamestatusbroadcaster')):
@@ -53,6 +56,7 @@ def commandGame(args):
     args.chat.sendMessage(msg)
     return True
 
+@permission('moderator')
 def commandPurge(args):
     if args.permissions.chatModerator and len(args.message) > 1:
         args.chat.sendMessage('.timeout ' + args.message[1] + ' 1')

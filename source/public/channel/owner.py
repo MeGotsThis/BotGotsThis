@@ -1,14 +1,19 @@
 ﻿from bot import config, globals
 from ..library import channel, exit, managebot, send
+from ..library.chat import permission, ownerChannel
 import datetime
 import json
 import sys
 import time
 
+@ownerChannel
+@permission('owner')
 def commandExit(args):
     exit.botExit(send.channel(args.chat))
     return True
 
+@ownerChannel
+@permission('owner')
 def commandSay(args):
     if len(args.message) < 3:
         return False
@@ -17,6 +22,8 @@ def commandSay(args):
                        args.message[2:])
     return True
 
+@ownerChannel
+@permission('admin')
 def commandJoin(args):
     if len(args.message) < 2:
         return False
@@ -25,6 +32,8 @@ def commandJoin(args):
                     send.channel(args.chat))
     return True
 
+@ownerChannel
+@permission('admin')
 def commandPart(args):
     if len(args.message) < 2:
         return False
@@ -32,10 +41,14 @@ def commandPart(args):
     channel.botPart(args.message.lower[1], send.channel(args.chat))
     return True
 
+@ownerChannel
+@permission('admin')
 def commandEmptyAll(args):
     channel.botEmptyAll(send.channel(args.chat))
     return True
 
+@ownerChannel
+@permission('admin')
 def commandEmpty(args):
     if len(args.message) < 2:
         return False
@@ -43,6 +56,8 @@ def commandEmpty(args):
     channel.botEmpty(args.message.lower[1], send.channel(args.chat))
     return True
 
+@ownerChannel
+@permission('owner')
 def commandManageBot(args):
     if len(args.message) < 2:
         return False

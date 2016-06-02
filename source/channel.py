@@ -43,25 +43,16 @@ def threadParse(chat, tags, nick, message, timestamp):
                 if complete:
                     break
             if not complete and message.command in commandList.commands:
-                commInfo = commandList.commands[message.command]
-                hasPerm = True
-                if commInfo[1] is not None:
-                    permissionSet = commInfo[1].split('+')
-                    for perm in permissionSet:
-                        hasPerm = hasPerm and permissions[perm]
-                if hasPerm and commInfo[0] is not None:
-                    complete = commInfo[0](arguments)
+                command = commandList.commands[message.command]
+                if command is not None:
+                    complete = command(arguments)
             if not complete:
                 for comm in commandList.commandsStartWith:
                     if message.command.startswith(comm):
-                        commInfo = commandList.commandsStartWith[comm]
+                        command = commandList.commandsStartWith[comm]
                         hasPerm = True
-                        if commInfo[1] is not None:
-                            permissionSet = commInfo[1].split('+')
-                            for perm in permissionSet:
-                                hasPerm = hasPerm and permissions[perm]
-                        if hasPerm and commInfo[0] is not None:
-                            complete = commInfo[0](arguments)
+                        if command is not None:
+                            complete = command(arguments)
                             if complete:
                                 break
             if not complete:

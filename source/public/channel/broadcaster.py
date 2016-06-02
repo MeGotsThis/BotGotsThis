@@ -1,30 +1,37 @@
 ﻿from ...api import twitch
 from ..library import broadcaster, send
+from ..library.chat import permission, ownerChannel
 import datetime
 import email.utils
 import json
 import time
 
+@permission('broadcaster')
 def commandHello(args):
     args.chat.sendMessage('Hello Kappa')
     return True
 
+@ownerChannel
 def commandCome(args):
     broadcaster.botCome(args.database, args.nick, send.channel(args.chat))
     return True
 
+@permission('broadcaster')
 def commandLeave(args):
     return broadcaster.botLeave(args.chat.channel, send.channel(args.chat))
 
+@permission('broadcaster')
 def commandEmpty(args):
     broadcaster.botEmpty(args.chat.channel, send.channel(args.chat))
     return True
 
+@ownerChannel
 def commandAutoJoin(args):
     broadcaster.botAutoJoin(args.database, args.nick, send.channel(args.chat),
                             args.message)
     return True
 
+@permission('broacaster')
 def commandSetTimeoutLevel(args):
     broadcaster.botSetTimeoutLevel(args.database, args.chat.channel,
                                    send.channel(args.chat), args.message)
