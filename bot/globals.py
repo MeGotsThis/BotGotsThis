@@ -7,7 +7,6 @@ import traceback
 running = True
 
 # Import some necessary libraries.
-messaging = None
 sockets = None
 
 join = None

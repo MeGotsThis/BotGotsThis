@@ -32,6 +32,8 @@ class SocketsThread(threading.Thread):
         isActive = lambda s: s.socket
         for socketConnection in filterfalse(isActive, self._socketConnections):
             socketConnection.connect()
+        for socketConnection in filter(isActive, self._socketConnections):
+            socketConnection.queueMessages()
         connections = list(filter(isActive, self._socketConnections))
         if connections:
             read, write, exceptional = select.select(

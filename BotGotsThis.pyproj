@@ -47,7 +47,6 @@
     <Compile Include="bot\main.py" />
     <Compile Include="bot\thread\background.py" />
     <Compile Include="bot\thread\join.py" />
-    <Compile Include="bot\thread\message.py" />
     <Compile Include="bot\thread\socket.py" />
     <Compile Include="bot\thread\__init__.py" />
     <Compile Include="bot\twitchmessage\ircmessage.py" />

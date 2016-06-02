@@ -149,10 +149,10 @@ class Channel:
         self._socket = None
     
     def sendMessage(self, msg, priority=1):
-        globals.messaging.queueMessage(self, msg, priority)
+        self._socket.sendChat(self, msg, priority)
     
     def sendMulipleMessages(self, messages, priority=1):
-        globals.messaging.queueMultipleMessages(self, messages, priority)
+        self._socket.sendChat(self, messages, priority)
     
     def updateFfzEmotes(self):
         self._ffzCache = datetime.datetime.utcnow()

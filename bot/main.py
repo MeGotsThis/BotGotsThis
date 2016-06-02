@@ -4,7 +4,6 @@ from .channel import Channel
 from .data.socket import Socket
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
-from .thread.message import MessageQueue
 from .thread.socket import SocketsThread
 from source.database.factory import getDatabase
 import source.private.autoload as privateAuto
@@ -19,7 +18,6 @@ import traceback
 
 def main(argv):
     print('{time} Starting'.format(time=datetime.datetime.utcnow()))
-    globals.messaging = MessageQueue(name='Message Queue')
     globals.sockets = SocketsThread(name='Sockets Thread')
 
     globals.clusters['aws'] = Socket(
@@ -34,7 +32,6 @@ def main(argv):
 
     # Start the Threads
     globals.sockets.start()
-    globals.messaging.start()
     globals.background.start()
     globals.join.start()
 
@@ -57,7 +54,7 @@ def main(argv):
                 utils.joinChannel(channel.broadcaster, channel.priority,
                                   channel.cluster)
     
-        globals.messaging.join()
+        globals.sockets.join()
         return 0
     except:
         utils.logException()
