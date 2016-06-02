@@ -14,7 +14,9 @@ _logCommandPerChannel = [
     'CLEARCHAT', 'ROOMSTATE',
     ]
 
-def parseMessage(socket, ircmsg, now):
+def parseMessage(socket, ircmsg, timestamp):
+    files = []
+    logs = []
     channels = socket.channels
     message = IrcMessage.fromMessage(ircmsg)
     if message.command == 'PRIVMSG':
@@ -23,25 +25,26 @@ def parseMessage(socket, ircmsg, now):
         where = message.params.middle
         msg = message.params.trailing
         if where[0] == '#':
-            utils.logIrcMessage(where + '#msg.log', nick + ': ' + msg, now)
+            files.append(where + '#msg.log')
+            logs.append(nick + ': ' + msg)
         if config.botnick in msg.lower().split():
-            utils.logIrcMessage(config.botnick + '-Mentions.log',
-                                nick + ' -> ' + where + ': ' + msg, now)
+            files.append(config.botnick + '-Mentions.log')
+            logs.append(nick + ' -> ' + where + ': ' + msg)
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
-            channel.parse(chan, tags, nick, msg, now)
+            channel.parse(chan, tags, nick, msg, timestamp)
         
     if message.command == 'WHISPER':
         tags = message.tags
         nick = message.prefix.nick
         msg = message.params.trailing
-        utils.logIrcMessage('@' + nick + '@whisper.log',
-                            nick + ': ' + msg, now)
-        utils.logIrcMessage(config.botnick + '-All Whisper.log',
-                            nick + ' -> ' + config.botnick + ': ' + msg, now)
-        utils.logIrcMessage(config.botnick + '-Raw Whisper.log',
-                            '< ' + ircmsg, now)
-        whisper.parse(tags, nick, msg, now)
+        files.append('@' + nick + '@whisper.log')
+        logs.append(nick + ': ' + msg)
+        files.append(config.botnick + '-All Whisper.log')
+        logs.append(nick + ' -> ' + config.botnick + ': ' + msg)
+        files.append(config.botnick + '-Raw Whisper.log')
+        logs.append('< ' + ircmsg)
+        whisper.parse(tags, nick, msg, timestamp)
         
     if message.command == 'NOTICE':
         nick = None
@@ -53,7 +56,8 @@ def parseMessage(socket, ircmsg, now):
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
         if where[0] == '#':
-            utils.logIrcMessage(where + '#notice.log', msg, now)
+            files.append(where + '#notice.log')
+            logs.append(msg)
         notice.parse(chan, nick, msg)
         
     if message.command == 'CLEARCHAT':
@@ -65,21 +69,23 @@ def parseMessage(socket, ircmsg, now):
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
         if where[0] == '#':
-            who = nick if nick else '#chat'
-            utils.logIrcMessage(where + '#clearchat.log', who, now)
+            files.append(where + '#clearchat.log')
+            logs.append(nick if nick else '#chat')
         clearchat.parse(chan, nick)
     
     if message.command == 'ROOMSTATE':
         msg = message.params.trailing
         where = message.params.middle
         if where[0] == '#':
-            utils.logIrcMessage(where + '#roomstate.log', str(message), now)
+            files.append(where + '#roomstate.log')
+            logs.append(str(message))
     
     if message.command == 'HOSTTARGET':
         msg = message.params.trailing
         where = message.params.middle
         if where[0] == '#':
-            utils.logIrcMessage(where + '#hosttarget.log', str(message), now)
+            files.append(where + '#hosttarget.log')
+            logs.append(str(message))
     
     if message.command == 'MODE':
         where, mode, nick = message.params.middle.split()
@@ -99,14 +105,16 @@ def parseMessage(socket, ircmsg, now):
         where = message.params.middle.split()[-1]
         nicks = message.params.trailing.split(' ')
         if where[0] == '#':
-            utils.logIrcMessage(where + '#full.log', '< ' + ircmsg, now)
+            files.append(where + '#full.log')
+            logs.append('< ' + ircmsg)
             if where[1:] in channels:
                 channels[where[1:]].ircUsers.update(nicks)
         
     if message.command == 366:
         where = message.params.middle.split()[-1]
         if where[0] == '#':
-            utils.logIrcMessage(where + '#full.log', '< ' + ircmsg, now)
+            files.append(where + '#full.log')
+            logs.append('< ' + ircmsg)
         
     if message.command == 'PART':
         where = message.params.middle
@@ -128,7 +136,8 @@ def parseMessage(socket, ircmsg, now):
     if message.command == 'USERSTATE':
         where = message.params.middle
         if where[0] == '#':
-            utils.logIrcMessage(where + '#userstate.log', str(message), now)
+            files.append(where + '#userstate.log')
+            logs.append(str(message))
         if where[0] == '#' and where[1:] in channels:
             chan = channels[where[1:]]
             tags = message.tags
@@ -137,6 +146,10 @@ def parseMessage(socket, ircmsg, now):
     if message.command in _logCommandPerChannel:
         where = message.params.middle.split(None, 1)[0]
         if where[0] == '#':
-            utils.logIrcMessage(where + '#full.log', '< ' + ircmsg, now)
-
-    ircmessage.parseMessage(socket, ircmsg, now)
+            files.append(where + '#full.log')
+            logs.append('< ' + ircmsg)
+    
+    for file, log in zip(files, logs):
+        utils.logIrcMessage(file, log, timestamp)
+    
+    ircmessage.parseMessage(socket, ircmsg, timestamp)
