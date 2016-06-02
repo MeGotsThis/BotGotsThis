@@ -22,9 +22,9 @@ def parse(tags, nick, rawMessage, timestamp):
     name = '{nick}-{command}-{time}'.format(
         nick=nick, command=message.command, time=time.time())
     params = tags, nick, message, timestamp
-    threading.Thread(target=threadParse, args=params, name=name).start()
+    threading.Thread(target=whisperCommand, args=params, name=name).start()
     
-def threadParse(tags, nick, message, timestamp):
+def whisperCommand(tags, nick, message, timestamp):
     if False: # Hints for Intellisense
         nick = str()
         message = Message('')
@@ -36,16 +36,15 @@ def threadParse(tags, nick, message, timestamp):
         with getDatabase() as database:
             arguments = WhisperCommandArgs(database, nick, message,
                                            permissions, timestamp)
-            if message.command in whisper.commands:
-                commInfo = whisper.commands[message.command]
-                hasPerm = True
-                if commInfo[1] is not None:
-                    permissionSet = commInfo[1].split('+')
-                    for perm in permissionSet:
-                        hasPerm = hasPerm and permissions[perm]
-                if hasPerm and commInfo[0] is not None:
-                    complete = commInfo[0](arguments)
+            for command in commandsToProcess(message.command):
+                if command(arguments):
+                    return
     except:
         extra = 'From: {nick}\nMessage: {message}'.format(
             nick=nick, message=message)
         utils.logException(extra, timestamp)
+
+def commandsToProcess(command):
+    if command in whisper.commands:
+        if whisper.commands[command] is not None:
+            yield whisper.commands[command]
