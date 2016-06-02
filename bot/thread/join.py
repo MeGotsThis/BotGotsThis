@@ -57,8 +57,7 @@ class JoinThread(threading.Thread):
             if chat.socket is not None:
                 ircCommand = IrcMessage(
                     None, None, 'JOIN', IrcMessageParams(chat.ircChannel))
-                params = ircCommand, chat.ircChannel
-                chat.socket.queueWrite(*params)
+                chat.socket.queueWrite(ircCommand, channel=chat)
                 self._channelJoined.add(chat.channel)
     
     def addSocket(self, socketThread):

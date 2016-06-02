@@ -106,7 +106,7 @@ class Socket:
     def fileno(self):
         return self._socket and self._socket.fileno()
 
-    def write(self, command, channel=None, whisper=None):
+    def write(self, command, *, channel=None, whisper=None):
         if not isinstance(command, IrcMessage):
             raise TypeError()
         if self._socket is None:
@@ -119,18 +119,20 @@ class Socket:
             if command.command == 'PING':
                 self.lastSentPing = datetime.utcnow()
             if command.command == 'JOIN':
-                globals.channels[channel[1:]].onJoin()
+                channel.onJoin()
                 globals.join.recordJoin()
                 print('{time} Joined {channel} on {socket}'.format(
-                    time=timestamp, channel=channel[1:], socket=self.name))
-            self._logWrite(command, channel, whisper, timestamp)
+                    time=timestamp, channel=channel.channel, socket=self.name))
+            self._logWrite(command, channel=channel, whisper=whisper,
+                           timestamp=timestamp)
         except socket.error:
             utils.logException()
             self.disconnect()
     
     def flushWrite(self):
         while self.writeQueue:
-            self.write(*self.writeQueue.popleft())
+            item = self.writeQueue.popleft()
+            self.write(*item[0], **item[1])
     
     def read(self):
         ircmsgs = lastRecv = bytes(self._socket.recv(2048))
@@ -172,36 +174,54 @@ class Socket:
                                             server=self.name)
         utils.logIrcMessage(file, '< ' + message)
     
-    def _logWrite(self, command, channel=None, whisper=None, timestamp=None):
+    def _logWrite(self, command, *,
+                  channel=None, whisper=None, timestamp=None):
         timestamp = timestamp or datetime.utcnow()
         if command.command == 'PASS':
             command = IrcMessage(command='PASS')
-        file = config.botnick + '-' + self.name + '.log'
-        utils.logIrcMessage(file, '> ' + str(command), timestamp)
+        files = []
+        logs = []
+        files.append('{bot}-{socket}.log'.format(bot=config.botnick,
+                                                 socket=self.name))
+        logs.append('> ' + str(command))
         if whisper:
-            file = '@' + whisper[0] + '@whisper.log'
-            log = config.botnick + ': ' + whisper[1]
-            utils.logIrcMessage(file, log, timestamp)
-            file = config.botnick + '-All Whisper.log'
-            log = config.botnick + ' -> ' +  whisper[0] + ': ' + whisper[1]
-            utils.logIrcMessage(file, log, timestamp)
-            file = config.botnick + '-Raw Whisper.log'
-            utils.logIrcMessage(file, '> ' + str(command), timestamp)
+            files.append('@{nick}@whisper.log'.format(nick=whisper.nick))
+            logs.append('{bot}: {message}'.format(bot=config.botnick,
+                                                  message=whisper.message))
+            files.append('{bot}-All Whisper.log'.format(bot=config.botnick))
+            logs.append(
+                '{bot} -> {nick}: {message}'.format(
+                    bot=config.botnick, nick=whisper.nick,
+                    message=whisper.message))
+            files.append('{bot}-Raw Whisper.log'.format(bot=config.botnick))
+            logs.append('> ' + str(command))
         elif channel:
-            file = channel + '#full.log'
-            utils.logIrcMessage(file, '> ' + str(command), timestamp)
+            files.append(
+                '{channel}#full.log'.format(channel=channel.ircChannel))
+            logs.append('> ' + str(command))
             if command.command == 'PRIVMSG':
-                file = channel + '#msg.log'
-                log = config.botnick + ': ' + command.params.trailing
-                utils.logIrcMessage(file, log, timestamp)
+                files.append(
+                    '{channel}#msg.log'.format(channel=channel.ircChannel))
+                logs.append(
+                    '{bot}: {message}'.format(bot=config.botnick,
+                                              message=command.params.trailing))
+        for file, log in zip(files, logs):
+            utils.logIrcMessage(file, log, timestamp)
     
-    def queueWrite(self, command, channel=None, whisper=None, prepend=False):
+    def queueWrite(self, command, *,
+                   channel=None, whisper=None, prepend=False):
         if not isinstance(command, IrcMessage):
             raise TypeError()
+        kwargs = {}
+        if channel:
+            kwargs['channel'] = channel
+        if whisper:
+            kwargs['whisper'] = whisper
+        item = (command,), kwargs
         if prepend:
-            self._writeQueue.appendleft((command, channel, whisper))
+            self.writeQueue.appendleft(item)
         else:
-            self._writeQueue.append((command, channel, whisper))
+            self.writeQueue.append(item)
     
     def joinChannel(self, channel):
         with self._channelsLock:
@@ -340,10 +360,10 @@ class Socket:
                                '.w {nick} {message}'.format(
                                    nick=message.nick,
                                    message=message.message))),
-                None, message)
+                whisper=message)
         for message in iter(self.popChat, None):
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
                            IrcMessageParams(message.channel.ircChannel,
                                             message.message)),
-                message.channel.ircChannel)
+                channel=message.channel)
