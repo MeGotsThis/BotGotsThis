@@ -1,14 +1,18 @@
 ﻿from ..library import channel, exit, managebot, send
+from ..library.whisper import permission
 from bot import globals
 
+@permission('owner')
 def commandHello(args):
     globals.messaging.queueWhisper(args.nick, 'Hello Kappa')
     return True
 
+@permission('owner')
 def commandExit(args):
     exit.botExit(send.whisper(args.nick))
     return True
 
+@permission('owner')
 def commandSay(args):
     if args.message.lower[1] in globals.channels:
         channel.botSay(args.database, args.nick, args.message.lower[1],
@@ -40,6 +44,7 @@ def commandEmpty(args):
     channel.botEmpty(args.message.lower[1], send.whisper(args.nick))
     return True
 
+@permission('owner')
 def commandManageBot(args):
     if len(args.message) < 2:
         return False
