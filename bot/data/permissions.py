@@ -43,14 +43,14 @@ class ChatPermissionSet:
     def twitchStaff(self):
         if self._isTwitchStaff is None:
             self._isTwitchStaff = self._userType == typeTwitchStaff
-            self._isGlobalMod = self.owner or self._isGlobalMod
+            self._isTwitchStaff = self.owner or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
     def twitchAdmin(self):
         if self._isTwitchAdmin is None:
             self._isTwitchAdmin = self._userType == typeTwitchAdmin
-            self._isGlobalMod = self.twitchStaff or self._isGlobalMod
+            self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
     
     @property
@@ -148,14 +148,14 @@ class WhisperPermissionSet:
     def twitchStaff(self):
         if self._isTwitchStaff is None:
             self._isTwitchStaff = self._userType == typeTwitchStaff
-            self._isGlobalMod = self.owner or self._isGlobalMod
+            self._isTwitchStaff = self.owner or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
     def twitchAdmin(self):
         if self._isTwitchAdmin is None:
             self._isTwitchAdmin = self._userType == typeTwitchAdmin
-            self._isGlobalMod = self.twitchStaff or self._isGlobalMod
+            self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
     
     @property
