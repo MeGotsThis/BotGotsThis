@@ -9,7 +9,7 @@ import source.ircmessage
 import threading
 
 ChatMessage = namedtuple('ChatMessage', ['channel', 'message'])
-WhisperMessage = namedtuple('WhisperMessage', ['nick', 'whisper'])
+WhisperMessage = namedtuple('WhisperMessage', ['nick', 'message'])
 
 disallowedCommands = (
     '.ignore',
@@ -276,6 +276,10 @@ class Socket:
                 self.sendWhisper(nick, *whispers[nick])
     
     def sendWhisper(self, nick, messages, priority=1):
+        if isinstance(messages, str):
+            messages = messages,
+        elif not isinstance(messages, Iterable):
+            raise TypeError()
         with self._queueLock:
             for message in messages:
                 self._whisperQueue.append(WhisperMessage(nick, message))
@@ -335,7 +339,7 @@ class Socket:
     
     def popWhisper(self):
         if self._whisperQueue and len(self._whisperSent) < config.modLimit:
-            self._whisperSent = datetime.utcnow()
+            self._whisperSent.append(datetime.utcnow())
             return self._whisperQueue.popleft()
         return None
     

@@ -1,10 +1,10 @@
 ﻿from ..library import channel, exit, managebot, send
 from ..library.whisper import permission
-from bot import globals
+from bot import globals, utils
 
 @permission('owner')
 def commandHello(args):
-    globals.messaging.queueWhisper(args.nick, 'Hello Kappa')
+    utils.whisper(args.nick, 'Hello Kappa')
     return True
 
 @permission('owner')

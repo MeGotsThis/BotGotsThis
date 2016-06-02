@@ -17,6 +17,8 @@ background = None
 clusters = {
     'aws': None,
     }
+whisperCluster = 'aws'
+
 channels = {}
 displayName = config.botnick
 isTwitchTurbo = False

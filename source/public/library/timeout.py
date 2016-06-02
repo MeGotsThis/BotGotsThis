@@ -1,4 +1,4 @@
-from bot import config, globals
+from bot import config, utils
 from collections import defaultdict
 from contextlib import suppress
 import datetime
@@ -37,7 +37,7 @@ def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
                      message, reason)
     if reason is not None:
         lengthText = '{} seconds'.format(length) if length else 'Banned'
-        globals.messaging.queueWhisper(
+        utils.whisper(
             user,
             '{reason} ({length})'.format(reason=reason, length=lengthText))
 

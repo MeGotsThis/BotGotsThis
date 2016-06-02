@@ -1,4 +1,4 @@
-﻿from bot import config
+﻿from bot import config, globals
 from .channel import Channel
 from .globals import channels, clusters
 import datetime
@@ -23,6 +23,9 @@ def partChannel(channel):
     if channel in channels:
         channels[channel].part()
         del channels[channel]
+
+def whisper(nick, message):
+    globals.clusters[globals.whisperCluster].sendWhisper(nick, message)
 
 ENSURE_CLUSTER_UNKNOWN = int(-3)
 ENSURE_CLUSTER_NONE = int(-2)
