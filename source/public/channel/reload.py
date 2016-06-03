@@ -1,20 +1,20 @@
-﻿from ..library import reload, send
-from ..library.chat import permission, ownerChannel
+﻿from ..library import reload
+from ..library.chat import permission, ownerChannel, send
 
 @ownerChannel
 @permission('owner')
 def commandReload(args):
-    reload.botReload(send.channel(args.chat))
+    reload.botReload(send(args.chat))
     return True
 
 @ownerChannel
 @permission('owner')
 def commandReloadCommands(args):
-    reload.botReloadCommands(send.channel(args.chat))
+    reload.botReloadCommands(send(args.chat))
     return True
 
 @ownerChannel
 @permission('owner')
 def commandReloadConfig(args):
-    reload.botReloadConfig(send.channel(args.chat))
+    reload.botReloadConfig(send(args.chat))
     return True

@@ -1,6 +1,6 @@
 ﻿from ...api import twitch
-from ..library import broadcaster, send
-from ..library.chat import cooldown, permission, ownerChannel
+from ..library import broadcaster
+from ..library.chat import cooldown, permission, ownerChannel, send
 from datetime import datetime, timedelta
 import email.utils
 import json
@@ -13,28 +13,28 @@ def commandHello(args):
 
 @ownerChannel
 def commandCome(args):
-    broadcaster.botCome(args.database, args.nick, send.channel(args.chat))
+    broadcaster.botCome(args.database, args.nick, send(args.chat))
     return True
 
 @permission('broadcaster')
 def commandLeave(args):
-    return broadcaster.botLeave(args.chat.channel, send.channel(args.chat))
+    return broadcaster.botLeave(args.chat.channel, send(args.chat))
 
 @permission('broadcaster')
 def commandEmpty(args):
-    broadcaster.botEmpty(args.chat.channel, send.channel(args.chat))
+    broadcaster.botEmpty(args.chat.channel, send(args.chat))
     return True
 
 @ownerChannel
 def commandAutoJoin(args):
-    broadcaster.botAutoJoin(args.database, args.nick, send.channel(args.chat),
+    broadcaster.botAutoJoin(args.database, args.nick, send(args.chat),
                             args.message)
     return True
 
 @permission('broacaster')
 def commandSetTimeoutLevel(args):
     broadcaster.botSetTimeoutLevel(args.database, args.chat.channel,
-                                   send.channel(args.chat), args.message)
+                                   send(args.chat), args.message)
     return True
 
 @cooldown(timedelta(seconds=60), 'uptime')

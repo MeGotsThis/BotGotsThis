@@ -1,4 +1,8 @@
-from functools import wraps
+from bot import utils
+from functools import partial, wraps
+
+def send(nick):
+    return functools.partial(utils.whisper, nick)
 
 def permission(permission):
     def decorator(func):

@@ -1,6 +1,6 @@
 ﻿from bot import config, globals
-from ..library import channel, exit, managebot, send
-from ..library.chat import permission, ownerChannel
+from ..library import channel, exit, managebot
+from ..library.chat import permission, ownerChannel, send
 import datetime
 import json
 import sys
@@ -9,7 +9,7 @@ import time
 @ownerChannel
 @permission('owner')
 def commandExit(args):
-    exit.botExit(send.channel(args.chat))
+    exit.botExit(send(args.chat))
     return True
 
 @ownerChannel
@@ -28,8 +28,7 @@ def commandJoin(args):
     if len(args.message) < 2:
         return False
 
-    channel.botJoin(args.database, args.message.lower[1],
-                    send.channel(args.chat))
+    channel.botJoin(args.database, args.message.lower[1], send(args.chat))
     return True
 
 @ownerChannel
@@ -38,13 +37,13 @@ def commandPart(args):
     if len(args.message) < 2:
         return False
     
-    channel.botPart(args.message.lower[1], send.channel(args.chat))
+    channel.botPart(args.message.lower[1], send(args.chat))
     return True
 
 @ownerChannel
 @permission('admin')
 def commandEmptyAll(args):
-    channel.botEmptyAll(send.channel(args.chat))
+    channel.botEmptyAll(send(args.chat))
     return True
 
 @ownerChannel
@@ -53,7 +52,7 @@ def commandEmpty(args):
     if len(args.message) < 2:
         return False
     
-    channel.botEmpty(args.message.lower[1], send.channel(args.chat))
+    channel.botEmpty(args.message.lower[1], send(args.chat))
     return True
 
 @ownerChannel
@@ -62,5 +61,5 @@ def commandManageBot(args):
     if len(args.message) < 2:
         return False
     
-    return managebot.botManageBot(args.database, send.channel(args.chat),
-                                  args.nick, args.message)
+    return managebot.botManageBot(args.database, send(args.chat), args.nick,
+                                  args.message)

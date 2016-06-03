@@ -1,19 +1,20 @@
-﻿from ..library import broadcaster, send
+﻿from ..library import broadcaster
+from ..library.whisper import send
 from bot import globals
 
 def commandCome(args):
-    broadcaster.botCome(args.database, args.nick, send.whisper(args.nick))
+    broadcaster.botCome(args.database, args.nick, send(args.nick))
     return True
 
 def commandLeave(args):
-    return broadcaster.botLeave(args.nick, send.whisper(args.nick))
+    return broadcaster.botLeave(args.nick, send(args.nick))
 
 def commandEmpty(args):
-    broadcaster.botEmpty(args.nick, send.whisper(args.nick))
+    broadcaster.botEmpty(args.nick, send(args.nick))
     return True
 
 def commandAutoJoin(args):
-    broadcaster.botAutoJoin(args.database, args.nick, send.whisper(args.nick),
+    broadcaster.botAutoJoin(args.database, args.nick, send(args.nick),
                             args.message)
     return True
 

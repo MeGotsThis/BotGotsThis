@@ -1,5 +1,8 @@
 from functools import wraps
 
+def send(chat):
+    return chat.sendMessage
+
 def permission(permission):
     def decorator(func):
         @wraps(func)
