@@ -1,9 +1,9 @@
 from bot import config
 
-typeTwitchStaff = ['staff']
-typeTwitchAdmin = ['staff', 'admin']
-typeGlobalModerator = ['staff', 'admin', 'global_mod']
-typeModerator = ['staff', 'admin', 'global_mod', 'mod']
+typeTwitchStaff = {'staff'}
+typeTwitchAdmin = {'staff', 'admin'}
+typeGlobalModerator = {'staff', 'admin', 'global_mod'}
+typeModerator = {'staff', 'admin', 'global_mod', 'mod'}
 
 class ChatPermissionSet:
     def __init__(self, tags, user, channel):
@@ -42,21 +42,21 @@ class ChatPermissionSet:
     @property
     def twitchStaff(self):
         if self._isTwitchStaff is None:
-            self._isTwitchStaff = self._userType == typeTwitchStaff
+            self._isTwitchStaff = self._userType in typeTwitchStaff
             self._isTwitchStaff = self.owner or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
     def twitchAdmin(self):
         if self._isTwitchAdmin is None:
-            self._isTwitchAdmin = self._userType == typeTwitchAdmin
+            self._isTwitchAdmin = self._userType in typeTwitchAdmin
             self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
     
     @property
     def globalModerator(self):
         if self._isGlobalMod is None:
-            self._isGlobalMod = self._userType == typeGlobalModerator
+            self._isGlobalMod = self._userType in typeGlobalModerator
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod
     
@@ -70,7 +70,7 @@ class ChatPermissionSet:
     @property
     def moderator(self):
         if self._isModerator is None:
-            self._isModerator = self._userType == typeModerator
+            self._isModerator = self._userType in typeModerator
             self._isModerator = self.broadcaster or self._isModerator
         return self._isModerator
     
@@ -147,21 +147,21 @@ class WhisperPermissionSet:
     @property
     def twitchStaff(self):
         if self._isTwitchStaff is None:
-            self._isTwitchStaff = self._userType == typeTwitchStaff
+            self._isTwitchStaff = self._userType in typeTwitchStaff
             self._isTwitchStaff = self.owner or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
     def twitchAdmin(self):
         if self._isTwitchAdmin is None:
-            self._isTwitchAdmin = self._userType == typeTwitchAdmin
+            self._isTwitchAdmin = self._userType in typeTwitchAdmin
             self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
     
     @property
     def globalModerator(self):
         if self._isGlobalMod is None:
-            self._isGlobalMod = self._userType == typeGlobalModerator
+            self._isGlobalMod = self._userType in typeGlobalModerator
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod
     
