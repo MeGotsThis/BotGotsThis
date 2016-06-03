@@ -30,13 +30,12 @@ def commandWall(args):
         length = min(length, 5)
         rows = min(rows, 10)
         
-        currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
         if 'modWall' in args.chat.sessionData:
-            since = currentTime - args.chat.sessionData['modWall']
+            since = args.timestamp - args.chat.sessionData['modWall']
             if since < cooldown:
                 return False
-        args.chat.sessionData['modWall'] = currentTime
+        args.chat.sessionData['modWall'] = args.timestamp
     elif not args.permissions.globalModerator:
         length = min(length, 20)
         rows = min(rows, 500)
@@ -64,13 +63,12 @@ def commandWallLong(args):
     if not args.permissions.broadcaster:
         rows = min(rows, 10)
         
-        currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
         if 'modWall' in args.chat.sessionData:
-            since = currentTime - args.chat.sessionData['modWall']
+            since = args.timestamp - args.chat.sessionData['modWall']
             if since < cooldown:
                 return False
-        args.chat.sessionData['modWall'] = currentTime
+        args.chat.sessionData['modWall'] = args.timestamp
     elif not args.permissions.globalModerator:
         rows = min(rows, 500)
     spacer = '' if args.permissions.chatModerator else ' \ufeff'

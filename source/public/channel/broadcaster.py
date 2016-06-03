@@ -38,12 +38,11 @@ def commandSetTimeoutLevel(args):
     return True
 
 def commandUptime(args):
-    currentTime = datetime.datetime.utcnow()
     if 'uptime' in args.chat.sessionData:
-        since = currentTime - args.chat.sessionData['uptime']
+        since = args.timestamp - args.chat.sessionData['uptime']
         if since < datetime.timedelta(seconds=60):
             return False
-    args.chat.sessionData['uptime'] = currentTime
+    args.chat.sessionData['uptime'] = args.timestamp
 
     if not args.chat.isStreaming:
         args.chat.sendMessage(

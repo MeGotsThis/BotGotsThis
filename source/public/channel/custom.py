@@ -28,14 +28,13 @@ def customCommands(args):
                 level = perm
     
     if customMessage:
-        currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.customMessageCooldown)
         if (not args.permissions.moderator and
             'customCommand' in args.chat.sessionData):
-            since = currentTime - args.chat.sessionData['customCommand']
+            since = args.timestamp - args.chat.sessionData['customCommand']
             if since < cooldown:
                 return
-        args.chat.sessionData['customCommand'] = currentTime
+        args.chat.sessionData['customCommand'] = args.timestamp
 
         cooldown = datetime.timedelta(seconds=config.customMessageUserCooldown)
         if 'customUserCommand' not in args.chat.sessionData:
@@ -43,10 +42,10 @@ def customCommands(args):
                 lambda: datetime.datetime.min)
         if not args.permissions.moderator:
             oldTime = args.chat.sessionData['customUserCommand'][args.nick]
-            since = currentTime - oldTime
+            since = args.timestamp - oldTime
             if since < cooldown:
                 return
-        args.chat.sessionData['customUserCommand'][args.nick] = currentTime
+        args.chat.sessionData['customUserCommand'][args.nick] = args.timestamp
         
         final = []
         try:

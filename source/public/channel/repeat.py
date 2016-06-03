@@ -74,8 +74,8 @@ class MessageRepeater(threading.Thread):
     
     def run(self):
         while self._continueRunning():
-            if datetime.datetime.now() >= self._lastTime + self._duration:
-                self._lastTime = datetime.datetime.now()
+            if datetime.datetime.utcnow() >= self._lastTime + self._duration:
+                self._lastTime = datetime.datetime.utcnow()
                 self._chat.sendMessage(self._message)
                 if self._chat.isMod:
                     with getDatabase() as database:

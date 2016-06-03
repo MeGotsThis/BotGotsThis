@@ -24,13 +24,12 @@ def commandPyramid(args):
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
-        currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
         if 'modPyramid' in chat.sessionData:
-            since = currentTime - args.chat.sessionData['modPyramid']
+            since = args.timestamp - args.chat.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        args.chat.sessionData['modPyramid'] = currentTime
+        args.chat.sessionData['modPyramid'] = args.timestamp
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
@@ -57,13 +56,12 @@ def commandRPyramid(args):
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
-        currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
         if 'modPyramid' in args.chat.sessionData:
-            since = currentTime - args.chat.sessionData['modPyramid']
+            since = args.timestamp - args.chat.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        args.chat.sessionData['modPyramid'] = currentTime
+        args.chat.sessionData['modPyramid'] = args.timestamp
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     emoteIds = list(emotes.keys())
@@ -97,13 +95,12 @@ def commandPyramidLong(args):
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
-        currentTime = datetime.datetime.utcnow()
         cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
         if 'modPyramid' in chat.sessionData:
-            since = currentTime - args.chat.sessionData['modPyramid']
+            since = args.timestamp - args.chat.sessionData['modPyramid']
             if since < cooldown:
                 return False
-        args.chat.sessionData['modPyramid'] = currentTime
+        args.chat.sessionData['modPyramid'] = args.timestamp
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]

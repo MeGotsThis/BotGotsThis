@@ -146,8 +146,7 @@ class Socket:
                     continue
                 ircmsg = bytes(ircmsg).decode('utf-8')
                 self._logRead(ircmsg)
-                timestamp = datetime.utcnow()
-                source.ircmessage.parseMessage(self, ircmsg, timestamp)
+                source.ircmessage.parseMessage(self, ircmsg, datetime.utcnow())
         except error.LoginUnsuccessfulException:
             self.disconnect()
             globals.running = False

@@ -18,8 +18,7 @@ def manageAutoJoin(args):
                 rejoin = utils.ensureServer(*params)
                 
                 print('{time} Set Server for {channel}'.format(
-                    time=datetime.datetime.utcnow(),
-                    channel=channelRow['broadcaster']))
+                    time=args.timestamp, channel=channelRow['broadcaster']))
         args.send('Auto Join reload server complete')
         return True
     

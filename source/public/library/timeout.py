@@ -19,14 +19,14 @@ def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
             lambda: defaultdict(
                 lambda: (datetime.datetime.min, 0)))
     
-    utcnow = datetime.datetime.utcnow()
+    timestamp = datetime.datetime.utcnow()
     duration = datetime.timedelta(seconds=config.warningDuration)
-    if utcnow - chat.sessionData['timeouts'][module][user][0] >= duration:
+    if timestamp - chat.sessionData['timeouts'][module][user][0] >= duration:
         level = baseLevel
     else:
         prevLevel = chat.sessionData['timeouts'][module][user][1]
         level = min(max(baseLevel + 1, prevLevel + 1), 2)
-    chat.sessionData['timeouts'][module][user] = (utcnow, level)
+    chat.sessionData['timeouts'][module][user] = (timestamp, level)
     length = timeouts[level]
     if length:
         chat.sendMessage('.timeout {user} {length}'.format(
