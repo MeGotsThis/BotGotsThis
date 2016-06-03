@@ -1,6 +1,6 @@
 ﻿from source.api.ffz import getBroadcasterEmotes as getFfzEmotes
 from source.api.bttv import getBroadcasterEmotes as getBttvEmotes
-from . import globals
+from .. import globals
 import datetime
 
 class Channel:

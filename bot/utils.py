@@ -1,6 +1,6 @@
-﻿from bot import config, globals
-from .channel import Channel
+﻿from .data.channel import Channel
 from .globals import channels, clusters
+from bot import config, globals
 import datetime
 import os.path
 import sys

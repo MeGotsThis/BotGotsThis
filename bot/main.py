@@ -1,6 +1,6 @@
 ﻿# Import some necessary libraries.
 from . import config, globals, utils
-from .channel import Channel
+from .data.channel import Channel
 from .data.socket import Socket
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread

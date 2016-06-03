@@ -3,7 +3,6 @@ from .data.argument import ChatCommandArgs
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
 from bot import config, utils
-from bot.channel import Channel
 from lists import channel as commandList
 import datetime
 import sys
@@ -26,11 +25,6 @@ def parse(chat, tags, nick, rawMessage, timestamp):
     threading.Thread(target=chatCommand, args=params, name=name).start()
     
 def chatCommand(chat, tags, nick, message, timestamp):
-    if False: # Hints for Intellisense
-        chat = Channel('', None)
-        nick = str()
-        message = Message('')
-    
     try:
         permissions = ChatPermissionSet(tags, nick, chat)
     

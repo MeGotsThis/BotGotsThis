@@ -33,10 +33,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="bot\config.py" />
-    <Compile Include="bot\channel.py" />
+    <Compile Include="bot\data\channel.py" />
+    <Compile Include="bot\data\error.py" />
     <Compile Include="bot\data\socket.py" />
     <Compile Include="bot\data\__init__.py" />
-    <Compile Include="bot\error.py" />
     <Compile Include="bot\globals.py" />
     <Compile Include="bot\main.py" />
     <Compile Include="bot\thread\background.py" />
