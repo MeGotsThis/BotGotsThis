@@ -100,7 +100,7 @@ timezones = [
 
 _ini = configparser.ConfigParser()
 _ini.read('config.ini')
-_connection = sqlite3.connect(_ini['DATABASE']['timezonedb'],
+_connection = sqlite3.connect(_ini['TIMEZONEDB']['timezonedb'],
                               detect_types=True)
 _cursor = _connection.cursor()
 _cursor.execute('SELECT abbreviation, gmt_offset FROM timezone '

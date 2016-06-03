@@ -22,12 +22,6 @@ owner = str(ini['BOT']['owner']).lower()
 ini = configparser.ConfigParser()
 ini.read('config.ini')
 
-mainServer = str(ini['TWITCH']['mainServer'])
-mainPort = int(ini['TWITCH']['mainPort'])
-eventServer = str(ini['TWITCH']['eventServer'])
-eventPort = int(ini['TWITCH']['eventPort'])
-groupServer = str(ini['TWITCH']['groupServer'])
-groupPort = int(ini['TWITCH']['groupPort'])
 awsServer = str(ini['TWITCH']['awsServer'])
 awsPort = int(ini['TWITCH']['awsPort'])
 
@@ -36,8 +30,6 @@ modLimit = min(int(ini['BOT']['modLimit']), 100)
 modSpamLimit = min(int(ini['BOT']['modSpamLimit']), 100)
 publicLimit = min(int(ini['BOT']['publicLimit']), 20)
 publicDelay = float(ini['BOT']['publicDelay'])
-messagePerSecond = float(ini['BOT']['messagePerSecond'])
-messagePerSecond = messagePerSecond if messagePerSecond > 0 else 20
 
 customMessageCooldown = float(ini['BOT']['customMessageCooldown'])
 if customMessageCooldown <= 0:
