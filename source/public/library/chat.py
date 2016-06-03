@@ -6,21 +6,21 @@ def send(chat):
 def permission(permission):
     def decorator(func):
         @wraps(func)
-        def chatCommand(args):
+        def command(args):
             if not args.permissions[permission]:
                 return False
             return func(args)
-        return chatCommand
+        return command
     return decorator
 
 def not_permission(permission):
     def decorator(func):
         @wraps(func)
-        def chatCommand(args):
+        def command(args):
             if not args.permissions[permission]:
                 return False
             return func(args)
-        return chatCommand
+        return command
     return decorator
 
 def ownerChannel(func):
@@ -72,11 +72,11 @@ def inCooldown(args, duration, key, permission=None):
 def min_args(amount, _return=False, reason=None):
     def decorator(func):
         @wraps(func)
-        def chatCommand(args):
+        def command(args):
             if len(args.message) < amount:
                 if message:
                     args.chat.send(reason)
                 return _return
             return func(args)
-        return chatCommand
+        return command
     return decorator
