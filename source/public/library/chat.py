@@ -1,7 +1,7 @@
 from functools import wraps
 
 def send(chat):
-    return chat.sendMessage
+    return chat.send
 
 def permission(permission):
     def decorator(func):
