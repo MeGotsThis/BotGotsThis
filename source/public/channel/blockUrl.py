@@ -1,6 +1,7 @@
 ﻿from ...api import twitch
 from ...database import factory
 from ..library import timeout
+from ..library.chat import feature, not_permission, permission
 from bot import config, utils
 import datetime
 import http.client
@@ -16,14 +17,10 @@ twitchUrlRegex = (r"(?:https?:\/\/)?(?:[-a-zA-Z0-9@:%_\+~#=]+\.)+[a-z]{2,6}\b"
 #twitchUrlRegex = r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|" + twitchUrlRegex
 
 # This is for banning the users who post a URL with no follows
+@feature('nourlredirect')
+@not_permission('moderator')
+@permission('chatModerator')
 def filterNoUrlForBots(args):
-    if not args.permissions.chatModerator:
-        return False
-    if not args.database.hasFeature(args.chat.channel, 'nourlredirect'):
-        return False
-    
-    if args.permissions.moderator:
-        return False
     match = re.search(twitchUrlRegex, str(args.message))
     if match is not None:
         params = args.chat, args.nick, args.message, args.timestamp

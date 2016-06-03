@@ -1,17 +1,13 @@
 ﻿from ..library import custom, timeout
-from ..library.chat import permission, ownerChannel
+from ..library.chat import not_feature, permission, ownerChannel
 from bot import config
 from bot.data.argument import CustomFieldArgs, CustomProcessArgs
 from collections import defaultdict
 import datetime
 import lists.custom
 
+@not_feature('nocustom')
 def customCommands(args):
-    customMessage = None
-    
-    if args.database.hasFeature(args.chat.channel, 'nocustom'):
-        return False
-    
     commands = args.database.getChatCommands(args.chat.channel,
                                              args.message.command)
     hasTextConvert = args.database.hasFeature(args.chat.channel, 'textconvert')
@@ -19,6 +15,7 @@ def customCommands(args):
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
                       'globalMod', 'admin', 'staff', 'owner',]
     level = None
+    customMessage = None
     for perm in permissionsSet:
         if not perm or args.permissions[perm]:
             if perm in commands['#global']:
@@ -88,6 +85,7 @@ def customCommands(args):
 def commandGlobal(args):
     return processCommand(args)
 
+@not_feature('nocustom')
 @permission('moderator')
 def commandCommand(args):
     return processCommand(args)
@@ -105,10 +103,6 @@ def processCommand(args):
     if input.called == '!global':
         broadcaster = '#global'
     
-    if (args.database.hasFeature(args.chat.channel, 'nocustom') and
-        broadcaster != '#global'):
-        return False
-        
     msg = None
     if input.level == False:
         args.chat.sendMessage('{user} -> Invalid level, command '
