@@ -31,7 +31,7 @@ def commandPyramid(args):
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
-    args.chat.sendMulipleMessages(messages, -1)
+    args.chat.send(messages, -1)
     return True
 
 @permission('moderator')
@@ -66,7 +66,7 @@ def commandRPyramid(args):
             break
     messages = [' '.join(rep[0:i]) for i in range(1, count)]
     messages += [' '.join(rep[0:i]) for i in range(count, 0, -1)]
-    args.chat.sendMulipleMessages(messages, -1)
+    args.chat.send(messages, -1)
     return True
 
 @permission('moderator')
@@ -96,7 +96,7 @@ def commandPyramidLong(args):
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
     messages += [rep * i for i in range(count, 0, -1)]
-    args.chat.sendMulipleMessages(messages, -1)
+    args.chat.send(messages, -1)
     if args.permissions.chatModerator:
         timeout.recordTimeoutFromCommand(args.database, args.chat, args.nick,
                                          messages[len(messages)//2], 

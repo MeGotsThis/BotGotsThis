@@ -70,7 +70,7 @@ def customCommands(args):
             broadcaster, level, args.message.command, msgs)
         for process in lists.custom.postProcess:
             process(processArgument)
-        args.chat.sendMulipleMessages(msgs)
+        args.chat.send(msgs)
         if args.permissions.chatModerator:
             timeout.recordTimeoutFromCommand(args.database, args.chat,
                                              args.nick, msgs, args.message)
@@ -100,17 +100,17 @@ def processCommand(args):
     
     msg = None
     if input.level == False:
-        args.chat.sendMessage('{user} -> Invalid level, command '
-                              'ignored'.format(user=args.nick))
+        args.chat.send(
+            '{user} -> Invalid level, command ignored'.format(user=args.nick))
         return True
     if input.level:
         if input.level not in args.permissions:
-            args.chat.sendMessage('{user} -> Invalid level, command '
-                                  'ignored'.format(user=args.nick))
+            args.chat.send('{user} -> Invalid level, command '
+                           'ignored'.format(user=args.nick))
             return True
         elif not args.permissions[input.level]:
-            args.chat.sendMessage('{user} -> You do not have permission to '
-                                  'set that level'.format(user=args.nick))
+            args.chat.send('{user} -> You do not have permission to set that '
+                           'level'.format(user=args.nick))
             return True
     
     if (input.action in ['property'] and args.permissions.broadcaster
@@ -120,8 +120,8 @@ def processCommand(args):
             parts.append(None)
         prop, value = parts
         if prop not in custom.properties:
-            args.chat.sendMessage('{user} -> That property does not '
-                                  'exist'.format(user=args.nick))
+            args.chat.send('{user} -> That property does not '
+                           'exist'.format(user=args.nick))
             return True
         if args.database.processCustomCommandProperty(
                 broadcaster, input.level, input.command, prop, value):
@@ -132,8 +132,8 @@ def processCommand(args):
                        'of {value}')
         else:
             msg = '{command} with {property} could not be processed'
-        args.chat.sendMessage(
-            msg.format(command=input.command, property=prop, value=value))
+        args.chat.send(msg.format(command=input.command, property=prop,
+                                  value=value))
         return True
     elif input.action in ['add', 'insert', 'new']:
         if args.database.insertCustomCommand(
@@ -176,5 +176,5 @@ def processCommand(args):
                    'not exist')
     else:
         return False
-    args.chat.sendMessage(msg.format(command=input.command))
+    args.chat.send(msg.format(command=input.command))
     return True

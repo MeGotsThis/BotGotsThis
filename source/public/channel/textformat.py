@@ -6,7 +6,7 @@ from ..library.chat import feature, permission
 def commandFull(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToFullWidth(args.message.query))
+    args.chat.send(textformat.asciiToFullWidth(args.message.query))
     return True
 
 @feature('textconvert')
@@ -14,7 +14,7 @@ def commandFull(args):
 def commandParenthesized(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToParenthesized(args.message.query))
+    args.chat.send(textformat.asciiToParenthesized(args.message.query))
     return True
 
 @feature('textconvert')
@@ -22,7 +22,7 @@ def commandParenthesized(args):
 def commandCircled(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToCircled(args.message.query))
+    args.chat.send(textformat.asciiToCircled(args.message.query))
     return True
 
 @feature('textconvert')
@@ -30,7 +30,7 @@ def commandCircled(args):
 def commandSmallCaps(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToSmallCaps(args.message.query))
+    args.chat.send(textformat.asciiToSmallCaps(args.message.query))
     return True
 
 @feature('textconvert')
@@ -38,7 +38,7 @@ def commandSmallCaps(args):
 def commandUpsideDown(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToUpsideDown(args.message.query))
+    args.chat.send(textformat.asciiToUpsideDown(args.message.query))
     return True
 
 @feature('textconvert')
@@ -46,7 +46,7 @@ def commandUpsideDown(args):
 def commandSerifBold(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToSerifBold(args.message.query))
+    args.chat.send(textformat.asciiToSerifBold(args.message.query))
     return True
 
 @feature('textconvert')
@@ -54,7 +54,7 @@ def commandSerifBold(args):
 def commandSerifItalic(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToSerifItalic(args.message.query))
+    args.chat.send(textformat.asciiToSerifItalic(args.message.query))
     return True
 
 @feature('textconvert')
@@ -62,8 +62,7 @@ def commandSerifItalic(args):
 def commandSerifBoldItalic(args):
     if len(args.message) < 2:
         return False
-    msg = textformat.asciiToSerifBoldItalic(args.message.query)
-    args.chat.sendMessage(msg)
+    args.chat.send(textformat.asciiToSerifBoldItalic(args.message.query))
     return True
 
 @feature('textconvert')
@@ -71,7 +70,7 @@ def commandSerifBoldItalic(args):
 def commandSanSerif(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToSanSerif(args.message.query))
+    args.chat.send(textformat.asciiToSanSerif(args.message.query))
     return True
 
 @feature('textconvert')
@@ -79,7 +78,7 @@ def commandSanSerif(args):
 def commandSanSerifBold(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToSanSerifBold(args.message.query))
+    args.chat.send(textformat.asciiToSanSerifBold(args.message.query))
     return True
 
 @feature('textconvert')
@@ -87,8 +86,7 @@ def commandSanSerifBold(args):
 def commandSanSerifItalic(args):
     if len(args.message) < 2:
         return False
-    msg = textformat.asciiToSanSerifItalic(args.message.query)
-    args.chat.sendMessage(msg)
+    args.chat.send(textformat.asciiToSanSerifItalic(args.message.query))
     return True
 
 @feature('textconvert')
@@ -96,8 +94,7 @@ def commandSanSerifItalic(args):
 def commandSanSerifBoldItalic(args):
     if len(args.message) < 2:
         return False
-    msg = textformat.asciiToSanSerifBoldItalic(args.message.query)
-    args.chat.sendMessage(msg)
+    args.chat.send(textformat.asciiToSanSerifBoldItalic(args.message.query))
     return True
 
 @feature('textconvert')
@@ -105,7 +102,7 @@ def commandSanSerifBoldItalic(args):
 def commandScript(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToScript(args.message.query))
+    args.chat.send(textformat.asciiToScript(args.message.query))
     return True
 
 @feature('textconvert')
@@ -113,7 +110,7 @@ def commandScript(args):
 def commandScriptBold(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToScriptBold(args.message.query))
+    args.chat.send(textformat.asciiToScriptBold(args.message.query))
     return True
 
 @feature('textconvert')
@@ -121,7 +118,7 @@ def commandScriptBold(args):
 def commandFraktur(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToFraktur(args.message.query))
+    args.chat.send(textformat.asciiToFraktur(args.message.query))
     return True
 
 @feature('textconvert')
@@ -129,7 +126,7 @@ def commandFraktur(args):
 def commandFrakturBold(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToFrakturBold(args.message.query))
+    args.chat.send(textformat.asciiToFrakturBold(args.message.query))
     return True
 
 @feature('textconvert')
@@ -137,7 +134,7 @@ def commandFrakturBold(args):
 def commandMonospace(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToMonospace(args.message.query))
+    args.chat.send(textformat.asciiToMonospace(args.message.query))
     return True
 
 @feature('textconvert')
@@ -145,5 +142,5 @@ def commandMonospace(args):
 def commandDoubleStruck(args):
     if len(args.message) < 2:
         return False
-    args.chat.sendMessage(textformat.asciiToDoubleStruck(args.message.query))
+    args.chat.send(textformat.asciiToDoubleStruck(args.message.query))
     return True

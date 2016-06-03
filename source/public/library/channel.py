@@ -30,7 +30,7 @@ def botSay(db, nick, channel, message):
     if channel in globals.channels:
         timeout.recordTimeoutFromCommand(db, globals.channels[channel], nick,
                                          message, None, 'say')
-        globals.channels[channel].sendMessage(message)
+        globals.channels[channel].send(message)
 
 def botEmptyAll(send):
     globals.messaging.clearAllQueue()

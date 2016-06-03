@@ -148,10 +148,7 @@ class Channel:
         globals.messaging.clearQueue(self.channel)
         self._socket = None
     
-    def sendMessage(self, msg, priority=1):
-        self._socket.messaging.sendChat(self, msg, priority)
-    
-    def sendMulipleMessages(self, messages, priority=1):
+    def send(self, messages, priority=1):
         self._socket.messaging.sendChat(self, messages, priority)
     
     def updateFfzEmotes(self):

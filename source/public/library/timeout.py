@@ -29,10 +29,10 @@ def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
     chat.sessionData['timeouts'][module][user] = (timestamp, level)
     length = timeouts[level]
     if length:
-        chat.sendMessage('.timeout {user} {length}'.format(
-            user=user, length=length), 0)
+        chat.send(
+            '.timeout {user} {length}'.format(user=user, length=length), 0)
     else:
-        chat.sendMessage('.ban {user}'.format(user=user), 0)
+        chat.send('.ban {user}'.format(user=user), 0)
     db.recordTimeout(chat.channel, user, None, module, level, length,
                      message, reason)
     if reason is not None:

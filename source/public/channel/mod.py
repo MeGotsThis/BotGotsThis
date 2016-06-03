@@ -21,7 +21,7 @@ def commandStatus(args):
         msg = 'Channel Status set as: ' + args.message.query
     else:
         msg = 'Channel Status failed to set'
-    args.chat.sendMessage(msg)
+    args.chat.send(msg)
     return True
 
 @permission('moderator')
@@ -53,13 +53,13 @@ def commandGame(args):
             msg = 'Channel Game has been unset'
     else:
         msg = 'Channel Game failed to set'
-    args.chat.sendMessage(msg)
+    args.chat.send(msg)
     return True
 
 @permission('moderator')
 def commandPurge(args):
     if args.permissions.chatModerator and len(args.message) > 1:
-        args.chat.sendMessage('.timeout ' + args.message[1] + ' 1')
+        args.chat.send('.timeout ' + args.message[1] + ' 1')
         args.database.recordTimeout(
             args.chat.channel, args.message[1], args.nick, 'purge', None, 1,
             args.message, None)

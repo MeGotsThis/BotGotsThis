@@ -42,7 +42,7 @@ def commandWall(args):
     spacer = '' if args.permissions.chatModerator else ' \ufeff'
     messages = [rep * length + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
-    args.chat.sendMulipleMessages(messages, -1)
+    args.chat.send(messages, -1)
     return True
 
 @permission('moderator')
@@ -74,7 +74,7 @@ def commandWallLong(args):
     spacer = '' if args.permissions.chatModerator else ' \ufeff'
     messages = [args.message.query + ('' if i % 2 == 0 else spacer)
                 for i in range(rows)]
-    args.chat.sendMulipleMessages(messages, -1)
+    args.chat.send(messages, -1)
     if args.permissions.chatModerator:
         timeout.recordTimeoutFromCommand(args.database, args.chat, args.nick,
                                          messages[0], args.message, 'wall')

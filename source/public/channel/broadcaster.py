@@ -8,7 +8,7 @@ import time
 
 @permission('broadcaster')
 def commandHello(args):
-    args.chat.sendMessage('Hello Kappa')
+    args.chat.send('Hello Kappa')
     return True
 
 @ownerChannel
@@ -40,7 +40,7 @@ def commandSetTimeoutLevel(args):
 @cooldown(timedelta(seconds=60), 'uptime')
 def commandUptime(args):
     if not args.chat.isStreaming:
-        args.chat.sendMessage(
+        args.chat.send(
             '{channel} is currently not streaming or has not been for a '
             'minute'.format(channel=args.chat.channel))
         return True
@@ -58,12 +58,12 @@ def commandUptime(args):
             unixTimestamp = time.mktime(dateStruct)
             currentTime = datetime.fromtimestamp(unixTimestamp)
                 
-            args.chat.sendMessage(
+            args.chat.send(
                 'Uptime: {uptime}'.format(
                     uptime=currentTime - args.chat.streamingSince))
             return True
         raise ValueError()
     except (ValueError, KeyError) as e:
-        args.chat.sendMessage('Fail to get information from Twitch.tv')
+        args.chat.send('Fail to get information from Twitch.tv')
     except:
-        args.chat.sendMessage('Unknown Error')
+        args.chat.send('Unknown Error')
