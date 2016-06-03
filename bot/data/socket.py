@@ -2,26 +2,15 @@ from .. import config, globals, utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
 from .error import LoginUnsuccessfulException
-from collections import defaultdict, deque, namedtuple, OrderedDict
-from collections.abc import Iterable
+from .message import MessagingQueue
+from collections import deque
 from datetime import datetime, timedelta
 import socket
 import source.ircmessage
 import threading
 
-ChatMessage = namedtuple('ChatMessage', ['channel', 'message'])
-WhisperMessage = namedtuple('WhisperMessage', ['nick', 'message'])
-
-disallowedCommands = (
-    '.ignore',
-    '/ignore',
-    '.disconnect',
-    '/disconnect',
-    )
-
 class Socket:
     def __init__(self, name, server, port):
-        # Instance variables for the socket
         self._writeQueue = deque()
         self._name = name
         self._server = server
@@ -29,16 +18,9 @@ class Socket:
         self._channels = {}
         self._channelsLock = threading.Lock()
         self._socket = None
+        self._messaging = MessagingQueue()
         self.lastSentPing = datetime.max
         self.lastPing = datetime.max
-        # Instance variables for the message queuing
-        self._chatQueues = [[], [], []]
-        self._whisperQueue = deque()
-        self._queueLock = threading.Lock()
-        self._chatSent = []
-        self._whisperSent = []
-        self._lowQueueRecent = OrderedDict()
-        self._publicTime = defaultdict(lambda: datetime.min)
     
     @property
     def name(self):
@@ -56,6 +38,10 @@ class Socket:
     def channels(self):
         with self._channelsLock:
             return self._channels.copy()
+    
+    @property
+    def messaging(self):
+        return self._messaging
     
     @property
     def writeQueue(self):
@@ -236,127 +222,9 @@ class Socket:
         print('{time} Parted {channel}'.format(
             time=datetime.utcnow(), channel=channel.channel))
     
-    def processMessages(self):
-        msgDuration = timedelta(seconds=30.1)
-        self._timesSent = [t for t in self._timesSent
-                    if datetime.utcnow() - t <= msgDuration]
-        pass
-    
-    def cleanTimes(self):
-        msgDuration = timedelta(seconds=30.1)
-        self._chatSent = [t for t in self._chatSent
-                          if datetime.utcnow() - t <= msgDuration]
-        self._whisperSent = [t for t in self._whisperSent
-                             if datetime.utcnow() - t <= msgDuration]
-    
-    def sendChat(self, channel, messages, priority=1, bypass=False):
-        if isinstance(messages, str):
-            messages = messages,
-        elif not isinstance(messages, Iterable):
-            raise TypeError()
-        if priority < 0 or priority >= len(self._chatQueues):
-            raise ValueError()
-        whispers = defaultdict(list)
-        with self._queueLock:
-            for message in messages:
-                if not message:
-                    continue
-                if not bypass and message.startswith(disallowedCommands):
-                    continue
-                if message.startswith(('/w ', '.w ')):
-                    tokens = message.split(' ', 2)
-                    if len(tokens) < 3:
-                        continue
-                    whispers[tokens[1].lower()].append((tokens[2], priority))
-                else:
-                    self._chatQueues[priority].append(
-                        ChatMessage(channel, message))
-        if whispers:
-            for nick in whispers:
-                self.sendWhisper(nick, *whispers[nick])
-    
-    def sendWhisper(self, nick, messages, priority=1):
-        if isinstance(messages, str):
-            messages = messages,
-        elif not isinstance(messages, Iterable):
-            raise TypeError()
-        with self._queueLock:
-            for message in messages:
-                self._whisperQueue.append(WhisperMessage(nick, message))
-    
-    def popChat(self):
-        timestamp = datetime.utcnow()
-        nextMessage = self._getChatMessage(timestamp)
-        if nextMessage:
-            self._chatSent.append(timestamp)
-        return nextMessage
-    
-    def _getChatMessage(self, timestamp):
-        publicDelay = timedelta(seconds=config.publicDelay)
-        isModGood = len(self._chatSent) < config.modLimit
-        isModSpamGood = len(self._chatSent) < config.modSpamLimit
-        isPublicGood = len(self._chatSent) < config.publicLimit
-        with self._queueLock:
-            if isPublicGood:
-                for queue in self._chatQueues:
-                    for i, message in enumerate(queue):
-                        last = self._publicTime[message.channel.channel]
-                        if (self._isMod(message.channel)
-                                or timestamp - last < publicDelay):
-                            continue
-                        del queue[i]
-                        return message
-            if isModGood:
-                for queue in self._chatQueues[:-1]:
-                    for i, message in enumerate(queue):
-                        if not self._isMod(message.channel):
-                            continue
-                        del queue[i]
-                        return message
-                else:
-                    for i, message in self._chatQueues[-1]:
-                        if message.channel.channel in self._lowQueueRecent:
-                            continue
-                        if not self._isMod(message.channel):
-                            continue
-                        del queue[i]
-                        self._lowQueueRecent[message.channel.channel] = True
-                        return message
-            if isModSpamGood:
-                for i, message in self._chatQueues[-1]:
-                    if message.channel.channel in self._lowQueueRecent:
-                        continue
-                    if not self._isMod(message.channel):
-                        continue
-                    del queue[i]
-                    self._lowQueueRecent[message.channel.channel] = True
-                    return message
-        return None
-    
-    @staticmethod
-    def _isMod(channel):
-        return channel.isMod or config.botnick == channel.channel
-    
-    def popWhisper(self):
-        if self._whisperQueue and len(self._whisperSent) < config.modLimit:
-            self._whisperSent.append(datetime.utcnow())
-            return self._whisperQueue.popleft()
-        return None
-    
-    def clearChat(self, channel):
-        with self._queueLock:
-            for queue in self._chatQueues:
-                for message in queue[:]:
-                    if message.channel == channel:
-                        queue.remove(message)
-    
-    def clearAllChat(self, channel):
-        with self._queueLock:
-            for queue in self._chatQueues:
-                queue.clear()
-    
     def queueMessages(self):
-        for message in iter(self.popWhisper, None):
+        self.messaging.cleanOldTimestamps()
+        for message in iter(self.messaging.popWhisper, None):
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
                            IrcMessageParams(
@@ -365,7 +233,7 @@ class Socket:
                                    nick=message.nick,
                                    message=message.message))),
                 whisper=message)
-        for message in iter(self.popChat, None):
+        for message in iter(self.messaging.popChat, None):
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
                            IrcMessageParams(message.channel.ircChannel,

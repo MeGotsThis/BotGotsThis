@@ -35,6 +35,7 @@
     <Compile Include="bot\config.py" />
     <Compile Include="bot\data\channel.py" />
     <Compile Include="bot\data\error.py" />
+    <Compile Include="bot\data\message.py" />
     <Compile Include="bot\data\socket.py" />
     <Compile Include="bot\data\__init__.py" />
     <Compile Include="bot\globals.py" />

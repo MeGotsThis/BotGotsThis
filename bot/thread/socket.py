@@ -1,4 +1,4 @@
-﻿from .. import config, globals
+﻿from .. import config, globals, utils
 from datetime import datetime
 from itertools import filterfalse
 import select
@@ -19,7 +19,10 @@ class SocketsThread(threading.Thread):
             time=datetime.utcnow(), name=self.__class__.__name__))
         
         while globals.running:
-            self.process()
+            try:
+                self.process()
+            except:
+                utils.logException()
         self.terminate()
         
         print('{time} Ending {name}'.format(

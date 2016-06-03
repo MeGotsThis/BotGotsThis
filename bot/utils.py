@@ -25,7 +25,8 @@ def partChannel(channel):
         del channels[channel]
 
 def whisper(nick, message):
-    globals.clusters[globals.whisperCluster].sendWhisper(nick, message)
+    cluster = globals.clusters[globals.whisperCluster]
+    cluster.messaging.sendWhisper(nick, message)
 
 ENSURE_CLUSTER_UNKNOWN = int(-3)
 ENSURE_CLUSTER_NONE = int(-2)
