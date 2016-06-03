@@ -1,11 +1,11 @@
 ﻿from ..library import timeout
-from ..library.chat import inCooldown, min_args, permission
+from ..library.chat import inCooldown, min_args, permission, permission_feature
 from bot import config, globals
 from datetime import timedelta
 import random
 
+@permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)
-@permission('moderator')
 def commandPyramid(args):
     if (not args.database.hasFeature(args.chat.channel, 'modpyramid') and
         not args.permissions.broadcaster):
@@ -33,14 +33,9 @@ def commandPyramid(args):
     args.chat.send(messages, -1)
     return True
 
-@permission('moderator')
+@permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 def commandRPyramid(args):
-    if (not args.database.hasFeature(args.chat.channel, 'modpyramid') and
-        not args.permissions.broadcaster):
-        return False
-    
     emotes = globals.globalEmotes
-    
     try:
         count = int(args.message[1])
     except:
@@ -68,13 +63,9 @@ def commandRPyramid(args):
     args.chat.send(messages, -1)
     return True
 
+@permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)
-@permission('moderator')
 def commandPyramidLong(args):
-    if (not args.database.hasFeature(chat.channel, 'modpyramid') and
-        not args.permissions.broadcaster):
-        return False
-    
     rep = args.message.query + ' '
     try:
         count = int(args.message.command.split('pyramid-')[1])

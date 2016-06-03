@@ -1,13 +1,10 @@
 ﻿from ...api import oauth, twitch
-from ..library.chat import permission
+from ..library.chat import permission_not_feature, permission
 import threading
 
-@permission('moderator')
+@permission_not_feature(('broadcaster', None),
+                        ('moderator', 'gamestatusbroadcaster'))
 def commandStatus(args):
-    if (not args.permissions.broadcaster and
-        args.database.hasFeature(args.chat.channel, 'gamestatusbroadcaster')):
-        return False
-    
     if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
         return False
     response, data = twitch.twitchCall(
@@ -24,12 +21,9 @@ def commandStatus(args):
     args.chat.send(msg)
     return True
 
-@permission('moderator')
+@permission_not_feature(('broadcaster', None),
+                        ('moderator', 'gamestatusbroadcaster'))
 def commandGame(args):
-    if (not args.permissions.broadcaster and
-        args.database.hasFeature(args.chat.channel, 'gamestatusbroadcaster')):
-        return False
-    
     if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
         return False
     gameToSet = args.message.query

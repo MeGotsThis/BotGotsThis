@@ -51,6 +51,40 @@ def not_feature(feature):
         return chatCommand
     return decorator
 
+def permission_feature(*permissionFeatures):
+    def decorator(func):
+        @wraps(func)
+        def chatCommand(args):
+            for permission, feature in permissionFeatures:
+                hasPermission = not permission or args.permissions[permission]
+                hasFeature = (not feature
+                              or args.database.hasFeature(args.chat.channel,
+                                                          feature))
+                if hasPermission and hasFeature:
+                    break
+            else:
+                return False
+            return func(args)
+        return chatCommand
+    return decorator
+
+def permission_not_feature(*permissionFeatures):
+    def decorator(func):
+        @wraps(func)
+        def chatCommand(args):
+            for permission, feature in permissionFeatures:
+                hasPermission = not permission or args.permissions[permission]
+                hasFeature = (not feature
+                              or not args.database.hasFeature(
+                                  args.chat.channel, feature))
+                if hasPermission and hasFeature:
+                    break
+            else:
+                return False
+            return func(args)
+        return chatCommand
+    return decorator
+
 def cooldown(duration, key, permission=None):
     def decorator(func):
         @wraps(func)
