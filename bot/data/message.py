@@ -43,7 +43,8 @@ class MessagingQueue:
             messages = messages,
         elif not isinstance(messages, Iterable):
             raise TypeError()
-        if priority < 0 or priority >= len(self._chatQueues):
+        if (priority < -len(self._chatQueues)
+                or priority >= len(self._chatQueues)):
             raise ValueError()
         whispers = defaultdict(list)
         with self._queueLock:
