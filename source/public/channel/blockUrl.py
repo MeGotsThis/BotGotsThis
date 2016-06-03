@@ -3,38 +3,28 @@ from ...database import factory
 from ..library import timeout
 from ..library.chat import feature, not_permission, permission
 from bot import config, utils
-import datetime
-import http.client
-import json
 import re
 import threading
 import urllib.error
 import urllib.parse
 import urllib.request
 
-twitchUrlRegex = (r"(?:https?:\/\/)?(?:[-a-zA-Z0-9@:%_\+~#=]+\.)+[a-z]{2,6}\b"
+twitchUrlRegex = (#r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"
+                  r"(?:https?:\/\/)?(?:[-a-zA-Z0-9@:%_\+~#=]+\.)+[a-z]{2,6}\b"
                   r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)")
-#twitchUrlRegex = r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|" + twitchUrlRegex
 
 # This is for banning the users who post a URL with no follows
 @feature('nourlredirect')
 @not_permission('moderator')
 @permission('chatModerator')
 def filterNoUrlForBots(args):
-    match = re.search(twitchUrlRegex, str(args.message))
-    if match is not None:
+    if re.search(twitchUrlRegex, str(args.message)):
         params = args.chat, args.nick, args.message, args.timestamp
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
 def checkIfUrlMaybeBad(chat, nick, message, timestamp):
-    try:
-        uri = '/kraken/users/' + nick + '/follows/channels?limit=1'
-        response, data = twitch.twitchCall(None, 'GET', uri)
-        followerData = json.loads(data.decode('utf-8'))
-        if int(followerData['_total']) > 0:
-            return False
-    except Exception:
+    if not twitch.getFollowerCount(nick):
         return
     
     # Record all urls with users of no follows
@@ -42,8 +32,8 @@ def checkIfUrlMaybeBad(chat, nick, message, timestamp):
                        '{nick}: {message}'.format(nick=nick, message=message),
                        timestamp)
 
-    matches = re.findall(twitchUrlRegex, message)
-    for originalUrl in matches:
+    for match in re.finditer(twitchUrlRegex, message):
+        originalUrl = match.group(0)
         url = originalUrl
         if not url.startswith('http://') and not url.startswith('https://'):
             url = 'http://' + url

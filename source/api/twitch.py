@@ -122,3 +122,12 @@ def checkValidTwitchUser(user):
                 })
         validCache[user] = response.code == 200, currentTime
     return validCache[user][0]
+
+def getFollowerCount(user):
+    try:
+        uri = '/kraken/users/' + user + '/follows/channels?limit=1'
+        response, data = twitchCall(None, 'GET', uri)
+        followerData = json.loads(data.decode('utf-8'))
+        return int(followerData['_total'])
+    except Exception:
+        return None
