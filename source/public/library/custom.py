@@ -1,5 +1,5 @@
+from ...data.return_ import CustomCommandTokens, CustomFieldParts
 from ..library import textformat
-from bot.data.return_ import CustomCommandTokens, CustomFieldParts
 import lists.custom
 
 def parseCommandMessageInput(message):

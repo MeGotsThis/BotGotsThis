@@ -1,7 +1,7 @@
-﻿from ..library import custom, timeout
+﻿from ...data.argument import CustomFieldArgs, CustomProcessArgs
+from ..library import custom, timeout
 from ..library.chat import inCooldown, not_feature, permission, ownerChannel
 from bot import config
-from bot.data.argument import CustomFieldArgs, CustomProcessArgs
 from collections import defaultdict
 from datetime import datetime, timedelta
 import lists.custom

@@ -1,5 +1,5 @@
-﻿from ..databasebase import DatabaseBase
-from bot.data.return_ import AutoJoinChannel
+﻿from ...data.return_ import AutoJoinChannel
+from ..databasebase import DatabaseBase
 from contextlib import closing
 import sqlite3
 

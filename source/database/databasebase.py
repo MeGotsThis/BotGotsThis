@@ -1,4 +1,4 @@
-from bot.data.return_ import AutoJoinChannel
+from ..data.return_ import AutoJoinChannel
 from abc import ABCMeta, abstractmethod
 
 class DatabaseBase(metaclass=ABCMeta):
