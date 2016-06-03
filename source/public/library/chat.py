@@ -47,3 +47,21 @@ def not_feature(feature):
             return func(args)
         return chatCommand
     return decorator
+
+def cooldown(duration, key, permission=None):
+    def decorator(func):
+        @wraps(func)
+        def chatCommand(args):
+            if inCooldown(args, duration, key, permission):
+                return False
+            return func(args)
+        return chatCommand
+    return decorator
+
+def inCooldown(args, duration, key, permission=None):
+    if ((permission is None or not args.permissions[permission])
+            and key in args.chat.sessionData
+            and args.timestamp - args.chat.sessionData[key] < duration):
+        return True
+    args.chat.sessionData[key] = args.timestamp
+    return False
