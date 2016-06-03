@@ -1,6 +1,7 @@
 ﻿from ...data.argument import CustomFieldArgs, CustomProcessArgs
 from ..library import custom, timeout
-from ..library.chat import inCooldown, not_feature, permission, ownerChannel
+from ..library.chat import inCooldown, min_args, not_feature, permission
+from ..library.chat import ownerChannel
 from bot import config
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -85,10 +86,8 @@ def commandGlobal(args):
 def commandCommand(args):
     return processCommand(args)
 
+@min_args(3)
 def processCommand(args):
-    if len(args.message) < 3:
-        return False
-    
     input = custom.parseCommandMessageInput(args.message)
     if r is None:
         return False

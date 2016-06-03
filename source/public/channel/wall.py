@@ -1,17 +1,16 @@
 ﻿from ..library import timeout
-from ..library.chat import inCooldown, permission
+from ..library.chat import inCooldown, min_args, permission
 from bot import config
 from contextlib import suppress
 import datetime
 
+@min_args(2)
 @permission('moderator')
 def commandWall(args):
     if (not args.database.hasFeature(args.chat.channel, 'modwall') and
         not args.permissions.broadcaster):
         return False
     
-    if len(args.message) < 2:
-        return False
     rep = args.message[1] + ' '
     if args.permissions.broadcaster:
         length = 5
@@ -45,14 +44,13 @@ def commandWall(args):
     args.chat.send(messages, -1)
     return True
 
+@min_args(2)
 @permission('moderator')
 def commandWallLong(args):
     if (not args.database.hasFeature(args.chat.channel, 'modwall') and
         not args.permissions.broadcaster):
         return False
     
-    if len(args.message) < 2:
-        return False
     try:
         rows = int(args.message.command.split('wall-')[1])
     except:

@@ -1,5 +1,5 @@
 ﻿from ..library import channel, exit, managebot
-from ..library.whisper import permission, send
+from ..library.whisper import min_args, permission, send
 from bot import globals, utils
 
 @permission('owner')
@@ -19,35 +19,29 @@ def commandSay(args):
                        args.message[2:])
     return True
 
+@min_args(2)
 def commandJoin(args):
-    if len(args.message) < 2:
-        return False
-
-    chan = args.message.lower[1]
-    
-    channel.botJoin(args.database, chan, send(args.nick))
+    channel.botJoin(args.database, args.message.lower[1], send(args.nick))
     return True
 
+@min_args(2)
 def commandPart(args):
-    if len(args.message) < 2:
-        return False
     channel.botPart(args.message.lower[1], send(args.nick))
     return True
 
+@permission('admin')
 def commandEmptyAll(args):
     channel.botEmptyAll(send(args.nick))
     return True
 
+@min_args(2)
+@permission('admin')
 def commandEmpty(args):
-    if len(args.message) < 2:
-        return False
     channel.botEmpty(args.message.lower[1], send(args.nick))
     return True
 
+@min_args(2)
 @permission('owner')
 def commandManageBot(args):
-    if len(args.message) < 2:
-        return False
-    
     return managebot.botManageBot(args.database, send(args.nick), args.nick,
                                   args.message)
