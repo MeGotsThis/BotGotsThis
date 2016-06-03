@@ -24,10 +24,12 @@ def moduleKey(module):
     if module == 'source.ircmessage':
         return (99, module)
     
-    if module == 'source.database':
+    if module.startswith('source.data'):
         return (0, module)
-    if module == 'source.database.databasebase':
+    if module == 'source.database':
         return (1, module)
+    if module == 'source.database.databasebase':
+        return (2, module)
     if module == 'source.database.factory':
         return (9, module)
     if module.startswith('source.database'):
