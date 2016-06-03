@@ -1,7 +1,7 @@
 ﻿from ..library import timeout
-from ..library.chat import permission
+from ..library.chat import inCooldown, permission
 from bot import config, globals
-import datetime
+from datetime import timedelta
 import random
 
 @permission('moderator')
@@ -24,12 +24,9 @@ def commandPyramid(args):
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
-        cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modPyramid' in chat.sessionData:
-            since = args.timestamp - args.chat.sessionData['modPyramid']
-            if since < cooldown:
-                return False
-        args.chat.sessionData['modPyramid'] = args.timestamp
+        cooldown = timedelta(seconds=config.spamModeratorCooldown)
+        if inCooldown(args, cooldown, 'modPyramid'):
+            return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]
@@ -56,12 +53,9 @@ def commandRPyramid(args):
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
-        cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modPyramid' in args.chat.sessionData:
-            since = args.timestamp - args.chat.sessionData['modPyramid']
-            if since < cooldown:
-                return False
-        args.chat.sessionData['modPyramid'] = args.timestamp
+        cooldown = timedelta(seconds=config.spamModeratorCooldown)
+        if inCooldown(args, cooldown, 'modPyramid'):
+            return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     emoteIds = list(emotes.keys())
@@ -95,12 +89,9 @@ def commandPyramidLong(args):
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
-        cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modPyramid' in chat.sessionData:
-            since = args.timestamp - args.chat.sessionData['modPyramid']
-            if since < cooldown:
-                return False
-        args.chat.sessionData['modPyramid'] = args.timestamp
+        cooldown = timedelta(seconds=config.spamModeratorCooldown)
+        if inCooldown(args, cooldown, 'modPyramid'):
+            return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     messages = [rep * i for i in range(1, count)]

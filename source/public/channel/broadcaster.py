@@ -1,7 +1,7 @@
 ﻿from ...api import twitch
 from ..library import broadcaster, send
-from ..library.chat import permission, ownerChannel
-import datetime
+from ..library.chat import cooldown, permission, ownerChannel
+from datetime import datetime, timedelta
 import email.utils
 import json
 import time
@@ -37,13 +37,8 @@ def commandSetTimeoutLevel(args):
                                    send.channel(args.chat), args.message)
     return True
 
+@cooldown(timedelta(seconds=60), 'uptime')
 def commandUptime(args):
-    if 'uptime' in args.chat.sessionData:
-        since = args.timestamp - args.chat.sessionData['uptime']
-        if since < datetime.timedelta(seconds=60):
-            return False
-    args.chat.sessionData['uptime'] = args.timestamp
-
     if not args.chat.isStreaming:
         args.chat.sendMessage(
             '{channel} is currently not streaming or has not been for a '
@@ -61,7 +56,7 @@ def commandUptime(args):
             date = response.getheader('Date')
             dateStruct = email.utils.parsedate(date)
             unixTimestamp = time.mktime(dateStruct)
-            currentTime = datetime.datetime.fromtimestamp(unixTimestamp)
+            currentTime = datetime.fromtimestamp(unixTimestamp)
                 
             args.chat.sendMessage(
                 'Uptime: {uptime}'.format(

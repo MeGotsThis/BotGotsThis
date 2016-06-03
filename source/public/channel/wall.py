@@ -1,5 +1,5 @@
 ﻿from ..library import timeout
-from ..library.chat import permission
+from ..library.chat import inCooldown, permission
 from bot import config
 from contextlib import suppress
 import datetime

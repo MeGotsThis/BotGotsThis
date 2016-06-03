@@ -1,9 +1,9 @@
 ﻿from ..library import custom, timeout
-from ..library.chat import not_feature, permission, ownerChannel
+from ..library.chat import inCooldown, not_feature, permission, ownerChannel
 from bot import config
 from bot.data.argument import CustomFieldArgs, CustomProcessArgs
 from collections import defaultdict
-import datetime
+from datetime import datetime, timedelta
 import lists.custom
 
 @not_feature('nocustom')
@@ -28,18 +28,14 @@ def customCommands(args):
                 level = perm
     
     if customMessage:
-        cooldown = datetime.timedelta(seconds=config.customMessageCooldown)
-        if (not args.permissions.moderator and
-            'customCommand' in args.chat.sessionData):
-            since = args.timestamp - args.chat.sessionData['customCommand']
-            if since < cooldown:
-                return
-        args.chat.sessionData['customCommand'] = args.timestamp
+        cooldown = timedelta(seconds=config.customMessageCooldown)
+        if inCooldown(args, cooldown, 'customCommand', 'moderator'):
+            return False
 
-        cooldown = datetime.timedelta(seconds=config.customMessageUserCooldown)
+        cooldown = timedelta(seconds=config.customMessageUserCooldown)
         if 'customUserCommand' not in args.chat.sessionData:
             args.chat.sessionData['customUserCommand'] = defaultdict(
-                lambda: datetime.datetime.min)
+                lambda: datetime.min)
         if not args.permissions.moderator:
             oldTime = args.chat.sessionData['customUserCommand'][args.nick]
             since = args.timestamp - oldTime
