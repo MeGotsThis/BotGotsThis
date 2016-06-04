@@ -37,7 +37,7 @@ commands = {
     '!status': mod.commandStatus,
     '!title': mod.commandStatus,
     '!game': mod.commandGame,
-    '!setgame': mod.commandGame,
+    '!setgame': mod.commandRawGame,
     '!purge': mod.commandPurge,
     '!rekt': mod.commandPurge,
     '!command': custom.commandCommand,

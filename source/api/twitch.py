@@ -148,3 +148,20 @@ def getFollowerCount(user):
         return int(followerData['_total'])
     except Exception:
         return None
+
+def updateChannel(channel, *, status=None, game=None):
+    postData = {}
+    if isinstance(status, str):
+        postData['channel[status]'] = status or ' '
+    if isinstance(status, str):
+        postData['channel[game]'] = game
+    if not postData:
+        return None
+    response, data = twitchCall(
+        channel, 'PUT', '/kraken/channels/' + channel,
+        headers={
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/vnd.twitchtv.v3+json',
+            },
+        data=postData)
+    return response.status == 200

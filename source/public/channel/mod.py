@@ -1,5 +1,5 @@
 ﻿from ...api import oauth, twitch
-from ..library.chat import permission_not_feature, permission
+from ..library.chat import min_args, permission_not_feature, permission
 import threading
 
 @permission_not_feature(('broadcaster', None),
@@ -7,14 +7,7 @@ import threading
 def commandStatus(args):
     if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
         return False
-    response, data = twitch.twitchCall(
-        args.chat.channel, 'PUT', '/kraken/channels/' + args.chat.channel,
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/vnd.twitchtv.v3+json',
-            },
-        data = {'channel[status]': args.message.query or ' '})
-    if response.status == 200:
+    if twitch.updateChannel(args.chat.channel, status=args.message.query):
         msg = 'Channel Status set as: ' + args.message.query
     else:
         msg = 'Channel Status failed to set'
@@ -26,23 +19,27 @@ def commandStatus(args):
 def commandGame(args):
     if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
         return False
-    gameToSet = args.message.query
-    if args.message.command == '!game':
-        fullGame = args.database.getFullGameTitle(args.message.lower[1])
-        if fullGame is not None:
-            gameToSet = fullGame
-        gameToSet = gameToSet.replace('Pokemon', 'Pokémon')
-        gameToSet = gameToSet.replace('Pokepark', 'Poképark')
-    response, data = twitch.twitchCall(
-        args.chat.channel, 'PUT', '/kraken/channels/' + args.chat.channel,
-        headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/vnd.twitchtv.v3+json',
-            },
-        data = {'channel[game]': gameToSet})
-    if response.status == 200:
-        if gameToSet:
-            msg = 'Channel Game set as: ' + gameToSet
+    game = args.message.query
+    game = args.database.getFullGameTitle(args.message.lower[1:]) or game
+    game = game.replace('Pokemon', 'Pokémon').replace('Pokepark', 'Poképark')
+    if twitch.updateChannel(args.chat.channel, game=game):
+        if game:
+            msg = 'Channel Game set as: ' + game
+        else:
+            msg = 'Channel Game has been unset'
+    else:
+        msg = 'Channel Game failed to set'
+    args.chat.send(msg)
+    return True
+
+@permission_not_feature(('broadcaster', None),
+                        ('moderator', 'gamestatusbroadcaster'))
+def commandRawGame(args):
+    if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
+        return False
+    if twitch.updateChannel(args.chat.channel, game=args.message.query):
+        if args.message.query:
+            msg = 'Channel Game set as: ' + args.message.query
         else:
             msg = 'Channel Game has been unset'
     else:
@@ -51,11 +48,10 @@ def commandGame(args):
     return True
 
 @permission('moderator')
+@permission('chatModerator')
+@min_args(1)
 def commandPurge(args):
-    if args.permissions.chatModerator and len(args.message) > 1:
-        args.chat.send('.timeout ' + args.message[1] + ' 1')
-        args.database.recordTimeout(
-            args.chat.channel, args.message[1], args.nick, 'purge', None, 1,
-            args.message, None)
-        return True
-    return False
+    args.chat.send('.timeout {user} 1'.format(user=args.message[1]))
+    args.database.recordTimeout(args.chat.channel, args.message[1], args.nick,
+                                'purge', None, 1, args.message, None)
+    return True
