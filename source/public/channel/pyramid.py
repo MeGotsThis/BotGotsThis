@@ -9,13 +9,23 @@ import random
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)
 def commandPyramid(args):
-    rep = args.message[1] + ' '
     count = 5 if args.permissions.broadcaster else 3
     # If below generate a ValueError or IndexError,
     # only the above line gets used
     with suppress(ValueError, IndexError):
         count = int(args.message[2])
-    count = min(count, config.messageLimit // len(rep))
+    return processPyramid(args, args.message[1] + ' ', count)
+
+@permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
+@min_args(2)
+def commandPyramidLong(args):
+    count = 5 if args.permissions.broadcaster else 3
+    with suppress(ValueError, IndexError):
+        count = int(args.message.command.split('pyramid-')[1])
+    return processPyramid(args, args.message.query + ' ', count)
+
+def processPyramid(args, repetition, count):
+    count = min(count, config.messageLimit // len(repetition))
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
@@ -24,8 +34,12 @@ def commandPyramid(args):
             return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
-    messages = itertools.chain((rep * i for i in range(1, count)),
-                               (rep * i for i in range(count, 0, -1)))
+    messages = itertools.chain((repetition * i for i in range(1, count)),
+                               (repetition * i for i in range(count, 0, -1)))
+    if args.permissions.chatModerator:
+        timeout.recordTimeoutFromCommand(
+            args.database, args.chat, args.nick, repetition * count,
+            str(args.message), 'pyramid')
     args.chat.send(messages, -1)
     return True
 
@@ -56,29 +70,4 @@ def commandRPyramid(args):
         (' '.join(rep[0:i]) for i in range(1, count)),
         (' '.join(rep[0:i]) for i in range(count, 0, -1)))
     args.chat.send(messages, -1)
-    return True
-
-@permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
-@min_args(2)
-def commandPyramidLong(args):
-    rep = args.message.query + ' '
-    count = 5 if args.permissions.broadcaster else 3
-    with suppress(ValueError, IndexError):
-        count = int(args.message.command.split('pyramid-')[1])
-    count = min(count, config.messageLimit // len(rep))
-    if not args.permissions.broadcaster:
-        count = min(count, 5)
-        
-        cooldown = timedelta(seconds=config.spamModeratorCooldown)
-        if inCooldown(args, cooldown, 'modPyramid'):
-            return False
-    elif not args.permissions.globalModerator:
-        count = min(count, 20)
-    messages = itertools.chain((rep * i for i in range(1, count)),
-                               (rep * i for i in range(count, 0, -1)))
-    args.chat.send(messages, -1)
-    if args.permissions.chatModerator:
-        timeout.recordTimeoutFromCommand(
-            args.database, args.chat, args.nick, rep * count,
-            str(args.message), 'pyramid')
     return True
