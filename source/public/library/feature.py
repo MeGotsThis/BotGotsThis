@@ -35,20 +35,16 @@ def botFeature(db, channel, message, send):
     if hasFeature and action in disable:
         db.removeFeature(channel, message.lower[1])
     
-    msg = None
+    msg = ''
     if hasFeature:
         if action in enable:
-            msg = 'The feature ' + features[message.lower[1]]
-            msg += ' has already been enabled in ' + channel
+            msg = 'The feature {feature} has already been enabled in {channel}'
         if action in disable:
-            msg = 'The feature ' + features[message.lower[1]] + ' has been '
-            msg += 'disabled in ' + channel
+            msg = 'The feature {feature} has been disabled in {channel}'
     else:
         if action in enable:
-            msg = 'The feature ' + features[message.lower[1]] + ' has been '
-            msg += 'enabled in ' + channel
+            msg = 'The feature {feature} has been enabled in {channel}'
         if action in disable:
-            msg = 'The feature ' + features[message.lower[1]] + ' was not '
-            msg += 'enabled in ' + channel
-    send(msg)
+            msg = 'The feature {feature} was not enabled in {channel}'
+    send(msg.format(feature=features[message.lower[1]], channel=channel))
     return True
