@@ -7,8 +7,8 @@ CustomCommand = namedtuple('CustomCommand',
                            ['message', 'broadcaster', 'level'])
 
 CustomCommandTokens = namedtuple('CustomCommandTokens',
-                                 ['called', 'action', 'broadcaster', 'level',
-                                  'command', 'text'])
+                                 ['action', 'broadcaster', 'level', 'command',
+                                  'text'])
 
 CustomFieldParts = namedtuple('CustomFieldParts',
                               ['plainText', 'field', 'format', 'prefix',

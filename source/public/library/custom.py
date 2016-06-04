@@ -1,3 +1,4 @@
+from ...data.argument import CustomFieldArgs, CustomProcessArgs
 from ...data.return_ import CustomCommand, CustomCommandTokens
 from ...data.return_ import CustomFieldParts
 from ..library import textformat
@@ -27,10 +28,9 @@ def createMessages(command, args):
                         formats.field, formats.param, formats.prefix,
                         formats.suffix, formats.default, args.message,
                         args.chat.channel, args.nick, args.timestamp)
-                    string = custom.fieldString(fieldArgument)
+                    string = fieldString(fieldArgument)
                     if string is not None:
-                        string = custom.format(string, formats.format,
-                                               textFormat)
+                        string = format(string, formats.format, textFormat)
                     else:
                         string = formats.original
                     messageParts.append(string)
@@ -89,8 +89,7 @@ def parseCommandMessageInput(message, broadcaster):
         command = message[i]
         text = message[i+1:]
         
-        return CustomCommandTokens(message.command, action, broadcaster, level,
-                                   command, text)
+        return CustomCommandTokens(action, broadcaster, level, command, text)
     except:
         return None
 

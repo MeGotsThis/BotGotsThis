@@ -1,5 +1,4 @@
-﻿from ...data.argument import CustomFieldArgs, CustomProcessArgs
-from ..library import custom, timeout
+﻿from ..library import custom, timeout
 from ..library.chat import inCooldown, min_args, not_feature, permission
 from ..library.chat import ownerChannel
 from bot import config
@@ -47,11 +46,11 @@ def commandCommand(args):
 @min_args(3)
 def processCommand(args):
     broadcaster = args.chat.channel
-    if input.called == '!global':
+    if args.message.command == '!global':
         broadcaster = '#global'
     
     input = custom.parseCommandMessageInput(args.message, broadcaster)
-    if r is None:
+    if input is None:
         return False
     
     message = ''
@@ -132,6 +131,6 @@ def processCommand(args):
                        'might not exist')
     else:
         return False
-    args.chat.send(message.format(command=input.command, property=prop,
+    args.chat.send(message.format(command=input.command, property=property,
                                   value=value))
     return True

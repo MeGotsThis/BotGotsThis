@@ -223,41 +223,41 @@ def _translateAsciiChain(c):
 def format(string, format):
     format = format.lower()
     if format == 'ascii':
-        return textformat.allToAscii(string)
+        return allToAscii(string)
     if format == 'full':
-        return textformat.asciiToFullWidth(string)
+        return asciiToFullWidth(string)
     if format == 'parenthesized':
-        return textformat.asciiToParenthesized(string)
+        return asciiToParenthesized(string)
     if format == 'circled':
-        return textformat.asciiToCircled(string)
+        return asciiToCircled(string)
     if format == 'smallcaps':
-        return textformat.asciiToSmallCaps(string)
+        return asciiToSmallCaps(string)
     if format == 'upsidedown':
-        return textformat.asciiToUpsideDown(string)
+        return asciiToUpsideDown(string)
     if re.fullmatch(r'serif-?bold', format):
-        return textformat.asciiToSerifBold(string)
+        return asciiToSerifBold(string)
     if re.fullmatch(r'serif-?italic', format):
-        return textformat.asciiToSerifItalic(string)
+        return asciiToSerifItalic(string)
     if re.fullmatch(r'serif-?bold-?italic', format):
-        return textformat.asciiToSerifBoldItalic(string)
+        return asciiToSerifBoldItalic(string)
     if format == 'sanserif':
-        return textformat.asciiToSanSerif(string)
+        return asciiToSanSerif(string)
     if re.fullmatch(r'sanserif-?bold', format):
-        return textformat.asciiToSanSerifBold(string)
+        return asciiToSanSerifBold(string)
     if re.fullmatch(r'sanserif-?italic', format):
-        return textformat.asciiToSanSerifItalic(string)
+        return asciiToSanSerifItalic(string)
     if re.fullmatch(r'(sanserif-?)?(bold-?italic|italic-?bold)', format):
-        return textformat.asciiToSanSerifBoldItalic(string)
+        return asciiToSanSerifBoldItalic(string)
     if format in ['script', 'cursive']:
-        return textformat.asciiToScript(string)
+        return asciiToScript(string)
     if re.fullmatch(r'(script|cursive)-?bold', format):
-        return textformat.asciiToScriptBold(string)
+        return asciiToScriptBold(string)
     if format == 'fraktur':
-        return textformat.asciiToFraktur(string)
+        return asciiToFraktur(string)
     if re.fullmatch(r'fraktur-?bold', format):
-        return textformat.asciiToFrakturBold(string)
+        return asciiToFrakturBold(string)
     if format == 'monospace':
-        return textformat.asciiToMonospace(string)
+        return asciiToMonospace(string)
     if format == 'doublestruck':
-        return textformat.asciiToDoubleStruck(string)
+        return asciiToDoubleStruck(string)
     return string
