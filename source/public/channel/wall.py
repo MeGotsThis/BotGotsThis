@@ -2,70 +2,55 @@
 from ..library.chat import inCooldown, min_args, permission_feature
 from bot import config
 from contextlib import suppress
-import datetime
+from datetime import timedelta
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
 @min_args(2)
 def commandWall(args):
     rep = args.message[1] + ' '
-    if args.permissions.broadcaster:
-        length = 5
-        rows = 20
-    else:
-        length = 3
-        rows = 5
-    with suppress(ValueError):
-        if len(args.message) == 3:
-            rows = int(args.message[2])
-        else:
-            length = int(args.message[2])
-            rows = int(args.message[3])
+    length, rows = (5, 20) if args.permissions.broadcaster else (3, 5)
+    # If below generate a ValueError, only the above line gets used
+    with suppress(ValueError, IndexError):
+        length, rows = length, int(args.message[2])
+        # If this line generate an IndexError it does not get evaluated
+        length, rows = rows, int(args.message[3])
     length = min(length, config.messageLimit // len(rep))
     if not args.permissions.broadcaster:
-        length = min(length, 5)
-        rows = min(rows, 10)
+        length, rows = min(length, 5), min(rows, 10)
         
-        cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modWall' in args.chat.sessionData:
-            since = args.timestamp - args.chat.sessionData['modWall']
-            if since < cooldown:
-                return False
-        args.chat.sessionData['modWall'] = args.timestamp
+        cooldown = timedelta(seconds=config.spamModeratorCooldown)
+        if inCooldown(args, cooldown, 'modWall'):
+            return False
     elif not args.permissions.globalModerator:
-        length = min(length, 20)
-        rows = min(rows, 500)
+        length, rows = min(length, 20), min(rows, 500)
     spacer = '' if args.permissions.chatModerator else ' \ufeff'
-    messages = [rep * length + ('' if i % 2 == 0 else spacer)
-                for i in range(rows)]
+    messages = (rep * length + ('' if i % 2 == 0 else spacer)
+                for i in range(rows))
     args.chat.send(messages, -1)
     return True
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
 @min_args(2)
 def commandWallLong(args):
-    try:
+    rows = 20 if args.permissions.broadcaster else 5
+    # If below generate a ValueError or IndexError,
+    # only the above line gets used
+    with suppress(ValueError, IndexError):
         rows = int(args.message.command.split('wall-')[1])
-    except:
-        if args.permissions.broadcaster:
-            rows = 20
-        else:
-            rows = 5
     if not args.permissions.broadcaster:
         rows = min(rows, 10)
         
-        cooldown = datetime.timedelta(seconds=config.spamModeratorCooldown)
-        if 'modWall' in args.chat.sessionData:
-            since = args.timestamp - args.chat.sessionData['modWall']
-            if since < cooldown:
-                return False
-        args.chat.sessionData['modWall'] = args.timestamp
+        cooldown = timedelta(seconds=config.spamModeratorCooldown)
+        if inCooldown(args, cooldown, 'modWall'):
+            return False
     elif not args.permissions.globalModerator:
         rows = min(rows, 500)
     spacer = '' if args.permissions.chatModerator else ' \ufeff'
-    messages = [args.message.query + ('' if i % 2 == 0 else spacer)
-                for i in range(rows)]
+    messages = (args.message.query + ('' if i % 2 == 0 else spacer)
+                for i in range(rows))
     args.chat.send(messages, -1)
     if args.permissions.chatModerator:
-        timeout.recordTimeoutFromCommand(args.database, args.chat, args.nick,
-                                         messages[0], args.message, 'wall')
+        timeout.recordTimeoutFromCommand(
+            args.database, args.chat, args.nick, args.message.query,
+            args.message, 'wall')
     return True
