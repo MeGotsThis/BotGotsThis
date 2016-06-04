@@ -1,8 +1,52 @@
-from ...data.return_ import CustomCommandTokens, CustomFieldParts
+from ...data.return_ import CustomCommand, CustomCommandTokens
+from ...data.return_ import CustomFieldParts
 from ..library import textformat
 import lists.custom
 
-def parseCommandMessageInput(message):
+def getCustomCommand(database, command, channel, permissions):
+    commands = database.getChatCommands(channel, command)
+    permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
+                      'globalMod', 'admin', 'staff', 'owner',]
+    for permission in reversed(permissionsSet):
+        if not permission or permissions[permission]:
+            for broadcaster in [channel, '#global']:
+                if permission in commands[channel]:
+                    message = commands[broadcaster][permission]
+                    return CustomCommand(message, broadcaster, permission)
+    return CustomCommand(None, None, None)
+
+def createMessages(command, args):
+    textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
+    messageParts = []
+    try:
+        for formats in parseFormatMessage(command.message):
+            messageParts.append(formats.plainText)
+            try:
+                if formats.field is not None:
+                    fieldArgument = CustomFieldArgs(
+                        formats.field, formats.param, formats.prefix,
+                        formats.suffix, formats.default, args.message,
+                        args.chat.channel, args.nick, args.timestamp)
+                    string = custom.fieldString(fieldArgument)
+                    if string is not None:
+                        string = custom.format(string, formats.format,
+                                               textFormat)
+                    else:
+                        string = formats.original
+                    messageParts.append(string)
+            except Exception as e:
+                messageParts.append(formats.original)
+    except Exception as e:
+        messageParts = [str(command.message)]
+    messages = [''.join(messageParts)]
+    processArgument = CustomProcessArgs(
+        args.database, args.chat, args.tags, args.nick, args.permissions,
+        command.broadcaster, command.level, args.message.command, messages)
+    for process in lists.custom.postProcess:
+        process(processArgument)
+    return messages
+
+def parseCommandMessageInput(message, broadcaster):
     allowPermissions = {
         None: '',
         '': '',
@@ -43,10 +87,10 @@ def parseCommandMessageInput(message):
         else:
             level = False
         command = message[i]
-        fullText = message[i+1:]
+        text = message[i+1:]
         
-        return CustomCommandTokens(message.command, action, level, command,
-                                   fullText)
+        return CustomCommandTokens(message.command, action, broadcaster, level,
+                                   command, text)
     except:
         return None
 
