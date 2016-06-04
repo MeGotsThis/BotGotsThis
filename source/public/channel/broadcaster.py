@@ -2,7 +2,6 @@
 from ..library import broadcaster
 from ..library.chat import cooldown, permission, ownerChannel, send
 from datetime import datetime, timedelta
-import email.utils
 import json
 import time
 
@@ -45,25 +44,10 @@ def commandUptime(args):
             'minute'.format(channel=args.chat.channel))
         return True
 
-    response, data = twitch.twitchCall(
-        args.chat.channel, 'GET', '/kraken/',
-        headers = {
-            'Accept': 'application/vnd.twitchtv.v3+json',
-            })
-    try:
-        if response.status == 200:
-            streamData = json.loads(data.decode('utf-8'))
-            date = response.getheader('Date')
-            dateStruct = email.utils.parsedate(date)
-            unixTimestamp = time.mktime(dateStruct)
-            currentTime = datetime.fromtimestamp(unixTimestamp)
-                
-            args.chat.send(
-                'Uptime: {uptime}'.format(
-                    uptime=currentTime - args.chat.streamingSince))
-            return True
-        raise ValueError()
-    except (ValueError, KeyError) as e:
+    currentTime = twitch.serverTime()
+    if currentTime:
+        uptime = currentTime - args.chat.streamingSince
+        args.chat.send('Uptime: {uptime}'.format(uptime=uptime))
+        return True
+    else:
         args.chat.send('Fail to get information from Twitch.tv')
-    except:
-        args.chat.send('Unknown Error')

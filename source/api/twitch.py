@@ -3,9 +3,11 @@ from bot import globals
 from contextlib import suppress
 import configparser
 import datetime
+import email.utils
 import http.client
 import json
 import os.path
+import time
 import urllib.parse
 
 def getTwitchClientId():
@@ -39,6 +41,21 @@ def twitchCall(channel, method, uri, headers={}, data=None):
     conn.close()
     
     return (response, responseData)
+
+def serverTime():
+    with suppress(http.client.HTTPException):
+        response, data = twitchCall(
+            None, 'GET', '/kraken/',
+            headers = {
+                'Accept': 'application/vnd.twitchtv.v3+json',
+                })
+        if response.status == 200:
+            date = response.getheader('Date')
+            if data is not None:
+                dateStruct = email.utils.parsedate(date)
+                unixTimestamp = time.mktime(dateStruct)
+                return datetime.datetime.fromtimestamp(unixTimestamp)
+    return None
 
 def updateTwitchEmotes():
     globals.globalEmotesCache = datetime.datetime.utcnow()
