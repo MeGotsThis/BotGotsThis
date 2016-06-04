@@ -142,122 +142,79 @@ def _translate(character, fromTable, toTable):
     j = fromTable.find(character)
     return toTable[j] if j != -1 else character
 
-def asciiToFullWidth(text):
-    return ''.join([_translate(c, ascii, full) for c in text])
+def _createAsciiTo(name, toTable):
+    def asciiTo(text):
+        return ''.join(_translate(c, ascii, toTable) for c in text)
+    asciiTo.__name__ = name
+    return asciiTo
 
-def asciiToParenthesized(text):
-    return ''.join([_translate(c, ascii, parenthesized) for c in text])
-
-def asciiToCircled(text):
-    return ''.join([_translate(c, ascii, circled) for c in text])
-
-def asciiToSmallCaps(text):
-    return ''.join([_translate(c, ascii, smallcaps) for c in text])
-
-def asciiToUpsideDown(text):
-    return ''.join([_translate(c, ascii, upsidedown) for c in text[::-1]])
-
-def asciiToSerifBold(text):
-    return ''.join([_translate(c, ascii, serifBold) for c in text])
-
-def asciiToSerifItalic(text):
-    return ''.join([_translate(c, ascii, serifItalic) for c in text])
-
-def asciiToSerifBoldItalic(text):
-    return ''.join([_translate(c, ascii, serifBoldItalic) for c in text])
-
-def asciiToSanSerif(text):
-    return ''.join([_translate(c, ascii, sanSerif) for c in text])
-
-def asciiToSanSerifBold(text):
-    return ''.join([_translate(c, ascii, sanSerifBold) for c in text])
-
-def asciiToSanSerifItalic(text):
-    return ''.join([_translate(c, ascii, sanSerifItalic) for c in text])
-
-def asciiToSanSerifBoldItalic(text):
-    return ''.join([_translate(c, ascii, sanSerifBoldItalic) for c in text])
-
-def asciiToScript(text):
-    return ''.join([_translate(c, ascii, script) for c in text])
-
-def asciiToScriptBold(text):
-    return ''.join([_translate(c, ascii, scriptBold) for c in text])
-
-def asciiToFraktur(text):
-    return ''.join([_translate(c, ascii, fraktur) for c in text])
-
-def asciiToFrakturBold(text):
-    return ''.join([_translate(c, ascii, frakturBold) for c in text])
-
-def asciiToMonospace(text):
-    return ''.join([_translate(c, ascii, monospace) for c in text])
-
-def asciiToDoubleStruck(text):
-    return ''.join([_translate(c, ascii, doubleStruck) for c in text])
+asciiToFullWidth = _createAsciiTo('asciiToFullWidth', full)
+asciiToParenthesized = _createAsciiTo('asciiToParenthesized', parenthesized)
+asciiToCircled = _createAsciiTo('asciiToCircled', circled)
+asciiToSmallCaps = _createAsciiTo('asciiToSmallCaps', smallcaps)
+asciiToUpsideDown = _createAsciiTo('asciiToUpsideDown', upsidedown)
+asciiToSerifBold = _createAsciiTo('asciiToSerifBold', serifBold)
+asciiToSerifItalic = _createAsciiTo('asciiToSerifItalic', serifItalic)
+asciiToSerifBoldItalic = _createAsciiTo('asciiToSerifBoldItalic',
+                                        serifBoldItalic)
+asciiToSanSerif = _createAsciiTo('asciiToSanSerif', sanSerif)
+asciiToSanSerifBold = _createAsciiTo('asciiToSanSerifBold', sanSerifBold)
+asciiToSanSerifItalic = _createAsciiTo('asciiToSanSerifItalic', sanSerifItalic)
+asciiToSanSerifBoldItalic = _createAsciiTo('asciiToSanSerifBoldItalic',
+                                           sanSerifBoldItalic)
+asciiToScript = _createAsciiTo('asciiToScript', script)
+asciiToScriptBold = _createAsciiTo('asciiToScriptBold', scriptBold)
+asciiToFraktur = _createAsciiTo('asciiToFraktur', fraktur)
+asciiToFrakturBold = _createAsciiTo('asciiToFrakturBold', frakturBold)
+asciiToMonospace = _createAsciiTo('asciiToMonospace', monospace)
+asciiToDoubleStruck = _createAsciiTo('asciiToDoubleStruck', doubleStruck)
 
 def allToAscii(text):
     return ''.join([_translateAsciiChain(c) for c in text])
 
 def _translateAsciiChain(c):
-    c = _translate(c, full, ascii)
-    c = _translate(c, parenthesized, ascii)
-    c = _translate(c, circled, ascii)
-    c = _translate(c, smallcaps, ascii)
-    c = _translate(c, upsidedown, ascii)
-    c = _translate(c, serifBold, ascii)
-    c = _translate(c, serifItalic, ascii)
-    c = _translate(c, serifBoldItalic, ascii)
-    c = _translate(c, sanSerif, ascii)
-    c = _translate(c, sanSerifBold, ascii)
-    c = _translate(c, sanSerifItalic, ascii)
-    c = _translate(c, sanSerifBoldItalic, ascii)
-    c = _translate(c, script, ascii)
-    c = _translate(c, scriptBold, ascii)
-    c = _translate(c, fraktur, ascii)
-    c = _translate(c, frakturBold, ascii)
-    c = _translate(c, monospace, ascii)
-    c = _translate(c, doubleStruck, ascii)
+    fromTable = [full, parenthesized, circled, smallcaps, upsidedown,
+                 serifBold, serifItalic, serifBoldItalic, sanSerif,
+                 sanSerifBold, sanSerifItalic, sanSerifBoldItalic, script,
+                 scriptBold, fraktur, frakturBold, monospace, doubleStruck]
+    for table in fromTable:
+        c = _translate(c, table, ascii)
     return c
 
 def format(string, format):
     format = format.lower()
-    if format == 'ascii':
-        return allToAscii(string)
-    if format == 'full':
-        return asciiToFullWidth(string)
-    if format == 'parenthesized':
-        return asciiToParenthesized(string)
-    if format == 'circled':
-        return asciiToCircled(string)
-    if format == 'smallcaps':
-        return asciiToSmallCaps(string)
-    if format == 'upsidedown':
-        return asciiToUpsideDown(string)
-    if re.fullmatch(r'serif-?bold', format):
-        return asciiToSerifBold(string)
-    if re.fullmatch(r'serif-?italic', format):
-        return asciiToSerifItalic(string)
-    if re.fullmatch(r'serif-?bold-?italic', format):
-        return asciiToSerifBoldItalic(string)
-    if format == 'sanserif':
-        return asciiToSanSerif(string)
-    if re.fullmatch(r'sanserif-?bold', format):
-        return asciiToSanSerifBold(string)
-    if re.fullmatch(r'sanserif-?italic', format):
-        return asciiToSanSerifItalic(string)
-    if re.fullmatch(r'(sanserif-?)?(bold-?italic|italic-?bold)', format):
-        return asciiToSanSerifBoldItalic(string)
-    if format in ['script', 'cursive']:
-        return asciiToScript(string)
-    if re.fullmatch(r'(script|cursive)-?bold', format):
-        return asciiToScriptBold(string)
-    if format == 'fraktur':
-        return asciiToFraktur(string)
-    if re.fullmatch(r'fraktur-?bold', format):
-        return asciiToFrakturBold(string)
-    if format == 'monospace':
-        return asciiToMonospace(string)
-    if format == 'doublestruck':
-        return asciiToDoubleStruck(string)
+    strTable = {
+        'ascii': allToAscii,
+        'full': asciiToFullWidth,
+        'parenthesized': asciiToParenthesized,
+        'circled': asciiToCircled,
+        'smallcaps': asciiToParenthesized,
+        'parenthesized': asciiToParenthesized,
+        'circled': asciiToCircled,
+        'smallcaps': asciiToSmallCaps,
+        'upsidedown': asciiToUpsideDown,
+        'sanserif': asciiToSanSerif,
+        'script': asciiToScript,
+        'cursive': asciiToScript,
+        'fraktur': asciiToFraktur,
+        'monospace': asciiToMonospace,
+        'doublestruck': asciiToDoubleStruck,
+        }
+    reTable = {
+        r'serif-?bold': asciiToSerifBold,
+        r'serif-?italic': asciiToSerifItalic,
+        r'serif-?bold-?italic': asciiToSerifBoldItalic,
+        r'serif-?bold': asciiToSerifBold,
+        r'serif-?bold': asciiToSerifBold,
+        r'sanserif-?bold': asciiToSanSerifBold,
+        r'sanserif-?italic': asciiToSanSerifBold,
+        r'(sanserif-?)?(bold-?italic|italic-?bold)': asciiToSanSerifBoldItalic,
+        r'(script|cursive)-?bold': asciiToScriptBold,
+        r'fraktur-?bold': asciiToFrakturBold,
+        }
+    if format in strTable:
+        return strTable[format](string)
+    for pattern in reTable:
+        if re.search(pattern, string):
+            return reTable[pattern](string)
     return string
