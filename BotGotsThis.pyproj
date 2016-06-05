@@ -151,6 +151,7 @@
     <Compile Include="source\public\library\exit.py" />
     <Compile Include="source\public\library\feature.py" />
     <Compile Include="source\public\library\managebot.py" />
+    <Compile Include="source\public\library\message.py" />
     <Compile Include="source\public\library\reload.py" />
     <Compile Include="source\public\library\textformat.py" />
     <Compile Include="source\public\library\timeout.py" />
