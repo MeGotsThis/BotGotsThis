@@ -33,9 +33,9 @@ def botSay(db, nick, channel, message):
         globals.channels[channel].send(message)
 
 def botEmptyAll(send):
-    globals.messaging.clearAllQueue()
+    utils.clearAllChat()
     send('Cleared all queued messages')
 
 def botEmpty(channel, send):
-    globals.messaging.clearQueue(channel)
+    globals.channels[channel].socket.messaging.clearChat(channel)
     send('Cleared all queued messages for ' + channel)

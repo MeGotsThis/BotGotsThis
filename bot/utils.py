@@ -28,6 +28,10 @@ def whisper(nick, message):
     cluster = globals.clusters[globals.whisperCluster]
     cluster.messaging.sendWhisper(nick, message)
 
+def clearAllChat():
+    for c in globals.clusters.values():
+        c.messaging.clearAllChat()
+
 ENSURE_CLUSTER_UNKNOWN = int(-3)
 ENSURE_CLUSTER_NONE = int(-2)
 ENSURE_REJOIN = int(-1)

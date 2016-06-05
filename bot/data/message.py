@@ -141,7 +141,7 @@ class MessagingQueue:
                     if message.channel == channel:
                         queue.remove(message)
     
-    def clearAllChat(self, channel):
+    def clearAllChat(self):
         with self._queueLock:
             for queue in self._chatQueues:
                 queue.clear()

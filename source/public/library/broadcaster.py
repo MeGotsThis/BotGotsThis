@@ -35,7 +35,7 @@ def botLeave(channel, send):
 
 def botEmpty(channel, send):
     if channel in globals.channels:
-        globals.messaging.clearQueue(channel)
+        globals.channels[channel].socket.messaging.clearChat(channel)
         send('Cleared all queued messages '
              'for {channel}'.format(channel=channel))
 

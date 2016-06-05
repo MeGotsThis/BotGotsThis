@@ -145,7 +145,7 @@ class Channel:
     
     def part(self):
         self.socket.partChannel(self)
-        globals.messaging.clearQueue(self.channel)
+        self._socket.messaging.clearChat(self.channel)
         self._socket = None
     
     def send(self, messages, priority=1):
