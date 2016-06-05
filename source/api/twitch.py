@@ -19,28 +19,21 @@ def getTwitchClientId():
     return None
 
 def twitchCall(channel, method, uri, headers={}, data=None):
-    conn = http.client.HTTPSConnection('api.twitch.tv')
-    
-    if channel is not None and 'Authorization' not in headers:
-        token = oauth.getOAuthToken(channel)
-        if token is not None:
-            headers['Authorization'] = 'OAuth ' + token
-        headers['Accept'] = 'application/vnd.twitchtv.v3+json'
-        clientId = getTwitchClientId()
-        if clientId is not None:
-            headers['Client-ID'] = clientId
-    
-    if data is not None:
-        if type(data) is dict:
-            data = urllib.parse.urlencode(data)
-    
-    conn.request(method, uri, data, headers)
-    response = conn.getresponse()
-    responseData = response.read()
-    
-    conn.close()
-    
-    return (response, responseData)
+    with http.client.HTTPSConnection('api.twitch.tv') as connection:
+        if channel is not None and 'Authorization' not in headers:
+            token = oauth.getOAuthToken(channel)
+            if token is not None:
+                headers['Authorization'] = 'OAuth ' + token
+            headers['Accept'] = 'application/vnd.twitchtv.v3+json'
+            clientId = getTwitchClientId()
+            if clientId is not None:
+                headers['Client-ID'] = clientId
+        if data is not None:
+            if type(data) is dict:
+                data = urllib.parse.urlencode(data)
+        connection.request(method, uri, data, headers)
+        response = connection.getresponse()
+        return response, response.read()
 
 def serverTime():
     with suppress(http.client.HTTPException):
