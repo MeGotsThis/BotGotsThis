@@ -165,3 +165,42 @@ def updateChannel(channel, *, status=None, game=None):
             },
         data=postData)
     return response.status == 200
+
+def checkOnlineStreams(channels):
+    uri = '/kraken/streams?limit=100&channel=' + ','.join(channels)
+    response, responseData = twitchCall(None, 'GET', uri)
+    if response.status != 200:
+        return None
+    online = {}
+    streamsData = json.loads(responseData.decode('utf-8'))
+    _handleStreams(streamsData['streams'], online)
+    if streamsData['_total'] > 100:
+        while streamsData['streams']:
+            time.sleep(0.05)
+            fullUrl = streamsData['_links']['next']
+            uri = fullUrl[fullUrl.index('/kraken'):]
+            response, responseData = twitchCall(None, 'GET', uri)
+            if response.status != 200:
+                break
+            streamsData = json.loads(responseData.decode('utf-8'))
+            _handleStreams(streamsData['streams'], online)
+    return online
+
+def _handleStreams(streams, online=None):
+    if online is None:
+        online = {}
+    for stream in streams:
+        channel = stream['channel']['name'].lower()
+        streamingSince = datetime.datetime.strptime(stream['created_at'],
+                                                    '%Y-%m-%dT%H:%M:%SZ')
+        streams[channel] = (streamingSince, stream['channel']['status'],
+                            stream['channel']['game'])
+    return online
+
+def channelStatusAndGame(channel):
+    uri = '/kraken/channels/' + channel
+    response, responseData = twitchCall(None, 'GET', uri)
+    if response.status != 200:
+        return None
+    channel_ = json.loads(responseData.decode('utf-8'))
+    return None, channel_['status'], channel_['game']
