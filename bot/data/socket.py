@@ -99,7 +99,7 @@ class Socket:
         if self._socket is None:
             return
         try:
-            message = str(command)[:config.messageLimit-2] + '\r\n'
+            message = str(command) + '\r\n'
             messageBytes = message.encode('utf-8')
             timestamp = datetime.utcnow()
             self._socket.send(messageBytes)
@@ -226,16 +226,18 @@ class Socket:
         self.messaging.cleanOldTimestamps()
         for message in iter(self.messaging.popWhisper, None):
             self.queueWrite(
-                IrcMessage(None, None, 'PRIVMSG',
-                           IrcMessageParams(
-                               globals.groupChannel.ircChannel,
-                               '.w {nick} {message}'.format(
-                                   nick=message.nick,
-                                   message=message.message))),
+                IrcMessage(
+                    None, None, 'PRIVMSG',
+                    IrcMessageParams(
+                        globals.groupChannel.ircChannel,
+                        '.w {nick} {message}'.format(
+                            nick=message.nick,
+                            message=message.message)[:config.messageLimit])),
                 whisper=message)
         for message in iter(self.messaging.popChat, None):
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
-                           IrcMessageParams(message.channel.ircChannel,
-                                            message.message)),
+                           IrcMessageParams(
+                               message.channel.ircChannel,
+                               message.message[:config.messageLimit])),
                 channel=message.channel)
