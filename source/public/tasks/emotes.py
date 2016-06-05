@@ -2,43 +2,49 @@
 from ...api import ffz
 from ...api import twitch
 from bot import globals
+from datetime import datetime, timedelta
 import copy
-import datetime
 import random
 
 def refreshTwitchGlobalEmotes(timestamp):
-    since = timestamp - globals.globalEmotesCache
-    if since >= datetime.timedelta(hours=1):
-        twitch.updateTwitchEmotes()
+    if timestamp - globals.globalEmotesCache >= timedelta(hours=1):
+        data = twitch.getTwitchEmotes()
+        if data:
+            emotes, emoteSets = data
+            globals.globalEmotesCache = timestamp
+            globals.globalEmotes = emotes
+            globals.globalEmoteSets = emoteSet
 
 def refreshFrankerFaceZEmotes(timestamp):
-    cooldown = datetime.timedelta(hours=1)
-    since = timestamp - globals.globalFfzEmotesCache
-    if since >= cooldown:
-        ffz.updateGlobalEmotes()
+    if timestamp - globals.globalFfzEmotesCache >= timedelta(hours=1):
+        emotes = ffz.getGlobalEmotes()
+        if emotes:
+            globals.globalFfzEmotesCache = timestamp
+            globals.globalFfzEmotes = emotes
     channels = copy.copy(globals.channels)
-    toUpdate = [channels[c] for c in globals.channels
-                if timestamp - channels[c].ffzCache >= cooldown and
-                channels[c].streamingSince is not None]
+    toUpdate = [chan for chan in channels.items()
+                if timestamp - chan.ffzCache >= timedelta(hours=1)
+                and chan.streamingSince is not None]
     if not toUpdate:
-        toUpdate = [channels[c] for c in globals.channels
-                    if timestamp - channels[c].ffzCache >= cooldown and
-                    channels[c].streamingSince is None]
+        toUpdate = [chan for chan in channels.items()
+                    if timestamp - chan.ffzCache >= timedelta(hours=1)
+                    and chan.streamingSince is None]
     if toUpdate:
         random.choice(toUpdate).updateFfzEmotes()
 
 def refreshBetterTwitchTvEmotes(timestamp):
-    cooldown = datetime.timedelta(hours=1)
-    since = timestamp - globals.globalBttvEmotesCache
-    if since >= cooldown:
-        bttv.updateGlobalEmotes()
+    if timestamp - globals.globalBttvEmotesCache >= timedelta(hours=1):
+        emotes = bttv.getGlobalEmotes()
+        if emotes:
+            globals.globalBttvEmotesCache = timestamp
+            globals.globalBttvEmotes = emotes
     channels = copy.copy(globals.channels)
-    toUpdate = [channels[c] for c in globals.channels
-                if timestamp - channels[c].bttvCache >= cooldown and
-                channels[c].streamingSince is not None]
+    toUpdate = [chan for chan in channels.items()
+                if timestamp - chan.bttvCache >= timedelta(hours=1)
+                and chan.streamingSince is not None]
     if not toUpdate:
-        toUpdate = [channels[c] for c in globals.channels
-                    if timestamp - channels[c].bttvCache >= cooldown and
-                    channels[c].streamingSince is None]
+        toUpdate = [chan for chan in channels.items()
+                    if timestamp - chan.bttvCache >= timedelta(hours=1)
+                    and chan.streamingSince is None]
     if toUpdate:
         random.choice(toUpdate).updateBttvEmotes()

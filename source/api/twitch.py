@@ -57,13 +57,12 @@ def serverTime():
                 return datetime.datetime.fromtimestamp(unixTimestamp)
     return None
 
-def updateTwitchEmotes():
-    globals.globalEmotesCache = datetime.datetime.utcnow()
-    emotesets = [str(i) for i in globals.emoteset]
+def getTwitchEmotes():
+    uri = ('/kraken/chat/emoticon_images?emotesets='
+           + ','.join(str(i) for i in globals.emoteset))
     with suppress(OSError):
         response, data = twitchCall(
-            None, 'GET',
-            '/kraken/chat/emoticon_images?emotesets=' + ','.join(emotesets),
+            None, 'GET', uri,
             headers = {
                 'Accept': 'application/vnd.twitchtv.v3+json',
                 })
@@ -93,8 +92,8 @@ def updateTwitchEmotes():
                 else:
                     emotes[emote['id']] = emote['code']
                 emoteSet[emote['id']] = int(emoteSetId)
-        globals.globalEmotes = emotes
-        globals.globalEmoteSets = emoteSet
+        return emotes, emoteSet
+    return None
 
 def twitchChatServer(chat, headers={}, data=None):
     conn = http.client.HTTPSConnection('tmi.twitch.tv')
