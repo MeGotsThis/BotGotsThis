@@ -14,7 +14,7 @@ def getCustomCommand(database, command, channel, permissions):
                 if permission in commands[channel]:
                     message = commands[broadcaster][permission]
                     return CustomCommand(message, broadcaster, permission)
-    return CustomCommand(None, None, None)
+    return None
 
 def createMessages(command, args):
     textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
