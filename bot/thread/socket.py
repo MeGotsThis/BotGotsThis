@@ -33,8 +33,11 @@ class SocketsThread(threading.Thread):
     
     def process(self):
         isActive = lambda s: s.socket
-        for socketConnection in filterfalse(isActive, self._socketConnections):
-            socketConnection.connect()
+        try:
+            for socketConnection in filterfalse(isActive, self._socketConnections):
+                socketConnection.connect()
+        except:
+            utils.logException()
         for socketConnection in filter(isActive, self._socketConnections):
             socketConnection.queueMessages()
         connections = list(filter(isActive, self._socketConnections))

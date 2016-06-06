@@ -50,11 +50,10 @@ class Socket:
     def connect(self):
         if self._socket is not None:
             raise ConnectionError('connection already exists')
-        try:
-            connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            connection.connect((self._server, self._port))
-        except:
-            raise
+        
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection.connect((self._server, self._port))
+        
         print('{time} {name} Connected {server}'.format(
             time=datetime.utcnow(), name=self.name, server=self._server))
         commands = [
@@ -122,10 +121,15 @@ class Socket:
             self.write(*item[0], **item[1])
     
     def read(self):
-        ircmsgs = lastRecv = bytes(self._socket.recv(2048))
-        while lastRecv != b'' and lastRecv[-2:] != b'\r\n':
-            lastRecv = bytes(self._socket.recv(2048))
-            ircmsgs += lastRecv
+        try:
+            ircmsgs = lastRecv = bytes(self._socket.recv(2048))
+            while lastRecv != b'' and lastRecv[-2:] != b'\r\n':
+                lastRecv = bytes(self._socket.recv(2048))
+                ircmsgs += lastRecv
+        except ConnectionError:
+            utils.logException()
+            self.disconnect()
+            return
         
         try:
             for ircmsg in ircmsgs.split(b'\r\n'):
