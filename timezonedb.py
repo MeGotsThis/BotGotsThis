@@ -1,4 +1,5 @@
-﻿import configparser
+﻿from contextlib import closing
+import configparser
 import csv
 import datetime
 import io
@@ -12,44 +13,38 @@ ini.read('config.ini')
 response = urllib.request.urlopen('http://timezonedb.com/date.txt')
 tzdate = datetime.date(*[int(i) for i in response.read().decode().split('-')])
 
-connection = sqlite3.connect(ini['TIMEZONEDB']['timezonedb'],
-                             detect_types=True)
-cursor = connection.cursor()
-try:
-    cursor.execute('SELECT updated FROM updated')
-    row = cursor.fetchone()
-except:
-    row = None
-if row is None or tzdate > row[0]:
-    with open('source/database/sqlite/timezonedb.sql', 'r') as file:
-        cursor.executescript(file.read())
-            
-    url = 'https://timezonedb.com/files/timezonedb.csv.zip'
-    response = urllib.request.urlopen(url)
-    with io.BytesIO(response.read()) as zipIO:
-        with zipfile.ZipFile(zipIO) as zipFile:
-            with zipFile.open('zone.csv', 'r') as file:
-                with io.TextIOWrapper(file) as text:
-                    reader = csv.reader(text)
-                    query = 'INSERT INTO zone VALUES (?, ?, ?)'
-                    cursor.executemany(query, list(reader))
-
-            with zipFile.open('timezone.csv', 'r') as file:
-                with io.TextIOWrapper(file) as text:
-                    reader = csv.reader(text)
-                    query = 'INSERT INTO timezone VALUES (?, ?, ?, ?, ?)'
-                    cursor.executemany(query, list(reader))
-
-            with zipFile.open('country.csv', 'r') as file:
-                with io.TextIOWrapper(file) as text:
-                    reader = csv.reader(text)
-                    query = 'INSERT INTO country VALUES (?, ?)'
-                    cursor.executemany(query, list(reader))
-
-    cursor.execute('INSERT INTO updated VALUES (?)', (tzdate,))
-    print('Database has been updated')
-else:
-    print('Database is up to date')
-cursor.close()
-connection.commit()
-connection.close()
+with sqlite3.connect(
+    ini['TIMEZONEDB']['timezonedb'], detect_types=True) as connection, \
+        closing(connection.cursor()) as cursor:
+    try:
+        cursor.execute('SELECT updated FROM updated')
+        lastUpdated, = cursor.fetchone()
+    except:
+        lastUpdated = datetime.date.min
+    if tzdate > lastUpdated:
+        with open('source/database/sqlite/timezonedb.sql', 'r') as file:
+            cursor.executescript(file.read())
+        url = 'https://timezonedb.com/files/timezonedb.csv.zip'
+        with urllib.request.urlopen(url) as response, \
+                io.BytesIO(response.read()) as zipIO, \
+                zipfile.ZipFile(zipIO) as zipFile:
+            with zipFile.open('zone.csv', 'r') as file, \
+                    io.TextIOWrapper(file) as text:
+                reader = csv.reader(text)
+                query = 'INSERT INTO zone VALUES (?, ?, ?)'
+                cursor.executemany(query, reader)
+            with zipFile.open('timezone.csv', 'r') as file, \
+                    io.TextIOWrapper(file) as text:
+                reader = csv.reader(text)
+                query = 'INSERT INTO timezone VALUES (?, ?, ?, ?, ?)'
+                cursor.executemany(query, reader)
+            with zipFile.open('country.csv', 'r') as file, \
+                    io.TextIOWrapper(file) as text:
+                reader = csv.reader(text)
+                query = 'INSERT INTO country VALUES (?, ?)'
+                cursor.executemany(query, reader)
+        cursor.execute('INSERT INTO updated VALUES (?)', (tzdate,))
+        print('Database has been updated')
+    else:
+        print('Database is up to date')
+    connection.commit()
