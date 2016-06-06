@@ -33,8 +33,8 @@ def twitchCall(channel, method, uri, headers={}, data=None):
             if type(data) is dict:
                 data = urllib.parse.urlencode(data)
         connection.request(method, uri, data, headers)
-        response = connection.getresponse()
-        return response, response.read()
+        with connection.getresponse() as response:
+            return response, response.read()
 
 def serverTime():
     with suppress(http.client.HTTPException):
@@ -104,11 +104,11 @@ def twitchChatServer(chat, headers={}, data=None):
             data = urllib.parse.urlencode(data)
     
         connection.request('GET', '/servers?channel=' + chat, data, headers)
-        response = connection.getresponse()
-        responseData = response.read()
-        with suppress(ValueError):
-            jData = json.loads(responseData.decode('utf-8'))
-            return str(jData['cluster'])
+        with connection.getresponse() as response:
+            responseData = response.read()
+            with suppress(ValueError):
+                jData = json.loads(responseData.decode('utf-8'))
+                return str(jData['cluster'])
     return None
 
 def checkValidTwitchUser(user):
