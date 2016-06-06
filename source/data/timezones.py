@@ -101,10 +101,10 @@ timezones = [
 
 _ini = configparser.ConfigParser()
 _ini.read('config.ini')
-with sqlite3.connect(_ini['TIMEZONEDB']['timezonedb'],
-                     detect_types=True) as _connection:
-    with closing(_connection.cursor()) as _cursor:
-        _cursor.execute('''
+with sqlite3.connect(
+    _ini['TIMEZONEDB']['timezonedb'], detect_types=True) as _connection, \
+        closing(_connection.cursor()) as _cursor:
+    _cursor.execute('''
 SELECT abbreviation, gmt_offset FROM timezone
     WHERE time_start >= 2114380800
     AND abbreviation NOT IN ('CST', 'CDT', 'AMT', 'AST', 'GST', 'IST',
@@ -113,28 +113,26 @@ SELECT abbreviation, gmt_offset FROM timezone
 UNION ALL SELECT abbreviation, gmt_offset FROM timezone
     WHERE time_start=2147483647 AND
     zone_id IN (382, 75, 294, 281, 190, 211, 159)''')
-        # For the abbreviation conflicts of: 
-        # CST, CDT, AMT, AST, GST, IST, KST, BST
-        # I have choosen: America/Chicago, America/Boa_Vista,
-        # America/Puerto_Rico, Asia/Muscat, Asia/Jerusalem, Asia/Seoul,
-        # Europe/London
-        for _row in _cursor:
-            timezones.append(BasicTimeZone(_row[1] // 60, _row[0]))
-        _zones = {}
-        _transitions = {}
-        _cursor.execute('SELECT zone_id, zone_name FROM zone ORDER BY zone_id')
-        for _row in _cursor:
-            _zones[_row[0]] = _row[1]
-            _transitions[_row[0]] = []
-        _cursor.execute('SELECT zone_id, abbreviation, time_start, gmt_offset '
-                        "FROM timezone WHERE abbreviation != 'UTC' "
-                        'ORDER BY zone_id, time_start')
-        for _row in _cursor:
-            _transitions[_row[0]].append((_row[2], _row[1], _row[3]))
-        for _z in _zones:
-            timezones.append(TimeZone(_zones[_z], _transitions[_z]))
+    # For the abbreviation conflicts of: CST, CDT, AMT, AST, GST, IST, KST, BST
+    # I have choosen: America/Chicago, America/Boa_Vista, America/Puerto_Rico,
+    # Asia/Muscat, Asia/Jerusalem, Asia/Seoul, Europe/London
+    for _row in _cursor:
+        timezones.append(BasicTimeZone(_row[1] // 60, _row[0]))
+    _zones = {}
+    _transitions = {}
+    _cursor.execute('SELECT zone_id, zone_name FROM zone ORDER BY zone_id')
+    for _row in _cursor:
+        _zones[_row[0]] = _row[1]
+        _transitions[_row[0]] = []
+    _cursor.execute('SELECT zone_id, abbreviation, time_start, gmt_offset '
+                    "FROM timezone WHERE abbreviation != 'UTC' "
+                    'ORDER BY zone_id, time_start')
+    for _row in _cursor:
+        _transitions[_row[0]].append((_row[2], _row[1], _row[3]))
+    for _z in _zones:
+        timezones.append(TimeZone(_zones[_z], _transitions[_z]))
 
-abbreviations = { tz.zone().lower(): tz for tz in timezones }
+abbreviations = {tz.zone().lower(): tz for tz in timezones}
 
 del _ini, _connection, _cursor, _row, _z, _zones, _transitions
 del closing, configparser, datetime, sqlite3
