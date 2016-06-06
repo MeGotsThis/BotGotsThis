@@ -13,7 +13,7 @@ def refreshTwitchGlobalEmotes(timestamp):
             emotes, emoteSets = data
             globals.globalEmotesCache = timestamp
             globals.globalEmotes = emotes
-            globals.globalEmoteSets = emoteSet
+            globals.globalEmoteSets = emoteSets
 
 def refreshFrankerFaceZEmotes(timestamp):
     if timestamp - globals.globalFfzEmotesCache >= timedelta(hours=1):
@@ -22,11 +22,11 @@ def refreshFrankerFaceZEmotes(timestamp):
             globals.globalFfzEmotesCache = timestamp
             globals.globalFfzEmotes = emotes
     channels = copy.copy(globals.channels)
-    toUpdate = [chan for chan in channels.items()
+    toUpdate = [chan for chan in channels.values()
                 if timestamp - chan.ffzCache >= timedelta(hours=1)
                 and chan.streamingSince is not None]
     if not toUpdate:
-        toUpdate = [chan for chan in channels.items()
+        toUpdate = [chan for chan in channels.values()
                     if timestamp - chan.ffzCache >= timedelta(hours=1)
                     and chan.streamingSince is None]
     if toUpdate:
@@ -39,11 +39,11 @@ def refreshBetterTwitchTvEmotes(timestamp):
             globals.globalBttvEmotesCache = timestamp
             globals.globalBttvEmotes = emotes
     channels = copy.copy(globals.channels)
-    toUpdate = [chan for chan in channels.items()
+    toUpdate = [chan for chan in channels.values()
                 if timestamp - chan.bttvCache >= timedelta(hours=1)
                 and chan.streamingSince is not None]
     if not toUpdate:
-        toUpdate = [chan for chan in channels.items()
+        toUpdate = [chan for chan in channels.values()
                     if timestamp - chan.bttvCache >= timedelta(hours=1)
                     and chan.streamingSince is None]
     if toUpdate:

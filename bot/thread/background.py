@@ -12,13 +12,12 @@ class BackgroundTasker(threading.Thread):
     def run(self):
         print('{time} Starting {name}'.format(
             time=datetime.utcnow(), name=self.__class__.__name__))
-        now = datetime.utcnow()
         try:
             while globals.running:
                 self.runTasks()
                 time.sleep(1 / 1000)
         except:
-            utils.logException(None, now)
+            utils.logException()
             raise
         finally:
             print('{time} Ending {name}'.format(

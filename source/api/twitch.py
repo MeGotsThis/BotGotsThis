@@ -1,6 +1,6 @@
 ﻿from . import oauth
 from bot import globals
-from contextlib import suppress
+from contextlib import closing, suppress
 from collections.abc import Mapping
 import configparser
 import datetime
@@ -20,7 +20,7 @@ def getTwitchClientId():
     return None
 
 def twitchCall(channel, method, uri, headers={}, data=None):
-    with http.client.HTTPSConnection('api.twitch.tv') as connection:
+    with closing(http.client.HTTPSConnection('api.twitch.tv')) as connection:
         if channel is not None and 'Authorization' not in headers:
             token = oauth.getOAuthToken(channel)
             if token is not None:
@@ -90,7 +90,7 @@ def getTwitchEmotes():
     return None
 
 def twitchChatServer(chat, headers={}, data=None):
-    with http.client.HTTPSConnection('tmi.twitch.tv') as connection:
+    with closing(http.client.HTTPSConnection('tmi.twitch.tv')) as connection:
         if chat is not None and 'Authorization' not in headers:
             token = oauth.getOAuthToken(chat)
             if token is not None:
