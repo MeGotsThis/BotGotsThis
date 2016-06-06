@@ -56,11 +56,7 @@ class IrcMessageTagsKey(collections.abc.Hashable):
     
     @staticmethod
     def parse(keyToParse):
-        if isinstance(keyToParse, IrcMessageTagsKey):
-            return keyToParse
-        if isinstance(keyToParse, str):
-            pass
-        else:
+        if not isinstance(keyToParse, str):
             raise ValueError()
         
         length = len(keyToParse)
