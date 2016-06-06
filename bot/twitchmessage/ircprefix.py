@@ -82,9 +82,7 @@ class IrcMessagePrefix:
     
     @staticmethod
     def parse(params):
-        if isinstance(params, str):
-            pass
-        else:
+        if not isinstance(params, str):
             raise ValueError()
         
         length = len(params)

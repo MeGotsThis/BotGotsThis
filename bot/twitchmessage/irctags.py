@@ -295,9 +295,7 @@ class IrcMessageTags(IrcMessageTagsReadOnly, collections.abc.MutableMapping):
     def __setitem__(self, key, value):
         if isinstance(key, str):
             key = IrcMessageTagsKey.fromKeyVendor(key)
-        elif isinstance(key, IrcMessageTagsKey):
-            pass
-        else:
+        elif not isinstance(key, IrcMessageTagsKey):
             raise TypeError()
         if value is True:
             self._items[key] = value

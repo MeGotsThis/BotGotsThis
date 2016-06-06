@@ -84,9 +84,7 @@ class IrcMessage:
     
     @staticmethod
     def parse(message):
-        if isinstance(message, str):
-            pass
-        else:
+        if not isinstance(message, str):
             raise ValueError()
         
         length = len(message)
