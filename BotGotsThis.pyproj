@@ -61,7 +61,7 @@
     <Compile Include="lists\private\custom.dist.disableAll.py" />
     <Compile Include="lists\private\custom.dist.py" />
     <Compile Include="lists\private\custom.py" />
-    <Compile Include="lists\private\default\chat.py" />
+    <Compile Include="lists\private\default\channel.py" />
     <Compile Include="lists\private\default\custom.py" />
     <Compile Include="lists\private\default\feature.py" />
     <Compile Include="lists\private\default\manage.py" />
