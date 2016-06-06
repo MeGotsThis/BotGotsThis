@@ -3,7 +3,7 @@ import time
 from contextlib import suppress
 from datetime import datetime, timedelta
 from ..library import timeout
-from ..library.chat import permission
+from ..library.chat import min_args, permission
 from ...database.factory import getDatabase
 
 
@@ -33,14 +33,15 @@ def commandAutoRepeatCount(args):
     return processAutoRepeat(args, count)
 
 
+@min_args(2)
 def processAutoRepeat(args, count):
-    try:
-        if args.message.lower[1] == 'off':
-            minutesDuration = 0
-        else:
+    if args.message.lower[1] == 'off':
+        minutesDuration = 0
+    else:
+        try:
             minutesDuration = float(args.message[1])
-    except (ValueError, IndexError):
-        return False
+        except (ValueError):
+            return False
     
     message = args.message[2:] or None
     if 'repeatThread' in args.chat.sessionData:

@@ -39,21 +39,17 @@ def customCommands(args):
 @ownerChannel
 @permission('admin')
 def commandGlobal(args):
-    return processCommand(args)
+    return processCommand(args, '#global')
 
 
 @not_feature('nocustom')
 @permission('moderator')
 def commandCommand(args):
-    return processCommand(args)
+    return processCommand(args, args.chat.channel)
 
 
 @min_args(3)
-def processCommand(args):
-    broadcaster = args.chat.channel
-    if args.message.command == '!global':
-        broadcaster = '#global'
-    
+def processCommand(args, broadcaster):
     input = custom.parseCommandMessageInput(args.message, broadcaster)
     if input is None:
         return False

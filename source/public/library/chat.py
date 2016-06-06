@@ -8,10 +8,10 @@ def send(chat):
 def permission(permission):
     def decorator(func):
         @wraps(func)
-        def command(args):
+        def command(args, *pargs, **kwargs):
             if not args.permissions[permission]:
                 return False
-            return func(args)
+            return func(args, *pargs, **kwargs)
         return command
     return decorator
 
@@ -19,30 +19,30 @@ def permission(permission):
 def not_permission(permission):
     def decorator(func):
         @wraps(func)
-        def command(args):
+        def command(args, *pargs, **kwargs):
             if not args.permissions[permission]:
                 return False
-            return func(args)
+            return func(args, *pargs, **kwargs)
         return command
     return decorator
 
 
 def ownerChannel(func):
     @wraps(func)
-    def chatCommand(args):
+    def chatCommand(args, *pargs, **kwargs):
         if not args.permissions.inOwnerChannel:
             return False
-        return func(args)
+        return func(args, *pargs, **kwargs)
     return chatCommand
 
 
 def feature(feature):
     def decorator(func):
         @wraps(func)
-        def chatCommand(args):
+        def chatCommand(args, *pargs, **kwargs):
             if not args.database.hasFeature(args.chat.channel, feature):
                 return False
-            return func(args)
+            return func(args, *pargs, **kwargs)
         return chatCommand
     return decorator
 
@@ -50,10 +50,10 @@ def feature(feature):
 def not_feature(feature):
     def decorator(func):
         @wraps(func)
-        def chatCommand(args):
+        def chatCommand(args, *pargs, **kwargs):
             if args.database.hasFeature(args.chat.channel, feature):
                 return False
-            return func(args)
+            return func(args, *pargs, **kwargs)
         return chatCommand
     return decorator
 
@@ -61,7 +61,7 @@ def not_feature(feature):
 def permission_feature(*permissionFeatures):
     def decorator(func):
         @wraps(func)
-        def chatCommand(args):
+        def chatCommand(args, *pargs, **kwargs):
             for permission, feature in permissionFeatures:
                 hasPermission = not permission or args.permissions[permission]
                 hasFeature = (not feature
@@ -71,7 +71,7 @@ def permission_feature(*permissionFeatures):
                     break
             else:
                 return False
-            return func(args)
+            return func(args, *pargs, **kwargs)
         return chatCommand
     return decorator
 
@@ -79,7 +79,7 @@ def permission_feature(*permissionFeatures):
 def permission_not_feature(*permissionFeatures):
     def decorator(func):
         @wraps(func)
-        def chatCommand(args):
+        def chatCommand(args, *pargs, **kwargs):
             for permission, feature in permissionFeatures:
                 hasPermission = not permission or args.permissions[permission]
                 hasFeature = (not feature
@@ -89,7 +89,7 @@ def permission_not_feature(*permissionFeatures):
                     break
             else:
                 return False
-            return func(args)
+            return func(args, *pargs, **kwargs)
         return chatCommand
     return decorator
 
@@ -97,10 +97,10 @@ def permission_not_feature(*permissionFeatures):
 def cooldown(duration, key, permission=None):
     def decorator(func):
         @wraps(func)
-        def chatCommand(args):
+        def chatCommand(args, *pargs, **kwargs):
             if inCooldown(args, duration, key, permission):
                 return False
-            return func(args)
+            return func(args, *pargs, **kwargs)
         return chatCommand
     return decorator
 
@@ -117,11 +117,11 @@ def inCooldown(args, duration, key, permission=None):
 def min_args(amount, _return=False, reason=None):
     def decorator(func):
         @wraps(func)
-        def command(args):
+        def command(args, *pargs, **kwargs):
             if len(args.message) < amount:
                 if reason:
                     args.chat.send(reason)
                 return _return
-            return func(args)
+            return func(args, *pargs, **kwargs)
         return command
     return decorator
