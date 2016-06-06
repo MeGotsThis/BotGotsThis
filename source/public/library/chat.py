@@ -108,7 +108,7 @@ def min_args(amount, _return=False, reason=None):
         @wraps(func)
         def command(args):
             if len(args.message) < amount:
-                if message:
+                if reason:
                     args.chat.send(reason)
                 return _return
             return func(args)
