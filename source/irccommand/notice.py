@@ -5,6 +5,7 @@ messageLimit += 'sending messages too quickly.'
 messageIdentical = 'Your message was not sent because it is identical to the '
 messageIdentical += 'previous one you sent, less than 30 seconds ago.'
 
+
 def parse(chat, nick, message):
     if message == 'Login unsuccessful':
         raise LoginUnsuccessfulException()

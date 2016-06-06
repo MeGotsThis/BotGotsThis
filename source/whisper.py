@@ -22,11 +22,8 @@ def parse(tags, nick, rawMessage, timestamp):
     params = tags, nick, message, timestamp
     threading.Thread(target=whisperCommand, args=params, name=name).start()
     
+
 def whisperCommand(tags, nick, message, timestamp):
-    if False: # Hints for Intellisense
-        nick = str()
-        message = Message('')
-    
     try:
         permissions = WhisperPermissionSet(tags, nick)
     
@@ -41,6 +38,7 @@ def whisperCommand(tags, nick, message, timestamp):
         extra = 'From: {nick}\nMessage: {message}'.format(
             nick=nick, message=message)
         utils.logException(extra, timestamp)
+
 
 def commandsToProcess(command):
     if command in whisper.commands:

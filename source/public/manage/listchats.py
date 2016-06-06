@@ -1,5 +1,5 @@
 ﻿from bot import globals
-from  ..library.message import messagesFromItems
+from ..library.message import messagesFromItems
 
 
 def manageListChats(args):

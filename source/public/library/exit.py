@@ -1,6 +1,7 @@
 ﻿from bot import globals, utils
 import time
 
+
 def botExit(send):
     send('Goodbye Keepo', 0)
     time.sleep(0.5)

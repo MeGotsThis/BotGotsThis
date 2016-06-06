@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from lists import custom as customItems
 
+
 @not_feature('nocustom')
 def customCommands(args):
     command = custom.getCustomCommand(args.database, args.message.command,
@@ -34,15 +35,18 @@ def customCommands(args):
         return True
     return False
 
+
 @ownerChannel
 @permission('admin')
 def commandGlobal(args):
     return processCommand(args)
 
+
 @not_feature('nocustom')
 @permission('moderator')
 def commandCommand(args):
     return processCommand(args)
+
 
 @min_args(3)
 def processCommand(args):
@@ -123,7 +127,7 @@ def processCommand(args):
         else:
             message = ('{command} was not appended successfully. The command '
                        'might not exist')
-    elif input.action in ['del', 'delete', 'rem', 'remove',]:
+    elif input.action in ['del', 'delete', 'rem', 'remove']:
         if args.database.deleteCustomCommand(
                 input.broadcaster, input.level, input.command, args.nick):
             message = '{command} was removed successfully'

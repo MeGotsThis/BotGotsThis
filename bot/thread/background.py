@@ -34,6 +34,7 @@ class BackgroundTasker(threading.Thread):
                     target=task.task, args=(timestamp,)).start()
                 task.timestamp = timestamp
 
+
 class Task:
     def __init__(self, task, interval):
         self._task = task

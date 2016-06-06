@@ -3,6 +3,7 @@ from contextlib import suppress
 import urllib.error
 import urllib.request
 
+
 def fieldUrl(args):
     if args.field.lower() == 'url':
         url = args.param.replace('{query}', args.message.query)

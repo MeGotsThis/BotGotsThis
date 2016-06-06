@@ -18,6 +18,7 @@ unescapedValue = {
     'n': '\n'
     }
 
+
 class IrcMessageTagsKey(collections.abc.Hashable):
     __slots__ = ('_vendor', '_key')
     
@@ -109,6 +110,7 @@ class IrcMessageTagsKey(collections.abc.Hashable):
         key = ''.join(s)
         vendor = ''.join(v) if v else None
         return ParsedKeyVendor(key, vendor)
+
 
 class IrcMessageTagsReadOnly(collections.abc.Mapping):
     __slots__ = '_items',
@@ -288,6 +290,7 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
                 break
         
         return items
+
 
 class IrcMessageTags(IrcMessageTagsReadOnly, collections.abc.MutableMapping):
     __slots__ = '_items',

@@ -7,6 +7,7 @@ engines = {
     'sqlite': SQLiteDatabase,
     }
 
+
 def getDatabase():
     if os.path.isfile('config.ini'):
         ini = configparser.ConfigParser()

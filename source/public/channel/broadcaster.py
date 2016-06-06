@@ -9,19 +9,23 @@ def commandHello(args):
     args.chat.send('Hello Kappa')
     return True
 
+
 @ownerChannel
 def commandCome(args):
     broadcaster.botCome(args.database, args.nick, send(args.chat))
     return True
 
+
 @permission('broadcaster')
 def commandLeave(args):
     return broadcaster.botLeave(args.chat.channel, send(args.chat))
+
 
 @permission('broadcaster')
 def commandEmpty(args):
     broadcaster.botEmpty(args.chat.channel, send(args.chat))
     return True
+
 
 @ownerChannel
 def commandAutoJoin(args):
@@ -29,11 +33,13 @@ def commandAutoJoin(args):
                             args.message)
     return True
 
+
 @permission('broacaster')
 def commandSetTimeoutLevel(args):
     broadcaster.botSetTimeoutLevel(args.database, args.chat.channel,
                                    send(args.chat), args.message)
     return True
+
 
 @cooldown(timedelta(seconds=60), 'uptime')
 def commandUptime(args):

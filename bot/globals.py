@@ -63,7 +63,7 @@ globalEmotes = {
     4: '>(',
     9: '<3',
     }
-globalEmoteSets = { k: 0 for k, v in globalEmotes.items() }
+globalEmoteSets = {k: 0 for k, v in globalEmotes.items()}
 globalEmotesCache = datetime.datetime.min
 globalSessionData = {}
 globalFfzEmotes = {

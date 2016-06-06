@@ -7,6 +7,7 @@ import sys
 import threading
 import traceback
 
+
 def joinChannel(channel, priority=float('inf'), cluster='aws'):
     if cluster is None or cluster not in clusters:
         return False
@@ -19,14 +20,17 @@ def joinChannel(channel, priority=float('inf'), cluster='aws'):
     clusters[cluster].joinChannel(channels[channel])
     return True
 
+
 def partChannel(channel):
     if channel in channels:
         channels[channel].part()
         del channels[channel]
 
+
 def whisper(nick, message):
     cluster = globals.clusters[globals.whisperCluster]
     cluster.messaging.sendWhisper(nick, message)
+
 
 def clearAllChat():
     for c in globals.clusters.values():
@@ -37,6 +41,7 @@ ENSURE_CLUSTER_NONE = int(-2)
 ENSURE_REJOIN = int(-1)
 ENSURE_CORRECT = int(0)
 ENSURE_NOT_JOINED = int(1)
+
 
 def ensureServer(channel, priority=float('inf'), cluster='aws'):
     if channel not in channels:
@@ -54,6 +59,7 @@ def ensureServer(channel, priority=float('inf'), cluster='aws'):
     joinChannel(channel, priority, cluster)
     return ENSURE_REJOIN
 
+
 def logIrcMessage(filename, message, timestamp=None):
     if config.ircLogFolder is None:
         return
@@ -63,6 +69,7 @@ def logIrcMessage(filename, message, timestamp=None):
         file.write(
             '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
                 time=timestamp, message=message))
+
 
 def logException(extraMessage=None, timestamp=None):
     if config.exceptionLog is None:

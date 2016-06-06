@@ -34,7 +34,8 @@ class SocketsThread(threading.Thread):
     def process(self):
         isActive = lambda s: s.socket
         try:
-            for socketConnection in filterfalse(isActive, self._socketConnections):
+            for socketConnection in filterfalse(
+                    isActive, self._socketConnections):
                 socketConnection.connect()
         except:
             utils.logException()

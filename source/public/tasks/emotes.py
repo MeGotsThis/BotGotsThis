@@ -17,6 +17,7 @@ def refreshTwitchGlobalEmotes(timestamp):
             globals.globalEmotes = emotes
             globals.globalEmoteSets = emoteSets
 
+
 def refreshFrankerFaceZEmotes(timestamp):
     if timestamp - globals.globalFfzEmotesCache >= timedelta(hours=1):
         emotes = ffz.getGlobalEmotes()
@@ -33,6 +34,7 @@ def refreshFrankerFaceZEmotes(timestamp):
                     and chan.streamingSince is None]
     if toUpdate:
         random.choice(toUpdate).updateFfzEmotes()
+
 
 def refreshBetterTwitchTvEmotes(timestamp):
     if timestamp - globals.globalBttvEmotesCache >= timedelta(hours=1):

@@ -6,6 +6,7 @@ ParsedPrefix = namedtuple('ParsedPrefix',
 
 nickSpecials = '-_'
 
+
 class IrcMessagePrefix:
     __slots__ = ('_servername', '_nick', '_user', '_host')
     
@@ -22,8 +23,9 @@ class IrcMessagePrefix:
         
         if servername is None and nick is None:
             raise ValueError()
-        if (servername is not None and
-            (nick is not None or user is not None or host is not None)):
+        if (servername is not None
+                and (nick is not None or user is not None
+                     or host is not None)):
             raise ValueError()
         if nick is not None and len(nick) == 0:
             raise ValueError()
@@ -71,10 +73,10 @@ class IrcMessagePrefix:
     
     def __eq__(self, other):
         if isinstance(other, IrcMessagePrefix):
-            return (self._servername == other._servername and
-                    self._nick == other._nick and
-                    self._user == other._user and
-                    self._host == other._host)
+            return (self._servername == other._servername
+                    and self._nick == other._nick
+                    and self._user == other._user
+                    and self._host == other._host)
         return False
     
     def __ne__(self, other):
@@ -115,8 +117,8 @@ class IrcMessagePrefix:
                     raise ValueError()
                 s.append(char)
             else:
-                if (char in string.ascii_letters or char.isdigit() or
-                    char == '-'):
+                if (char in string.ascii_letters or char.isdigit()
+                        or char == '-'):
                     s.append(char)
                 elif char in nickSpecials:
                     if isServerName:

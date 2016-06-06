@@ -7,10 +7,12 @@ def commandReload(args):
     reload.botReload(send(args.nick))
     return True
 
+
 @permission('owner')
 def commandReloadCommands(args):
     reload.botReloadCommands(send(args.nick))
     return True
+
 
 @permission('owner')
 def commandReloadConfig(args):

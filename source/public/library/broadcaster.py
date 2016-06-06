@@ -25,6 +25,7 @@ def botCome(db, channel, send):
             send('Moved {channel} to correct chat '
                  'server'.format(channel=channel))
 
+
 def botLeave(channel, send):
     if channel == config.botnick:
         return False
@@ -33,11 +34,13 @@ def botLeave(channel, send):
     utils.partChannel(channel)
     return True
 
+
 def botEmpty(channel, send):
     if channel in globals.channels:
         globals.channels[channel].socket.messaging.clearChat(channel)
         send('Cleared all queued messages '
              'for {channel}'.format(channel=channel))
+
 
 def botAutoJoin(db, channel, send, message):
     if db.isChannelBannedReason(channel):
@@ -91,6 +94,7 @@ def botAutoJoin(db, channel, send, message):
                    'in chat')
     send(msg.format(channel=channel))
     return True
+
 
 def botSetTimeoutLevel(db, channel, send, message):
     propertyDict = {

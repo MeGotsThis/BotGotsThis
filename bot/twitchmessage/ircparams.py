@@ -2,6 +2,7 @@ from collections import namedtuple
 
 ParsedParams = namedtuple('ParsedParams', ['middle', 'trailing'])
 
+
 class IrcMessageParams:
     __slots__ = ('_middle', '_trailing')
     
@@ -48,8 +49,8 @@ class IrcMessageParams:
     
     def __eq__(self, other):
         if isinstance(other, IrcMessageParams):
-            return (self._middle == other._middle and
-                    self._trailing == other._trailing)
+            return (self._middle == other._middle
+                    and self._trailing == other._trailing)
         return False
     
     def __ne__(self, other):

@@ -2,6 +2,7 @@
 
 needReason = ['add', 'insert', 'del', 'delete', 'rem', 'remove', 'remove']
 
+
 def manageBanned(args):
     if len(args.message) < 3:
         return False
@@ -23,7 +24,7 @@ def manageBanned(args):
         isBannedOrReason = args.database.isChannelBannedReason(channel)
         if isBannedOrReason:
             args.send('{channel} is already banned for: {reason}'.format(
-                channel=channel, reason = isBannedOrReason))
+                channel=channel, reason=isBannedOrReason))
             return False
         params = channel, args.message[4:], args.nick
         result = args.database.addBannedChannel(*params)
@@ -46,7 +47,7 @@ def manageBanned(args):
         result = args.database.removeBannedChannel(*params)
             
         if result:
-            msg =  'Chat {channel} is now unbanned'
+            msg = 'Chat {channel} is now unbanned'
         else:
             msg = 'Chat {channel} could not be unbanned. Error has occured.'
         args.send(msg.format(channel=channel))

@@ -17,6 +17,7 @@ def commandPyramid(args):
         count = int(args.message[2])
     return processPyramid(args, args.message[1] + ' ', count)
 
+
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)
 def commandPyramidLong(args):
@@ -24,6 +25,7 @@ def commandPyramidLong(args):
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('pyramid-')[1])
     return processPyramid(args, args.message.query + ' ', count)
+
 
 def processPyramid(args, repetition, count):
     count = min(count, config.messageLimit // len(repetition))
@@ -43,6 +45,7 @@ def processPyramid(args, repetition, count):
             str(args.message), 'pyramid')
     args.chat.send(messages, -1)
     return True
+
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 def commandRPyramid(args):

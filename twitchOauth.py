@@ -17,11 +17,11 @@ try:
         for code in queryParts['code']:
             response, data = twitch.twitchCall(
                 None, 'POST', '/kraken/oauth2/token/',
-                headers = {
+                headers={
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/vnd.twitchtv.v2+json',
                     },
-                data = {
+                data={
                     'client_id': ini['twitch']['twitchClientID'],
                     'client_secret': ini['twitch']['twitchSecret'],
                     'grant_type': 'authorization_code',
@@ -35,7 +35,7 @@ try:
                 
                 response, data = twitch.twitchCall(
                     None, 'GET', '/kraken/',
-                    headers = {
+                    headers={
                         'Authorization': 'OAuth ' + token,
                         'Accept': 'application/vnd.twitchtv.v2+json',
                         })

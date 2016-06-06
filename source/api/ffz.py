@@ -17,6 +17,7 @@ def getGlobalEmotes():
             return emotes
     return None
 
+
 def getBroadcasterEmotes(broadcaster):
     url = 'https://api.frankerfacez.com/v1/room/' + broadcaster
     with suppress(urllib.request.URLError), \

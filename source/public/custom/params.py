@@ -1,6 +1,7 @@
 ﻿from contextlib import suppress
 import re
 
+
 def fieldParams(args):
     with suppress(TypeError):
         match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', args.field)

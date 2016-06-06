@@ -1,6 +1,7 @@
 ﻿from ..library import textformat
 from ..library.chat import feature, min_args, permission
 
+
 def textCommand(name, asciiTo):
     @feature('textconvert')
     @min_args(2)

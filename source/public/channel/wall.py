@@ -4,6 +4,7 @@ from bot import config
 from contextlib import suppress
 from datetime import timedelta
 
+
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
 @min_args(2)
 def commandWall(args):
@@ -16,6 +17,7 @@ def commandWall(args):
     length = min(length, config.messageLimit // (len(args.message[1]) + 1))
     return processWall(args, (args.message[1] + ' ') * length, rows)
 
+
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
 @min_args(2)
 def commandWallLong(args):
@@ -25,6 +27,7 @@ def commandWallLong(args):
     with suppress(ValueError, IndexError):
         rows = int(args.message.command.split('wall-')[1])
     return processWall(args, args.message.query, rows)
+
 
 def processWall(args, repetition, rows):
     if not args.permissions.broadcaster:

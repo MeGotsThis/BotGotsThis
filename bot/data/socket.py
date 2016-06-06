@@ -9,6 +9,7 @@ import socket
 import source.ircmessage
 import threading
 
+
 class Socket:
     def __init__(self, name, server, port):
         self._writeQueue = deque()
@@ -158,7 +159,7 @@ class Socket:
                                        IrcMessageParams(config.botnick)),
                             prepend=True)
             self.lastSentPing = datetime.utcnow()
-        elif sinceLast >= timedelta(minutes=1,seconds=15):
+        elif sinceLast >= timedelta(minutes=1, seconds=15):
             self.disconnect()
     
     def _logRead(self, message):

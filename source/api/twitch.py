@@ -2,6 +2,7 @@
 from bot import globals
 from contextlib import closing, suppress
 from collections.abc import Mapping
+from datetime import datetime, timedelta
 import configparser
 import datetime
 import email.utils
@@ -11,6 +12,7 @@ import os.path
 import time
 import urllib.parse
 
+
 def getTwitchClientId():
     if os.path.isfile('config.ini'):
         ini = configparser.ConfigParser()
@@ -18,6 +20,7 @@ def getTwitchClientId():
         if 'twitch' in ini and 'twitchClientID' in ini['twitch']:
             return ini['twitch']['twitchClientID']
     return None
+
 
 def twitchCall(channel, method, uri, headers=None, data=None):
     if headers is None:
@@ -38,11 +41,12 @@ def twitchCall(channel, method, uri, headers=None, data=None):
         with connection.getresponse() as response:
             return response, response.read()
 
+
 def serverTime():
     with suppress(http.client.HTTPException):
         response, data = twitchCall(
             None, 'GET', '/kraken/',
-            headers = {
+            headers={
                 'Accept': 'application/vnd.twitchtv.v3+json',
                 })
         if response.status == 200:
@@ -50,8 +54,9 @@ def serverTime():
             if data is not None:
                 dateStruct = email.utils.parsedate(date)
                 unixTimestamp = time.mktime(dateStruct)
-                return datetime.datetime.fromtimestamp(unixTimestamp)
+                return datetime.fromtimestamp(unixTimestamp)
     return None
+
 
 def getTwitchEmotes():
     uri = ('/kraken/chat/emoticon_images?emotesets='
@@ -59,7 +64,7 @@ def getTwitchEmotes():
     with suppress(OSError):
         response, data = twitchCall(
             None, 'GET', uri,
-            headers = {
+            headers={
                 'Accept': 'application/vnd.twitchtv.v3+json',
                 })
         globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']
@@ -91,6 +96,7 @@ def getTwitchEmotes():
         return emotes, emoteSet
     return None
 
+
 def twitchChatServer(chat, headers=None, data=None):
     if headers is None:
         headers = {}
@@ -115,21 +121,23 @@ def twitchChatServer(chat, headers=None, data=None):
                 return str(jData['cluster'])
     return None
 
+
 def checkValidTwitchUser(user):
     user = user.lower()
-    currentTime = datetime.datetime.utcnow()
+    currentTime = datetime.utcnow()
     if 'validTwitchUser' not in globals.globalSessionData:
         globals.globalSessionData['validTwitchUser'] = {}
     validCache = globals.globalSessionData['validTwitchUser']
-    if (user not in validCache or
-        currentTime - validCache[user][1] > datetime.timedelta(minutes=1)):
+    if (user not in validCache
+            or currentTime - validCache[user][1] > timedelta(minutes=1)):
         response, data = twitchCall(
             None, 'GET', '/kraken/channels/' + user,
-            headers = {
+            headers={
                 'Accept': 'application/vnd.twitchtv.v3+json',
                 })
         validCache[user] = response.code == 200, currentTime
     return validCache[user][0]
+
 
 def getFollowerCount(user):
     try:
@@ -139,6 +147,7 @@ def getFollowerCount(user):
         return int(followerData['_total'])
     except Exception:
         return None
+
 
 def updateChannel(channel, *, status=None, game=None):
     postData = {}
@@ -156,6 +165,7 @@ def updateChannel(channel, *, status=None, game=None):
             },
         data=postData)
     return response.status == 200
+
 
 def checkOnlineStreams(channels):
     uri = '/kraken/streams?limit=100&channel=' + ','.join(channels)
@@ -177,16 +187,18 @@ def checkOnlineStreams(channels):
             _handleStreams(streamsData['streams'], online)
     return online
 
+
 def _handleStreams(streams, online=None):
     if online is None:
         online = {}
     for stream in streams:
         channel = stream['channel']['name'].lower()
-        streamingSince = datetime.datetime.strptime(stream['created_at'],
-                                                    '%Y-%m-%dT%H:%M:%SZ')
+        streamingSince = datetime.strptime(stream['created_at'],
+                                           '%Y-%m-%dT%H:%M:%SZ')
         streams[channel] = (streamingSince, stream['channel']['status'],
                             stream['channel']['game'])
     return online
+
 
 def channelStatusAndGame(channel):
     uri = '/kraken/channels/' + channel

@@ -12,6 +12,7 @@ _logCommandPerChannel = [
     'CLEARCHAT', 'ROOMSTATE',
     ]
 
+
 def parseMessage(socket, ircmsg, timestamp):
     files = []
     logs = []
@@ -123,12 +124,12 @@ def parseMessage(socket, ircmsg, timestamp):
     if message.command == 'PING' and message.params.trailing is not None:
         socket.ping(message.params.trailing)
         
-    if (message.command == 'PONG' and message.prefix is not None and
-        message.prefix.servername is not None and 
-        message.prefix.servername == 'tmi.twitch.tv' and
-        not message.params.isEmpty and
-        message.params.middle == 'tmi.twitch.tv' and
-        message.params.trailing == config.botnick):
+    if (message.command == 'PONG' and message.prefix is not None
+            and message.prefix.servername is not None
+            and message.prefix.servername == 'tmi.twitch.tv'
+            and not message.params.isEmpty
+            and message.params.middle == 'tmi.twitch.tv'
+            and message.params.trailing == config.botnick):
         socket.lastPing = timestamp
         
     if message.command == 'USERSTATE':

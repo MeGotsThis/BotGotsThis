@@ -1,6 +1,7 @@
 ﻿import datetime
 import bot.globals
 
+
 def parse(channelData, tags):
     bot.globals.displayName = tags['display-name']
     bot.globals.isTwitchStaff = tags['user-type'] in ['staff']

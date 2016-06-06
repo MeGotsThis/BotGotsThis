@@ -16,6 +16,7 @@ def getGlobalEmotes():
             return emotes
     return None
 
+
 def getBroadcasterEmotes(broadcaster):
     url = 'https://api.betterttv.net/2/channels/' + broadcaster
     with suppress(urllib.request.URLError), \

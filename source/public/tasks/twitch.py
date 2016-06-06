@@ -26,14 +26,15 @@ def checkStreamsAndChannel(timestamp):
                 continue
             channels[channel].streamingSince = None
 
+
 def checkOfflineChannels(timestamp):
     if not globals.channels:
         return
     cacheDuration = datetime.timedelta(seconds=300)
     channels = copy.copy(globals.channels)
     offlineChannels = [c for c, ch in channels.items()
-                       if (channels[c].streamingSince is None and
-                           timestamp - ch.twitchCache >= cacheDuration)]
+                       if (channels[c].streamingSince is None
+                           and timestamp - ch.twitchCache >= cacheDuration)]
     if not offlineChannels:
         return
     channel = random.choice(offlineChannels)
@@ -45,19 +46,20 @@ def checkOfflineChannels(timestamp):
     except socket.gaierror:
         chat.twitchCache = old
 
+
 def checkChatServers(timestamp):
     cooldown = datetime.timedelta(seconds=3600)
     channels = copy.copy(globals.channels)
     toCheck = [c for c, ch in channels.items()
-               if (ch.serverCheck is None or
-                   timestamp - ch.serverCheck >= cooldown)]
+               if (ch.serverCheck is None
+                   or timestamp - ch.serverCheck >= cooldown)]
     if not toCheck:
         return
     channel = random.choice(toCheck)
     channels[channel].serverCheck = timestamp
     cluster = twitch.twitchChatServer(channel)
-    if (cluster is not None and cluster in globals.clusters and
-        globals.clusters[cluster] is not channels[channel].socket):
+    if (cluster is not None and cluster in globals.clusters
+            and globals.clusters[cluster] is not channels[channel].socket):
         with getDatabase() as db:
             priority = db.getAutoJoinsPriority(channel)
             priority = priority if priority is not None else float('inf')

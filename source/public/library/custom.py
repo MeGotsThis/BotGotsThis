@@ -4,10 +4,11 @@ from ...data.return_ import CustomFieldParts
 from ..library import textformat
 import lists.custom
 
+
 def getCustomCommand(database, command, channel, permissions):
     commands = database.getChatCommands(channel, command)
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
-                      'globalMod', 'admin', 'staff', 'owner',]
+                      'globalMod', 'admin', 'staff', 'owner']
     for permission in reversed(permissionsSet):
         if not permission or permissions[permission]:
             for broadcaster in [channel, '#global']:
@@ -15,6 +16,7 @@ def getCustomCommand(database, command, channel, permissions):
                     message = commands[broadcaster][permission]
                     return CustomCommand(message, broadcaster, permission)
     return None
+
 
 def createMessages(command, args):
     textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
@@ -45,6 +47,7 @@ def createMessages(command, args):
     for process in lists.custom.postProcess:
         process(processArgument)
     return messages
+
 
 def parseCommandMessageInput(message, broadcaster):
     allowPermissions = {
@@ -92,6 +95,7 @@ def parseCommandMessageInput(message, broadcaster):
         return CustomCommandTokens(action, broadcaster, level, command, text)
     except:
         return None
+
 
 def parseFormatMessage(message):
     # Format: {field:format<prefix>suffix@param!default}
@@ -352,12 +356,14 @@ def parseFormatMessage(message):
         
     return parsed
 
+
 def fieldString(args):
     for fieldConvert in lists.custom.fields:
         result = fieldConvert(args)
         if result is not None:
             return result
     return None
+
 
 def format(string, format, hasTextConvert):
     if hasTextConvert:

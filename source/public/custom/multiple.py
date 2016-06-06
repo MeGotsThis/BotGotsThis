@@ -1,6 +1,6 @@
 def propertyMultipleLines(args):
     if not args.database.getCustomCommandProperty(
-        args.broadcaster, args.level, args.command, 'multiple'):
+            args.broadcaster, args.level, args.command, 'multiple'):
         return
     
     delimiter = args.database.getCustomCommandProperty(

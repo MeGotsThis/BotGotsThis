@@ -5,6 +5,7 @@ typeTwitchAdmin = {'staff', 'admin'}
 typeGlobalModerator = {'staff', 'admin', 'global_mod'}
 typeModerator = {'staff', 'admin', 'global_mod', 'mod'}
 
+
 class ChatPermissionSet:
     def __init__(self, tags, user, channel):
         if 'user-type' in tags:
@@ -122,6 +123,7 @@ class ChatPermissionSet:
                 return self.chatModerator
             raise KeyError('unknown permission')
         raise TypeError('key is not of type str')
+
 
 class WhisperPermissionSet:
     def __init__(self, tags, user):

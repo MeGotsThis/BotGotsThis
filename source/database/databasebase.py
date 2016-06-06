@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+
 class DatabaseBase(metaclass=ABCMeta):
     __slots__ = ('_engine', '_connection')
     
@@ -80,7 +81,7 @@ class DatabaseBase(metaclass=ABCMeta):
     
     @abstractmethod
     def appendCustomCommand(self, broadcaster, permission, command,
-                             message, user):
+                            message, user):
         return False
     
     @abstractmethod

@@ -5,6 +5,7 @@ import sqlite3
 
 ZERO = datetime.timedelta(0)
 
+
 class BasicTimeZone(datetime.tzinfo):
     """Fixed offset in minutes east from UTC."""
     __slots__ = ('__offset', '__name')
@@ -24,6 +25,7 @@ class BasicTimeZone(datetime.tzinfo):
     
     def dst(self, dt):
         return ZERO
+
 
 class TimeZone(datetime.tzinfo):
     """Fixed offset in minutes east from UTC."""
@@ -64,37 +66,37 @@ class TimeZone(datetime.tzinfo):
         delta = transistion[2] - self._transitions[0][2]
         return datetime.timedelta(seconds=delta)
 
-utc = BasicTimeZone(0,'UTC')
+utc = BasicTimeZone(0, 'UTC')
 unixEpoch = datetime.datetime(1970, 1, 1, 0, 0, 0, 0)
 
 timezones = [
     utc,
-    BasicTimeZone(0,'UTC+0:00'),
-    BasicTimeZone(60,'UTC+1:00'),
-    BasicTimeZone(120,'UTC+2:00'),
-    BasicTimeZone(180,'UTC+3:00'),
-    BasicTimeZone(240,'UTC+4:00'),
-    BasicTimeZone(300,'UTC+5:00'),
-    BasicTimeZone(360,'UTC+6:00'),
-    BasicTimeZone(420,'UTC+7:00'),
-    BasicTimeZone(480,'UTC+8:00'),
-    BasicTimeZone(540,'UTC+9:00'),
-    BasicTimeZone(600,'UTC+10:00'),
-    BasicTimeZone(660,'UTC+11:00'),
-    BasicTimeZone(720,'UTC+12:00'),
-    BasicTimeZone(-0,'UTC-0:00'),
-    BasicTimeZone(-60,'UTC-1:00'),
-    BasicTimeZone(-120,'UTC-2:00'),
-    BasicTimeZone(-180,'UTC-3:00'),
-    BasicTimeZone(-240,'UTC-4:00'),
-    BasicTimeZone(-300,'UTC-5:00'),
-    BasicTimeZone(-360,'UTC-6:00'),
-    BasicTimeZone(-420,'UTC-7:00'),
-    BasicTimeZone(-480,'UTC-8:00'),
-    BasicTimeZone(-540,'UTC-9:00'),
-    BasicTimeZone(-600,'UTC-10:00'),
-    BasicTimeZone(-660,'UTC-11:00'),
-    BasicTimeZone(-720,'UTC-12:00'),
+    BasicTimeZone(0, 'UTC+0:00'),
+    BasicTimeZone(60, 'UTC+1:00'),
+    BasicTimeZone(120, 'UTC+2:00'),
+    BasicTimeZone(180, 'UTC+3:00'),
+    BasicTimeZone(240, 'UTC+4:00'),
+    BasicTimeZone(300, 'UTC+5:00'),
+    BasicTimeZone(360, 'UTC+6:00'),
+    BasicTimeZone(420, 'UTC+7:00'),
+    BasicTimeZone(480, 'UTC+8:00'),
+    BasicTimeZone(540, 'UTC+9:00'),
+    BasicTimeZone(600, 'UTC+10:00'),
+    BasicTimeZone(660, 'UTC+11:00'),
+    BasicTimeZone(720, 'UTC+12:00'),
+    BasicTimeZone(-0, 'UTC-0:00'),
+    BasicTimeZone(-60, 'UTC-1:00'),
+    BasicTimeZone(-120, 'UTC-2:00'),
+    BasicTimeZone(-180, 'UTC-3:00'),
+    BasicTimeZone(-240, 'UTC-4:00'),
+    BasicTimeZone(-300, 'UTC-5:00'),
+    BasicTimeZone(-360, 'UTC-6:00'),
+    BasicTimeZone(-420, 'UTC-7:00'),
+    BasicTimeZone(-480, 'UTC-8:00'),
+    BasicTimeZone(-540, 'UTC-9:00'),
+    BasicTimeZone(-600, 'UTC-10:00'),
+    BasicTimeZone(-660, 'UTC-11:00'),
+    BasicTimeZone(-720, 'UTC-12:00'),
     ]
 
 _ini = configparser.ConfigParser()

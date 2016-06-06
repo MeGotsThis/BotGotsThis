@@ -3,6 +3,7 @@ from ..databasebase import DatabaseBase
 from contextlib import closing
 import sqlite3
 
+
 class SQLiteDatabase(DatabaseBase):
     __slots__ = DatabaseBase.__slots__ + (
         '_dbfile', '_oauthfile', '_timeoutlogfile')
@@ -25,9 +26,8 @@ class SQLiteDatabase(DatabaseBase):
     def getAutoJoinsChats(self):
         query = '''
 SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC'''
-        rowMap = lambda r: AutoJoinChannel(*r)
         with closing(self.connection.cursor()) as cursor:
-            yield from map(rowMap, cursor.execute(query))
+            yield from map(lambda r: AutoJoinChannel(*r), cursor.execute(query))
     
     def getAutoJoinsPriority(self, broadcaster):
         query = '''SELECT priority FROM auto_join WHERE broadcaster=?'''
@@ -146,8 +146,8 @@ INSERT INTO custom_commands_history
     VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
         with closing(self.connection.cursor()) as cursor:
             display = None if command.lower() == command else command
-            cursor.execute(query, (display, fullMessage, user,broadcaster,
-                                    permission, command.lower()))
+            cursor.execute(query, (display, fullMessage, user, broadcaster,
+                                   permission, command.lower()))
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False

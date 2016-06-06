@@ -20,11 +20,13 @@ def botJoin(db, channel, send):
         elif result == utils.ENSURE_REJOIN:
             send('Moved ' + channel + ' to correct chat server')
 
+
 def botPart(channel, send):
     if channel == config.botnick:
         return
     utils.partChannel(channel)
     send('Leaving ' + channel)
+
 
 def botSay(db, nick, channel, message):
     if channel in globals.channels:
@@ -32,9 +34,11 @@ def botSay(db, nick, channel, message):
                                          message, None, 'say')
         globals.channels[channel].send(message)
 
+
 def botEmptyAll(send):
     utils.clearAllChat()
     send('Cleared all queued messages')
+
 
 def botEmpty(channel, send):
     globals.channels[channel].socket.messaging.clearChat(channel)

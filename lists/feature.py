@@ -5,8 +5,4 @@ try:
 except ImportError:
     from .private.default import feature as privateFeature
 
-if False: # Hints for Intellisense
-    features = privateFeature.features
-    features = publicFeature.features
-
 features = ChainMap(privateFeature.features, publicFeature.features)

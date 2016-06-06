@@ -12,6 +12,7 @@ disable = {
     '0',
     }
 
+
 def botFeature(db, channel, message, send):
     if len(message) < 2:
         return False

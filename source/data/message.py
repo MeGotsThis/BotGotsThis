@@ -68,6 +68,7 @@ class Tokenized:
     def __contains__(self, item):
         return item in self._tokens
 
+
 class Message(Tokenized):
     def __init__(self, message):
         super().__init__(message)

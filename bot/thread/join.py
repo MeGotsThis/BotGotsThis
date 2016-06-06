@@ -9,6 +9,7 @@ from ..twitchmessage.ircparams import IrcMessageParams
 
 joinDuration = datetime.timedelta(seconds=10.05)
 
+
 class JoinThread(threading.Thread):
     def __init__(self, **args):
         threading.Thread.__init__(self, **args)

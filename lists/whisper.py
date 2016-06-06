@@ -5,8 +5,4 @@ try:
 except ImportError:
     from .private.default import whisper as privateList
 
-if False: # Hints for Intellisense
-    commands = privateList.commands
-    commands = publicList.commands
-
 commands = ChainMap(privateList.commands, publicList.commands)

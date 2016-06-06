@@ -1,6 +1,7 @@
 ﻿from ...data.argument import ManageBotArgs
 from lists.manage import methods
 
+
 def botManageBot(database, send, nick, message):
     argument = ManageBotArgs(database, send, nick, message)
     

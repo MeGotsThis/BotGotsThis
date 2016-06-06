@@ -35,13 +35,13 @@ def main(argv):
 
     _modulesList = [
         pkgutil.walk_packages(path=publicAuto.__path__,
-                              prefix=publicAuto.__name__+'.'),
+                              prefix=publicAuto.__name__ + '.'),
         pkgutil.walk_packages(path=privateAuto.__path__,
-                              prefix=privateAuto.__name__+'.')
+                              prefix=privateAuto.__name__ + '.')
         ]
     for _modules in _modulesList:
         for importer, modname, ispkg in _modules:
-              importlib.import_module(modname)
+            importlib.import_module(modname)
 
     try:
         utils.joinChannel(config.botnick, float('-inf'), 'aws')

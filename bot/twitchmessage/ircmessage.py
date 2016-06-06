@@ -8,6 +8,7 @@ import string
 ParsedMessage = namedtuple('ParsedMessage',
                            ['tags', 'prefix', 'command', 'params'])
 
+
 class IrcMessage:
     __slots__ = ('_tags', '_prefix', '_command', '_params')
     
@@ -73,10 +74,10 @@ class IrcMessage:
     
     def __eq__(self, other):
         if isinstance(other, IrcMessage):
-            return (self._tags == other._tags and
-                    self._prefix == other._prefix and
-                    self._command == other._command and
-                    self._params == other._params)
+            return (self._tags == other._tags
+                    and self._prefix == other._prefix
+                    and self._command == other._command
+                    and self._params == other._params)
         return False
     
     def __ne__(self, other):
@@ -179,8 +180,7 @@ class IrcMessage:
                         if char in '\0\r\n; ':
                             raise ValueError()
                         if char == '\\':
-                            if (i < length and
-                                message[i] in unescapedValue):
+                            if i < length and message[i] in unescapedValue:
                                 char = unescapedValue[message[i]]
                                 v.append(char)
                                 i += 1
@@ -237,8 +237,8 @@ class IrcMessage:
                         raise ValueError()
                     s.append(char)
                 else:
-                    if (char in string.ascii_letters or char.isdigit() or
-                        char == '-'):
+                    if (char in string.ascii_letters or char.isdigit()
+                            or char == '-'):
                         s.append(char)
                     elif char in nickSpecials:
                         if isServerName:

@@ -5,18 +5,6 @@ try:
 except ImportError:
     from .private.default import channel as privateList
 
-if False: # Hints for Intellisense
-    filterMessage = privateList.filterMessage
-    filterMessage = publicList.filterMessage
-    commands = privateList.commands
-    commands = publicList.commands
-    commandsStartWith = publicList.commandsStartWith
-    commandsStartWith = privateList.commandsStartWith
-    commandsStartWith = publicList.commandsStartWith
-    processNoCommand = privateList.noCommandPreCustom
-    processNoCommand = privateList.noCommandPostCustom
-    processNoCommand = publicList.processNoCommand
-
 if privateList.disableFilters:
     filterMessage = privateList.filterMessage
 else:

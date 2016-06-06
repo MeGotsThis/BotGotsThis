@@ -14,6 +14,7 @@ disallowedCommands = (
     '/disconnect',
     )
 
+
 class MessagingQueue:
     def __init__(self):
         self._chatQueues = [[], [], []]

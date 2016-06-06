@@ -1,7 +1,9 @@
 from functools import wraps
 
+
 def send(chat):
     return chat.send
+
 
 def permission(permission):
     def decorator(func):
@@ -13,6 +15,7 @@ def permission(permission):
         return command
     return decorator
 
+
 def not_permission(permission):
     def decorator(func):
         @wraps(func)
@@ -23,6 +26,7 @@ def not_permission(permission):
         return command
     return decorator
 
+
 def ownerChannel(func):
     @wraps(func)
     def chatCommand(args):
@@ -30,6 +34,7 @@ def ownerChannel(func):
             return False
         return func(args)
     return chatCommand
+
 
 def feature(feature):
     def decorator(func):
@@ -41,6 +46,7 @@ def feature(feature):
         return chatCommand
     return decorator
 
+
 def not_feature(feature):
     def decorator(func):
         @wraps(func)
@@ -50,6 +56,7 @@ def not_feature(feature):
             return func(args)
         return chatCommand
     return decorator
+
 
 def permission_feature(*permissionFeatures):
     def decorator(func):
@@ -68,6 +75,7 @@ def permission_feature(*permissionFeatures):
         return chatCommand
     return decorator
 
+
 def permission_not_feature(*permissionFeatures):
     def decorator(func):
         @wraps(func)
@@ -85,6 +93,7 @@ def permission_not_feature(*permissionFeatures):
         return chatCommand
     return decorator
 
+
 def cooldown(duration, key, permission=None):
     def decorator(func):
         @wraps(func)
@@ -95,6 +104,7 @@ def cooldown(duration, key, permission=None):
         return chatCommand
     return decorator
 
+
 def inCooldown(args, duration, key, permission=None):
     if ((permission is None or not args.permissions[permission])
             and key in args.chat.sessionData
@@ -102,6 +112,7 @@ def inCooldown(args, duration, key, permission=None):
         return True
     args.chat.sessionData[key] = args.timestamp
     return False
+
 
 def min_args(amount, _return=False, reason=None):
     def decorator(func):

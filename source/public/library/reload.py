@@ -1,12 +1,14 @@
 ﻿import sys
 import importlib
 
+
 def loadThisModule(module):
     include = module.startswith('source') or module.startswith('lists')
     exclude = module == 'source.public.library.reload'
     exclude = exclude or module.startswith('source.private.autoload')
     exclude = exclude or module.startswith('source.public.autoload')
     return include and not exclude
+
 
 def moduleKey(module):
     if module.startswith('source.irccommand'):
@@ -74,6 +76,7 @@ def moduleKey(module):
     
     return 50, module
 
+
 def botReload(send):
     send('Reloading', 0)
     
@@ -82,6 +85,7 @@ def botReload(send):
     
     send('Complete', 0)
     return True
+
 
 def botReloadCommands(send):
     send('Reloading Commands', 0)
@@ -92,6 +96,7 @@ def botReloadCommands(send):
     
     send('Complete Reloading', 0)
     return True
+
 
 def botReloadConfig(send):
     send('Reloading Config', 0)

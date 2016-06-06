@@ -14,6 +14,7 @@ def commandStatus(args):
     args.chat.send(msg)
     return True
 
+
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 def commandGame(args):
@@ -32,6 +33,7 @@ def commandGame(args):
     args.chat.send(msg)
     return True
 
+
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 def commandRawGame(args):
@@ -46,6 +48,7 @@ def commandRawGame(args):
         msg = 'Channel Game failed to set'
     args.chat.send(msg)
     return True
+
 
 @permission('moderator')
 @permission('chatModerator')

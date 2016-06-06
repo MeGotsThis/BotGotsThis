@@ -23,6 +23,7 @@ def parse(chat, tags, nick, rawMessage, timestamp):
     params = chat, tags, nick, message, timestamp
     threading.Thread(target=chatCommand, args=params, name=name).start()
     
+
 def chatCommand(chat, tags, nick, message, timestamp):
     try:
         permissions = ChatPermissionSet(tags, nick, chat)
@@ -37,6 +38,7 @@ def chatCommand(chat, tags, nick, message, timestamp):
         extra = 'Channel: {channel}\nMessage: {message}'.format(
             channel=chat.channel, message=message)
         utils.logException(extra, timestamp)
+
 
 def commandsToProcess(command):
     yield from commandList.filterMessage

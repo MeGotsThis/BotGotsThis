@@ -18,6 +18,7 @@ def commandAutoRepeat(args):
     count = None
     return processAutoRepeat(args, count)
 
+
 @permission('broadcaster')
 def commandAutoRepeatCount(args):
     """
@@ -30,6 +31,7 @@ def commandAutoRepeatCount(args):
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('autorepeat-')[1])
     return processAutoRepeat(args, count)
+
 
 def processAutoRepeat(args, count):
     try:
@@ -53,6 +55,7 @@ def processAutoRepeat(args, count):
     args.chat.sessionData['repeatThread'] = thread
     thread.start()
     return True
+
 
 class MessageRepeater(threading.Thread):
     def __init__(self, *args,
@@ -78,9 +81,9 @@ class MessageRepeater(threading.Thread):
     def run(self):
         while self._continueRunning():
             self.process()
-            time.sleep(1/20)
+            time.sleep(1 / 20)
         if ('repeatThread' in self._chat.sessionData
-            and self._chat.sessionData['repeatThread'] is self):
+                and self._chat.sessionData['repeatThread'] is self):
             del self._chat.sessionData['repeatThread']
     
     def process(self):
@@ -99,4 +102,3 @@ class MessageRepeater(threading.Thread):
     def _continueRunning(self):
         with self._countLock:
             return self._count is None or self._count > 0
-    

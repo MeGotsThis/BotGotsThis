@@ -3,9 +3,10 @@ from collections import defaultdict
 from contextlib import suppress
 import datetime
 
+
 def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
                 reason=None):
-    properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2',]
+    properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2']
     defaults = {'timeoutLength0': config.moderatorDefaultTimeout[0],
                 'timeoutLength1': config.moderatorDefaultTimeout[1],
                 'timeoutLength2': config.moderatorDefaultTimeout[2],
@@ -40,6 +41,7 @@ def timeoutUser(db, chat, user, module, baseLevel=0, message=None,
         utils.whisper(
             user,
             '{reason} ({length})'.format(reason=reason, length=lengthText))
+
 
 def recordTimeoutFromCommand(db, chat, user, messages, sourceMessage,
                              module='custom'):

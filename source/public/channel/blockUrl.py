@@ -13,6 +13,7 @@ twitchUrlRegex = (#r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"
                   r"(?:https?:\/\/)?(?:[-a-zA-Z0-9@:%_\+~#=]+\.)+[a-z]{2,6}\b"
                   r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)")
 
+
 # This is for banning the users who post a URL with no follows
 @feature('nourlredirect')
 @not_permission('moderator')
@@ -23,14 +24,15 @@ def filterNoUrlForBots(args):
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
+
 def checkIfUrlMaybeBad(chat, nick, message, timestamp):
     if not twitch.getFollowerCount(nick):
         return
     
     # Record all urls with users of no follows
     utils.logIrcMessage(chat.ircChannel + '#blockurl.log',
-                       '{nick}: {message}'.format(nick=nick, message=message),
-                       timestamp)
+                        '{nick}: {message}'.format(nick=nick, message=message),
+                        timestamp)
 
     for match in re.finditer(twitchUrlRegex, message):
         originalUrl = match.group(0)

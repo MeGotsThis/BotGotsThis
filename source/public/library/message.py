@@ -1,6 +1,7 @@
 from bot import config
 from collections import deque
 
+
 def messagesFromItems(items, prepend=None):
     limit = config.messageLimit - len(prepend)
     queue = deque(items)

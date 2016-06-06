@@ -56,6 +56,7 @@ daysOfWeek = {
     'sat': SATURDAY,
     }
 
+
 def fieldCountdown(args):
     if args.field.lower() == 'countdown':
         cooldown = None
@@ -88,6 +89,7 @@ def fieldCountdown(args):
             delta = timedeltaFormat(next - timestamp)
             return args.prefix + delta + args.suffix
     return None
+
 
 def fieldSince(args):
     if args.field.lower() == 'since':
@@ -122,6 +124,7 @@ def fieldSince(args):
             return args.prefix + delta + args.suffix
     return None
 
+
 def fieldNext(args):
     if args.field.lower() in ['next', 'future']:
         dateInstances = []
@@ -146,6 +149,7 @@ def fieldNext(args):
             return args.prefix + nextDateTime[0].strftime(format) + args.suffix
     return None
 
+
 def fieldPrevious(args):
     if args.field.lower() in ['prev', 'previous', 'past']:
         dateInstances = []
@@ -169,6 +173,7 @@ def fieldPrevious(args):
             format = _24HourFormat if pastDateTime[1] else _12HourFormat
             return args.prefix + pastDateTime[0].strftime(format) + args.suffix
     return None
+
 
 def _parseDateString(string):
     match = re.fullmatch(_pattern, string, re.IGNORECASE)
@@ -216,6 +221,7 @@ def _parseDateString(string):
         date = (year, month, day)
 
     return timeOfDay, dayofweek, date, is24Hour
+
 
 def _getNextDateTime(now, timeOfDay, dayofweek, date, is24Hour):
     now = now.replace(tzinfo=timezones.utc)
@@ -266,6 +272,7 @@ def _getNextDateTime(now, timeOfDay, dayofweek, date, is24Hour):
         else:
             return dt + datetime.timedelta(days=1), is24Hour
 
+
 def _getPastDateTime(now, timeOfDay, dayofweek, date, is24Hour):
     now = now.replace(tzinfo=timezones.utc)
     today = datetime.date.today()
@@ -315,17 +322,18 @@ def _getPastDateTime(now, timeOfDay, dayofweek, date, is24Hour):
         else:
             return dt - datetime.timedelta(days=1), is24Hour
 
+
 def _getCooldown(string):
     match = re.match(_cooldownPattern, string.strip())
     if match is not None:
         groups = match.groups()
         if groups[0] is not None:
             return float(groups[0]) / 100.0
-        elif (groups[1] is not None or
-              groups[2] is not None or
-              groups[3] is not None or
-              groups[4] is not None or
-              groups[5] is not None):
+        elif (groups[1] is not None
+              or groups[2] is not None
+              or groups[3] is not None
+              or groups[4] is not None
+              or groups[5] is not None):
             weeks = int(groups[1] or 0)
             days = int(groups[2] or 0)
             hours = int(groups[3] or 0)
@@ -334,6 +342,7 @@ def _getCooldown(string):
             return datetime.timedelta(weeks=weeks, days=days, hours=hours,
                                       minutes=minutes, seconds=seconds)
     return None
+
 
 def _testCooldown(cooldown, past, future, now):
     if cooldown is None:
