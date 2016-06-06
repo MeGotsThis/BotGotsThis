@@ -66,7 +66,7 @@ class IrcMessageParams:
         i = 0
         
         if i == length:
-            return (None, None)
+            return None, None
         
         s = []
         m = []

@@ -111,7 +111,7 @@ class IrcMessageTagsKey(collections.abc.Hashable):
         return ParsedKeyVendor(key, vendor)
 
 class IrcMessageTagsReadOnly(collections.abc.Mapping):
-    __slots__ = ('_items')
+    __slots__ = '_items',
     
     def __new__(cls, items=None):
         # This returns itself, only for read only
@@ -127,7 +127,7 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
         self._items = {}
         if items is not None:
             if isinstance(items, str):
-                self._items = parseTags(items)
+                self._items = self.__class__.parseTags(items)
             elif isinstance(items, collections.abc.Mapping):
                 for key in items:
                     if (items[key] is not True
@@ -290,7 +290,7 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
         return items
 
 class IrcMessageTags(IrcMessageTagsReadOnly, collections.abc.MutableMapping):
-    __slots__ = ('_items')
+    __slots__ = '_items',
     
     def __setitem__(self, key, value):
         if isinstance(key, str):
