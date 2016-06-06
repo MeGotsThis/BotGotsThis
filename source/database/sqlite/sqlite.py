@@ -7,8 +7,8 @@ class SQLiteDatabase(DatabaseBase):
     __slots__ = DatabaseBase.__slots__ + (
         '_dbfile', '_oauthfile', '_timeoutlogfile')
     
-    def __init__(self, ini, *args):
-        super().__init__(*args)
+    def __init__(self, ini, **kwargs):
+        super().__init__(**kwargs)
         self._engine = 'SQLite'
         self._dbfile = ini['file']
         self._oauthfile = ini['oauth']

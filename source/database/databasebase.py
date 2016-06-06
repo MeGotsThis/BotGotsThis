@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 class DatabaseBase(metaclass=ABCMeta):
     __slots__ = ('_engine', '_connection')
     
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._engine = 'None'
         self._connection = None
     
