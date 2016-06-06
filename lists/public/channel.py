@@ -91,12 +91,12 @@ commands = {
     '!come': broadcaster.commandCome,
     '!autojoin': broadcaster.commandAutoJoin,
     '!uptime': broadcaster.commandUptime,
-}
+    }
 commandsStartWith = {
     '!pyramid-': pyramid.commandPyramidLong,
     '!wall-': wall.commandWallLong,
     '!autorepeat-': repeat.commandAutoRepeat,
     '!settimeoutlevel-': broadcaster.commandSetTimeoutLevel,
-}
+    }
 
 processNoCommand = [custom.customCommands]
