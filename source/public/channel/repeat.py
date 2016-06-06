@@ -83,7 +83,7 @@ class MessageRepeater(threading.Thread):
             and self._chat.sessionData['repeatThread'] is self):
             del self._chat.sessionData['repeatThread']
     
-    def process():
+    def process(self):
         if datetime.utcnow() >= self._lastTime + self._duration:
             self._lastTime = datetime.utcnow()
             self._chat.send(self._message)
