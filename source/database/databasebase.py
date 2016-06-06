@@ -141,7 +141,7 @@ class DatabaseBase(metaclass=ABCMeta):
         return default
     
     @abstractmethod
-    def getChatProperties(self, broadcaster, properties=[], default=None,
+    def getChatProperties(self, broadcaster, properties=(), default=None,
                           parse=None):
         return {}
     

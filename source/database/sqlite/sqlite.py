@@ -404,7 +404,7 @@ SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''
                 return parse(row[0])
             return row[0]
     
-    def getChatProperties(self, broadcaster, properties=[], default=None,
+    def getChatProperties(self, broadcaster, properties=(), default=None,
                           parse=None):
         query = '''
 SELECT property, value FROM chat_properties

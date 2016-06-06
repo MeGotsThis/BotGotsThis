@@ -19,7 +19,9 @@ def getTwitchClientId():
             return ini['twitch']['twitchClientID']
     return None
 
-def twitchCall(channel, method, uri, headers={}, data=None):
+def twitchCall(channel, method, uri, headers=None, data=None):
+    if headers is None:
+        headers = {}
     with closing(http.client.HTTPSConnection('api.twitch.tv')) as connection:
         if channel is not None and 'Authorization' not in headers:
             token = oauth.getOAuthToken(channel)
@@ -89,7 +91,9 @@ def getTwitchEmotes():
         return emotes, emoteSet
     return None
 
-def twitchChatServer(chat, headers={}, data=None):
+def twitchChatServer(chat, headers=None, data=None):
+    if headers is None:
+        headers = {}
     with closing(http.client.HTTPSConnection('tmi.twitch.tv')) as connection:
         if chat is not None and 'Authorization' not in headers:
             token = oauth.getOAuthToken(chat)
