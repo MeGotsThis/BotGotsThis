@@ -4,6 +4,7 @@ from ..library.chat import ownerChannel
 from bot import config
 from collections import defaultdict
 from datetime import datetime, timedelta
+from lists import custom as customItems
 
 @not_feature('nocustom')
 def customCommands(args):
@@ -76,7 +77,7 @@ def processCommand(args):
         if len(parts) < 2:
             parts.append(None)
         property, value = parts
-        if property not in custom.properties:
+        if property not in customItems.properties:
             args.chat.send('{user} -> That property does not '
                            'exist'.format(user=args.nick))
             return True

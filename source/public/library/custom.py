@@ -34,9 +34,9 @@ def createMessages(command, args):
                     else:
                         string = formats.original
                     messageParts.append(string)
-            except Exception as e:
+            except Exception:
                 messageParts.append(formats.original)
-    except Exception as e:
+    except Exception:
         messageParts = [str(command.message)]
     messages = [''.join(messageParts)]
     processArgument = CustomProcessArgs(

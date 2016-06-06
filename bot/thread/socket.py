@@ -1,9 +1,9 @@
-﻿from .. import config, globals, utils
+﻿import select
+import threading
 from datetime import datetime
 from itertools import filterfalse
-import select
-import socket
-import threading
+from .. import globals, utils
+
 
 class SocketsThread(threading.Thread):
     def __init__(self, **args):

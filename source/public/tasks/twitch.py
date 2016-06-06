@@ -1,14 +1,13 @@
-﻿from ...api import twitch
-from ...database.factory import getDatabase
-from bot import globals, utils
-from contextlib import suppress
-import copy
+﻿import copy
 import datetime
-import json
 import random
 import socket
-import threading
-import time
+from contextlib import suppress
+
+from bot import globals, utils
+from ...api import twitch
+from ...database.factory import getDatabase
+
 
 def checkStreamsAndChannel(timestamp):
     if not globals.channels:
@@ -18,9 +17,9 @@ def checkStreamsAndChannel(timestamp):
         onlineStreams = twitch.checkOnlineStreams(channels.keys())
         for channel in onlineStreams:
             chat = channels[channel]
-            channelData.twitchCache = timestamp
-            (channelData.streamingSince, channelData.twitchStatus,
-             channelData.twitchGame) = onlineStreams[channel]
+            chat.twitchCache = timestamp
+            (chat.streamingSince, chat.twitchStatus,
+             chat.twitchGame) = onlineStreams[channel]
         
         for channel in channels:
             if channel in onlineStreams:

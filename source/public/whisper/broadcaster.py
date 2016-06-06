@@ -1,6 +1,6 @@
 ﻿from ..library import broadcaster
 from ..library.whisper import send
-from bot import globals
+
 
 def commandCome(args):
     broadcaster.botCome(args.database, args.nick, send(args.nick))

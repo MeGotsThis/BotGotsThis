@@ -1,10 +1,11 @@
-﻿from ..library import timeout
-from ..library.chat import inCooldown, min_args, permission, permission_feature
-from bot import config, globals
+﻿import itertools
+import random
 from contextlib import suppress
 from datetime import timedelta
-import itertools
-import random
+from bot import config, globals
+from ..library import timeout
+from ..library.chat import inCooldown, min_args, permission_feature
+
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)

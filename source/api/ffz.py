@@ -1,7 +1,7 @@
-﻿from bot import globals
-from contextlib import suppress
-import json
+﻿import json
 import urllib.request
+from contextlib import suppress
+
 
 def getGlobalEmotes():
     url = 'https://api.frankerfacez.com/v1/set/global'

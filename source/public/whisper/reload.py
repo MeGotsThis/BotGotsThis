@@ -1,6 +1,6 @@
 ﻿from ..library import reload
 from ..library.whisper import permission, send
-from bot import globals
+
 
 @permission('owner')
 def commandReload(args):

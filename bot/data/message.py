@@ -1,4 +1,4 @@
-from .. import config, utils
+from .. import config
 from collections import defaultdict, deque, namedtuple, OrderedDict
 from collections.abc import Iterable
 from datetime import datetime, timedelta

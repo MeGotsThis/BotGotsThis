@@ -1,13 +1,11 @@
-﻿from . import channel, whisper
+﻿from bot import config, utils
+from bot.twitchmessage.ircmessage import IrcMessage
+from . import channel, whisper
 from .irccommand import clearchat, notice, userstate
 try:
     from .private import ircmessage
 except ImportError:
     from .public.default import ircmessage
-from bot import config, utils
-from bot.twitchmessage.ircmessage import IrcMessage
-import bot.thread.socket
-import datetime
 
 _logCommandPerChannel = [
     'PRIVMSG', 'NOTICE', 'MODE', 'JOIN', 'PART', 'USERSTATE', 'HOSTTARGET',

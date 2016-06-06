@@ -1,6 +1,7 @@
-from . import chat
+import functools
 from bot import utils
-from functools import partial, wraps
+from . import chat
+
 
 def send(nick):
     return functools.partial(utils.whisper, nick)

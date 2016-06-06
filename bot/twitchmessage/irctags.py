@@ -80,10 +80,10 @@ class IrcMessageTagsKey(collections.abc.Hashable):
                     raise ValueError()
                 if not s[0].isalpha():
                     raise ValueError()
-                if not isVendor and vendor:
+                if not isVendor and v:
                     raise ValueError()
                 s.append(char)
-                vendor.append(''.join(s))
+                v.append(''.join(s))
                 s = []
                 isVendor = True
             elif char == '/':
@@ -93,7 +93,7 @@ class IrcMessageTagsKey(collections.abc.Hashable):
                     raise ValueError()
                 if not s[0].isalpha():
                     raise ValueError()
-                vendor.append(''.join(s))
+                v.append(''.join(s))
                 s = []
                 isVendor = False
             else:

@@ -1,7 +1,7 @@
-﻿from ...api import twitch
+﻿from bot import config, globals, utils
 from . import timeout
-from bot import config, globals, utils
-import json
+from ...api import twitch
+
 
 def botJoin(db, channel, send):
     if db.isChannelBannedReason(channel):
@@ -14,7 +14,7 @@ def botJoin(db, channel, send):
     if utils.joinChannel(channel, priority, cluster):
         send('Joining ' + channel)
     else:
-        result = utils.ensureServer(channel, priority, server)
+        result = utils.ensureServer(channel, priority, cluster)
         if result == utils.ENSURE_CORRECT:
             send('Already joined ' + channel)
         elif result == utils.ENSURE_REJOIN:

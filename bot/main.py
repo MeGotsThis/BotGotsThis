@@ -1,20 +1,17 @@
 ﻿# Import some necessary libraries.
+import datetime
+import importlib
+import pkgutil
+import source.private.autoload as privateAuto
+import source.public.autoload as publicAuto
+from source.database.factory import getDatabase
 from . import config, globals, utils
 from .data.channel import Channel
 from .data.socket import Socket
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
-from source.database.factory import getDatabase
-import source.private.autoload as privateAuto
-import source.public.autoload as publicAuto
-import datetime
-import importlib
-import pkgutil
-import sys
-import threading
-import time
-import traceback
+
 
 def main(argv):
     print('{time} Starting'.format(time=datetime.datetime.utcnow()))

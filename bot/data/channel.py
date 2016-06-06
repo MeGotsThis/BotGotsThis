@@ -1,7 +1,7 @@
-﻿from source.api.ffz import getBroadcasterEmotes as getFfzEmotes
+﻿import datetime
 from source.api.bttv import getBroadcasterEmotes as getBttvEmotes
-from .. import globals
-import datetime
+from source.api.ffz import getBroadcasterEmotes as getFfzEmotes
+
 
 class Channel:
     __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',

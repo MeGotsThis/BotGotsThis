@@ -1,14 +1,11 @@
-﻿from .. import config
+﻿import datetime
+import threading
+import time
+from .. import config
 from .. import globals
 from .. import utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
-import threading
-import traceback
-import datetime
-import os.path
-import time
-import sys
 
 joinDuration = datetime.timedelta(seconds=10.05)
 
@@ -59,9 +56,6 @@ class JoinThread(threading.Thread):
                     None, None, 'JOIN', IrcMessageParams(chat.ircChannel))
                 chat.socket.queueWrite(ircCommand, channel=chat)
                 self._channelJoined.add(chat.channel)
-    
-    def addSocket(self, socketThread):
-        self._socketThreads.append(socketThread)
     
     def connected(self, socketThread):
         with self._joinTimesLock:

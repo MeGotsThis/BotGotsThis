@@ -1,7 +1,6 @@
-﻿from ...api import twitch
-from bot import globals, utils
-import datetime
-import json
+﻿from bot import globals, utils
+from ...api import twitch
+
 
 def manageAutoJoin(args):
     if len(args.message) < 3:

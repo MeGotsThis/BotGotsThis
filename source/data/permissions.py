@@ -172,7 +172,7 @@ class WhisperPermissionSet:
                 turbo = self._tags['turbo']
             else:
                 turbo = 0
-            self._isTurbo = self.broadcaster or bool(int(turbo))
+            self._isTurbo = self.globalModerator or bool(int(turbo))
         return self._isTurbo
     
     def __getitem__(self, key):

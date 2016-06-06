@@ -20,7 +20,7 @@ class IrcMessageParams:
     
     @classmethod
     def fromParams(cls, params):
-        if not isinstance(message, params):
+        if not isinstance(params, IrcMessageParams):
             raise TypeError()
         return cls(*cls.parse(params))
     

@@ -1,4 +1,5 @@
-﻿from bot import config, globals
+﻿from bot import config
+
 
 def parse(chat, nick):
     if nick == config.botnick:

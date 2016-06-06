@@ -1,8 +1,6 @@
 ﻿import configparser
-import os.path
-import json
-import sys
 import os
+import sys
 
 if not os.path.isfile('twitch.ini'):
     print('Missing twitch.ini')

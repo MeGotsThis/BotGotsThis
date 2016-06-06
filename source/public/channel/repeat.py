@@ -1,11 +1,11 @@
-﻿from ...database.factory import getDatabase
-from ..library import timeout
-from ..library.chat import permission
+﻿import threading
+import time
 from contextlib import suppress
 from datetime import datetime, timedelta
-import threading
-import time
-import json
+from ..library import timeout
+from ..library.chat import permission
+from ...database.factory import getDatabase
+
 
 @permission('broadcaster')
 def commandAutoRepeat(args):
@@ -62,7 +62,7 @@ class MessageRepeater(threading.Thread):
         self._message = message
         self._count = count
         self._duration = max(duration, timedelta(seconds=1))
-        self._lastTime = datetime.datetime.min
+        self._lastTime = datetime.min
         self._countLock = threading.Lock()
     
     @property

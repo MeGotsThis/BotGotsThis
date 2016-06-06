@@ -1,7 +1,7 @@
-﻿from bot import globals
-from contextlib import suppress
-import json
+﻿import json
 import urllib.request
+from contextlib import suppress
+
 
 def getGlobalEmotes():
     url = 'https://api.betterttv.net/2/emotes'
@@ -24,7 +24,7 @@ def getBroadcasterEmotes(broadcaster):
             responseData = response.read()
             bttvData = json.loads(responseData.decode())
             emotes = {}
-            for emoteData in bttvData['emotes']:
+            for emote in bttvData['emotes']:
                 emotes[emote['id']] = emote['code']
             return emotes
     return None

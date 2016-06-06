@@ -1,6 +1,6 @@
-﻿from  ..library.message import messagesFromItems
-from bot import config, globals
-from collections import deque
+﻿from bot import globals
+from  ..library.message import messagesFromItems
+
 
 def manageListChats(args):
     if globals.channels:

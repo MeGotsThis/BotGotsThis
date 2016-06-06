@@ -1,10 +1,12 @@
-﻿from ...api import bttv
+﻿import copy
+import random
+from datetime import timedelta
+
+from bot import globals
+from ...api import bttv
 from ...api import ffz
 from ...api import twitch
-from bot import globals
-from datetime import datetime, timedelta
-import copy
-import random
+
 
 def refreshTwitchGlobalEmotes(timestamp):
     if timestamp - globals.globalEmotesCache >= timedelta(hours=1):

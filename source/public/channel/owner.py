@@ -1,10 +1,7 @@
-﻿from bot import config, globals
+﻿from bot import globals
 from ..library import channel, exit, managebot
 from ..library.chat import min_args, permission, ownerChannel, send
-import datetime
-import json
-import sys
-import time
+
 
 @ownerChannel
 @permission('owner')

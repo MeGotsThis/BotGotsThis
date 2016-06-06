@@ -1,14 +1,12 @@
-﻿from .database.factory import getDatabase
+﻿import threading
+import time
+from bot import utils
+from lists import whisper
 from .data.argument import WhisperCommandArgs
 from .data.message import Message
 from .data.permissions import WhisperPermissionSet
-from bot import config, utils
-from lists import whisper
-import datetime
-import sys
-import threading
-import time
-import traceback
+from .database.factory import getDatabase
+
 
 # Set up our commands function
 def parse(tags, nick, rawMessage, timestamp):

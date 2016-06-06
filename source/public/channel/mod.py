@@ -1,6 +1,6 @@
-﻿from ...api import oauth, twitch
-from ..library.chat import min_args, permission_not_feature, permission
-import threading
+﻿from ..library.chat import min_args, permission_not_feature, permission
+from ...api import oauth, twitch
+
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))

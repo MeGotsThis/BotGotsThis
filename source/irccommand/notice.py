@@ -1,5 +1,4 @@
-﻿from bot import globals
-from bot.data.error import LoginUnsuccessfulException
+﻿from bot.data.error import LoginUnsuccessfulException
 
 messageLimit = 'Your message was not sent because you are '
 messageLimit += 'sending messages too quickly.'

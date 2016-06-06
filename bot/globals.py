@@ -1,8 +1,5 @@
-﻿from . import config
-import datetime
-import sys
-import threading
-import traceback
+﻿import datetime
+from . import config
 
 running = True
 

@@ -74,7 +74,7 @@ def checkIfUrlMaybeBad(chat, nick, message, timestamp):
             try:
                 if e.reason.errno not in [-2, 11001]:
                     utils.logException(message, timestamp)
-            except BaseException as e:
+            except BaseException:
                 utils.logException(message, timestamp)
         except:
             utils.logException(message, timestamp)
