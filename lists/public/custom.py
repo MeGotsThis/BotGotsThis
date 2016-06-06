@@ -1,5 +1,7 @@
-﻿from source.public.custom import broadcaster, countdown, multiple, params
+﻿from source.data.argument import CustomFieldArgs, CustomProcessArgs
+from source.public.custom import broadcaster, countdown, multiple, params
 from source.public.custom import query, url, user
+from typing import Callable, List, Optional
 
 fields = [broadcaster.fieldBroadcaster,
           user.fieldUser,
@@ -9,7 +11,7 @@ fields = [broadcaster.fieldBroadcaster,
           countdown.fieldSince,
           countdown.fieldNext,
           countdown.fieldPrevious,
-          ]
-fieldsEnd = [params.fieldParams]
-properties = ['multiple', 'delimiter']
-postProcess = [multiple.propertyMultipleLines]
+          ]  # type: List[Callable[[CustomFieldArgs], Optional[str]]]
+fieldsEnd = [params.fieldParams]  # type: List[Callable[[CustomFieldArgs], Optional[str]]]
+properties = ['multiple', 'delimiter']  # type: List[str]
+postProcess = [multiple.propertyMultipleLines]  # type: List[Callable[[CustomProcessArgs], Optional[str]]]

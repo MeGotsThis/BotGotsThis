@@ -1,7 +1,10 @@
-﻿disableFilters = True
-disableCustomMessage = True
+﻿from source.data.argument import ChatCommandArgs
+from typing import Callable, List, Mapping, Optional
 
-filterMessage = []
+disableFilters = True  # type: bool
+disableCustomMessage = True  # type: bool
+
+filterMessage = []  # type: List[Callable[[ChatCommandArgs], bool]]
 commands = {
     '!exit': None,
     '!managebot': None,
@@ -37,11 +40,11 @@ commands = {
     '!come': None,
     '!autojoin': None,
     '!uptime': None,
-    }
+    }  # type: Mapping[str, Optional[Callable[[ChatCommandArgs], bool]]]
 commandsStartWith = {
     '!pyramid-': None,
     '!wall-': None,
     '!autorepeat-': None,
-    }
-noCommandPreCustom = []
-noCommandPostCustom = []
+    }  # type: Mapping[str, Optional[Callable[[ChatCommandArgs], bool]]]
+noCommandPreCustom = []  # type: List[Callable[[ChatCommandArgs], bool]]
+noCommandPostCustom = []  # type: List[Callable[[ChatCommandArgs], bool]]
