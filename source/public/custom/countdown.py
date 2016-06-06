@@ -215,7 +215,7 @@ def _parseDateString(string):
             year = None
         date = (year, month, day)
 
-    return (timeOfDay, dayofweek, date, is24Hour)
+    return timeOfDay, dayofweek, date, is24Hour
 
 def _getNextDateTime(now, timeOfDay, dayofweek, date, is24Hour):
     now = now.replace(tzinfo=timezones.utc)
@@ -230,7 +230,7 @@ def _getNextDateTime(now, timeOfDay, dayofweek, date, is24Hour):
         ldate = list(date)
         ldate[0] = today.year
         # For February 29
-        while(True):
+        while True:
             try:
                 actualDate = datetime.date(*ldate)
                 break
@@ -242,7 +242,7 @@ def _getNextDateTime(now, timeOfDay, dayofweek, date, is24Hour):
         else:
             year = actualDate.year + 1
             # For February 29
-            while(True):
+            while True:
                 try:
                     actualDate = actualDate.replace(year=year)
                     break
@@ -279,7 +279,7 @@ def _getPastDateTime(now, timeOfDay, dayofweek, date, is24Hour):
         ldate = list(date)
         ldate[0] = today.year
         # For February 29
-        while(True):
+        while True:
             try:
                 actualDate = datetime.date(*ldate)
                 break
@@ -291,7 +291,7 @@ def _getPastDateTime(now, timeOfDay, dayofweek, date, is24Hour):
         else:
             year = actualDate.year + 1
             # For February 29
-            while(True):
+            while True:
                 try:
                     actualDate = actualDate.replace(year=year)
                     break

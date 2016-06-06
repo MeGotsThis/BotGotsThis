@@ -10,69 +10,69 @@ def loadThisModule(module):
 
 def moduleKey(module):
     if module.startswith('source.irccommand'):
-        return (90, module)
+        return 90, module
     if module == 'source.public.channel.text':
-        return (96, module)
+        return 96, module
     if module == 'source.public.library.feature':
-        return (96, module)
+        return 96, module
     if module == 'source.public.library.managebot':
-        return (96, module)
+        return 96, module
     if module == 'source.channel':
-        return (97, module)
+        return 97, module
     if module == 'source.whisper':
-        return (98, module)
+        return 98, module
     if module == 'source.ircmessage':
-        return (99, module)
+        return 99, module
     
     if module.startswith('source.data'):
-        return (0, module)
+        return 0, module
     if module == 'source.database':
-        return (1, module)
+        return 1, module
     if module == 'source.database.databasebase':
-        return (2, module)
+        return 2, module
     if module == 'source.database.factory':
-        return (9, module)
+        return 9, module
     if module.startswith('source.database'):
-        return (8, module)
+        return 8, module
 
     if module.startswith('source.api'):
-        return (10, module)
+        return 10, module
     if module.startswith('source.public.library'):
-        return (18, module)
+        return 18, module
     if module.startswith('source.private.library'):
-        return (19, module)
+        return 19, module
     
     if module.startswith('source.public.tasks'):
-        return (20, module)
+        return 20, module
     if module.startswith('source.private.tasks'):
-        return (21, module)
+        return 21, module
     
     if module.startswith('source.public.manage'):
-        return (60, module)
+        return 60, module
     if module.startswith('source.private.manage'):
-        return (61, module)
+        return 61, module
     if module.startswith('source.public.custom'):
-        return (60, module)
+        return 60, module
     if module.startswith('source.private.custom'):
-        return (61, module)
+        return 61, module
     
     if module.startswith('source.public.channel'):
-        return (70, module)
+        return 70, module
     if module.startswith('source.private.channel'):
-        return (71, module)
+        return 71, module
     if module.startswith('source.public.whisper'):
-        return (72, module)
+        return 72, module
     if module.startswith('source.private.whisper'):
-        return (73, module)
+        return 73, module
     
     if module.startswith('lists.private'):
-        return (87, module)
+        return 87, module
     if module.startswith('lists.public'):
-        return (88, module)
+        return 88, module
     if module.startswith('lists'):
-        return (89, module)
+        return 89, module
     
-    return (50, module)
+    return 50, module
 
 def botReload(send):
     send('Reloading', 0)
