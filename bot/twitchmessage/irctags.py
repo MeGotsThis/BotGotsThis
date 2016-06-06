@@ -133,7 +133,7 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
                     if (items[key] is not True
                             and not isinstance(items[key], str)):
                         raise TypeError()
-                    self._items[self.__class__._getKey(key)] = items[key]
+                    self._items[self.__class__.fromKey(key)] = items[key]
             elif isinstance(items, collections.abc.Iterable):
                 for key in items:
                     if (isinstance(key, collections.abc.Sequence)
@@ -141,13 +141,14 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
                         if (items[key[1]] is not True
                                 and not isinstance(items[key[1]], str)):
                             raise TypeError()
-                        self._items[self.__class__._getKey(key[0])] = key[1]
+                        self._items[self.__class__.fromKey(key[0])] = key[1]
                     else:
-                        self._items[self.__class__._getKey(key)] = True
+                        self._items[self.__class__.fromKey(key)] = True
             else:
                 raise TypeError()
-    
-    def _getKey(key):
+
+    @staticmethod
+    def fromKey(key):
         if isinstance(key, IrcMessageTagsKey):
             return key
         else:
