@@ -2,7 +2,7 @@
 from collections import ChainMap
 try:
     from .private import channel as privateList
-except:
+except ImportError:
     from .private.default import channel as privateList
 
 if False: # Hints for Intellisense

@@ -75,7 +75,7 @@ def manageAutoJoin(args):
     if args.message.lower[2] in ['pri', 'priority']:
         try:
             priority = int(args.message[4])
-        except:
+        except (ValueError, IndexError):
             priority = 0
         result = args.database.setAutoJoinPriority(
             args.message.lower[3], priority)

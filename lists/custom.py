@@ -1,7 +1,7 @@
 ﻿from .public import custom as publicCustom
 try:
     from .private import custom as privateCustom
-except:
+except ImportError:
     from .private.default import custom as privateCustom
 
 fields = []

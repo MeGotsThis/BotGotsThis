@@ -2,7 +2,7 @@
 from .irccommand import clearchat, notice, userstate
 try:
     from .private import ircmessage
-except:
+except ImportError:
     from .public.default import ircmessage
 from bot import config, utils
 from bot.twitchmessage.ircmessage import IrcMessage

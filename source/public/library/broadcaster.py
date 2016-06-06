@@ -108,7 +108,7 @@ def botSetTimeoutLevel(db, channel, send, message):
         return False
     try:
         value = int(message[1])
-    except:
+    except (ValueError, IndexError):
         value = None
     timeout = config.moderatorDefaultTimeout[int(k) - 1]
     default = '{} seconds'.format(timeout) if timeout else 'Banned'

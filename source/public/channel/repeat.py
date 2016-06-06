@@ -37,7 +37,7 @@ def processAutoRepeat(args, count):
             minutesDuration = 0
         else:
             minutesDuration = float(args.message[1])
-    except:
+    except (ValueError, IndexError):
         return False
     
     message = args.message[2:] or None

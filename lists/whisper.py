@@ -2,7 +2,7 @@
 from collections import ChainMap
 try:
     from .private import whisper as privateList
-except:
+except ImportError:
     from .private.default import whisper as privateList
 
 if False: # Hints for Intellisense

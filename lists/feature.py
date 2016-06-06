@@ -2,7 +2,7 @@
 from collections import ChainMap
 try:
     from .private import feature as privateFeature
-except:
+except ImportError:
     from .private.default import feature as privateFeature
 
 if False: # Hints for Intellisense
