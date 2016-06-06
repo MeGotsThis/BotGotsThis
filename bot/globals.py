@@ -33,7 +33,6 @@ globalEmotes = {
     34: 'SwiftRage',
     36: 'PJSalt',
     356: 'OpieOP',
-    88: 'PogChamp',
     41: 'Kreygasm',
     86: 'BibleThump',
     1906: 'SoBayed',
