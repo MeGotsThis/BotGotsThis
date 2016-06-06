@@ -61,7 +61,7 @@ def botAutoJoin(db, channel, send, message):
     cluster = twitch.twitchChatServer(channel)
     result = db.saveAutoJoin(channel, 0, cluster)
     priority = db.getAutoJoinsPriority(channel)
-    if result == False:
+    if result is False:
         db.setAutoJoinServer(channel, cluster)
     
     wasInChat = channel in globals.channels

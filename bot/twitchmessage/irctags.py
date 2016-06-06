@@ -302,7 +302,7 @@ class IrcMessageTags(IrcMessageTagsReadOnly, collections.abc.MutableMapping):
             pass
         else:
             raise TypeError()
-        if value == True:
+        if value is True:
             self._items[key] = value
         elif isinstance(value, str):
             self._items[key] = value

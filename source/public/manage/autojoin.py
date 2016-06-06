@@ -33,7 +33,7 @@ def manageAutoJoin(args):
         params = args.message.lower[3], 0, cluster
         result = args.database.saveAutoJoin(*params)
         priority = args.database.getAutoJoinsPriority(args.message.lower[3])
-        if result == False:
+        if result is False:
             args.database.setAutoJoinServer(args.message.lower[3], cluster)
             
         wasInChat = args.message.lower[3] in globals.channels
