@@ -31,8 +31,6 @@ class TimeZone(datetime.tzinfo):
     
     def __init__(self, zone, transitions):
         self.__zone = zone
-        _transitions = []
-        epoch = datetime.datetime.utcfromtimestamp(0)
         self._transitions = transitions
     
     def zone(self):
