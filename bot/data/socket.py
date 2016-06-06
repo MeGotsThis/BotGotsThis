@@ -1,7 +1,7 @@
 from .. import config, globals, utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
-from .error import LoginUnsuccessfulException
+from .error import ConnectionResetException, LoginUnsuccessfulException
 from .message import MessagingQueue
 from collections import deque
 from datetime import datetime, timedelta
@@ -134,6 +134,8 @@ class Socket:
                 ircmsg = bytes(ircmsg).decode('utf-8')
                 self._logRead(ircmsg)
                 source.ircmessage.parseMessage(self, ircmsg, datetime.utcnow())
+        except ConnectionResetException:
+            self.disconnect()
         except LoginUnsuccessfulException:
             self.disconnect()
             globals.running = False
