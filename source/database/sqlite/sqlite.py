@@ -38,8 +38,7 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC'''
                 return int(autoJoinRow[0])
             else:
                 return float('inf')
-            return priority
-    
+
     def saveAutoJoin(self, broadcaster, priority=0, cluster='aws'):
         query = '''
 INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''
