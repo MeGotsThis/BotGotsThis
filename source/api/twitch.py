@@ -1,10 +1,9 @@
 ﻿from . import oauth
 from bot import globals
 from contextlib import closing, suppress
-from collections.abc import Mapping
 from datetime import datetime, timedelta
+from typing import Mapping
 import configparser
-import datetime
 import email.utils
 import http.client
 import json

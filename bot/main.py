@@ -4,7 +4,10 @@ import importlib
 import pkgutil
 import source.private.autoload as privateAuto
 import source.public.autoload as publicAuto
+from itertools import chain
+from importlib.abc import PathEntryFinder
 from source.database.factory import getDatabase
+from typing import Generator, List, Iterable, Optional, Tuple
 from . import config, globals, utils
 from .data.channel import Channel
 from .data.socket import Socket
@@ -13,7 +16,7 @@ from .thread.join import JoinThread
 from .thread.socket import SocketsThread
 
 
-def main(argv):
+def main(argv:Optional[List[str]]=None) -> int:
     print('{time} Starting'.format(time=datetime.datetime.utcnow()))
     globals.running = True
     globals.sockets = SocketsThread(name='Sockets Thread')
@@ -34,14 +37,13 @@ def main(argv):
     globals.join.start()
 
     _modulesList = [
-        pkgutil.walk_packages(path=publicAuto.__path__,
+        pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore --
                               prefix=publicAuto.__name__ + '.'),
-        pkgutil.walk_packages(path=privateAuto.__path__,
+        pkgutil.walk_packages(path=privateAuto.__path__,  # type: ignore --
                               prefix=privateAuto.__name__ + '.')
-        ]
-    for _modules in _modulesList:
-        for importer, modname, ispkg in _modules:
-            importlib.import_module(modname)
+        ]  # type: Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
+    for importer, modname, ispkg in chain(*_modulesList):  # --type: PathEntryFinder, str, bool
+        importlib.import_module(modname)
 
     try:
         utils.joinChannel(config.botnick, float('-inf'), 'aws')

@@ -1,5 +1,5 @@
 from collections import namedtuple
-import collections.abc
+import typing
 
 ParsedKeyVendor = namedtuple('ParsedKey', ['key', 'vendor'])
 
@@ -19,7 +19,7 @@ unescapedValue = {
     }
 
 
-class IrcMessageTagsKey(collections.abc.Hashable):
+class IrcMessageTagsKey(typing.Hashable):
     __slots__ = ('_vendor', '_key')
     
     def __init__(self, key='', vendor=None):
@@ -112,7 +112,7 @@ class IrcMessageTagsKey(collections.abc.Hashable):
         return ParsedKeyVendor(key, vendor)
 
 
-class IrcMessageTagsReadOnly(collections.abc.Mapping):
+class IrcMessageTagsReadOnly(typing.Mapping):
     __slots__ = '_items',
     
     def __new__(cls, items=None):
@@ -130,15 +130,15 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
         if items is not None:
             if isinstance(items, str):
                 self._items = self.__class__.parseTags(items)
-            elif isinstance(items, collections.abc.Mapping):
+            elif isinstance(items, typing.Mapping):
                 for key in items:
                     if (items[key] is not True
                             and not isinstance(items[key], str)):
                         raise TypeError()
                     self._items[self.__class__.fromKey(key)] = items[key]
-            elif isinstance(items, collections.abc.Iterable):
+            elif isinstance(items, typing.Iterable):
                 for key in items:
-                    if (isinstance(key, collections.abc.Sequence)
+                    if (isinstance(key, typing.Sequence)
                             and len(key) >= 2):
                         if (items[key[1]] is not True
                                 and not isinstance(items[key[1]], str)):
@@ -292,9 +292,9 @@ class IrcMessageTagsReadOnly(collections.abc.Mapping):
         return items
 
 
-class IrcMessageTags(IrcMessageTagsReadOnly, collections.abc.MutableMapping):
+class IrcMessageTags(IrcMessageTagsReadOnly, typing.MutableMapping):
     __slots__ = '_items',
-    
+        
     def __setitem__(self, key, value):
         if isinstance(key, str):
             key = IrcMessageTagsKey.fromKeyVendor(key)

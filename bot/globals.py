@@ -1,27 +1,33 @@
-﻿import datetime
+﻿from .data.channel import Channel
+from .data.socket import Socket
+from .thread.background import BackgroundTasker
+from .thread.join import JoinThread
+from .thread.socket import SocketsThread
+from datetime import datetime
+from typing import Any, Dict, List
 from . import config
 
-running = True
+running = True  # type: bool
 
 # Import some necessary libraries.
-sockets = None
+sockets = None  # type: SocketsThread
 
-join = None
-groupChannel = None
+join = None  # type: JoinThread
+groupChannel = None  # type: Channel
 
-background = None
+background = None  # type: BackgroundTasker
 
 clusters = {
     'aws': None,
-    }
-whisperCluster = 'aws'
+    }  # type: Dict[str, Socket]
+whisperCluster = 'aws'  # type: str
 
-channels = {}
-displayName = config.botnick
-isTwitchTurbo = False
-isTwitchAdmin = False
-isTwitchStaff = False
-emoteset = [0]
+channels = {}  # type: Dict[str, Channel]
+displayName = config.botnick  # type: str
+isTwitchTurbo = False  # type: bool
+isTwitchAdmin = False  # type: bool
+isTwitchStaff = False  # type: bool
+emoteset = [0]  # type: List[int]
 globalEmotes = {
     25: 'Kappa',
     88: 'PogChamp',
@@ -62,10 +68,10 @@ globalEmotes = {
     3: ':D',
     4: '>(',
     9: '<3',
-    }
-globalEmoteSets = {k: 0 for k, v in globalEmotes.items()}
-globalEmotesCache = datetime.datetime.min
-globalSessionData = {}
+    }  # type: Dict[int, str]
+globalEmoteSets = {k: 0 for k, v in globalEmotes.items()}  # type: Dict[int, int]
+globalEmotesCache = datetime.min  # type: datetime
+globalSessionData = {}  # type: Dict[Any, Any]
 globalFfzEmotes = {
     25927: 'CatBag',
     27081: 'ZreknarF',
@@ -76,8 +82,8 @@ globalFfzEmotes = {
     5: 'YellowFever',
     4: 'ManChicken',
     3: 'BeanieHipster',
-    }
-globalFfzEmotesCache = datetime.datetime.min
+    }  # type: Dict[int, str]
+globalFfzEmotesCache = datetime.min  # type: datetime
 globalBttvEmotes = {
-    }
-globalBttvEmotesCache = datetime.datetime.min
+    }  # type: Dict[str, str]
+globalBttvEmotesCache = datetime.min  # type: datetime

@@ -5,7 +5,7 @@ from .irccommand import clearchat, notice, userstate
 try:
     from .private import ircmessage
 except ImportError:
-    from .public.default import ircmessage
+    from .public.default import ircmessage  # type: ignore
 
 _logCommandPerChannel = [
     'PRIVMSG', 'NOTICE', 'MODE', 'JOIN', 'PART', 'USERSTATE', 'HOSTTARGET',

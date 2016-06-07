@@ -1,12 +1,18 @@
-﻿from contextlib import closing
+﻿from abc import ABCMeta, abstractmethod
+from contextlib import closing
+from typing import Dict, List, Tuple
 import configparser
 import datetime
 import sqlite3
 
 ZERO = datetime.timedelta(0)
 
+class BaseTimeZone(datetime.tzinfo, metaclass=ABCMeta):
+    @abstractmethod
+    def zone(self):
+        return 'zone'
 
-class BasicTimeZone(datetime.tzinfo):
+class BasicTimeZone(BaseTimeZone):
     """Fixed offset in minutes east from UTC."""
     __slots__ = ('__offset', '__name')
     
@@ -27,7 +33,7 @@ class BasicTimeZone(datetime.tzinfo):
         return ZERO
 
 
-class TimeZone(datetime.tzinfo):
+class TimeZone(BaseTimeZone):
     """Fixed offset in minutes east from UTC."""
     __slots__ = ('__zone', '_transitions')
     
@@ -97,7 +103,7 @@ timezones = [
     BasicTimeZone(-600, 'UTC-10:00'),
     BasicTimeZone(-660, 'UTC-11:00'),
     BasicTimeZone(-720, 'UTC-12:00'),
-    ]
+    ]  # type: List[BaseTimeZone]
 
 _ini = configparser.ConfigParser()
 _ini.read('config.ini')
@@ -118,8 +124,8 @@ UNION ALL SELECT abbreviation, gmt_offset FROM timezone
     # Asia/Muscat, Asia/Jerusalem, Asia/Seoul, Europe/London
     for _row in _cursor:
         timezones.append(BasicTimeZone(_row[1] // 60, _row[0]))
-    _zones = {}
-    _transitions = {}
+    _zones = {}  # type: Dict[int, str]
+    _transitions = {}  # type: Dict[int, List[Tuple[int, str, int]]]
     _cursor.execute('SELECT zone_id, zone_name FROM zone ORDER BY zone_id')
     for _row in _cursor:
         _zones[_row[0]] = _row[1]

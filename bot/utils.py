@@ -1,86 +1,95 @@
 ﻿from .data.channel import Channel
-from .globals import channels, clusters
 from bot import config, globals
-import datetime
+from datetime import datetime
+from typing import List, Optional, TextIO, Tuple, Union
 import os.path
 import sys
 import threading
 import traceback
 
 
-def joinChannel(channel, priority=float('inf'), cluster='aws'):
-    if cluster is None or cluster not in clusters:
+def joinChannel(channel:str,
+                priority:Union[int, float]=float('inf'),
+                cluster:str='aws') -> bool:
+    if cluster is None or cluster not in globals.clusters:
         return False
     channel = channel.lower()
-    if channel in channels:
-        t = min(channels[channel].joinPriority, priority)
-        channels[channel].joinPriority = t
+    if channel in globals.channels:
+        t = min(globals.channels[channel].joinPriority, priority)
+        globals.channels[channel].joinPriority = t
         return False
-    channels[channel] = Channel(channel, clusters[cluster], priority)
-    clusters[cluster].joinChannel(channels[channel])
+    globals.channels[channel] = Channel(channel, globals.clusters[cluster],
+                                        priority)
+    globals.clusters[cluster].joinChannel(globals.channels[channel])
     return True
 
 
-def partChannel(channel):
-    if channel in channels:
-        channels[channel].part()
-        del channels[channel]
+def partChannel(channel:str) -> None:
+    if channel in globals.channels:
+        globals.channels[channel].part()
+        del globals.channels[channel]
 
 
-def whisper(nick, message):
+def whisper(nick:str, message:str) -> None:
     cluster = globals.clusters[globals.whisperCluster]
     cluster.messaging.sendWhisper(nick, message)
 
 
-def clearAllChat():
+def clearAllChat() -> None:
     for c in globals.clusters.values():
         c.messaging.clearAllChat()
 
-ENSURE_CLUSTER_UNKNOWN = int(-3)
-ENSURE_CLUSTER_NONE = int(-2)
-ENSURE_REJOIN = int(-1)
-ENSURE_CORRECT = int(0)
-ENSURE_NOT_JOINED = int(1)
+ENSURE_CLUSTER_UNKNOWN = -3  # type: int
+ENSURE_CLUSTER_NONE = -2  # type: int
+ENSURE_REJOIN = -1  # type: int
+ENSURE_CORRECT = 0  # type: int
+ENSURE_NOT_JOINED = 1  # type: int
 
 
-def ensureServer(channel, priority=float('inf'), cluster='aws'):
-    if channel not in channels:
+def ensureServer(channel:str,
+                 priority:Union[int, float]=float('inf'),
+                 cluster:str='aws') -> int:
+    if channel not in globals.channels:
         return ENSURE_NOT_JOINED
     if cluster is None:
         return ENSURE_CLUSTER_NONE
-    if cluster not in clusters:
+    if cluster not in globals.clusters:
         partChannel(channel)
         return ENSURE_CLUSTER_UNKNOWN
-    if clusters[cluster] is channels[channel].socket:
-        channels[channel].joinPriority = min(
-            channels[channel].joinPriority, priority)
+    if globals.clusters[cluster] is globals.channels[channel].socket:
+        globals.channels[channel].joinPriority = min(
+            globals.channels[channel].joinPriority, priority)
         return ENSURE_CORRECT
     partChannel(channel)
     joinChannel(channel, priority, cluster)
     return ENSURE_REJOIN
 
 
-def logIrcMessage(filename, message, timestamp=None):
+def logIrcMessage(filename:str,
+                  message:str,
+                  timestamp:Optional[datetime]=None) -> None:
     if config.ircLogFolder is None:
         return
-    timestamp = timestamp or datetime.datetime.utcnow()
+    timestamp = timestamp or datetime.utcnow()
     with open(os.path.join(config.ircLogFolder, filename), 'a',
-              encoding='utf-8') as file:
+              encoding='utf-8') as file:  # --type: TextIO
         file.write(
             '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
                 time=timestamp, message=message))
 
 
-def logException(extraMessage=None, timestamp=None):
+def logException(extraMessage:str=None,
+                 timestamp:Optional[datetime]=None) -> None:
     if config.exceptionLog is None:
         return
-    timestamp = timestamp or datetime.datetime.utcnow()
-    excep = traceback.format_exception(*sys.exc_info())
-    with open(config.exceptionLog, 'a', encoding='utf-8') as file:
+    timestamp = timestamp or datetime.utcnow()
+    exceptInfo = sys.exc_info()  # type: Tuple[Optional[type], Optional[BaseException], Optional[traceback.TracebackType]]
+    excep = traceback.format_exception(*exceptInfo)  # type: ignore -- List[traceback.TracebackException]
+    with open(config.exceptionLog, 'a', encoding='utf-8') as file:  # --type: TextIO
         if extraMessage and extraMessage[-1] != '\n':
             extraMessage += '\n'
         file.write(
             '{time:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {thread}:\n'
             '{extra}{exception}'.format(
-                time=timestamp, thread=threading.current_thread().name,
+                time=timestamp, thread=threading.current_thread().name,  # type: ignore --
                 extra=extraMessage, exception=''.join(excep)))

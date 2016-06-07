@@ -1,7 +1,7 @@
 from .. import config
 from collections import defaultdict, deque, namedtuple, OrderedDict
-from collections.abc import Iterable
 from datetime import datetime, timedelta
+from typing import Iterable
 import threading
 
 ChatMessage = namedtuple('ChatMessage', ['channel', 'message'])
