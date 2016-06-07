@@ -1,26 +1,29 @@
-﻿import datetime
-import threading
+﻿import threading
 import time
+from datetime import datetime, timedelta
+from typing import Dict, List, Set
+from ..data.channel import Channel
+from ..data.socket import Socket
 from .. import config
 from .. import globals
 from .. import utils
 from ..twitchmessage.ircmessage import IrcMessage
 from ..twitchmessage.ircparams import IrcMessageParams
 
-joinDuration = datetime.timedelta(seconds=10.05)
+joinDuration = timedelta(seconds=10.05)
 
 
 class JoinThread(threading.Thread):
-    def __init__(self, **args):
-        threading.Thread.__init__(self, **args)
-        self._joinTimes = []
-        self._joinTimesLock = threading.Lock()
-        self._channelJoined = set()
-        self._channelsLock = threading.Lock()
+    def __init__(self, **kwargs):
+        threading.Thread.__init__(self, **kwargs)
+        self._joinTimes = []  # type: List[datetime]
+        self._joinTimesLock = threading.Lock()  # type: threading.Lock
+        self._channelJoined = set()  # type: Set[str]
+        self._channelsLock = threading.Lock()  # type: threading.Lock
     
-    def run(self):
+    def run(self) -> None:
         print('{time} Starting {name}'.format(
-            time=datetime.datetime.utcnow(), name=self.__class__.__name__))
+            time=datetime.utcnow(), name=self.__class__.__name__))
         while globals.running:
             try:
                 self.process()
@@ -28,56 +31,56 @@ class JoinThread(threading.Thread):
             except:
                 utils.logException()
         print('{time} Ending {name}'.format(
-            time=datetime.datetime.utcnow(), name=self.__class__.__name__))
+            time=datetime.utcnow(), name=self.__class__.__name__))
 
-    def process(self):
-        timestamp = datetime.datetime.utcnow()
+    def process(self) -> None:
+        timestamp = datetime.utcnow()  # type: datetime
         with self._joinTimesLock:
             self._joinTimes = [t for t in self._joinTimes
                                if timestamp - t <= joinDuration]
             if len(self._joinTimes) >= config.joinLimit:
                 return
         
-        channels = {}
-        for socketThread in globals.clusters.values():
+        channels = {}  # type: Dict[str, Channel]
+        for socketThread in globals.clusters.values():  # --type: SocketsThread
             if socketThread.isConnected:
                 chans = socketThread.channels
-                for chan in chans:
+                for chan in chans:  # --type: Channel
                     channels[chan] = chans[chan]
         with self._channelsLock:
-            notJoined = set(channels.keys() - self._channelJoined)
+            notJoined = set(channels.keys() - self._channelJoined)  # type: Set[str]
             if not notJoined:
                 return
             
-            params = channels, notJoined
-            broadcaster = self._getJoinWithLowestPriority(*params)
-            chat = channels[broadcaster]
+            broadcaster = self._getJoinWithLowestPriority(channels, notJoined)  # type: str
+            chat = channels[broadcaster]  # type: Channel
             if chat.socket is not None:
                 ircCommand = IrcMessage(
-                    None, None, 'JOIN', IrcMessageParams(chat.ircChannel))
+                    None, None, 'JOIN', IrcMessageParams(chat.ircChannel)) # type: IrcMessage
                 chat.socket.queueWrite(ircCommand, channel=chat)
                 self._channelJoined.add(chat.channel)
     
-    def connected(self, socketThread):
+    def connected(self, socket:Socket) -> None:
         with self._joinTimesLock:
-            self._joinTimes.append(datetime.datetime.utcnow())
+            self._joinTimes.append(datetime.utcnow())
     
-    def disconnected(self, socketThread):
+    def disconnected(self, socket:Socket) -> None:
         with self._channelsLock:
-            self._channelJoined -= socketThread.channels.keys()
+            self._channelJoined -= socket.channels.keys()
     
-    def part(self, channel):
+    def part(self, channel:str) -> None:
         with self._channelsLock:
             self._channelJoined.discard(channel)
     
-    def recordJoin(self):
-        timestamp = datetime.datetime.utcnow()
+    def recordJoin(self) -> None:
+        timestamp = datetime.utcnow()  # type: datetime
         with self._joinTimesLock:
             self._joinTimes.append(timestamp)
     
     @staticmethod
-    def _getJoinWithLowestPriority(channelsData, notJoinedChannels):
-        priority = float(min([float(channelsData[c].joinPriority)
-                              for c in notJoinedChannels]))
-        return [str(c) for c in notJoinedChannels
-                if channelsData[c].joinPriority == priority][0]
+    def _getJoinWithLowestPriority(channels:Dict[str, Channel],
+                                   notJoinedChannels:Set[str]) -> str:
+        priority = float(min(float(channels[c].joinPriority) for c
+                             in notJoinedChannels)) # type: float
+        return [c for c in notJoinedChannels
+                if channels[c].joinPriority == priority][0]
