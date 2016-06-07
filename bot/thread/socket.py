@@ -2,7 +2,6 @@
 import threading
 from datetime import datetime
 from itertools import filterfalse
-from socket import socket
 from typing import Callable, List, Tuple
 from ..data.socket import Socket
 from .. import globals, utils
@@ -35,7 +34,7 @@ class SocketsThread(threading.Thread):
         self._socketConnections.append(socketConn)
     
     def process(self):
-        isActive = lambda s: s.socket  # type: Callable[[Socket], Optional[socket]]
+        isActive = lambda s: s.isConnected  # type: Callable[[Socket], bool]
         try:
             for socketConnection in filterfalse(
                     isActive, self._socketConnections):  # --type: Socket

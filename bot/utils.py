@@ -1,4 +1,4 @@
-﻿from .data.channel import Channel
+﻿from .data import channel
 from bot import config, globals
 from datetime import datetime
 from typing import List, Optional, TextIO, Tuple, Union
@@ -8,19 +8,19 @@ import threading
 import traceback
 
 
-def joinChannel(channel:str,
+def joinChannel(broadcaster:str,
                 priority:Union[int, float]=float('inf'),
                 cluster:str='aws') -> bool:
     if cluster is None or cluster not in globals.clusters:
         return False
-    channel = channel.lower()
-    if channel in globals.channels:
-        t = min(globals.channels[channel].joinPriority, priority)
-        globals.channels[channel].joinPriority = t
+    broadcaster = broadcaster.lower()
+    if broadcaster in globals.channels:
+        t = min(globals.channels[broadcaster].joinPriority, priority)
+        globals.channels[broadcaster].joinPriority = t
         return False
-    globals.channels[channel] = Channel(channel, globals.clusters[cluster],
-                                        priority)
-    globals.clusters[cluster].joinChannel(globals.channels[channel])
+    globals.channels[broadcaster] = channel.Channel(
+        broadcaster, globals.clusters[cluster], priority)
+    globals.clusters[cluster].joinChannel(globals.channels[broadcaster])
     return True
 
 
