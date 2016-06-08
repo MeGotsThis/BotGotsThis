@@ -8,9 +8,9 @@ import threading
 import traceback
 
 
-def joinChannel(broadcaster:str,
-                priority:Union[int, float]=float('inf'),
-                cluster:str='aws') -> bool:
+def joinChannel(broadcaster: str,
+                priority: Union[int, float]=float('inf'),
+                cluster: str='aws') -> bool:
     if cluster is None or cluster not in globals.clusters:
         return False
     broadcaster = broadcaster.lower()
@@ -24,13 +24,13 @@ def joinChannel(broadcaster:str,
     return True
 
 
-def partChannel(channel:str) -> None:
+def partChannel(channel: str) -> None:
     if channel in globals.channels:
         globals.channels[channel].part()
         del globals.channels[channel]
 
 
-def whisper(nick:str, message:str) -> None:
+def whisper(nick: str, message: str) -> None:
     cluster = globals.clusters[globals.whisperCluster]
     cluster.messaging.sendWhisper(nick, message)
 
@@ -46,9 +46,9 @@ ENSURE_CORRECT = 0  # type: int
 ENSURE_NOT_JOINED = 1  # type: int
 
 
-def ensureServer(channel:str,
-                 priority:Union[int, float]=float('inf'),
-                 cluster:str='aws') -> int:
+def ensureServer(channel: str,
+                 priority: Union[int, float]=float('inf'),
+                 cluster: str='aws') -> int:
     if channel not in globals.channels:
         return ENSURE_NOT_JOINED
     if cluster is None:
@@ -65,9 +65,9 @@ def ensureServer(channel:str,
     return ENSURE_REJOIN
 
 
-def logIrcMessage(filename:str,
-                  message:str,
-                  timestamp:Optional[datetime]=None) -> None:
+def logIrcMessage(filename: str,
+                  message: str,
+                  timestamp: Optional[datetime]=None) -> None:
     if config.ircLogFolder is None:
         return
     timestamp = timestamp or datetime.utcnow()
@@ -78,8 +78,8 @@ def logIrcMessage(filename:str,
                 time=timestamp, message=message))
 
 
-def logException(extraMessage:str=None,
-                 timestamp:Optional[datetime]=None) -> None:
+def logException(extraMessage: str=None,
+                 timestamp: Optional[datetime]=None) -> None:
     if config.exceptionLog is None:
         return
     timestamp = timestamp or datetime.utcnow()

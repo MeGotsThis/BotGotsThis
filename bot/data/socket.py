@@ -13,11 +13,12 @@ import threading
 
 socketAlias = socket.socket
 
+
 class Socket:
     def __init__(self,
-                 name:str,
-                 server:str,
-                 port:int) -> None:
+                 name: str,
+                 server: str,
+                 port: int) -> None:
         self._writeQueue = deque()  # type: deque
         self._name = name  # type: str
         self._server = server  # type: str
@@ -100,9 +101,9 @@ class Socket:
         return self._socket and self._socket.fileno()  # type: ignore
 
     def write(self,
-              command:IrcMessage, *,
-              channel:'channel.Channel'=None,
-              whisper:WhisperMessage=None) -> None:
+              command: IrcMessage, *,
+              channel: 'channel.Channel'=None,
+              whisper: WhisperMessage=None) -> None:
         if not isinstance(command, IrcMessage):
             raise TypeError()
         if self._socket is None:
@@ -154,7 +155,7 @@ class Socket:
             self.disconnect()
             globals.running = False
     
-    def ping(self, message:str='ping') -> None:
+    def ping(self, message: str='ping') -> None:
         self.queueWrite(IrcMessage(None, None, 'PONG',
                                    IrcMessageParams(None, message)),
                         prepend=True)
@@ -171,16 +172,16 @@ class Socket:
         elif sinceLast >= timedelta(minutes=1, seconds=15):
             self.disconnect()
     
-    def _logRead(self, message:str) -> None:
+    def _logRead(self, message: str) -> None:
         file = '{nick}-{server}.log'.format(nick=config.botnick,
                                             server=self.name)  # type: str
         utils.logIrcMessage(file, '< ' + message)
     
     def _logWrite(self,
-                  command:IrcMessage, *,
-                  channel:'channel.Channel'=None,
-                  whisper:WhisperMessage=None,
-                  timestamp:Optional[datetime]=None) -> None:
+                  command: IrcMessage, *,
+                  channel: 'channel.Channel'=None,
+                  whisper: WhisperMessage=None,
+                  timestamp: Optional[datetime]=None) -> None:
         timestamp = timestamp or datetime.utcnow()
         if command.command == 'PASS':
             command = IrcMessage(command='PASS')
@@ -214,10 +215,10 @@ class Socket:
             utils.logIrcMessage(file, log, timestamp)
     
     def queueWrite(self,
-                   command:IrcMessage, *,
-                   channel:'channel.Channel'=None,
-                   whisper:WhisperMessage=None,
-                   prepend:bool=False) -> None:
+                   command: IrcMessage, *,
+                   channel: 'channel.Channel'=None,
+                   whisper: WhisperMessage=None,
+                   prepend: bool=False) -> None:
         if not isinstance(command, IrcMessage):
             raise TypeError()
         kwargs = {}  # type: dict
@@ -231,11 +232,11 @@ class Socket:
         else:
             self.writeQueue.append(item)
     
-    def joinChannel(self, channel:'channel.Channel') -> None:
+    def joinChannel(self, channel: 'channel.Channel') -> None:
         with self._channelsLock:
             self._channels[channel.channel] = channel
     
-    def partChannel(self, channel:'channel.Channel') -> None:
+    def partChannel(self, channel: 'channel.Channel') -> None:
         with self._channelsLock:
             self.queueWrite(IrcMessage(None, None, 'PART',
                                        IrcMessageParams(channel.ircChannel)))

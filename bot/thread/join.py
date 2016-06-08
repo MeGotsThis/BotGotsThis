@@ -60,11 +60,11 @@ class JoinThread(threading.Thread):
                 chat.socket.queueWrite(ircCommand, channel=chat)
                 self._channelJoined.add(chat.channel)
     
-    def connected(self, socket:Socket) -> None:
+    def connected(self, socket: Socket) -> None:
         with self._joinTimesLock:
             self._joinTimes.append(datetime.utcnow())
     
-    def disconnected(self, socket:Socket) -> None:
+    def disconnected(self, socket: Socket) -> None:
         with self._channelsLock:
             self._channelJoined -= socket.channels.keys()
     
@@ -78,8 +78,8 @@ class JoinThread(threading.Thread):
             self._joinTimes.append(timestamp)
     
     @staticmethod
-    def _getJoinWithLowestPriority(channels:Dict[str, Channel],
-                                   notJoinedChannels:Set[str]) -> str:
+    def _getJoinWithLowestPriority(channels: Dict[str, Channel],
+                                   notJoinedChannels: Set[str]) -> str:
         priority = float(min(float(channels[c].joinPriority) for c
                              in notJoinedChannels)) # type: float
         return [c for c in notJoinedChannels

@@ -61,7 +61,7 @@ class Channel:
         return self._isSubscriber
     
     @isSubscriber.setter
-    def isSubscriber(self, value:bool) -> None:
+    def isSubscriber(self, value: bool) -> None:
         self._isSubscriber = bool(value)
     
     @property
@@ -77,7 +77,7 @@ class Channel:
         return self._joinPriority
     
     @joinPriority.setter
-    def joinPriority(self, value:Union[int,float]) -> None:
+    def joinPriority(self, value: Union[int,float]) -> None:
         self._joinPriority = float(value)
     
     @property
@@ -125,7 +125,7 @@ class Channel:
         return self._twitchStatus
     
     @twitchStatus.setter
-    def twitchStatus(self, value:str):
+    def twitchStatus(self, value: str):
         self._twitchStatus = value
     
     @property
@@ -133,7 +133,7 @@ class Channel:
         return self._twitchGame
     
     @twitchGame.setter
-    def twitchGame(self, value:str):
+    def twitchGame(self, value: str):
         self._twitchGame = value
     
     @property

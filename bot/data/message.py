@@ -19,7 +19,7 @@ disallowedCommands = {
 
 
 class MessagingQueue:
-    def __init__(self):
+    def __init__(self) -> None:
         self._chatQueues = [], [], []  # type: Tuple[List[ChatMessage], ...]
         self._whisperQueue = deque()  # type: MutableSequence[WhisperMessage]
         self._queueLock = threading.Lock()  # type: threading.Lock
@@ -28,7 +28,7 @@ class MessagingQueue:
         self._lowQueueRecent = OrderedDict()  # type: Dict[str, Any]
         self._publicTime = defaultdict(lambda: datetime.min)  # type: Dict[str, datetime]
 
-    def cleanOldTimestamps(self):
+    def cleanOldTimestamps(self) -> None:
         msgDuration = timedelta(seconds=30.1)
         timestamp = datetime.utcnow()
         self._chatSent = [t for t in self._chatSent
@@ -37,10 +37,10 @@ class MessagingQueue:
                              if timestamp - t <= msgDuration]
     
     def sendChat(self,
-                 channel:'channel.Channel',
-                 messages:Union[str,Iterable[str]],
-                 priority:int=1,
-                 bypass:bool=False) -> None:
+                 channel: 'channel.Channel',
+                 messages: Union[str,Iterable[str]],
+                 priority: int=1,
+                 bypass: bool=False) -> None:
         if isinstance(messages, str):
             messages = messages,
         elif not isinstance(messages, Iterable):
@@ -69,8 +69,8 @@ class MessagingQueue:
                 self.sendWhisper(nick, whispers[nick])
     
     def sendWhisper(self,
-                    nick:str,
-                    messages:Union[str,Iterable[str]]) -> None:
+                    nick: str,
+                    messages: Union[str,Iterable[str]]) -> None:
         if isinstance(messages, str):
             messages = messages,
         elif not isinstance(messages, Iterable):
@@ -86,7 +86,7 @@ class MessagingQueue:
             self._chatSent.append(timestamp)
         return nextMessage
     
-    def _getChatMessage(self, timestamp:datetime) -> ChatMessage:
+    def _getChatMessage(self, timestamp: datetime) -> ChatMessage:
         publicDelay = timedelta(seconds=config.publicDelay)  # type: timedelta
         isModGood = len(self._chatSent) < config.modLimit  # type: bool
         isModSpamGood = len(self._chatSent) < config.modSpamLimit  # type: bool
@@ -130,7 +130,7 @@ class MessagingQueue:
         return None
     
     @staticmethod
-    def _isMod(channel:'channel.Channel') -> bool:
+    def _isMod(channel: 'channel.Channel') -> bool:
         return channel.isMod or config.botnick == channel.channel
     
     def popWhisper(self):
@@ -139,7 +139,7 @@ class MessagingQueue:
             return self._whisperQueue.popleft()
         return None
     
-    def clearChat(self, channel:'channel.Channel') -> None:
+    def clearChat(self, channel: 'channel.Channel') -> None:
         with self._queueLock:
             for queue in self._chatQueues:  # --type: List[ChatMessage]
                 for message in queue[:]:  # --type: ChatMessage

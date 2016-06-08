@@ -24,7 +24,9 @@ class BackgroundTasker(threading.Thread):
             print('{time} Ending {name}'.format(
                 time=datetime.utcnow(), name=self.__class__.__name__))
     
-    def addTask(self, task, interval=timedelta(seconds=60)) -> None:
+    def addTask(self,
+                task: Callable[[datetime], None],
+                interval: timedelta=timedelta(seconds=60)) -> None:
         self._tasks.append(Task(task, interval))
     
     def runTasks(self) -> None:
@@ -38,8 +40,8 @@ class BackgroundTasker(threading.Thread):
 
 class Task:
     def __init__(self,
-                 task:Callable[[datetime], None],
-                 interval:timedelta) -> None:
+                 task: Callable[[datetime], None],
+                 interval: timedelta) -> None:
         self._task = task
         self._interval = interval
         self.timestamp = datetime.min  # type: datetime

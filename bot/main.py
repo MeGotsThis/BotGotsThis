@@ -16,7 +16,7 @@ from .thread.join import JoinThread
 from .thread.socket import SocketsThread
 
 
-def main(argv:Optional[List[str]]=None) -> int:
+def main(argv: Optional[List[str]]=None) -> int:
     print('{time} Starting'.format(time=datetime.datetime.utcnow()))
     globals.running = True
     globals.sockets = SocketsThread(name='Sockets Thread')
