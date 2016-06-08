@@ -6,7 +6,7 @@ from .error import ConnectionResetException, LoginUnsuccessfulException
 from .message import ChatMessage, MessagingQueue, WhisperMessage
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import socket
 import source.ircmessage
 import threading
@@ -18,7 +18,7 @@ class Socket:
                  name:str,
                  server:str,
                  port:int) -> None:
-        self._writeQueue = deque()  # type: deque[Tuple[Tuple[IrcMessage], dict]]
+        self._writeQueue = deque()  # type: deque
         self._name = name  # type: str
         self._server = server  # type: str
         self._port = port  # type: int
@@ -51,7 +51,7 @@ class Socket:
         return self._messaging
     
     @property
-    def writeQueue(self) -> deque[Tuple[Tuple[IrcMessage], dict]]:
+    def writeQueue(self) -> deque:
         return self._writeQueue
     
     def connect(self) -> None:

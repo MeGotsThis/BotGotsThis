@@ -21,6 +21,10 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="bot\twitchmessage\irctags.pyi" />
+    <Content Include="bot\twitchmessage\ircmessage.pyi" />
+    <Content Include="bot\twitchmessage\ircparams.pyi" />
+    <Content Include="bot\twitchmessage\ircprefix.pyi" />
     <Content Include="config.dist.ini" />
     <Content Include="config.ini" />
     <Content Include="source\database\sqlite\timeout.sql" />

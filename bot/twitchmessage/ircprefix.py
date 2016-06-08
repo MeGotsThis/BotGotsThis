@@ -1,17 +1,23 @@
-from collections import namedtuple
+from typing import List, NamedTuple, Optional
 import string
 
-ParsedPrefix = namedtuple('ParsedPrefix',
-                          ['servername', 'nick', 'user', 'host'])
+ParsedPrefix = NamedTuple('ParsedPrefix',
+                          [('servername', Optional[str]),
+                           ('nick', Optional[str]),
+                           ('user', Optional[str]),
+                           ('host', Optional[str])])
 
-nickSpecials = '-_'
+nickSpecials = '-_'  # type: str
 
 
 class IrcMessagePrefix:
     __slots__ = ('_servername', '_nick', '_user', '_host')
     
-    def __init__(self, servername=None, nick=None, user=None,
-                 host=None):
+    def __init__(self,
+                 servername:Optional[str]=None,
+                 nick:Optional[str]=None,
+                 user:Optional[str]=None,
+                 host:Optional[str]=None) -> None:
         if not isinstance(servername, (type(None), str)):
             raise TypeError()
         if not isinstance(nick, (type(None), str)):
@@ -32,34 +38,34 @@ class IrcMessagePrefix:
         if user is not None and any(c in ' \0\r\n' for c in user):
             raise ValueError()
         
-        self._servername = servername
-        self._nick = nick
-        self._user = user
-        self._host = host
+        self._servername = servername  # type: Optional[str]
+        self._nick = nick  # type: Optional[str]
+        self._user = user  # type: Optional[str]
+        self._host = host  # type: Optional[str]
     
     @classmethod
-    def fromPrefix(cls, prefix):
+    def fromPrefix(cls, prefix:str) -> 'IrcMessagePrefix':
         if not isinstance(prefix, str):
             raise TypeError()
         return cls(*cls.parse(prefix))
     
     @property
-    def servername(self):
+    def servername(self) -> Optional[str]:
         return self._servername
     
     @property
-    def nick(self):
+    def nick(self) -> Optional[str]:
         return self._nick
     
     @property
-    def user(self):
+    def user(self) -> Optional[str]:
         return self._user
     
     @property
-    def host(self):
+    def host(self) -> Optional[str]:
         return self._host
     
-    def __str__(self):
+    def __str__(self) -> str:
         if self._servername is not None:
             return str(self._servername)
         if self._nick is not None:
@@ -71,7 +77,7 @@ class IrcMessagePrefix:
             return s
         return ''
     
-    def __eq__(self, other):
+    def __eq__(self, other:object) -> bool:
         if isinstance(other, IrcMessagePrefix):
             return (self._servername == other._servername
                     and self._nick == other._nick
@@ -79,29 +85,29 @@ class IrcMessagePrefix:
                     and self._host == other._host)
         return False
     
-    def __ne__(self, other):
+    def __ne__(self, other:object) -> bool:
         return not (self == other)
     
     @staticmethod
-    def parse(params):
+    def parse(params:str) -> ParsedPrefix:
         if not isinstance(params, str):
             raise ValueError()
         
-        length = len(params)
-        i = 0
+        length = len(params)  # type: int
+        i = 0  # type: int
         
         if i == length:
             raise ValueError()
         
-        s = []
-        servername = None
-        nick = None
-        user = None
-        host = None
-        isServerName = False
-        isNick = False
+        s = []  # type: List[str]
+        servername = None  # type: Optional[str]
+        nick = None  # type: Optional[str]
+        user = None  # type: Optional[str]
+        host = None  # type: Optional[str]
+        isServerName = False  # type: bool
+        isNick = False  # type: bool
         while i < length:
-            char = params[i]
+            char = params[i]  # type: str
             i += 1
             
             if char == '!':
@@ -136,14 +142,14 @@ class IrcMessagePrefix:
             raise ValueError()
         if len(s) == 0:
             raise ValueError()
-        ss = ''.join(s)
+        ss = ''.join(s)  # type: str
         if isServerName:
             servername = ss
         else:
             nick = ss
             
         if char == '!':
-            u = []
+            u = []  # type: List[str]
             while i < length:
                 char = params[i]
                 i += 1
@@ -156,7 +162,7 @@ class IrcMessagePrefix:
             user = ''.join(u)
             
         if char == '@':
-            h = []
+            h = []  # type: List[str]
             s = []
             while i < length:
                 char = params[i]

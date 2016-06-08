@@ -1,43 +1,47 @@
-from collections import namedtuple
+from typing import List, NamedTuple, Optional
 
-ParsedParams = namedtuple('ParsedParams', ['middle', 'trailing'])
+ParsedParams = NamedTuple('ParsedParams',
+                          [('middle', Optional[str]),
+                           ('trailing', Optional[str])])
 
 
 class IrcMessageParams:
     __slots__ = ('_middle', '_trailing')
     
-    def __init__(self, middle=None, trailing=None):
+    def __init__(self,
+                 middle:Optional[str]=None,
+                 trailing:Optional[str]=None) -> None:
         if not isinstance(middle, (type(None), str)):
             raise TypeError()
         if not isinstance(trailing, (type(None), str)):
             raise TypeError()
-        
+
         if middle is not None:
             if any([s for s in middle.split(' ') if len(s) and s[0] == ':']):
                 raise ValueError()
-        
-        self._middle = middle
-        self._trailing = trailing
-    
+
+        self._middle = middle  # type: Optional[str]
+        self._trailing = trailing  # type: Optional[str]
+
     @classmethod
-    def fromParams(cls, params):
-        if not isinstance(params, IrcMessageParams):
+    def fromParams(cls, params:str) -> 'IrcMessageParams':
+        if not isinstance(params, str):
             raise TypeError()
         return cls(*cls.parse(params))
-    
+
     @property
-    def isEmpty(self):
+    def isEmpty(self) -> bool:
         return self._middle is None and self._trailing is None
-    
+
     @property
-    def middle(self):
+    def middle(self) -> Optional[str]:
         return self._middle
-    
+
     @property
-    def trailing(self):
+    def trailing(self) -> Optional[str]:
         return self._trailing
-    
-    def __str__(self):
+
+    def __str__(self) -> str:
         s = ''
         if self._middle is not None:
             s += self._middle
@@ -46,30 +50,30 @@ class IrcMessageParams:
         if self._trailing is not None:
             s += ':' + self._trailing
         return s
-    
-    def __eq__(self, other):
+
+    def __eq__(self, other:object) -> bool:
         if isinstance(other, IrcMessageParams):
             return (self._middle == other._middle
                     and self._trailing == other._trailing)
         return False
     
-    def __ne__(self, other):
+    def __ne__(self, other:object) -> bool:
         return not self.__eq__(other)
     
     @staticmethod
-    def parse(params):
+    def parse(params:str) -> ParsedParams:
         if not isinstance(params, str):
             raise ValueError()
         
-        length = len(params)
-        i = 0
+        length = len(params)  # type: int
+        i = 0  # type: int
         
         if i == length:
-            return None, None
+            return ParsedParams(None, None)
         
-        s = []
-        m = []
-        t = []
+        s = []  # type: List[str]
+        m = []  # type: List[str]
+        t = []  # type: List[str]
         while i < length:
             char = params[i]
             i += 1
@@ -101,7 +105,7 @@ class IrcMessageParams:
         if i != length:
             raise ValueError()
         
-        middle = ''.join(m) if m else None
-        trailing = ''.join(t) if t else None
+        middle = ''.join(m) if m else None  # type: Optional[str]
+        trailing = ''.join(t) if t else None  # type: Optional[str]
         
         return ParsedParams(middle, trailing)
