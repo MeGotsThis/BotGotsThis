@@ -1,15 +1,18 @@
-﻿from ..database.factory import getDatabase
+﻿from typing import Optional
+from ..database.databasebase import DatabaseBase
+from ..database.factory import getDatabase
 
 
-def getOAuthToken(broadcaster):
+def getOAuthToken(broadcaster: str) -> Optional[str]:
     if broadcaster is None:
         return None
     
-    with getDatabase() as db:
+    with getDatabase() as db:  # --type: DatabaseBase
         return db.getOAuthToken(broadcaster)
 
 
-def getOAuthTokenWithDB(db, broadcaster):
+def getOAuthTokenWithDB(db: DatabaseBase,
+                        broadcaster: str) -> Optional[str]:
     if broadcaster is None:
         return None
     
