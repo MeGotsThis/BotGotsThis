@@ -1,6 +1,6 @@
-﻿from source.data.argument import WhisperCommandArgs
+﻿from source.data import argument
 from source.public.whisper import broadcaster, feature, owner, reload
-from typing import Callable, Mapping, Optional
+from typing import Mapping, Optional
 
 commands = {
     '!hello': owner.commandHello,
@@ -19,4 +19,4 @@ commands = {
     '!come': broadcaster.commandCome,
     '!autojoin': broadcaster.commandAutoJoin,
     '!feature': feature.commandFeature,
-    }  # type: Mapping[str, Optional[Callable[[WhisperCommandArgs], bool]]]
+    }  # type: Mapping[str, Optional['argument.WhisperCommand']]

@@ -1,4 +1,7 @@
 from bot import config
+from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from typing import Any
+
 
 typeTwitchStaff = {'staff'}
 typeTwitchAdmin = {'staff', 'admin'}
@@ -7,99 +10,105 @@ typeModerator = {'staff', 'admin', 'global_mod', 'mod'}
 
 
 class ChatPermissionSet:
-    def __init__(self, tags, user, channel):
+    def __init__(self,
+                 tags: IrcMessageTagsReadOnly,
+                 user: str,
+                 channel: Any) -> None:
+        userType = None  # type: str
         if 'user-type' in tags:
-            userType = tags['user-type']
+            userType = str(tags['user-type'])
         else:
             userType = ''
-        self._tags = tags
-        self._userType = userType
-        self._user = user
+        self._tags = tags  # type: IrcMessageTagsReadOnly
+        self._userType = userType  # type: str
+        self._user = user  # type: str
         self._channel = channel
-        self._isOwner = None
-        self._inOwnerChannel = None
-        self._isTwitchStaff = None
-        self._isTwitchAdmin = None
-        self._isGlobalMod = None
-        self._isBroadcaster = None
-        self._isModerator = None
-        self._isSubscriber = None
-        self._isTurbo = None
+        self._isOwner = None  # type: bool
+        self._inOwnerChannel = None  # type: bool
+        self._isTwitchStaff = None  # type: bool
+        self._isTwitchAdmin = None  # type: bool
+        self._isGlobalMod = None  # type: bool
+        self._isBroadcaster = None  # type: bool
+        self._isModerator = None  # type: bool
+        self._isSubscriber = None  # type: bool
+        self._isTurbo = None  # type: bool
     
     @property
-    def owner(self):
+    def owner(self) -> bool:
         if self._isOwner is None:
             self._isOwner = self._user == config.owner
         return self._isOwner
     
     @property
-    def inOwnerChannel(self):
+    def inOwnerChannel(self) -> bool:
         if self._inOwnerChannel is None:
-            inOwner = self._channel.channel == config.owner
-            inBot = self._channel.channel == config.botnick
+            inOwner = self._channel.channel == config.owner  # type: bool
+            inBot = self._channel.channel == config.botnick  # type: bool
             self._inOwnerChannel = inOwner or inBot
         return self._inOwnerChannel
     
     @property
-    def twitchStaff(self):
+    def twitchStaff(self) -> bool:
         if self._isTwitchStaff is None:
             self._isTwitchStaff = self._userType in typeTwitchStaff
             self._isTwitchStaff = self.owner or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
-    def twitchAdmin(self):
+    def twitchAdmin(self) -> bool:
         if self._isTwitchAdmin is None:
             self._isTwitchAdmin = self._userType in typeTwitchAdmin
             self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
     
     @property
-    def globalModerator(self):
+    def globalModerator(self) -> bool:
         if self._isGlobalMod is None:
             self._isGlobalMod = self._userType in typeGlobalModerator
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod
     
     @property
-    def broadcaster(self):
+    def broadcaster(self) -> bool:
         if self._isBroadcaster is None:
             self._isBroadcaster = self._channel.channel == self._user
             self._isBroadcaster = self.globalModerator or self._isBroadcaster
         return self._isBroadcaster
     
     @property
-    def moderator(self):
+    def moderator(self) -> bool:
         if self._isModerator is None:
             self._isModerator = self._userType in typeModerator
             self._isModerator = self.broadcaster or self._isModerator
         return self._isModerator
     
     @property
-    def subscriber(self):
+    def subscriber(self) -> bool:
         if self._isSubscriber is None:
+            subscriber = None  # type: int
             if 'subscriber' in self._tags:
-                subscriber = self._tags['subscriber']
+                subscriber = int(self._tags['subscriber'])
             else:
                 subscriber = 0
-            self._isSubscriber = self.broadcaster or bool(int(subscriber))
+            self._isSubscriber = self.broadcaster or bool(subscriber)
         return self._isSubscriber
     
     @property
-    def turbo(self):
+    def turbo(self) -> bool:
         if self._isTurbo is None:
+            turbo = None  # type: int
             if 'turbo' in self._tags:
-                turbo = self._tags['turbo']
+                turbo = int(self._tags['turbo'])
             else:
                 turbo = 0
-            self._isTurbo = self.broadcaster or bool(int(turbo))
+            self._isTurbo = self.broadcaster or bool(turbo)
         return self._isTurbo
     
     @property
-    def chatModerator(self):
+    def chatModerator(self) -> bool:
         return self._channel.isMod
     
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> bool:
         if isinstance(key, str):
             if key == 'owner':
                 return self.owner
@@ -126,58 +135,62 @@ class ChatPermissionSet:
 
 
 class WhisperPermissionSet:
-    def __init__(self, tags, user):
+    def __init__(self,
+                 tags: IrcMessageTagsReadOnly,
+                 user: str) -> None:
+        userType = None  # type: str
         if 'user-type' in tags:
-            userType = tags['user-type']
+            userType = str(tags['user-type'])
         else:
             userType = ''
-        self._tags = tags
-        self._userType = userType
-        self._user = user
-        self._isOwner = None
-        self._isTwitchStaff = None
-        self._isTwitchAdmin = None
-        self._isGlobalMod = None
-        self._isTurbo = None
+        self._tags = tags  # type: IrcMessageTagsReadOnly
+        self._userType = userType  # type: str
+        self._user = user  # type: str
+        self._isOwner = None  # type: bool
+        self._isTwitchStaff = None  # type: bool
+        self._isTwitchAdmin = None  # type: bool
+        self._isGlobalMod = None  # type: bool
+        self._isTurbo = None  # type: bool
     
     @property
-    def owner(self):
+    def owner(self) -> bool:
         if self._isOwner is None:
             self._isOwner = self._user == config.owner
         return self._isOwner
     
     @property
-    def twitchStaff(self):
+    def twitchStaff(self) -> bool:
         if self._isTwitchStaff is None:
             self._isTwitchStaff = self._userType in typeTwitchStaff
             self._isTwitchStaff = self.owner or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
-    def twitchAdmin(self):
+    def twitchAdmin(self) -> bool:
         if self._isTwitchAdmin is None:
             self._isTwitchAdmin = self._userType in typeTwitchAdmin
             self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
     
     @property
-    def globalModerator(self):
+    def globalModerator(self) -> bool:
         if self._isGlobalMod is None:
             self._isGlobalMod = self._userType in typeGlobalModerator
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod
     
     @property
-    def turbo(self):
+    def turbo(self) -> bool:
         if self._isTurbo is None:
+            turbo = None  # type: int
             if 'turbo' in self._tags:
-                turbo = self._tags['turbo']
+                turbo = int(self._tags['turbo'])
             else:
                 turbo = 0
-            self._isTurbo = self.globalModerator or bool(int(turbo))
+            self._isTurbo = self.globalModerator or bool(turbo)
         return self._isTurbo
     
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> bool:
         if isinstance(key, str):
             if key == 'owner':
                 return self.owner

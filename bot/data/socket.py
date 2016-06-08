@@ -6,7 +6,7 @@ from .error import ConnectionResetException, LoginUnsuccessfulException
 from .message import ChatMessage, MessagingQueue, WhisperMessage
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 import socket
 import source.ircmessage
 import threading

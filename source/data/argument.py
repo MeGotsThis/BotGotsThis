@@ -1,21 +1,60 @@
-from collections import namedtuple
+from ..data.message import Message
+from ..data.permissions import ChatPermissionSet, WhisperPermissionSet
+from ..database.databasebase import DatabaseBase
+from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from datetime import datetime
+from typing import Any, Callable, Iterable, List, NamedTuple, Optional, Union
 
-ChatCommandArgs = namedtuple('ChatCommandArgs',
-                             ['database', 'chat', 'tags', 'nick', 'message',
-                              'permissions', 'timestamp'])
+ChatCommandArgs = NamedTuple('ChatCommandArgs',
+                             [('database', DatabaseBase),
+                              ('chat', Any),
+                              ('tags', IrcMessageTagsReadOnly),
+                              ('nick', str),
+                              ('message', Message),
+                              ('permissions', ChatPermissionSet),
+                              ('timestamp', datetime)])
 
-WhisperCommandArgs = namedtuple('WhisperCommandArgs',
-                                ['database', 'nick', 'message', 'permissions',
-                                 'timestamp'])
+WhisperCommandArgs = NamedTuple('WhisperCommandArgs',
+                                [('database', DatabaseBase),
+                                 ('nick', str),
+                                 ('message', Message),
+                                 ('permissions', WhisperPermissionSet),
+                                 ('timestamp', datetime)])
 
-CustomFieldArgs = namedtuple('CustomFieldArgs',
-                             ['field', 'param', 'prefix', 'suffix', 'default',
-                              'message', 'channel', 'nick', 'timestamp'])
+CustomFieldArgs = NamedTuple('CustomFieldArgs',
+                             [('field', str),
+                              ('param', str),
+                              ('prefix', str),
+                              ('suffix', str),
+                              ('default', str),
+                              ('message', Message),
+                              ('channel', Any),
+                              ('nick', str),
+                              ('timestamp', datetime)])
 
-CustomProcessArgs = namedtuple('CustomProcessArgs',
-                               ['database', 'chat', 'tags', 'nick',
-                                'permissions', 'broadcaster', 'level',
-                                'command', 'messages'])
+CustomProcessArgs = NamedTuple('CustomProcessArgs',
+                               [('database', DatabaseBase),
+                                ('chat', Any),
+                                ('tags', IrcMessageTagsReadOnly),
+                                ('nick', str),
+                                ('permissions', ChatPermissionSet),
+                                ('broadcaster', str),
+                                ('level', Optional[str]),
+                                ('command', str),
+                                ('messages', List[str])])
 
-ManageBotArgs = namedtuple('ManageBotArgs',
-                           ['database', 'send', 'nick', 'message'])
+ManageBotArgs = NamedTuple('ManageBotArgs',
+                           [('database', DatabaseBase),
+                            ('send', Callable[[Union[str,Iterable[str]]], None]),
+                            ('nick', str),
+                            ('message', Message)])
+
+ChatCommand = Callable[[ChatCommandArgs], bool]
+
+WhisperCommand = Callable[[WhisperCommandArgs], bool]
+
+CustomCommandField = Callable[[CustomFieldArgs], Optional[str]]
+
+CustomCommandProcess = Callable[[CustomProcessArgs], None]
+
+ManageBotCommand = Callable[[ManageBotArgs], bool]

@@ -1,18 +1,20 @@
+from typing import Iterator, List, Union
+
+
 class Tokenized:
-    def __init__(self, string):
+    def __init__(self, string: str) -> None:
         if not isinstance(string, str):
             raise TypeError('message needs to be a str')
-        self._string = string
-        self._tokens = self._string.split()
-        self._command = None
-    
-    def __str__(self):
+        self._string = string  # type: str
+        self._tokens = self._string.split()  # type: List[str]
+
+    def __str__(self) -> str:
         return self._string
     
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._tokens)
     
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union[int, slice]) -> str:
         if isinstance(key, int):
             return self._tokens[key]
         if isinstance(key, slice):
@@ -59,28 +61,28 @@ class Tokenized:
             return message
         raise TypeError('key is not of type int or slice')
     
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         yield from self._tokens
     
-    def __reversed__(self):
-        yield from self._tokens.reverse()
+    def __reversed__(self) -> Iterator[str]:
+        yield from reversed(self._tokens)
     
-    def __contains__(self, item):
+    def __contains__(self, item: object) -> bool:
         return item in self._tokens
 
 
 class Message(Tokenized):
-    def __init__(self, message):
+    def __init__(self, message: str) -> None:
         super().__init__(message)
-        self._query = None
-        self._lower = None
+        self._query = None  # type: str
+        self._lower = None  # type: Tokenized
     
     @property
-    def command(self):
+    def command(self) -> str:
         return self.lower[0]
     
     @property
-    def query(self):
+    def query(self) -> str:
         if self._query is None:
             self._query = self[1:]
         return self._query

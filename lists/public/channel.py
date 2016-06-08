@@ -1,4 +1,4 @@
-﻿from source.data.argument import ChatCommandArgs
+﻿from source.data import argument
 from source.public.channel import blockUrl
 from source.public.channel import broadcaster
 from source.public.channel import custom
@@ -14,7 +14,7 @@ from typing import Callable, List, Mapping, Optional
 
 filterMessage = [
     blockUrl.filterNoUrlForBots
-    ]  # type: List[Callable[[ChatCommandArgs], bool]]
+    ]  # type: List['argument.ChatCommand']
 
 commands = {
     '!exit': owner.commandExit,
@@ -93,12 +93,12 @@ commands = {
     '!come': broadcaster.commandCome,
     '!autojoin': broadcaster.commandAutoJoin,
     '!uptime': broadcaster.commandUptime,
-    }  # type: Mapping[str, Optional[Callable[[ChatCommandArgs], bool]]]
+    }  # type: Mapping[str, Optional['argument.ChatCommand']]
 commandsStartWith = {
     '!pyramid-': pyramid.commandPyramidLong,
     '!wall-': wall.commandWallLong,
     '!autorepeat-': repeat.commandAutoRepeat,
     '!settimeoutlevel-': broadcaster.commandSetTimeoutLevel,
-    }  # type: Mapping[str, Optional[Callable[[ChatCommandArgs], bool]]]
+    }  # type: Mapping[str, Optional['argument.ChatCommand']]
 
-processNoCommand = [custom.customCommands]  # type: List[Callable[[ChatCommandArgs], bool]]
+processNoCommand = [custom.customCommands]  # type: List['argument.ChatCommand']

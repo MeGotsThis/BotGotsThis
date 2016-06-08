@@ -2,7 +2,8 @@ from . import channel
 from .. import config
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
-from typing import Any, Dict, Iterable, List, MutableSequence, NamedTuple, Tuple, Union
+from typing import Any, Dict, Iterable, List, MutableSequence, NamedTuple
+from typing import Tuple, Union
 import threading
 
 ChatMessage = NamedTuple('ChatMessage',
@@ -19,7 +20,7 @@ disallowedCommands = {
 
 
 class MessagingQueue:
-    def __init__(self) -> None:
+    def __init__(self):
         self._chatQueues = [], [], []  # type: Tuple[List[ChatMessage], ...]
         self._whisperQueue = deque()  # type: MutableSequence[WhisperMessage]
         self._queueLock = threading.Lock()  # type: threading.Lock

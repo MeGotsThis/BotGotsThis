@@ -2,7 +2,7 @@
 import time
 from bot import utils
 from lists import whisper
-from .data.argument import WhisperCommandArgs
+from .data import argument
 from .data.message import Message
 from .data.permissions import WhisperPermissionSet
 from .database.factory import getDatabase
@@ -26,11 +26,11 @@ def parse(tags, nick, rawMessage, timestamp):
 def whisperCommand(tags, nick, message, timestamp):
     try:
         permissions = WhisperPermissionSet(tags, nick)
-    
+
         complete = False
         with getDatabase() as database:
-            arguments = WhisperCommandArgs(database, nick, message,
-                                           permissions, timestamp)
+            arguments = argument.WhisperCommandArgs(
+                database, nick, message, permissions, timestamp)
             for command in commandsToProcess(message.command):
                 if command(arguments):
                     return

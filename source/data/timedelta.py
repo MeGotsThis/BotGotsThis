@@ -1,4 +1,6 @@
-﻿def format(timeDelta):
+﻿from datetime import timedelta
+
+def format(timeDelta: timedelta) -> str:
     formatted = []
     if timeDelta.days == 1:
         formatted.append('1 day')

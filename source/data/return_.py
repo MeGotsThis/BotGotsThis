@@ -1,15 +1,28 @@
-from collections import namedtuple
+from typing import NamedTuple, Union
 
-AutoJoinChannel = namedtuple('AutoJoinChannel',
-                             ['broadcaster', 'priority', 'cluster'])
+AutoJoinChannel = NamedTuple('AutoJoinChannel',
+                             [('broadcaster', str),
+                              ('priority', Union[int, float]),
+                              ('cluster', str)])
 
-CustomCommand = namedtuple('CustomCommand',
-                           ['message', 'broadcaster', 'level'])
+CustomCommand = NamedTuple('CustomCommand',
+                           [('message', str),
+                            ('broadcaster', str),
+                            ('level', str)])
 
-CustomCommandTokens = namedtuple('CustomCommandTokens',
-                                 ['action', 'broadcaster', 'level', 'command',
-                                  'text'])
+CustomCommandTokens = NamedTuple('CustomCommandTokens',
+                                 [('action', str),
+                                  ('broadcaster', str),
+                                  ('level', str),
+                                  ('command', str),
+                                  ('text', str)])
 
-CustomFieldParts = namedtuple('CustomFieldParts',
-                              ['plainText', 'field', 'format', 'prefix',
-                               'suffix', 'param', 'default', 'original'])
+CustomFieldParts = NamedTuple('CustomFieldParts',
+                              [('plainText', str),
+                               ('field', str),
+                               ('format', str),
+                               ('prefix', str),
+                               ('suffix', str),
+                               ('param', str),
+                               ('default', str),
+                               ('original', str)])

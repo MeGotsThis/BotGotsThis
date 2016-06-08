@@ -1,68 +1,74 @@
 ﻿from abc import ABCMeta, abstractmethod
 from contextlib import closing
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 import configparser
 import datetime
 import sqlite3
 
 ZERO = datetime.timedelta(0)
 
+
 class BaseTimeZone(datetime.tzinfo, metaclass=ABCMeta):
     @abstractmethod
-    def zone(self):
+    def zone(self) -> str:
         return 'zone'
+
 
 class BasicTimeZone(BaseTimeZone):
     """Fixed offset in minutes east from UTC."""
     __slots__ = ('__offset', '__name')
     
-    def __init__(self, offset, name):
-        self.__offset = datetime.timedelta(minutes=offset)
-        self.__name = name
+    def __init__(self,
+                 offset: int,
+                 name: str) -> None:
+        self.__offset = datetime.timedelta(minutes=offset)  # type: datetime.timedelta
+        self.__name = name  # type: str
     
-    def zone(self):
+    def zone(self) -> str:
         return self.__name
     
-    def tzname(self, dt):
+    def tzname(self, dt: datetime.datetime) -> str:
         return self.__name
     
-    def utcoffset(self, dt):
-        return self.__offset
+    def utcoffset(self, dt: Optional[datetime.datetime]) -> int:
+        return self.__offset.seconds // 60
     
-    def dst(self, dt):
-        return ZERO
+    def dst(self, dt: Optional[datetime.datetime]) -> int:
+        return ZERO.seconds // 60
 
 
 class TimeZone(BaseTimeZone):
     """Fixed offset in minutes east from UTC."""
     __slots__ = ('__zone', '_transitions')
     
-    def __init__(self, zone, transitions):
-        self.__zone = zone
-        self._transitions = transitions
+    def __init__(self,
+                 zone :str,
+                 transitions: List[Tuple[int, str, int]]) -> None:
+        self.__zone = zone  # type: str
+        self._transitions = transitions  # type: List[Tuple[int, str, int]]
     
-    def zone(self):
+    def zone(self) -> str:
         return self.__zone
     
-    def tzname(self, dt):
-        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
-        transistion = self._transitions[0]
+    def tzname(self, dt: datetime.datetime) -> str:
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
+        transistion = self._transitions[0]  # type: Tuple[int, str, int]
         for t in self._transitions[::-1]:
             if unixTime >= t[0]:
                 transistion = t
                 break
         return transistion[1]
     
-    def utcoffset(self, dt):
+    def utcoffset(self, dt: Optional[datetime.datetime]) -> int:
         unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
         transistion = self._transitions[0]
         for t in self._transitions[::-1]:
             if unixTime >= t[0]:
                 transistion = t
                 break
-        return datetime.timedelta(seconds=transistion[2])
+        return transistion[2] // 60
      
-    def dst(self, dt):
+    def dst(self, dt: Optional[datetime.datetime]) -> int:
         unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
         transistion = self._transitions[0]
         for t in self._transitions[::-1]:
@@ -70,7 +76,7 @@ class TimeZone(BaseTimeZone):
                 transistion = t
                 break
         delta = transistion[2] - self._transitions[0][2]
-        return datetime.timedelta(seconds=delta)
+        return delta // 60
 
 utc = BasicTimeZone(0, 'UTC')
 unixEpoch = datetime.datetime(1970, 1, 1, 0, 0, 0, 0)

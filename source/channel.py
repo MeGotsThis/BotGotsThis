@@ -3,7 +3,7 @@ import time
 
 from bot import utils
 from lists import channel as commandList
-from .data.argument import ChatCommandArgs
+from .data import argument
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
 from .database import factory
@@ -29,8 +29,8 @@ def chatCommand(chat, tags, nick, message, timestamp):
         permissions = ChatPermissionSet(tags, nick, chat)
     
         with factory.getDatabase() as database:
-            arguments = ChatCommandArgs(database, chat, tags, nick, message,
-                                        permissions, timestamp)
+            arguments = argument.ChatCommandArgs(
+                database, chat, tags, nick, message, permissions, timestamp)
             for command in commandsToProcess(message.command):
                 if command(arguments):
                     return
