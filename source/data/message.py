@@ -1,7 +1,7 @@
-from typing import Iterator, List, Union
+from typing import Iterator, List, Sequence, Union
 
 
-class Tokenized:
+class Tokenized(Sequence[str]):
     def __init__(self, string: str) -> None:
         if not isinstance(string, str):
             raise TypeError('message needs to be a str')
@@ -60,15 +60,6 @@ class Tokenized:
                     message = message.rsplit(None, -stop - start)[0]
             return message
         raise TypeError('key is not of type int or slice')
-    
-    def __iter__(self) -> Iterator[str]:
-        yield from self._tokens
-    
-    def __reversed__(self) -> Iterator[str]:
-        yield from reversed(self._tokens)
-    
-    def __contains__(self, item: object) -> bool:
-        return item in self._tokens
 
 
 class Message(Tokenized):

@@ -27,6 +27,7 @@
     <Content Include="bot\twitchmessage\ircprefix.pyi" />
     <Content Include="config.dist.ini" />
     <Content Include="config.ini" />
+    <Content Include="source\database\databasebase.pyi" />
     <Content Include="source\database\sqlite\timeout.sql" />
     <Content Include="source\database\sqlite\database.sql" />
     <Content Include="source\database\sqlite\gamesabbreviation.sql" />

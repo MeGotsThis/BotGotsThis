@@ -1,8 +1,11 @@
 ﻿import threading
 import time
-
 from bot import utils
+from bot.data import channel
+from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from datetime import datetime
 from lists import channel as commandList
+from typing import Iterator
 from .data import argument
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
@@ -10,28 +13,36 @@ from .database import factory
 
 
 # Set up our commands function
-def parse(chat, tags, nick, rawMessage, timestamp):
+def parse(chat: 'channel.Channel',
+          tags: IrcMessageTagsReadOnly,
+          nick: str,
+          rawMessage: str,
+          timestamp: datetime) -> None:
     if len(rawMessage) == 0:
         return
     
-    message = Message(rawMessage)
+    message = Message(rawMessage)  # type: Message
     if len(message) == 0:
         return
     
     name = '{channel}-{command}-{time}'.format(
-        channel=chat.channel, command=message.command, time=time.time())
-    params = chat, tags, nick, message, timestamp
+        channel=chat.channel, command=message.command, time=time.time())  # type: str
+    params = chat, tags, nick, message, timestamp  # type: tuple
     threading.Thread(target=chatCommand, args=params, name=name).start()
     
 
-def chatCommand(chat, tags, nick, message, timestamp):
+def chatCommand(chat: 'channel.Channel',
+                tags: IrcMessageTagsReadOnly,
+                nick: str,
+                message: Message,
+                timestamp: datetime) -> None:
     try:
-        permissions = ChatPermissionSet(tags, nick, chat)
+        permissions = ChatPermissionSet(tags, nick, chat)  # type: ChatPermissionSet
     
         with factory.getDatabase() as database:
             arguments = argument.ChatCommandArgs(
-                database, chat, tags, nick, message, permissions, timestamp)
-            for command in commandsToProcess(message.command):
+                database, chat, tags, nick, message, permissions, timestamp)  # type: argument.ChatCommandArgs
+            for command in commandsToProcess(message.command):  # --type: argument.ChatCommand
                 if command(arguments):
                     return
     except:
@@ -40,7 +51,7 @@ def chatCommand(chat, tags, nick, message, timestamp):
         utils.logException(extra, timestamp)
 
 
-def commandsToProcess(command):
+def commandsToProcess(command: str) -> Iterator[argument.ChatCommand]:
     yield from commandList.filterMessage
     if command in commandList.commands:
         if commandList.commands[command] is not None:

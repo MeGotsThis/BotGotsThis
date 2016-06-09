@@ -1,5 +1,10 @@
 ﻿from bot import config, utils
 from bot.twitchmessage.ircmessage import IrcMessage
+from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from bot.data import channel as channel_
+from bot.data import socket
+from datetime import datetime
+from typing import Mapping, List, Optional
 from . import channel, whisper
 from .irccommand import clearchat, notice, userstate
 try:
@@ -13,16 +18,18 @@ _logCommandPerChannel = [
     ]
 
 
-def parseMessage(socket, ircmsg, timestamp):
-    files = []
-    logs = []
-    channels = socket.channels
-    message = IrcMessage.fromMessage(ircmsg)
+def parseMessage(socket: 'socket.Socket',
+                 ircmsg: str,
+                 timestamp: datetime) -> None:
+    files = []  # type: List[str]
+    logs = []  # type: List[str]
+    channels = socket.channels  # type: Mapping[str, 'channel_.Channel']
+    message = IrcMessage.fromMessage(ircmsg)  # type: IrcMessage
     if message.command == 'PRIVMSG':
-        tags = message.tags
-        nick = message.prefix.nick
-        where = message.params.middle
-        msg = message.params.trailing
+        tags = message.tags  # type: IrcMessageTagsReadOnly
+        nick = message.prefix.nick # type: Optional[str]
+        where = message.params.middle # type: str
+        msg = message.params.trailing # type: str
         if where[0] == '#':
             files.append(where + '#msg.log')
             logs.append(nick + ': ' + msg)
@@ -30,7 +37,7 @@ def parseMessage(socket, ircmsg, timestamp):
             files.append(config.botnick + '-Mentions.log')
             logs.append(nick + ' -> ' + where + ': ' + msg)
         if where[0] == '#' and where[1:] in channels:
-            chan = channels[where[1:]]
+            chan = channels[where[1:]] # type: Optional['channel_.Channel']
             channel.parse(chan, tags, nick, msg, timestamp)
         
     if message.command == 'WHISPER':
@@ -102,7 +109,7 @@ def parseMessage(socket, ircmsg, timestamp):
         
     if message.command == 353:
         where = message.params.middle.split()[-1]
-        nicks = message.params.trailing.split(' ')
+        nicks = message.params.trailing.split(' ')  # List[str]
         if where[0] == '#':
             files.append(where + '#full.log')
             logs.append('< ' + ircmsg)

@@ -220,8 +220,6 @@ class DatabaseBase(metaclass=ABCMeta):
 
 
 class DatabaseNone(DatabaseBase):
-    __slots__ = DatabaseBase.__slots__
-
     def getAutoJoinsChats(self) -> Iterable[AutoJoinChannel]:
         yield from []
 

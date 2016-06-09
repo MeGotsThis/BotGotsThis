@@ -1,16 +1,19 @@
-﻿import datetime
+﻿from bot.data import channel
+from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from typing import List
+import datetime
 import bot.globals
 
 
-def parse(channelData, tags):
-    bot.globals.displayName = tags['display-name']
+def parse(channel: 'channel.Channel',
+          tags: IrcMessageTagsReadOnly) -> None:
+    bot.globals.displayName = str(tags['display-name'])
     bot.globals.isTwitchStaff = tags['user-type'] in ['staff']
     bot.globals.isTwitchAdmin = tags['user-type'] in ['staff', 'admin']
     bot.globals.isTwitchTurbo = bool(int(tags['turbo']))
-    channelData.isMod = tags['user-type'] in ['staff', 'admin', 'mod']
+    channel.isMod = tags['user-type'] in ['staff', 'admin', 'mod']
     
-    emoteset = tags['emote-sets'].split(',')
-    emoteset = [int(i) for i in emoteset]
+    emoteset = [int(i) for i in str(tags['emote-sets']).split(',')]  # List[int]
     # This is to remove twitch turbo emotes that are shared with
     # global emoticons
     if 33 in emoteset:
