@@ -1,8 +1,11 @@
 ﻿import sys
 import importlib
+from typing import Tuple
+from ...data.argument import Send
+from ...data.message import Message
 
 
-def loadThisModule(module):
+def loadThisModule(module: str) -> bool:
     include = module.startswith('source') or module.startswith('lists')
     exclude = module == 'source.public.library.reload'
     exclude = exclude or module.startswith('source.private.autoload')
@@ -10,7 +13,7 @@ def loadThisModule(module):
     return include and not exclude
 
 
-def moduleKey(module):
+def moduleKey(module: str) -> Tuple[int, str]:
     if module.startswith('source.irccommand'):
         return 90, module
     if module == 'source.public.channel.text':
@@ -77,31 +80,31 @@ def moduleKey(module):
     return 50, module
 
 
-def botReload(send):
-    send('Reloading', 0)
+def botReload(send: Send):
+    send('Reloading')
     
     botReloadCommands(send)
     botReloadConfig(send)
     
-    send('Complete', 0)
+    send('Complete')
     return True
 
 
-def botReloadCommands(send):
-    send('Reloading Commands', 0)
+def botReloadCommands(send: Send):
+    send('Reloading Commands')
     
-    modules = [m for m in sys.modules.keys() if loadThisModule(m)]
-    for moduleString in sorted(modules, key=moduleKey):
+    modules = [m for m in sys.modules.keys() if loadThisModule(m)]  # type: List[str]
+    for moduleString in sorted(modules, key=moduleKey):  # --type: str
         importlib.reload(sys.modules[moduleString])
     
-    send('Complete Reloading', 0)
+    send('Complete Reloading')
     return True
 
 
-def botReloadConfig(send):
-    send('Reloading Config', 0)
+def botReloadConfig(send: Send):
+    send('Reloading Config')
     
     importlib.reload(sys.modules['bot.config'])
     
-    send('Complete Reloading', 0)
+    send('Complete Reloading')
     return True

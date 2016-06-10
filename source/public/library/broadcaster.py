@@ -1,15 +1,20 @@
 ﻿import time
 from bot import config, globals, utils
+from typing import Dict, List, Optional, Union
 from ...api import twitch
+from ...data.argument import Send
+from ...data.message import Message
+from ...database.databasebase import DatabaseBase
 
 
-def botCome(db, channel, send):
-    if db.isChannelBannedReason(channel):
+def botCome(database: DatabaseBase,
+            channel: str,
+            send: Send):
+    if database.isChannelBannedReason(channel):
         send('Chat {channel} is banned from joining'.format(channel=channel))
         return True
-    priority = db.getAutoJoinsPriority(channel)
-    priority = priority if priority is not None else float('inf')
-    
+    priority = database.getAutoJoinsPriority(channel)  # type: Union[float, int]
+
     if channel in globals.channels:
         send('I am already in {channel}'.format(channel=channel))
         return True
@@ -26,7 +31,8 @@ def botCome(db, channel, send):
                  'server'.format(channel=channel))
 
 
-def botLeave(channel, send):
+def botLeave(channel: str,
+             send: Send) -> bool:
     if channel == config.botnick:
         return False
     send('Bye {channel}'.format(channel=channel))
@@ -35,24 +41,29 @@ def botLeave(channel, send):
     return True
 
 
-def botEmpty(channel, send):
+def botEmpty(channel: str,
+             send: Send) -> None:
     if channel in globals.channels:
-        globals.channels[channel].socket.messaging.clearChat(channel)
+        chan = globals.channels[channel]
+        chan.socket.messaging.clearChat(chan)
         send('Cleared all queued messages '
              'for {channel}'.format(channel=channel))
 
 
-def botAutoJoin(db, channel, send, message):
-    if db.isChannelBannedReason(channel):
+def botAutoJoin(database: DatabaseBase,
+                channel: str,
+                send: Send,
+                message: Message) -> bool:
+    if database.isChannelBannedReason(channel):
         send('Chat {channel} is banned from '
              'joining'.format(channel=channel))
-        return
+        return True
 
     if len(message) >= 2:
         removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
-                      'leave', 'part']
+                      'leave', 'part']  # type: List[str]
         if message.lower[1] in removeMsgs:
-            result = db.discardAutoJoin(channel)
+            result = database.discardAutoJoin(channel)  # type: bool
             if result:
                 send('Auto join for {channel} is now '
                      'disabled'.format(channel=channel))
@@ -61,13 +72,14 @@ def botAutoJoin(db, channel, send, message):
                      'enabled'.format(channel=channel))
             return True
     
-    cluster = twitch.twitchChatServer(channel)
-    result = db.saveAutoJoin(channel, 0, cluster)
-    priority = db.getAutoJoinsPriority(channel)
+    cluster = twitch.twitchChatServer(channel) or 'aws'  # type: str
+    result = database.saveAutoJoin(channel, 0, cluster)
+    priority = database.getAutoJoinsPriority(channel)  # type: Union[int, float]
     if result is False:
-        db.setAutoJoinServer(channel, cluster)
+        database.setAutoJoinServer(channel, cluster)
     
     wasInChat = channel in globals.channels
+    rejoin = 0  # type: int
     if not wasInChat:
         utils.joinChannel(channel, priority, cluster)
     else:
@@ -75,7 +87,7 @@ def botAutoJoin(db, channel, send, message):
     
     if result and not wasInChat:
         msg = ('Auto join for {channel} is now enabled and joined {channel} '
-               'chat')
+               'chat')  # type: str
     elif result:
         if rejoin < 0:
             msg = ('Auto join for {channel} is now enabled and moved to the '
@@ -96,27 +108,30 @@ def botAutoJoin(db, channel, send, message):
     return True
 
 
-def botSetTimeoutLevel(db, channel, send, message):
+def botSetTimeoutLevel(database: DatabaseBase,
+                       channel: str,
+                       send: Send,
+                       message: Message) -> bool:
     propertyDict = {
         '1': 'timeoutLength0',
         '2': 'timeoutLength1',
         '3': 'timeoutLength2',
-        }
+        }  # type: Dict[str, str]
     ordinal = {
         '1': '1st',
         '2': '2nd',
         '3': '3rd',
-        }
-    k = message.command.split('settimeoutlevel-')[1]
+        }  # type: Dict[str, str]
+    k = message.command.split('settimeoutlevel-')[1]  # type: str
     if k not in propertyDict:
         return False
     try:
-        value = int(message[1])
+        value = int(message[1])  # type: Optional[int]
     except (ValueError, IndexError):
         value = None
-    timeout = config.moderatorDefaultTimeout[int(k) - 1]
-    default = '{} seconds'.format(timeout) if timeout else 'Banned'
-    db.setChatProperty(channel, propertyDict[k], value)
+    timeout = config.moderatorDefaultTimeout[int(k) - 1]  # type: int
+    default = '{} seconds'.format(timeout) if timeout else 'Banned'  # type: str
+    database.setChatProperty(channel, propertyDict[k], str(value))
     if value is None:
         msg = ('Setting the timeout length for {ordinal} offense to defaulted '
                'amount ({default})')

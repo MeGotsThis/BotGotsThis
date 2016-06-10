@@ -1,4 +1,4 @@
-from typing import NamedTuple, Union
+from typing import NamedTuple, Optional, Union
 
 AutoJoinChannel = NamedTuple('AutoJoinChannel',
                              [('broadcaster', str),
@@ -19,10 +19,10 @@ CustomCommandTokens = NamedTuple('CustomCommandTokens',
 
 CustomFieldParts = NamedTuple('CustomFieldParts',
                               [('plainText', str),
-                               ('field', str),
-                               ('format', str),
-                               ('prefix', str),
-                               ('suffix', str),
-                               ('param', str),
-                               ('default', str),
-                               ('original', str)])
+                               ('field', Optional[str]),
+                               ('format', Optional[str]),
+                               ('prefix', Optional[str]),
+                               ('suffix', Optional[str]),
+                               ('param', Optional[str]),
+                               ('default', Optional[str]),
+                               ('original', Optional[str])])

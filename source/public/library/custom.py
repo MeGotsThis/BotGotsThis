@@ -1,26 +1,35 @@
-from ...data.argument import CustomFieldArgs, CustomProcessArgs
+from typing import Dict, Iterable, List, Optional
+from ...data.argument import ChatCommandArgs, CustomFieldArgs
+from ...data.argument import CustomProcessArgs, CustomCommandProcess
+from ...data.message import Message
+from ...data.permissions import ChatPermissionSet
 from ...data.return_ import CustomCommand, CustomCommandTokens
 from ...data.return_ import CustomFieldParts
+from ...database.databasebase import DatabaseBase
 from ..library import textformat
 import lists.custom
 
 
-def getCustomCommand(database, command, channel, permissions):
-    commands = database.getChatCommands(channel, command)
+def getCustomCommand(database: DatabaseBase,
+                     command: str,
+                     channel: str,
+                     permissions: ChatPermissionSet) -> Optional[CustomCommand]:
+    commands = database.getChatCommands(channel, command)  # type: Dict[str, Dict[str, str]]
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
-                      'globalMod', 'admin', 'staff', 'owner']
-    for permission in reversed(permissionsSet):
+                      'globalMod', 'admin', 'staff', 'owner']  # type: List[str]
+    for permission in reversed(permissionsSet):  # --type: str
         if not permission or permissions[permission]:
-            for broadcaster in [channel, '#global']:
+            for broadcaster in [channel, '#global']:  # --type: str
                 if permission in commands[channel]:
-                    message = commands[broadcaster][permission]
+                    message = commands[broadcaster][permission]  # --type: str
                     return CustomCommand(message, broadcaster, permission)
     return None
 
 
-def createMessages(command, args):
+def createMessages(command: CustomCommand,
+                   args: ChatCommandArgs) -> List[str]:
     textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
-    messageParts = []
+    messageParts = []  # type: List[str]
     try:
         for formats in parseFormatMessage(command.message):
             messageParts.append(formats.plainText)
@@ -29,8 +38,8 @@ def createMessages(command, args):
                     fieldArgument = CustomFieldArgs(
                         formats.field, formats.param, formats.prefix,
                         formats.suffix, formats.default, args.message,
-                        args.chat.channel, args.nick, args.timestamp)
-                    string = fieldString(fieldArgument)
+                        args.chat.channel, args.nick, args.timestamp)  # type: CustomFieldArgs
+                    string = fieldString(fieldArgument)  # type: Optional[str]
                     if string is not None:
                         string = format(string, formats.format, textFormat)
                     else:
@@ -43,13 +52,14 @@ def createMessages(command, args):
     messages = [''.join(messageParts)]
     processArgument = CustomProcessArgs(
         args.database, args.chat, args.tags, args.nick, args.permissions,
-        command.broadcaster, command.level, args.message.command, messages)
-    for process in lists.custom.postProcess:
+        command.broadcaster, command.level, args.message.command, messages)  # type: CustomProcessArgs
+    for process in lists.custom.postProcess:  # --type: CustomCommandProcess
         process(processArgument)
     return messages
 
 
-def parseCommandMessageInput(message, broadcaster):
+def parseCommandMessageInput(message: Message,
+                             broadcaster: str) -> Optional[CustomCommandTokens]:
     allowPermissions = {
         None: '',
         '': '',
@@ -81,14 +91,14 @@ def parseCommandMessageInput(message, broadcaster):
     try:
         action = message.lower[1]
         i = 2
-        level = None
+        level = None  # type: Optional[str]
         if message[2].startswith('level='):
             i = 3
             level = message[2][len('level='):]
         if level in allowPermissions:
             level = allowPermissions[level]
         else:
-            level = False
+            level = None
         command = message[i]
         text = message[i+1:]
         
@@ -97,16 +107,16 @@ def parseCommandMessageInput(message, broadcaster):
         return None
 
 
-def parseFormatMessage(message):
+def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
     # Format: {field:format<prefix>suffix@param!default}
-    parsed = []
-    i = 0
-    length = len(message)
+    parsed = []  # type: List[CustomFieldParts]
+    i = 0  # type: int
+    length = len(message)  # type: int
     
     while True:
-        noFormat = []
+        noFormat = []  # type: List[str]
         while i < length:
-            char = message[i]
+            char = message[i]  # type: str
             i += 1
             
             if char == '}':
@@ -125,15 +135,15 @@ def parseFormatMessage(message):
         
         if i == length:
             if noFormat:
-                parsed.append(CustomFieldParts(''.join(noFormat)))
+                parsed.append(CustomFieldParts(''.join(noFormat), None, None, None, None, None, None, None))
             break
         
-        s = i
+        s = i  # type: int
         i += 1
         if i == length:
             raise ValueError()
         
-        field = []
+        field = []  # type: List[str]
         while True:
             if i == length:
                 raise ValueError()
@@ -179,7 +189,7 @@ def parseFormatMessage(message):
                     break
             field.append(char)
 
-        format = []
+        format = []  # type: List[str]
         if char == ':':
             while True:
                 if i == length:
@@ -221,7 +231,7 @@ def parseFormatMessage(message):
                         break
                 format.append(char)
 
-        prefix = []
+        prefix = []  # type: List[str]
         if char == '<':
             while True:
                 if i == length:
@@ -258,7 +268,7 @@ def parseFormatMessage(message):
                         break
                 prefix.append(char)
 
-        suffix = []
+        suffix = []  # type: List[str]
         if char == '>':
             while True:
                 if i == length:
@@ -290,7 +300,7 @@ def parseFormatMessage(message):
                         break
                 suffix.append(char)
 
-        param = []
+        param = []  # type: List[str]
         if char == '@':
             while True:
                 if i == length:
@@ -317,7 +327,7 @@ def parseFormatMessage(message):
                         break
                 param.append(char)
 
-        default = []
+        default = []  # type: List[str]
         if char == '!':
             while True:
                 if i == length:
@@ -357,15 +367,17 @@ def parseFormatMessage(message):
     return parsed
 
 
-def fieldString(args):
-    for fieldConvert in lists.custom.fields:
-        result = fieldConvert(args)
+def fieldString(args: CustomFieldArgs) -> Optional[str]:
+    for fieldConvert in lists.custom.fields:  # --type: CustomCommandField
+        result = fieldConvert(args)  # type: Optional[str]
         if result is not None:
             return result
     return None
 
 
-def format(string, format, hasTextConvert):
+def format(string: str,
+           format: str,
+           hasTextConvert: bool) -> str:
     if hasTextConvert:
         return textformat.format(string=string, format=format)
     return string

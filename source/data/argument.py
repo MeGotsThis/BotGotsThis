@@ -58,3 +58,5 @@ CustomCommandField = Callable[[CustomFieldArgs], Optional[str]]
 CustomCommandProcess = Callable[[CustomProcessArgs], None]
 
 ManageBotCommand = Callable[[ManageBotArgs], bool]
+
+Send = Callable[[Union[str,Iterable[str]]], None]

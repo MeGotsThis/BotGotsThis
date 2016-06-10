@@ -1,14 +1,17 @@
 from bot import config
 from collections import deque
+from typing import Generator, Iterator, Optional
 
 
-def messagesFromItems(items, prepend=None):
+def messagesFromItems(items:Iterator[str],
+                      prepend:Optional[str]=None) -> Generator[str, None, None]:
+    prepend = prepend or ''
     limit = config.messageLimit - len(prepend)
-    queue = deque(items)
-    itemsMsg = deque()
-    length = 0
+    queue = deque(items)  # type: deque
+    itemsMsg = deque()  # type: deque
+    length = 0  # type: int
     while queue:
-        item = queue.popleft()
+        item = queue.popleft()  # type: str
         itemsMsg.append(item)
         if length:
             length += 2

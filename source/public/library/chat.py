@@ -1,14 +1,22 @@
+from datetime import timedelta
 from functools import wraps
+from typing import Any, Callable, Optional, Tuple, Union
+from ...data import argument
+
+_AnyArgs = Union[argument.ChatCommandArgs, argument.WhisperCommandArgs]
+_AnyCallable = Callable[..., Any]
+_AnyDecorator = Callable[..., _AnyCallable]
 
 
-def send(chat):
+def send(chat: Any) -> argument.Send:
     return chat.send
 
 
-def permission(permission):
-    def decorator(func):
+def permission(permission: str) -> _AnyDecorator:
+    def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def command(args, *pargs, **kwargs):
+        def command(args: _AnyArgs,
+                    *pargs, **kwargs) -> Any:
             if not args.permissions[permission]:
                 return False
             return func(args, *pargs, **kwargs)
@@ -16,10 +24,11 @@ def permission(permission):
     return decorator
 
 
-def not_permission(permission):
-    def decorator(func):
+def not_permission(permission: str) -> _AnyDecorator:
+    def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def command(args, *pargs, **kwargs):
+        def command(args: _AnyArgs,
+                    *pargs, **kwargs) -> Any:
             if not args.permissions[permission]:
                 return False
             return func(args, *pargs, **kwargs)
@@ -27,19 +36,21 @@ def not_permission(permission):
     return decorator
 
 
-def ownerChannel(func):
+def ownerChannel(func: _AnyCallable) -> _AnyCallable:
     @wraps(func)
-    def chatCommand(args, *pargs, **kwargs):
+    def chatCommand(args: argument.ChatCommandArgs,
+                *pargs, **kwargs) -> Any:
         if not args.permissions.inOwnerChannel:
             return False
         return func(args, *pargs, **kwargs)
     return chatCommand
 
 
-def feature(feature):
-    def decorator(func):
+def feature(feature: str):
+    def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args, *pargs, **kwargs):
+        def chatCommand(args: argument.ChatCommandArgs,
+                        *pargs, **kwargs) -> Any:
             if not args.database.hasFeature(args.chat.channel, feature):
                 return False
             return func(args, *pargs, **kwargs)
@@ -47,10 +58,11 @@ def feature(feature):
     return decorator
 
 
-def not_feature(feature):
-    def decorator(func):
+def not_feature(feature: str):
+    def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args, *pargs, **kwargs):
+        def chatCommand(args: argument.ChatCommandArgs,
+                        *pargs, **kwargs) -> Any:
             if args.database.hasFeature(args.chat.channel, feature):
                 return False
             return func(args, *pargs, **kwargs)
@@ -58,11 +70,12 @@ def not_feature(feature):
     return decorator
 
 
-def permission_feature(*permissionFeatures):
-    def decorator(func):
+def permission_feature(*permissionFeatures: Tuple[str, str]):
+    def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args, *pargs, **kwargs):
-            for permission, feature in permissionFeatures:
+        def chatCommand(args: argument.ChatCommandArgs,
+                        *pargs, **kwargs) -> Any:
+            for permission, feature in permissionFeatures:  # --type: str, str
                 hasPermission = not permission or args.permissions[permission]
                 hasFeature = (not feature
                               or args.database.hasFeature(args.chat.channel,
@@ -76,11 +89,12 @@ def permission_feature(*permissionFeatures):
     return decorator
 
 
-def permission_not_feature(*permissionFeatures):
-    def decorator(func):
+def permission_not_feature(*permissionFeatures: Tuple[str, str]):
+    def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args, *pargs, **kwargs):
-            for permission, feature in permissionFeatures:
+        def chatCommand(args: argument.ChatCommandArgs,
+                        *pargs, **kwargs) -> Any:
+            for permission, feature in permissionFeatures:  # --type: str, str
                 hasPermission = not permission or args.permissions[permission]
                 hasFeature = (not feature
                               or not args.database.hasFeature(
@@ -94,10 +108,13 @@ def permission_not_feature(*permissionFeatures):
     return decorator
 
 
-def cooldown(duration, key, permission=None):
-    def decorator(func):
+def cooldown(duration: timedelta,
+             key: Any,
+             permission: Optional[str]=None):
+    def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args, *pargs, **kwargs):
+        def chatCommand(args: argument.ChatCommandArgs,
+                        *pargs, **kwargs) -> Any:
             if inCooldown(args, duration, key, permission):
                 return False
             return func(args, *pargs, **kwargs)
@@ -105,7 +122,10 @@ def cooldown(duration, key, permission=None):
     return decorator
 
 
-def inCooldown(args, duration, key, permission=None):
+def inCooldown(args: argument.ChatCommandArgs,
+               duration: timedelta,
+               key: Any,
+               permission: Optional[str]=None):
     if ((permission is None or not args.permissions[permission])
             and key in args.chat.sessionData
             and args.timestamp - args.chat.sessionData[key] < duration):
@@ -114,10 +134,13 @@ def inCooldown(args, duration, key, permission=None):
     return False
 
 
-def min_args(amount, _return=False, reason=None):
-    def decorator(func):
+def min_args(amount: int,
+             _return: bool=False,
+             reason: Optional[str]=None):
+    def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def command(args, *pargs, **kwargs):
+        def command(args: argument.ChatCommandArgs,
+                    *pargs, **kwargs) -> Any:
             if len(args.message) < amount:
                 if reason:
                     args.chat.send(reason)

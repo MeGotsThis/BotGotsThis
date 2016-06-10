@@ -57,7 +57,7 @@ def processCommand(args, broadcaster):
     message = ''
     property = None
     value = None
-    if input.level is False:
+    if input.level is None:
         args.chat.send(
             '{user} -> Invalid level, command ignored'.format(user=args.nick))
         return True

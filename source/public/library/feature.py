@@ -1,23 +1,30 @@
 ﻿from lists.feature import features
+from typing import Set
+from ...data.argument import Send
+from ...data.message import Message
+from ...database.databasebase import DatabaseBase
 
 enable = {
     '',
     'enable',
     'yes',
     '1',
-    }
+    }  # type: Set[str]
 disable = {
     'disable',
     'no',
     '0',
-    }
+    }  # type: Set[str]
 
 
-def botFeature(db, channel, message, send):
+def botFeature(database: DatabaseBase,
+               channel: str,
+               message: Message,
+               send: Send) -> bool:
     if len(message) < 2:
         return False
     
-    action = ''
+    action = ''  # type: str
     if len(message) >= 3:
         action = message.lower[2]
     
@@ -26,15 +33,15 @@ def botFeature(db, channel, message, send):
         return True
     
     if action not in enable and action not in disable:
-        msg = 'Unrecognized second parameter: ' + action
+        msg = 'Unrecognized second parameter: ' + action  # type: str
         send(msg)
         return True
     
-    hasFeature = db.hasFeature(channel, message.lower[1])
+    hasFeature = database.hasFeature(channel, message.lower[1])  # type: bool
     if not hasFeature and action in enable:
-        db.addFeature(channel, message.lower[1])
+        database.addFeature(channel, message.lower[1])
     if hasFeature and action in disable:
-        db.removeFeature(channel, message.lower[1])
+        database.removeFeature(channel, message.lower[1])
     
     msg = ''
     if hasFeature:
