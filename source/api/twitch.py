@@ -177,7 +177,7 @@ def updateChannel(channel: str, *,
     return response.status == 200
 
 
-def checkOnlineStreams(channels: Iterable[str]):
+def checkOnlineStreams(channels: Iterable[str]) -> Dict[str, Tuple[datetime, str, str]]:
     uri = '/kraken/streams?limit=100&channel=' + ','.join(channels)  # type: str
     response, responseData = twitchCall(None, 'GET', uri)  # type: http.client.HTTPResponse, bytes
     if response.status != 200:
