@@ -1,57 +1,58 @@
-﻿from datetime import timedelta
+﻿from datetime import datetime, timedelta
 from ..library import broadcaster
 from ..library.chat import cooldown, permission, ownerChannel, send
 from ...api import twitch
+from ...data.argument import ChatCommandArgs
 
 
 @permission('broadcaster')
-def commandHello(args):
+def commandHello(args: ChatCommandArgs) -> bool:
     args.chat.send('Hello Kappa')
     return True
 
 
 @ownerChannel
-def commandCome(args):
+def commandCome(args: ChatCommandArgs) -> bool:
     broadcaster.botCome(args.database, args.nick, send(args.chat))
     return True
 
 
 @permission('broadcaster')
-def commandLeave(args):
+def commandLeave(args: ChatCommandArgs) -> bool:
     return broadcaster.botLeave(args.chat.channel, send(args.chat))
 
 
 @permission('broadcaster')
-def commandEmpty(args):
+def commandEmpty(args: ChatCommandArgs) -> bool:
     broadcaster.botEmpty(args.chat.channel, send(args.chat))
     return True
 
 
 @ownerChannel
-def commandAutoJoin(args):
+def commandAutoJoin(args: ChatCommandArgs) -> bool:
     broadcaster.botAutoJoin(args.database, args.nick, send(args.chat),
                             args.message)
     return True
 
 
 @permission('broacaster')
-def commandSetTimeoutLevel(args):
+def commandSetTimeoutLevel(args: ChatCommandArgs) -> bool:
     broadcaster.botSetTimeoutLevel(args.database, args.chat.channel,
                                    send(args.chat), args.message)
     return True
 
 
 @cooldown(timedelta(seconds=60), 'uptime')
-def commandUptime(args):
+def commandUptime(args: ChatCommandArgs) -> bool:
     if not args.chat.isStreaming:
         args.chat.send(
             '{channel} is currently not streaming or has not been for a '
             'minute'.format(channel=args.chat.channel))
         return True
 
-    currentTime = twitch.serverTime()
+    currentTime = twitch.serverTime()  # type: datetime
     if currentTime:
-        uptime = currentTime - args.chat.streamingSince
+        uptime = currentTime - args.chat.streamingSince  # type: timedelta
         args.chat.send('Uptime: {uptime}'.format(uptime=uptime))
         return True
     else:

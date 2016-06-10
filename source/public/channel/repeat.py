@@ -1,49 +1,53 @@
 ﻿import threading
 import time
+from bot.data import channel
 from contextlib import suppress
 from datetime import datetime, timedelta
+from typing import Optional
 from ..library import timeout
 from ..library.chat import min_args, permission
-from ...database.factory import getDatabase
+from ...data.argument import ChatCommandArgs
+from ...database.factory import DatabaseBase, getDatabase
 
 
 @permission('broadcaster')
-def commandAutoRepeat(args):
+def commandAutoRepeat(args: ChatCommandArgs) -> bool:
     """
     !autorepeat 1 MONEY MONEY
     !autorepeat 0
     !autorepeat off
     """
     
-    count = None
+    count = None  # type: Optional[int]
     return processAutoRepeat(args, count)
 
 
 @permission('broadcaster')
-def commandAutoRepeatCount(args):
+def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
     """
     !autorepeat-20 0.5 MONEY MONEY 
     !autorepeat-20 0
     !autorepeat-20 off
     """
     
-    count = 10
+    count = 10  # type: Optional[int]
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('autorepeat-')[1])
     return processAutoRepeat(args, count)
 
 
 @min_args(2)
-def processAutoRepeat(args, count):
+def processAutoRepeat(args: ChatCommandArgs,
+                      count: Optional[int]) -> bool:
     if args.message.lower[1] == 'off':
-        minutesDuration = 0
+        minutesDuration = 0  # type: float
     else:
         try:
             minutesDuration = float(args.message[1])
         except (ValueError):
             return False
     
-    message = args.message[2:] or None
+    message = args.message[2:] or None  # type: Optional[str]
     if 'repeatThread' in args.chat.sessionData:
         args.chat.sessionData['repeatThread'].count = 0
     
@@ -52,7 +56,7 @@ def processAutoRepeat(args, count):
     
     thread = MessageRepeater(
         chat=args.chat, message=message,
-        duration=timedelta(minutes=minutesDuration), count=count)
+        duration=timedelta(minutes=minutesDuration), count=count)  # type: MessageRepeater
     args.chat.sessionData['repeatThread'] = thread
     thread.start()
     return True
@@ -60,26 +64,30 @@ def processAutoRepeat(args, count):
 
 class MessageRepeater(threading.Thread):
     def __init__(self, *args,
-                 chat, message='', duration=timedelta(), count=None):
-        threading.Thread.__init__(self, *args)
-        self._chat = chat
-        self._message = message
-        self._count = count
-        self._duration = max(duration, timedelta(seconds=1))
-        self._lastTime = datetime.min
-        self._countLock = threading.Lock()
+                 chat: channel.Channel,
+                 message: str='',
+                 duration: timedelta=timedelta(),
+                 count: Optional[int]=None,
+                 **kwargs) -> None:
+        threading.Thread.__init__(self, *args, **kwargs)
+        self._chat = chat  # type: channel.Channel
+        self._message = message  # type: str
+        self._count = count  # type: Optional[int]
+        self._duration = max(duration, timedelta(seconds=1))  # type: timedelta
+        self._lastTime = datetime.min  # type: datetime
+        self._countLock = threading.Lock()  # type: threading.Lock
     
     @property
-    def count(self):
+    def count(self) -> Optional[int]:
         with self._countLock:
             return self._count
     
     @count.setter
-    def count(self, value):
+    def count(self, value: Optional[int]) -> None:
         with self._countLock:
             self._count = value
     
-    def run(self):
+    def run(self) -> None:
         while self._continueRunning():
             self.process()
             time.sleep(1 / 20)
@@ -87,12 +95,12 @@ class MessageRepeater(threading.Thread):
                 and self._chat.sessionData['repeatThread'] is self):
             del self._chat.sessionData['repeatThread']
     
-    def process(self):
+    def process(self) -> None:
         if datetime.utcnow() >= self._lastTime + self._duration:
             self._lastTime = datetime.utcnow()
             self._chat.send(self._message)
             if self._chat.isMod:
-                with getDatabase() as database:
+                with getDatabase() as database:  # --type: DatabaseBase
                     timeout.recordTimeoutFromCommand(
                         database, self._chat, None, self._message, None,
                         'autorepeat')

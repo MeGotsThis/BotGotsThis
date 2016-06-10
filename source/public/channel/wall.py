@@ -1,13 +1,15 @@
 ﻿from ..library import timeout
 from ..library.chat import inCooldown, min_args, permission_feature
+from ...data.argument import ChatCommandArgs
 from bot import config
 from contextlib import suppress
 from datetime import timedelta
+from typing import Iterator
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
 @min_args(2)
-def commandWall(args):
+def commandWall(args: ChatCommandArgs) -> bool:
     length, rows = (5, 20) if args.permissions.broadcaster else (3, 5)
     # If below generate a ValueError, only the above line gets used
     with suppress(ValueError, IndexError):
@@ -20,7 +22,7 @@ def commandWall(args):
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
 @min_args(2)
-def commandWallLong(args):
+def commandWallLong(args: ChatCommandArgs) -> bool:
     rows = 20 if args.permissions.broadcaster else 5
     # If below generate a ValueError or IndexError,
     # only the above line gets used
@@ -29,21 +31,23 @@ def commandWallLong(args):
     return processWall(args, args.message.query, rows)
 
 
-def processWall(args, repetition, rows):
+def processWall(args: ChatCommandArgs,
+                repetition: str,
+                rows: int) -> bool:
     if not args.permissions.broadcaster:
         rows = min(rows, 10)
         
-        cooldown = timedelta(seconds=config.spamModeratorCooldown)
+        cooldown = timedelta(seconds=config.spamModeratorCooldown)  # type: timedelta
         if inCooldown(args, cooldown, 'modWall'):
             return False
     elif not args.permissions.globalModerator:
         rows = min(rows, 500)
-    spacer = '' if args.permissions.chatModerator else ' \ufeff'
+    spacer = '' if args.permissions.chatModerator else ' \ufeff'  # type: str
     messages = (repetition + ('' if i % 2 == 0 else spacer)
-                for i in range(rows))
+                for i in range(rows))  # type: Iterator[str]
     args.chat.send(messages, -1)
     if args.permissions.chatModerator:
         timeout.recordTimeoutFromCommand(
             args.database, args.chat, args.nick, repetition,
-            args.message, 'wall')
+            str(args.message), 'wall')
     return True

@@ -1,12 +1,14 @@
-﻿from ..library import textformat
+﻿from typing import Callable
+from ..library import textformat
 from ..library.chat import feature, min_args, permission
+from ...data.argument import ChatCommandArgs
 
 
-def textCommand(name, asciiTo):
+def textCommand(name: str, asciiTo: Callable[[str], str]):
     @feature('textconvert')
     @min_args(2)
     @permission('moderator')
-    def command(args):
+    def command(args: ChatCommandArgs) -> bool:
         args.chat.send(asciiTo(args.message.query))
         return True
     command.__name__ = name

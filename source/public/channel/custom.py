@@ -1,18 +1,21 @@
 ﻿from ..library import custom, timeout
 from ..library.chat import inCooldown, min_args, not_feature, permission
 from ..library.chat import ownerChannel
+from ...data.argument import ChatCommandArgs
+from ...data.return_ import CustomCommand, CustomCommandTokens
 from bot import config
 from collections import defaultdict
 from datetime import datetime, timedelta
 from lists import custom as customItems
+from typing import List, Optional
 
 
 @not_feature('nocustom')
-def customCommands(args):
+def customCommands(args: ChatCommandArgs) -> bool:
     command = custom.getCustomCommand(args.database, args.message.command,
                                       args.chat.channel, args.permissions)
     if command:
-        cooldown = timedelta(seconds=config.customMessageCooldown)
+        cooldown = timedelta(seconds=config.customMessageCooldown)  # type: timedelta
         if inCooldown(args, cooldown, 'customCommand', 'moderator'):
             return False
 
@@ -30,50 +33,51 @@ def customCommands(args):
         msgs = custom.createMessages(command, args)
         args.chat.send(msgs)
         if args.permissions.chatModerator:
-            timeout.recordTimeoutFromCommand(args.database, args.chat,
-                                             args.nick, msgs, args.message)
+            timeout.recordTimeoutFromCommand(
+                args.database, args.chat, args.nick, msgs, str(args.message))
         return True
     return False
 
 
 @ownerChannel
 @permission('admin')
-def commandGlobal(args):
+def commandGlobal(args: ChatCommandArgs) -> bool:
     return processCommand(args, '#global')
 
 
 @not_feature('nocustom')
 @permission('moderator')
-def commandCommand(args):
+def commandCommand(args: ChatCommandArgs) -> bool:
     return processCommand(args, args.chat.channel)
 
 
 @min_args(3)
-def processCommand(args, broadcaster):
-    input = custom.parseCommandMessageInput(args.message, broadcaster)
+def processCommand(args: ChatCommandArgs, broadcaster: str) -> bool:
+    input = custom.parseCommandMessageInput(args.message, broadcaster)  # type: Optional[CustomCommandTokens]
     if input is None:
         return False
-    
-    message = ''
-    property = None
-    value = None
+
+    message = ''  # type: str
+    property = None  # type: Optional[str]
+    value = None  # type: Optional[str]
     if input.level is None:
         args.chat.send(
             '{user} -> Invalid level, command ignored'.format(user=args.nick))
         return True
     if input.level:
-        if input.level not in args.permissions:
+        try:
+            if not args.permissions[input.level]:
+                args.chat.send('{user} -> You do not have permission to set '
+                               'that level'.format(user=args.nick))
+                return True
+        except KeyError:
             args.chat.send('{user} -> Invalid level, command '
                            'ignored'.format(user=args.nick))
             return True
-        elif not args.permissions[input.level]:
-            args.chat.send('{user} -> You do not have permission to set that '
-                           'level'.format(user=args.nick))
-            return True
-    
+
     if (input.action in ['property'] and args.permissions.broadcaster
             and input.text):
-        parts = input.text.split(None, 1)
+        parts = input.text.split(None, 1)  # type: List[Optional[str]]
         if len(parts) < 2:
             parts.append(None)
         property, value = parts

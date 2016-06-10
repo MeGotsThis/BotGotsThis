@@ -1,10 +1,11 @@
 ﻿from ..library.chat import min_args, permission_not_feature, permission
 from ...api import oauth, twitch
+from ...data.argument import ChatCommandArgs
 
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
-def commandStatus(args):
+def commandStatus(args: ChatCommandArgs) -> bool:
     if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
         return False
     if twitch.updateChannel(args.chat.channel, status=args.message.query):
@@ -17,10 +18,10 @@ def commandStatus(args):
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
-def commandGame(args):
+def commandGame(args: ChatCommandArgs) -> bool:
     if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
         return False
-    game = args.message.query
+    game = args.message.query  # type: str
     game = args.database.getFullGameTitle(args.message.lower[1:]) or game
     game = game.replace('Pokemon', 'Pokémon').replace('Pokepark', 'Poképark')
     if twitch.updateChannel(args.chat.channel, game=game):
@@ -36,7 +37,7 @@ def commandGame(args):
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
-def commandRawGame(args):
+def commandRawGame(args: ChatCommandArgs) -> bool:
     if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
         return False
     if twitch.updateChannel(args.chat.channel, game=args.message.query):
@@ -53,8 +54,8 @@ def commandRawGame(args):
 @permission('moderator')
 @permission('chatModerator')
 @min_args(1)
-def commandPurge(args):
+def commandPurge(args: ChatCommandArgs) -> bool:
     args.chat.send('.timeout {user} 1'.format(user=args.message[1]))
     args.database.recordTimeout(args.chat.channel, args.message[1], args.nick,
-                                'purge', None, 1, args.message, None)
+                                'purge', None, 1, str(args.message), None)
     return True
