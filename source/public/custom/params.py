@@ -1,14 +1,16 @@
 ﻿from contextlib import suppress
+from typing import Match, Optional, Sequence
+from ...data.argument import CustomFieldArgs
 import re
 
 
-def fieldParams(args):
+def fieldParams(args: CustomFieldArgs) -> Optional[str]:
     with suppress(TypeError):
-        match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', args.field)
+        match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', args.field)  # type: Match[str]
         if match is not None:
-            matchParts = match.groups()
-            start = None
-            stop = None
+            matchParts = match.groups()  # type: Sequence[str]
+            start = None  # type: Optional[int]
+            stop = None  # type: Optional[int]
             if matchParts[0] is not None:
                 start = int(matchParts[0])
                 if matchParts[2] is not None:
