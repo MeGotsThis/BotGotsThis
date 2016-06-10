@@ -1,9 +1,9 @@
 from bot import config
 from collections import deque
-from typing import Generator, Iterator, Optional
+from typing import Generator, Iterable, Optional
 
 
-def messagesFromItems(items:Iterator[str],
+def messagesFromItems(items:Iterable[str],
                       prepend:Optional[str]=None) -> Generator[str, None, None]:
     prepend = prepend or ''
     limit = config.messageLimit - len(prepend)

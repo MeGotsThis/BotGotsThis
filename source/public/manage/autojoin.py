@@ -1,23 +1,23 @@
 ﻿from bot import globals, utils
+from datetime import datetime
+from typing import Optional, Union
 from ...api import twitch
+from ...data.argument import ManageBotArgs
+from ...data.return_ import AutoJoinChannel
 
 
-def manageAutoJoin(args):
+def manageAutoJoin(args: ManageBotArgs) -> bool:
     if len(args.message) < 3:
         return False
     if args.message.lower[2] in ['reloadserver']:
-        for channelRow in args.database.getAutoJoinsChats():
-            cluster = twitch.twitchChatServer(channelRow['broadcaster'])
-            if channelRow['cluster'] != cluster['eventchat']:
-                params = channelRow['broadcaster'], cluster,
-                args.database.setAutoJoinServer(*params)
-                    
-                params = channelRow['broadcaster'], channelRow['priority'],
-                params += cluster,
-                rejoin = utils.ensureServer(*params)
-                
+        for autojoin in args.database.getAutoJoinsChats():  # --type: AutoJoinChannel
+            cluster = twitch.twitchChatServer(autojoin.broadcaster)  # type: Optional[str]
+            if cluster is not None and autojoin.cluster != cluster:
+                args.database.setAutoJoinServer(autojoin.broadcaster, cluster)
+                utils.ensureServer(autojoin.broadcaster, autojoin.priority,
+                                   cluster)
                 print('{time} Set Server for {channel}'.format(
-                    time=args.timestamp, channel=channelRow['broadcaster']))
+                    time=datetime.utcnow(), channel=autojoin.broadcaster))
         args.send('Auto Join reload server complete')
         return True
     
@@ -28,14 +28,13 @@ def manageAutoJoin(args):
             args.send('Chat {channel} is banned from joining'.format(
                 channel=args.message.lower[3]))
             return True
-        cluster = twitch.twitchChatServer(args.message.lower[3])
-        params = args.message.lower[3], 0, cluster
-        result = args.database.saveAutoJoin(*params)
-        priority = args.database.getAutoJoinsPriority(args.message.lower[3])
+        cluster = twitch.twitchChatServer(args.message.lower[3]) or 'aws'
+        result = args.database.saveAutoJoin(args.message.lower[3], 0, cluster)  # type: bool
+        priority = args.database.getAutoJoinsPriority(args.message.lower[3])  # type: Union[int, float]
         if result is False:
             args.database.setAutoJoinServer(args.message.lower[3], cluster)
             
-        wasInChat = args.message.lower[3] in globals.channels
+        wasInChat = args.message.lower[3] in globals.channels  # type: bool
         if not wasInChat:
             utils.joinChannel(args.message.lower[3], priority, cluster)
         else:

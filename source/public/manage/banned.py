@@ -1,33 +1,35 @@
 ﻿from bot import utils
+from typing import Iterable, List, Optional
+from ..library.message import messagesFromItems
+from ...data.argument import ManageBotArgs
 
-needReason = ['add', 'insert', 'del', 'delete', 'rem', 'remove', 'remove']
+needReason = ['add', 'insert', 'del', 'delete', 'rem', 'remove', 'remove']  # type: List[str]
 
 
-def manageBanned(args):
+def manageBanned(args: ManageBotArgs) -> bool:
     if len(args.message) < 3:
         return False
     if args.message.lower[2] in ['list']:
-        bannedChannels = args.database.listBannedChannels()
+        bannedChannels = args.database.listBannedChannels()  # type: Iterable[str]
         if bannedChannels:
-            msg = 'Banned Channels: ' + ', '.join(bannedChannels)
+            args.send(messagesFromItems(bannedChannels, 'Banned Channels: '))
         else:
-            msg = 'There are no banned channels'
-        args.send(msg)
+            args.send('There are no banned channels')
         return True
     
     if len(args.message) < 5:
         if args.message.lower[2] in needReason:
             args.send(args.nick + ' -> Reason needs to be specified')
         return False
-    channel = args.message.lower[3]
+    channel = args.message.lower[3]  # type: str
     if args.message.lower[2] in ['add', 'insert']:
-        isBannedOrReason = args.database.isChannelBannedReason(channel)
+        isBannedOrReason = args.database.isChannelBannedReason(channel)  # type: Optional[str]
         if isBannedOrReason:
             args.send('{channel} is already banned for: {reason}'.format(
                 channel=channel, reason=isBannedOrReason))
-            return False
-        params = channel, args.message[4:], args.nick
-        result = args.database.addBannedChannel(*params)
+            return True
+        result = args.database.addBannedChannel(channel, args.message[4:],
+                                                args.nick)  # type: bool
         if result:
             args.database.discardAutoJoin(channel)
             utils.partChannel(channel)
