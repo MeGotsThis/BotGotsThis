@@ -124,10 +124,10 @@ class DatabaseBase(metaclass=ABCMeta):
                       user: str,
                       fromUser: Optional[str],
                       module: str,
-                      level: int,
+                      level: Optional[int],
                       length: int,
                       message: Optional[str],
-                      reason: str) -> bool: ...
+                      reason: Optional[str]) -> bool: ...
     @abstractmethod
     def getChatProperty(self,
                         broadcaster: str,
@@ -242,10 +242,10 @@ class DatabaseNone(DatabaseBase):
                       user: str,
                       fromUser: Optional[str],
                       module: str,
-                      level: int,
+                      level: Optional[int],
                       length: int,
                       message: Optional[str],
-                      reason: str) -> bool: ...
+                      reason: Optional[str]) -> bool: ...
     def getChatProperty(self,
                         broadcaster: str,
                         property: str,

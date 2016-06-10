@@ -64,7 +64,7 @@ def processAutoRepeat(args: ChatCommandArgs,
 
 class MessageRepeater(threading.Thread):
     def __init__(self, *args,
-                 chat: channel.Channel,
+                 chat: 'channel.Channel',
                  message: str='',
                  duration: timedelta=timedelta(),
                  count: Optional[int]=None,

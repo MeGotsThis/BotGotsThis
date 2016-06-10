@@ -431,10 +431,10 @@ INSERT INTO banned_channels_log
                       user: str,
                       fromUser: Optional[str],
                       module: str,
-                      level: int,
+                      level: Optional[int],
                       length: int,
                       message: Optional[str],
-                      reason: str) -> bool:
+                      reason: Optional[str]) -> bool:
         attach = '''
 ATTACH DATABASE ? AS timeout'''  # type: str
         query = '''

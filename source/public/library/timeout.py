@@ -55,9 +55,9 @@ def timeoutUser(database: DatabaseBase,
 
 def recordTimeoutFromCommand(database: DatabaseBase,
                              chat: 'channel.Channel',
-                             user: str,
+                             user: Optional[str],
                              messages: Union[str, Iterable[str], Iterator[str]],
-                             sourceMessage: str,
+                             sourceMessage: Optional[str],
                              module: str='custom'):
     if isinstance(messages, str):
         messages = messages,
