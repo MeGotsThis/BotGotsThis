@@ -1,6 +1,6 @@
 from datetime import timedelta
 from functools import wraps
-from typing import Any, Callable, Optional, Tuple, Union
+from typing import Any, Callable, Iterable, Optional, Tuple, Union
 from ...data import argument
 
 _AnyArgs = Union[argument.ChatCommandArgs, argument.WhisperCommandArgs]
@@ -10,6 +10,13 @@ _AnyDecorator = Callable[..., _AnyCallable]
 
 def send(chat: Any) -> argument.Send:
     return chat.send
+
+
+def sendPriority(chat: Any,
+                 priority: int) -> argument.Send:
+    def sendMessages(messages: Union[str, Iterable[str]]):
+        return chat.send(messages, priority)
+    return sendMessages
 
 
 def permission(permission: str) -> _AnyDecorator:

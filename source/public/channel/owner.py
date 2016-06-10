@@ -1,13 +1,14 @@
 ﻿from bot import globals
 from ..library import channel, exit, managebot
 from ..library.chat import min_args, permission, ownerChannel, send
+from ..library.chat import sendPriority
 from ...data.argument import ChatCommandArgs
 
 
 @ownerChannel
 @permission('owner')
 def commandExit(args: ChatCommandArgs) -> bool:
-    exit.botExit(send(args.chat))
+    exit.botExit(sendPriority(args.chat, 0))
     return True
 
 

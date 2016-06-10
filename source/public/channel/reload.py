@@ -1,24 +1,24 @@
 ﻿from ..library import reload
-from ..library.chat import permission, ownerChannel, send
+from ..library.chat import permission, ownerChannel, sendPriority
 from ...data.argument import ChatCommandArgs
 
 
 @ownerChannel
 @permission('owner')
 def commandReload(args: ChatCommandArgs) -> bool:
-    reload.botReload(send(args.chat))
+    reload.botReload(sendPriority(args.chat, 0))
     return True
 
 
 @ownerChannel
 @permission('owner')
 def commandReloadCommands(args: ChatCommandArgs) -> bool:
-    reload.botReloadCommands(send(args.chat))
+    reload.botReloadCommands(sendPriority(args.chat, 0))
     return True
 
 
 @ownerChannel
 @permission('owner')
 def commandReloadConfig(args: ChatCommandArgs) -> bool:
-    reload.botReloadConfig(send(args.chat))
+    reload.botReloadConfig(sendPriority(args.chat, 0))
     return True
