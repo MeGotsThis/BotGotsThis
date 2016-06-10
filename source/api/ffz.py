@@ -8,6 +8,8 @@ from typing import Dict, Optional
 def getGlobalEmotes() -> Optional[Dict[int, str]]:
     url = 'https://api.frankerfacez.com/v1/set/global'
     with suppress(urllib.request.URLError), urllib.request.urlopen(url) as response:  # type: ignore
+        if not isinstance(response, HTTPResponse):
+            raise TypeError()
         if response.status == 200:
             responseData = response.read()  # type: bytes
             ffzData = json.loads(responseData.decode())  # type: dict
@@ -22,6 +24,8 @@ def getGlobalEmotes() -> Optional[Dict[int, str]]:
 def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[int, str]]:
     url = 'https://api.frankerfacez.com/v1/room/' + broadcaster
     with suppress(urllib.request.URLError), urllib.request.urlopen(url) as response:  # type: ignore
+        if not isinstance(response, HTTPResponse):
+            raise TypeError()
         if response.status == 200:
             responseData = response.read()  # type: bytes
             ffzData = json.loads(responseData.decode())  # type: dict
