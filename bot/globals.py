@@ -1,5 +1,4 @@
-﻿from .data.channel import Channel
-from .data.socket import Socket
+﻿from .data import channel, socket
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
@@ -13,16 +12,16 @@ running = True  # type: bool
 sockets = None  # type: SocketsThread
 
 join = None  # type: JoinThread
-groupChannel = None  # type: Channel
+groupChannel = None  # type: channel.Channel
 
 background = None  # type: BackgroundTasker
 
 clusters = {
     'aws': None,
-    }  # type: Dict[str, Socket]
+    }  # type: Dict[str, socket.Socket]
 whisperCluster = 'aws'  # type: str
 
-channels = {}  # type: Dict[str, Channel]
+channels = {}  # type: Dict[str, socket.Channel]
 displayName = config.botnick  # type: str
 isTwitchTurbo = False  # type: bool
 isTwitchAdmin = False  # type: bool

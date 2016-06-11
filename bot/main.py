@@ -6,11 +6,11 @@ import source.private.autoload as privateAuto
 import source.public.autoload as publicAuto
 from itertools import chain
 from importlib.abc import PathEntryFinder
+from source.data import return_
 from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
 from . import config, globals, utils
-from .data.channel import Channel
-from .data.socket import Socket
+from .data import channel, socket
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
@@ -21,13 +21,13 @@ def main(argv: Optional[List[str]]=None) -> int:
     globals.running = True
     globals.sockets = SocketsThread(name='Sockets Thread')
 
-    globals.clusters['aws'] = Socket(
+    globals.clusters['aws'] = socket.Socket(
         'AWS Chat', config.awsServer, config.awsPort)
     globals.sockets.register(globals.clusters['aws'])
 
     globals.join = JoinThread(name='Join Thread')
-    globals.groupChannel = Channel('jtv', globals.clusters['aws'],
-                                   float('-inf'))
+    globals.groupChannel = channel.Channel('jtv', globals.clusters['aws'],
+                                           float('-inf'))
 
     globals.background = BackgroundTasker(name='Background Tasker')
 
@@ -50,9 +50,9 @@ def main(argv: Optional[List[str]]=None) -> int:
         if config.owner:
             utils.joinChannel(config.owner, float('-inf'), 'aws')
         with getDatabase() as db:
-            for channel in db.getAutoJoinsChats():
-                utils.joinChannel(channel.broadcaster, channel.priority,
-                                  channel.cluster)
+            for autoJoin in db.getAutoJoinsChats():  # --type: return_.AutoJoinChannel
+                utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
+                                  autoJoin.cluster)
     
         globals.sockets.join()
         return 0
