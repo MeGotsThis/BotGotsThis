@@ -2,8 +2,8 @@
 import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Set
-from ..data import channel, socket
 from .. import config
+from .. import data
 from .. import globals
 from .. import utils
 from ..twitchmessage.ircmessage import IrcMessage
@@ -40,7 +40,7 @@ class JoinThread(threading.Thread):
             if len(self._joinTimes) >= config.joinLimit:
                 return
         
-        channels = {}  # type: Dict[str, channel.Channel]
+        channels = {}  # type: Dict[str, data.Channel]
         for socketThread in globals.clusters.values():  # --type: SocketsThread
             if socketThread.isConnected:
                 chans = socketThread.channels
@@ -52,18 +52,18 @@ class JoinThread(threading.Thread):
                 return
             
             broadcaster = self._getJoinWithLowestPriority(channels, notJoined)  # type: str
-            chat = channels[broadcaster]  # type: channel.Channel
+            chat = channels[broadcaster]  # type: data.Channel
             if chat.socket is not None:
                 ircCommand = IrcMessage(
                     None, None, 'JOIN', IrcMessageParams(chat.ircChannel)) # type: IrcMessage
                 chat.socket.queueWrite(ircCommand, channel=chat)
                 self._channelJoined.add(chat.channel)
     
-    def connected(self, socket: socket.Socket) -> None:
+    def connected(self, socket: 'data.Socket') -> None:
         with self._joinTimesLock:
             self._joinTimes.append(datetime.utcnow())
     
-    def disconnected(self, socket: socket.Socket) -> None:
+    def disconnected(self, socket: 'data.Socket') -> None:
         with self._channelsLock:
             self._channelJoined -= socket.channels.keys()
     
@@ -77,7 +77,7 @@ class JoinThread(threading.Thread):
             self._joinTimes.append(timestamp)
     
     @staticmethod
-    def _getJoinWithLowestPriority(channels: Dict[str, channel.Channel],
+    def _getJoinWithLowestPriority(channels: Dict[str, 'data.Channel'],
                                    notJoinedChannels: Set[str]) -> str:
         priority = float(min(float(channels[c].joinPriority) for c
                              in notJoinedChannels)) # type: float

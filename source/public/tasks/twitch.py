@@ -2,8 +2,7 @@
 import random
 import socket
 from contextlib import suppress
-from bot import globals, utils
-from bot.data import channel
+from bot import data, globals, utils
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple, Union
 from ...api import twitch
@@ -14,7 +13,7 @@ def checkStreamsAndChannel(timestamp: datetime) -> None:
     if not globals.channels:
         return
     with suppress(socket.gaierror):
-        channels = copy.copy(globals.channels)  # type: Dict[str, channel.Channel]
+        channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
         onlineStreams = twitch.checkOnlineStreams(channels.keys())  # type: Dict[str, Tuple[datetime, str, str]]
         for channel in onlineStreams:  # --type: str
             chat = channels[channel]
@@ -32,14 +31,14 @@ def checkOfflineChannels(timestamp: datetime) -> None:
     if not globals.channels:
         return
     cacheDuration = timedelta(seconds=300)  # type: timedelta
-    channels = copy.copy(globals.channels)  # type: Dict[str, channel.Channel]
+    channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
     offlineChannels = [c for c, ch in channels.items()
                        if (ch.streamingSince is None
                            and timestamp - ch.twitchCache >= cacheDuration)]  # type: List[str]
     if not offlineChannels:
         return
     ch = random.choice(offlineChannels)  # type: str
-    chat = channels[ch]  # type: channel.Channel
+    chat = channels[ch]  # type: data.Channel
     with suppress(socket.gaierror):
         (chat.streamingSince, chat.twitchStatus,
          chat.twitchGame) = twitch.channelStatusAndGame(ch)
@@ -48,7 +47,7 @@ def checkOfflineChannels(timestamp: datetime) -> None:
 
 def checkChatServers(timestamp: datetime) -> None:
     cooldown = timedelta(seconds=3600)  # type: timedelta
-    channels = copy.copy(globals.channels)  # type: Dict[str, channel.Channel]
+    channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
     toCheck = [c for c, ch in channels.items()
                if (ch.serverCheck is None
                    or timestamp - ch.serverCheck >= cooldown)]  # type: List[str]

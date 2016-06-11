@@ -1,7 +1,6 @@
 ﻿import threading
 import time
-from bot import utils
-from bot.data import channel
+from bot import data, utils
 from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
 from datetime import datetime
 from lists import channel as commandList
@@ -13,7 +12,7 @@ from .database import factory
 
 
 # Set up our commands function
-def parse(chat: 'channel.Channel',
+def parse(chat: 'data.Channel',
           tags: IrcMessageTagsReadOnly,
           nick: str,
           rawMessage: str,
@@ -31,7 +30,7 @@ def parse(chat: 'channel.Channel',
     threading.Thread(target=chatCommand, args=params, name=name).start()
     
 
-def chatCommand(chat: 'channel.Channel',
+def chatCommand(chat: 'data.Channel',
                 tags: IrcMessageTagsReadOnly,
                 nick: str,
                 message: Message,

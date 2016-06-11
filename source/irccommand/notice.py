@@ -1,4 +1,4 @@
-﻿from bot.data import channel
+﻿from bot import data
 from bot.data.error import LoginUnsuccessfulException
 
 messageLimit = 'Your message was not sent because you are '
@@ -7,7 +7,7 @@ messageIdentical = 'Your message was not sent because it is identical to the '
 messageIdentical += 'previous one you sent, less than 30 seconds ago.'
 
 
-def parse(chat: 'channel.Channel',
+def parse(chat: 'data.Channel',
           nick: str,
           message: str) -> None:
     if message == 'Login unsuccessful':

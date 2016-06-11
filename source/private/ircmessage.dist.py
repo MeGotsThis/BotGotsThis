@@ -1,7 +1,7 @@
-﻿from bot.data import socket
+﻿from bot import data
 from datetime import datetime
 
-def parseMessage(socket: 'socket.Socket',
+def parseMessage(socket: 'data.Socket',
                  ircmsg: str,
                  now: datetime) -> None:
-    pass
+    return 1

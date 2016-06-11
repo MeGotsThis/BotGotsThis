@@ -4,8 +4,7 @@ from ...data.message import Message
 from ...database import factory
 from ..library import timeout
 from ..library.chat import feature, not_permission, permission
-from bot import config, utils
-from bot.data import channel
+from bot import config, data, utils
 from datetime import datetime
 from typing import Tuple
 import http.client
@@ -26,12 +25,12 @@ twitchUrlRegex = (#r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"
 @permission('chatModerator')
 def filterNoUrlForBots(args: ChatCommandArgs) -> bool:
     if re.search(twitchUrlRegex, str(args.message)):
-        params = args.chat, args.nick, args.message, args.timestamp  # type: Tuple['channel.Channel', str, Message, datetime]
+        params = args.chat, args.nick, args.message, args.timestamp  # type: Tuple[data.Channel, str, Message, datetime]
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
 
-def checkIfUrlMaybeBad(chat: 'channel.Channel',
+def checkIfUrlMaybeBad(chat: 'data.Channel',
                        nick: str,
                        message: Message,
                        timestamp: datetime):

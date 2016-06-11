@@ -1,11 +1,11 @@
-﻿from bot.data import channel
+﻿from bot import data
 from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
 from typing import List
 import datetime
 import bot.globals
 
 
-def parse(channel: 'channel.Channel',
+def parse(channel: 'data.Channel',
           tags: IrcMessageTagsReadOnly) -> None:
     bot.globals.displayName = str(tags['display-name'])
     bot.globals.isTwitchStaff = tags['user-type'] in ['staff']

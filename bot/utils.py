@@ -1,4 +1,4 @@
-﻿from .data import channel
+﻿from . import data
 from bot import config, globals
 from datetime import datetime
 from typing import List, Optional, TextIO, Tuple, Union
@@ -18,7 +18,7 @@ def joinChannel(broadcaster: str,
         t = min(globals.channels[broadcaster].joinPriority, priority)
         globals.channels[broadcaster].joinPriority = t
         return False
-    globals.channels[broadcaster] = channel.Channel(
+    globals.channels[broadcaster] = data.Channel(
         broadcaster, globals.clusters[cluster], priority)
     globals.clusters[cluster].joinChannel(globals.channels[broadcaster])
     return True

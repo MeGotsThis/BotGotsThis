@@ -1,8 +1,7 @@
-﻿from bot.data import channel
-from bot import config
+﻿from bot import config, data
 
 
-def parse(chat: 'channel.Channel',
+def parse(chat: 'data.Channel',
           nick: str):
     if nick == config.botnick:
         chat.isMod = False

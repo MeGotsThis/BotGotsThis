@@ -1,6 +1,6 @@
 ﻿import threading
 import time
-from bot.data import channel
+from bot import data
 from contextlib import suppress
 from datetime import datetime, timedelta
 from typing import Optional
@@ -64,13 +64,13 @@ def processAutoRepeat(args: ChatCommandArgs,
 
 class MessageRepeater(threading.Thread):
     def __init__(self, *args,
-                 chat: 'channel.Channel',
+                 chat: 'data.Channel',
                  message: str='',
                  duration: timedelta=timedelta(),
                  count: Optional[int]=None,
                  **kwargs) -> None:
         threading.Thread.__init__(self, *args, **kwargs)
-        self._chat = chat  # type: channel.Channel
+        self._chat = chat  # type: data.Channel
         self._message = message  # type: str
         self._count = count  # type: Optional[int]
         self._duration = max(duration, timedelta(seconds=1))  # type: timedelta

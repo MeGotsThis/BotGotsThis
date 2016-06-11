@@ -1,5 +1,4 @@
-from bot import config, utils
-from bot.data import channel
+from bot import config, data, utils
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timedelta
@@ -9,7 +8,7 @@ from ...database.databasebase import DatabaseBase
 
 
 def timeoutUser(database: DatabaseBase,
-                chat: 'channel.Channel',
+                chat: 'data.Channel',
                 user: str,
                 module: str,
                 baseLevel: int=0,
@@ -54,7 +53,7 @@ def timeoutUser(database: DatabaseBase,
 
 
 def recordTimeoutFromCommand(database: DatabaseBase,
-                             chat: 'channel.Channel',
+                             chat: 'data.Channel',
                              user: Optional[str],
                              messages: Union[str, Iterable[str], Iterator[str]],
                              sourceMessage: Optional[str],

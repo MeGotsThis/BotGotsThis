@@ -9,8 +9,7 @@ from importlib.abc import PathEntryFinder
 from source.data import return_
 from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
-from . import config, globals, utils
-from .data import channel, socket
+from . import config, data, globals, utils
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
@@ -21,13 +20,13 @@ def main(argv: Optional[List[str]]=None) -> int:
     globals.running = True
     globals.sockets = SocketsThread(name='Sockets Thread')
 
-    globals.clusters['aws'] = socket.Socket(
+    globals.clusters['aws'] = data.Socket(
         'AWS Chat', config.awsServer, config.awsPort)
     globals.sockets.register(globals.clusters['aws'])
 
     globals.join = JoinThread(name='Join Thread')
-    globals.groupChannel = channel.Channel('jtv', globals.clusters['aws'],
-                                           float('-inf'))
+    globals.groupChannel = data.Channel('jtv', globals.clusters['aws'],
+                                        float('-inf'))
 
     globals.background = BackgroundTasker(name='Background Tasker')
 

@@ -1,8 +1,7 @@
 ﻿from bot import config, utils
 from bot.twitchmessage.ircmessage import IrcMessage
 from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
-from bot.data import channel as channel_
-from bot.data import socket
+from bot import data
 from datetime import datetime
 from typing import Mapping, List, Optional
 from . import channel, whisper
@@ -18,12 +17,12 @@ _logCommandPerChannel = [
     ]
 
 
-def parseMessage(socket: 'socket.Socket',
+def parseMessage(socket: 'data.Socket',
                  ircmsg: str,
                  timestamp: datetime) -> None:
     files = []  # type: List[str]
     logs = []  # type: List[str]
-    channels = socket.channels  # type: Mapping[str, 'channel_.Channel']
+    channels = socket.channels  # type: Mapping[str, data.Channel]
     message = IrcMessage.fromMessage(ircmsg)  # type: IrcMessage
     if message.command == 'PRIVMSG':
         tags = message.tags  # type: IrcMessageTagsReadOnly
@@ -37,7 +36,7 @@ def parseMessage(socket: 'socket.Socket',
             files.append(config.botnick + '-Mentions.log')
             logs.append(nick + ' -> ' + where + ': ' + msg)
         if where[0] == '#' and where[1:] in channels:
-            chan = channels[where[1:]] # type: Optional['channel_.Channel']
+            chan = channels[where[1:]] # type: Optional[data.Channel]
             channel.parse(chan, tags, nick, msg, timestamp)
         
     if message.command == 'WHISPER':
