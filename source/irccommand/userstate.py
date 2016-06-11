@@ -1,5 +1,5 @@
 ﻿from bot import data
-from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from bot.twitchmessage import IrcMessageTagsReadOnly
 from typing import List
 import datetime
 import bot.globals

@@ -2,12 +2,8 @@
 import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Set
-from .. import config
-from .. import data
-from .. import globals
-from .. import utils
-from ..twitchmessage.ircmessage import IrcMessage
-from ..twitchmessage.ircparams import IrcMessageParams
+from .. import config, data, globals, utils
+from ..twitchmessage import IrcMessage, IrcMessageParams
 
 joinDuration = timedelta(seconds=10.05)
 

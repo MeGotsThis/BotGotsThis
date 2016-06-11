@@ -1,6 +1,5 @@
 ﻿from bot import config, utils
-from bot.twitchmessage.ircmessage import IrcMessage
-from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from bot.twitchmessage import IrcMessage, IrcMessageTagsReadOnly
 from bot import data
 from datetime import datetime
 from typing import Mapping, List, Optional

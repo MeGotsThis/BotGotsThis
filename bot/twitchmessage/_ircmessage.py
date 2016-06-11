@@ -1,7 +1,7 @@
-from .ircparams import IrcMessageParams
-from .ircprefix import IrcMessagePrefix, nickSpecials
-from .irctags import IrcMessageTagsReadOnly, IrcMessageTags, IrcMessageTagsKey
-from .irctags import TagValue, unescapedValue
+from ._ircparams import IrcMessageParams
+from ._ircprefix import IrcMessagePrefix, nickSpecials
+from ._irctags import IrcMessageTagsReadOnly, IrcMessageTags, IrcMessageTagsKey
+from ._irctags import TagValue, unescapedValue
 from typing import List, NamedTuple, Optional, Union
 import string
 

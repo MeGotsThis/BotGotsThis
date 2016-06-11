@@ -1,7 +1,7 @@
 ﻿import threading
 import time
 from bot import utils
-from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
 from lists import whisper
 from typing import Iterator

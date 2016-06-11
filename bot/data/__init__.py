@@ -9,8 +9,7 @@ from source.api.bttv import getBroadcasterEmotes as getBttvEmotes
 from source.api.ffz import getBroadcasterEmotes as getFfzEmotes
 from .error import ConnectionResetException, LoginUnsuccessfulException
 from .. import config, globals, utils
-from ..twitchmessage.ircmessage import IrcMessage
-from ..twitchmessage.ircparams import IrcMessageParams
+from ..twitchmessage import IrcMessage, IrcMessageParams
 
 socketAlias = socket.socket
 

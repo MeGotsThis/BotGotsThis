@@ -1,5 +1,5 @@
 from bot import config
-from bot.twitchmessage.irctags import IrcMessageTagsReadOnly
+from bot.twitchmessage import IrcMessageTagsReadOnly
 from typing import Any
 
 

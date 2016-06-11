@@ -1,6 +1,6 @@
-from .ircparams import IrcMessageParams
-from .ircprefix import IrcMessagePrefix
-from .irctags import IrcMessageTagsReadOnly
+from ._ircparams import IrcMessageParams
+from ._ircprefix import IrcMessagePrefix
+from ._irctags import IrcMessageTagsReadOnly
 from typing import NamedTuple, Optional, Union
 
 Command = Union[str, int]
