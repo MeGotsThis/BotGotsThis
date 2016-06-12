@@ -1,6 +1,6 @@
 ﻿from contextlib import suppress
 from typing import Match, Optional, Sequence
-from ...data.argument import CustomFieldArgs
+from ...data import CustomFieldArgs
 import re
 
 

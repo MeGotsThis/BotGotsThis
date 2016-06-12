@@ -1,5 +1,5 @@
 from typing import List
-from ...data.argument import CustomProcessArgs
+from ...data import CustomProcessArgs
 
 
 def propertyMultipleLines(args: CustomProcessArgs) -> None:

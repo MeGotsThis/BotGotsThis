@@ -1,6 +1,6 @@
 ﻿from ..library import reload
 from ..library.chat import permission, ownerChannel, sendPriority
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 
 
 @ownerChannel

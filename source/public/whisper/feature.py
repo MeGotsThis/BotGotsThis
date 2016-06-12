@@ -1,6 +1,6 @@
 ﻿from ..library import feature
 from ..library.whisper import send
-from ...data.argument import WhisperCommandArgs
+from ...data import WhisperCommandArgs
 
 
 def commandFeature(args: WhisperCommandArgs) -> bool:

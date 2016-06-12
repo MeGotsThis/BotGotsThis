@@ -1,18 +1,18 @@
 ﻿import threading
 import time
-from bot import data, utils
+from bot import data as botData, utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
 from lists import channel as commandList
 from typing import Iterator
-from .data import argument
+from . import data
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
 from .database import factory
 
 
 # Set up our commands function
-def parse(chat: 'data.Channel',
+def parse(chat: 'botData.Channel',
           tags: IrcMessageTagsReadOnly,
           nick: str,
           rawMessage: str,
@@ -30,7 +30,7 @@ def parse(chat: 'data.Channel',
     threading.Thread(target=chatCommand, args=params, name=name).start()
     
 
-def chatCommand(chat: 'data.Channel',
+def chatCommand(chat: 'botData.Channel',
                 tags: IrcMessageTagsReadOnly,
                 nick: str,
                 message: Message,
@@ -39,8 +39,8 @@ def chatCommand(chat: 'data.Channel',
         permissions = ChatPermissionSet(tags, nick, chat)  # type: ChatPermissionSet
     
         with factory.getDatabase() as database:
-            arguments = argument.ChatCommandArgs(
-                database, chat, tags, nick, message, permissions, timestamp)  # type: argument.ChatCommandArgs
+            arguments = data.ChatCommandArgs(
+                database, chat, tags, nick, message, permissions, timestamp)  # type: data.ChatCommandArgs
             for command in commandsToProcess(message.command):  # --type: argument.ChatCommand
                 if command(arguments):
                     return
@@ -50,7 +50,7 @@ def chatCommand(chat: 'data.Channel',
         utils.logException(extra, timestamp)
 
 
-def commandsToProcess(command: str) -> Iterator[argument.ChatCommand]:
+def commandsToProcess(command: str) -> Iterator[data.ChatCommand]:
     yield from commandList.filterMessage
     if command in commandList.commands:
         if commandList.commands[command] is not None:

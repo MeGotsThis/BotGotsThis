@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from ..library import timeout
 from ..library.chat import min_args, permission
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 from ...database.factory import DatabaseBase, getDatabase
 
 

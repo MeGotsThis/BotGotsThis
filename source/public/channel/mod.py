@@ -1,6 +1,6 @@
 ﻿from ..library.chat import min_args, permission_not_feature, permission
 from ...api import oauth, twitch
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 
 
 @permission_not_feature(('broadcaster', None),

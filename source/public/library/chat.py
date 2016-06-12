@@ -1,19 +1,19 @@
 from datetime import timedelta
 from functools import wraps
 from typing import Any, Callable, Iterable, Optional, Tuple, Union
-from ...data import argument
+from ... import data
 
-_AnyArgs = Union[argument.ChatCommandArgs, argument.WhisperCommandArgs]
+_AnyArgs = Union[data.ChatCommandArgs, data.WhisperCommandArgs]
 _AnyCallable = Callable[..., Any]
 _AnyDecorator = Callable[..., _AnyCallable]
 
 
-def send(chat: Any) -> argument.Send:
+def send(chat: Any) -> data.Send:
     return chat.send
 
 
 def sendPriority(chat: Any,
-                 priority: int) -> argument.Send:
+                 priority: int) -> data.Send:
     def sendMessages(messages: Union[str, Iterable[str]]):
         return chat.send(messages, priority)
     return sendMessages
@@ -45,7 +45,7 @@ def not_permission(permission: str) -> _AnyDecorator:
 
 def ownerChannel(func: _AnyCallable) -> _AnyCallable:
     @wraps(func)
-    def chatCommand(args: argument.ChatCommandArgs,
+    def chatCommand(args: data.ChatCommandArgs,
                 *pargs, **kwargs) -> Any:
         if not args.permissions.inOwnerChannel:
             return False
@@ -56,7 +56,7 @@ def ownerChannel(func: _AnyCallable) -> _AnyCallable:
 def feature(feature: str):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args: argument.ChatCommandArgs,
+        def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
             if not args.database.hasFeature(args.chat.channel, feature):
                 return False
@@ -68,7 +68,7 @@ def feature(feature: str):
 def not_feature(feature: str):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args: argument.ChatCommandArgs,
+        def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
             if args.database.hasFeature(args.chat.channel, feature):
                 return False
@@ -80,7 +80,7 @@ def not_feature(feature: str):
 def permission_feature(*permissionFeatures: Tuple[str, str]):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args: argument.ChatCommandArgs,
+        def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
             for permission, feature in permissionFeatures:  # --type: str, str
                 hasPermission = not permission or args.permissions[permission]
@@ -99,7 +99,7 @@ def permission_feature(*permissionFeatures: Tuple[str, str]):
 def permission_not_feature(*permissionFeatures: Tuple[str, str]):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args: argument.ChatCommandArgs,
+        def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
             for permission, feature in permissionFeatures:  # --type: str, str
                 hasPermission = not permission or args.permissions[permission]
@@ -120,7 +120,7 @@ def cooldown(duration: timedelta,
              permission: Optional[str]=None):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def chatCommand(args: argument.ChatCommandArgs,
+        def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
             if inCooldown(args, duration, key, permission):
                 return False
@@ -129,7 +129,7 @@ def cooldown(duration: timedelta,
     return decorator
 
 
-def inCooldown(args: argument.ChatCommandArgs,
+def inCooldown(args: data.ChatCommandArgs,
                duration: timedelta,
                key: Any,
                permission: Optional[str]=None):
@@ -146,7 +146,7 @@ def min_args(amount: int,
              reason: Optional[str]=None):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def command(args: argument.ChatCommandArgs,
+        def command(args: data.ChatCommandArgs,
                     *pargs, **kwargs) -> Any:
             if len(args.message) < amount:
                 if reason:

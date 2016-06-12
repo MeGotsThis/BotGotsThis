@@ -1,7 +1,7 @@
 ﻿from bot import utils
 from typing import Iterable, List, Optional
 from ..library.message import messagesFromItems
-from ...data.argument import ManageBotArgs
+from ...data import ManageBotArgs
 
 needReason = ['add', 'insert', 'del', 'delete', 'rem', 'remove', 'remove']  # type: List[str]
 

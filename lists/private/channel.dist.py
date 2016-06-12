@@ -1,4 +1,4 @@
-﻿from source.data.argument import ChatCommand
+﻿from source.data import ChatCommand
 from typing import List, Mapping, Optional
 
 disableFilters = False  # type: bool

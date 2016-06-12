@@ -11,7 +11,7 @@
 
 from datetime import date, datetime, time, timedelta
 from typing import List, Match, Optional, Sequence, Tuple, Union
-from ...data.argument import CustomFieldArgs
+from ...data import CustomFieldArgs
 from ...data.timedelta import format as timedeltaFormat
 from ...data import timezones
 import re

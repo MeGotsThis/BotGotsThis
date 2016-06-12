@@ -1,7 +1,7 @@
 ﻿from bot import globals
 from typing import List
 from ..library.message import messagesFromItems
-from ...data.argument import ManageBotArgs
+from ...data import ManageBotArgs
 
 
 def manageListChats(args: ManageBotArgs) -> bool:

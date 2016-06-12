@@ -1,7 +1,7 @@
 ﻿import sys
 import importlib
 from typing import Tuple
-from ...data.argument import Send
+from ...data import Send
 from ...data.message import Message
 
 

@@ -2,13 +2,13 @@ from bot import utils
 from functools import partial, wraps
 from typing import Any, Callable, Optional, Union
 from . import chat
-from ...data import argument
+from ... import data
 
 _AnyCallable = Callable[..., Any]
 _AnyDecorator = Callable[..., _AnyCallable]
 
 
-def send(nick: Any) -> argument.Send:
+def send(nick: Any) -> data.Send:
     return partial(utils.whisper, nick)  # type: ignore
 
 permission = chat.permission
@@ -20,7 +20,7 @@ def min_args(amount: int,
              reason: Optional[str]=None):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def command(args: argument.WhisperCommandArgs,
+        def command(args: data.WhisperCommandArgs,
                     *pargs, **kwargs) -> Any:
             if len(args.message) < amount:
                 if reason:

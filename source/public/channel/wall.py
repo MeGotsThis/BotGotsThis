@@ -1,6 +1,6 @@
 ﻿from ..library import timeout
 from ..library.chat import inCooldown, min_args, permission_feature
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 from bot import config
 from contextlib import suppress
 from datetime import timedelta

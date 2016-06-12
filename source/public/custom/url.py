@@ -1,7 +1,7 @@
 ﻿from bot import config
 from contextlib import suppress
 from typing import Optional
-from ...data.argument import CustomFieldArgs
+from ...data import CustomFieldArgs
 import http.client
 import urllib.error
 import urllib.request

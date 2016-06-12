@@ -1,8 +1,7 @@
 ﻿from ..library import custom, timeout
 from ..library.chat import inCooldown, min_args, not_feature, permission
 from ..library.chat import ownerChannel
-from ...data.argument import ChatCommandArgs
-from ...data.return_ import CustomCommand, CustomCommandTokens
+from ...data import ChatCommandArgs, CustomCommand, CustomCommandTokens
 from bot import config
 from collections import defaultdict
 from datetime import datetime, timedelta

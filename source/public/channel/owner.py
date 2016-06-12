@@ -2,7 +2,7 @@
 from ..library import channel, exit, managebot
 from ..library.chat import min_args, permission, ownerChannel, send
 from ..library.chat import sendPriority
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 
 
 @ownerChannel

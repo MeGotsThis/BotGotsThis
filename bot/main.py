@@ -6,7 +6,7 @@ import source.private.autoload as privateAuto
 import source.public.autoload as publicAuto
 from itertools import chain
 from importlib.abc import PathEntryFinder
-from source.data import return_
+from source.database.databasebase import AutoJoinChannel
 from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
 from . import config, data, globals, utils
@@ -49,7 +49,7 @@ def main(argv: Optional[List[str]]=None) -> int:
         if config.owner:
             utils.joinChannel(config.owner, float('-inf'), 'aws')
         with getDatabase() as db:
-            for autoJoin in db.getAutoJoinsChats():  # --type: return_.AutoJoinChannel
+            for autoJoin in db.getAutoJoinsChats():  # --type: AutoJoinChannel
                 utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
                                   autoJoin.cluster)
     

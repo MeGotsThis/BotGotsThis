@@ -2,7 +2,7 @@
 from bot import config, globals, utils
 from typing import Dict, List, Optional, Union
 from ...api import twitch
-from ...data.argument import Send
+from ...data import Send
 from ...data.message import Message
 from ...database.databasebase import DatabaseBase
 

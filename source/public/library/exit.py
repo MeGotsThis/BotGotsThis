@@ -1,5 +1,5 @@
 ﻿from bot import globals, utils
-from ...data.argument import Send
+from ...data import Send
 import time
 
 

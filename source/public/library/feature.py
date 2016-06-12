@@ -1,6 +1,6 @@
 ﻿from lists.feature import features
 from typing import Set
-from ...data.argument import Send
+from ...data import Send
 from ...data.message import Message
 from ...database.databasebase import DatabaseBase
 

@@ -1,7 +1,12 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
-from typing import Union
-from ..data.return_ import AutoJoinChannel
+from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
+from typing import Sequence, Union
+
+AutoJoinChannel = NamedTuple('AutoJoinChannel',
+                             [('broadcaster', str),
+                              ('priority', Union[int, float]),
+                              ('cluster', str)])
+
 
 
 class DatabaseBase(metaclass=ABCMeta):

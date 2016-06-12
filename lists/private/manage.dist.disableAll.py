@@ -1,4 +1,4 @@
-﻿from source.data.argument import ManageBotCommand
+﻿from source.data import ManageBotCommand
 from typing import Callable, Mapping, Optional
 
 methods = {

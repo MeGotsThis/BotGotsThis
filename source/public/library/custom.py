@@ -1,10 +1,9 @@
 from typing import Dict, Iterable, List, Optional
-from ...data.argument import ChatCommandArgs, CustomFieldArgs
-from ...data.argument import CustomProcessArgs, CustomCommandProcess
+from ...data import ChatCommandArgs, CustomFieldArgs, CustomCommand
+from ...data import CustomCommandTokens, CustomCommandProcess
+from ...data import CustomFieldParts, CustomProcessArgs
 from ...data.message import Message
 from ...data.permissions import ChatPermissionSet
-from ...data.return_ import CustomCommand, CustomCommandTokens
-from ...data.return_ import CustomFieldParts
 from ...database.databasebase import DatabaseBase
 from ..library import textformat
 import lists.custom

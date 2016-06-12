@@ -6,7 +6,7 @@ from bot import config, globals
 from typing import Dict, List
 from ..library import timeout
 from ..library.chat import inCooldown, min_args, permission_feature
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))

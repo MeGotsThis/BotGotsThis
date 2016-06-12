@@ -2,8 +2,8 @@
 from datetime import datetime
 from typing import Optional, Union
 from ...api import twitch
-from ...data.argument import ManageBotArgs
-from ...data.return_ import AutoJoinChannel
+from ...database.databasebase import AutoJoinChannel
+from ...data import ManageBotArgs
 
 
 def manageAutoJoin(args: ManageBotArgs) -> bool:

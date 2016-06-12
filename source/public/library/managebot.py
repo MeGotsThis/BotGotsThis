@@ -1,4 +1,4 @@
-﻿from ...data.argument import ManageBotArgs, Send
+﻿from ...data import ManageBotArgs, Send
 from ...data.message import Message
 from ...database.databasebase import DatabaseBase
 from lists.manage import methods

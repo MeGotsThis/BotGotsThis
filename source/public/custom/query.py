@@ -1,5 +1,5 @@
 ﻿from typing import Optional
-from ...data.argument import CustomFieldArgs
+from ...data import CustomFieldArgs
 
 
 def fieldQuery(args: CustomFieldArgs) -> Optional[str]:

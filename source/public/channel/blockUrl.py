@@ -1,5 +1,5 @@
 ﻿from ...api import twitch
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 from ...data.message import Message
 from ...database import factory
 from ..library import timeout

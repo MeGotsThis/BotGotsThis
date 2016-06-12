@@ -2,7 +2,7 @@
 from typing import Dict, List, Optional, Union
 from . import timeout
 from ...api import twitch
-from ...data.argument import Send
+from ...data import Send
 from ...database.databasebase import DatabaseBase
 
 

@@ -1,6 +1,6 @@
 ﻿from ..library import feature
 from ..library.chat import permission, send
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 
 
 @permission('broadcaster')

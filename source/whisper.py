@@ -5,7 +5,7 @@ from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
 from lists import whisper
 from typing import Iterator
-from .data import argument
+from . import data
 from .data.message import Message
 from .data.permissions import WhisperPermissionSet
 from .database.factory import getDatabase
@@ -38,9 +38,9 @@ def whisperCommand(tags: IrcMessageTagsReadOnly,
 
         complete = False
         with getDatabase() as database:
-            arguments = argument.WhisperCommandArgs(
-                database, nick, message, permissions, timestamp)  # type: argument.WhisperCommandArgs
-            for command in commandsToProcess(message.command):  # --type: argument.WhisperCommand
+            arguments = data.WhisperCommandArgs(
+                database, nick, message, permissions, timestamp)  # type: data.WhisperCommandArgs
+            for command in commandsToProcess(message.command):  # --type: data.WhisperCommand
                 if command(arguments):
                     return
     except:
@@ -49,7 +49,7 @@ def whisperCommand(tags: IrcMessageTagsReadOnly,
         utils.logException(extra, timestamp)
 
 
-def commandsToProcess(command: str) -> Iterator[argument.WhisperCommand]:
+def commandsToProcess(command: str) -> Iterator[data.WhisperCommand]:
     if command in whisper.commands:
         if whisper.commands[command] is not None:
             yield whisper.commands[command]

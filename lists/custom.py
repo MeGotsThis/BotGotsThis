@@ -1,4 +1,4 @@
-﻿from source.data import argument
+﻿from source import data
 from typing import List
 from .public import custom as publicCustom
 try:
@@ -6,9 +6,9 @@ try:
 except ImportError:
     from .private.default import custom as privateCustom  # type: ignore
 
-fields = []  # type: List['argument.CustomCommandField']
+fields = []  # type: List[data.CustomCommandField]
 properties = []  # type: List[str]
-postProcess = []  # type: List['argument.CustomCommandProcess']
+postProcess = []  # type: List[data.CustomCommandProcess]
 if privateCustom.disablePublic:
     fields = privateCustom.fields
     properties = privateCustom.properties

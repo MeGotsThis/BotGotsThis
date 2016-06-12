@@ -1,7 +1,7 @@
 ﻿from ..library import channel, exit, managebot
 from ..library.whisper import min_args, permission, send
 from bot import globals, utils
-from ...data.argument import WhisperCommandArgs
+from ...data import WhisperCommandArgs
 
 
 @permission('owner')

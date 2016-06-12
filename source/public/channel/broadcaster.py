@@ -2,7 +2,7 @@
 from ..library import broadcaster
 from ..library.chat import cooldown, permission, ownerChannel, send
 from ...api import twitch
-from ...data.argument import ChatCommandArgs
+from ...data import ChatCommandArgs
 
 
 @permission('broadcaster')
