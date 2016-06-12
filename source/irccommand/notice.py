@@ -1,5 +1,5 @@
 ﻿from bot import data
-from bot.data.error import LoginUnsuccessfulException
+from bot.data.error import LoginUnsuccessful
 
 messageLimit = 'Your message was not sent because you are '
 messageLimit += 'sending messages too quickly.'
@@ -11,7 +11,7 @@ def parse(chat: 'data.Channel',
           nick: str,
           message: str) -> None:
     if message == 'Login unsuccessful':
-        raise LoginUnsuccessfulException()
+        raise LoginUnsuccessful()
     if message.startswith('You are permanently banned from talking in '):
         chat.isMod = False
         chat.socket.messaging.clearChat(chat)

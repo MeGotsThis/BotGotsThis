@@ -1,6 +1,6 @@
-class LoginUnsuccessfulException(Exception):
+class LoginUnsuccessful(Exception):
     pass
 
 
-class ConnectionResetException(Exception):
+class ConnectionReset(Exception):
     pass

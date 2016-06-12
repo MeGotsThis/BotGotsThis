@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterable, List, Optional, NamedTuple, Set
 from typing import Tuple, Union
 from source.api.bttv import getBroadcasterEmotes as getBttvEmotes
 from source.api.ffz import getBroadcasterEmotes as getFfzEmotes
-from .error import ConnectionResetException, LoginUnsuccessfulException
+from .error import ConnectionReset, LoginUnsuccessful
 from .. import config, globals, utils
 from ..twitchmessage import IrcMessage, IrcMessageParams
 
@@ -330,9 +330,9 @@ class Socket:
                 message = ircmsg.decode('utf-8')  # type: str
                 self._logRead(message)
                 source.ircmessage.parseMessage(self, message, datetime.utcnow())
-        except ConnectionResetException:
+        except ConnectionReset:
             self.disconnect()
-        except LoginUnsuccessfulException:
+        except LoginUnsuccessful:
             self.disconnect()
             globals.running = False
 
