@@ -88,7 +88,7 @@
     <Compile Include="lists\whisper.py" />
     <Compile Include="lists\__init__.py" />
     <Compile Include="main.py" />
-    <Compile Include="mypy.py" />
+    <Compile Include="mypy-test.py" />
     <Compile Include="source\api\bttv.py" />
     <Compile Include="source\api\ffz.py" />
     <Compile Include="source\api\oauth.py" />
