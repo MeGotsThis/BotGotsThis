@@ -27,7 +27,7 @@
     <Content Include="bot\twitchmessage\ircprefix.pyi" />
     <Content Include="config.dist.ini" />
     <Content Include="config.ini" />
-    <Content Include="source\database\databasebase.pyi" />
+    <Content Include="source\database\__init__.pyi" />
     <Content Include="source\database\sqlite\timeout.sql" />
     <Content Include="source\database\sqlite\database.sql" />
     <Content Include="source\database\sqlite\gamesabbreviation.sql" />
@@ -95,14 +95,12 @@
     <Compile Include="source\api\twitch.py" />
     <Compile Include="source\api\__init__.py" />
     <Compile Include="source\channel.py" />
-    <Compile Include="source\data\argument.py" />
     <Compile Include="source\data\message.py" />
     <Compile Include="source\data\permissions.py" />
-    <Compile Include="source\data\return_.py" />
     <Compile Include="source\data\timedelta.py" />
     <Compile Include="source\data\timezones.py" />
     <Compile Include="source\data\__init__.py" />
-    <Compile Include="source\database\databasebase.py" />
+    <Compile Include="source\database\databasenone.py" />
     <Compile Include="source\database\factory.py" />
     <Compile Include="source\database\sqlite\sqlite.py" />
     <Compile Include="source\database\sqlite\__init__.py" />
