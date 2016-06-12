@@ -461,10 +461,11 @@ class MessagingQueue:
             lambda: datetime.min)  # type: Dict[str, datetime]
 
     def cleanOldTimestamps(self) -> None:
-        msgDuration = timedelta(seconds=30.1)
         timestamp = datetime.utcnow()
+        msgDuration = timedelta(seconds=config.messageSpan)
         self._chatSent = [t for t in self._chatSent
                           if timestamp - t <= msgDuration]
+        msgDuration = timedelta(seconds=config.whiperSpan)
         self._whisperSent = [t for t in self._whisperSent
                              if timestamp - t <= msgDuration]
 
@@ -571,7 +572,7 @@ class MessagingQueue:
         return channel.isMod or config.botnick == channel.channel
 
     def popWhisper(self):
-        if self._whisperQueue and len(self._whisperSent) < config.modLimit:
+        if self._whisperQueue and len(self._whisperSent) < config.whiperLimit:
             self._whisperSent.append(datetime.utcnow())
             return self._whisperQueue.popleft()
         return None

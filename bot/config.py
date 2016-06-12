@@ -29,6 +29,9 @@ modLimit = min(int(ini['BOT']['modLimit']), 100)  # type: int
 modSpamLimit = min(int(ini['BOT']['modSpamLimit']), 100)  # type: int
 publicLimit = min(int(ini['BOT']['publicLimit']), 20)  # type: int
 publicDelay = float(ini['BOT']['publicDelay'])  # type: float
+messageSpan = float(ini['BOT']['messageSpan'])  # type: float
+whiperLimit = float(ini['BOT']['whiperLimit'])  # type: float
+whiperSpan = float(ini['BOT']['whiperSpan'])  # type: float
 
 customMessageCooldown = float(ini['BOT']['customMessageCooldown'])  # type: float
 if customMessageCooldown <= 0:
