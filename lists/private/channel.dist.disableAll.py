@@ -1,10 +1,10 @@
-﻿from source.data.argument import ChatCommandArgs
-from typing import Callable, List, Mapping, Optional
+﻿from source.data.argument import ChatCommand
+from typing import List, Mapping, Optional
 
 disableFilters = True  # type: bool
 disableCustomMessage = True  # type: bool
 
-filterMessage = []  # type: List[Callable[[ChatCommandArgs], bool]]
+filterMessage = []  # type: List[ChatCommand]
 commands = {
     '!exit': None,
     '!managebot': None,
@@ -40,11 +40,11 @@ commands = {
     '!come': None,
     '!autojoin': None,
     '!uptime': None,
-    }  # type: Mapping[str, Optional[Callable[[ChatCommandArgs], bool]]]
+    }  # type: Mapping[str, Optional[ChatCommand]
 commandsStartWith = {
     '!pyramid-': None,
     '!wall-': None,
     '!autorepeat-': None,
-    }  # type: Mapping[str, Optional[Callable[[ChatCommandArgs], bool]]]
-noCommandPreCustom = []  # type: List[Callable[[ChatCommandArgs], bool]]
-noCommandPostCustom = []  # type: List[Callable[[ChatCommandArgs], bool]]
+    }  # type: Mapping[str, Optional[ChatCommand]]
+noCommandPreCustom = []  # type: List[ChatCommand]
+noCommandPostCustom = []  # type: List[ChatCommand]

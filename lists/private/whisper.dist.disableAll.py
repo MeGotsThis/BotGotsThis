@@ -1,4 +1,4 @@
-﻿from source.data.argument import WhisperCommandArgs
+﻿from source.data.argument import WhisperCommand
 from typing import Callable, Mapping, Optional
 
 commands = {
@@ -18,4 +18,4 @@ commands = {
     '!come': None,
     '!autojoin': None,
     '!feature': None,
-    }  # type: Mapping[str, Optional[Callable[[WhisperCommandArgs], bool]]]
+    }  # type: Mapping[str, Optional[WhisperCommand]
