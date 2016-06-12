@@ -1,6 +1,6 @@
 from .message import Message
 from .permissions import ChatPermissionSet, WhisperPermissionSet
-from ..database.databasebase import DatabaseBase
+from ..database import DatabaseBase
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
 from typing import Any, Callable, Iterable, List, NamedTuple, Optional, Union

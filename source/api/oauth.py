@@ -1,5 +1,5 @@
 ﻿from typing import Optional
-from ..database.databasebase import DatabaseBase
+from ..database import DatabaseBase
 from ..database.factory import getDatabase
 
 

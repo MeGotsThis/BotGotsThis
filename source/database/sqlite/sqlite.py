@@ -1,9 +1,8 @@
-﻿from ..databasebase import AutoJoinChannel, DatabaseBase
+﻿from .. import AutoJoinChannel, DatabaseBase
 from contextlib import closing
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
 from typing import Tuple, Union
 import sqlite3
-import configparser
 
 
 class SQLiteDatabase(DatabaseBase):

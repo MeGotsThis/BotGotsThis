@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Union
 from . import timeout
 from ...api import twitch
 from ...data import Send
-from ...database.databasebase import DatabaseBase
+from ...database import DatabaseBase
 
 
 def botJoin(database: DatabaseBase,

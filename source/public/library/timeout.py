@@ -4,7 +4,7 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 from typing import Dict, Iterable, Iterator, Mapping, List, Optional, Tuple
 from typing import Union
-from ...database.databasebase import DatabaseBase
+from ...database import DatabaseBase
 
 
 def timeoutUser(database: DatabaseBase,

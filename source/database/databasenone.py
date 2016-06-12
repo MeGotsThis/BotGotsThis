@@ -1,86 +1,49 @@
-from abc import ABCMeta, abstractmethod
-from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
-from typing import Sequence, Union
+from . import AutoJoinChannel, DatabaseBase
+from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
+from typing import Union
 
-AutoJoinChannel = NamedTuple('AutoJoinChannel',
-                             [('broadcaster', str),
-                              ('priority', Union[int, float]),
-                              ('cluster', str)])
-
-
-class DatabaseBase(metaclass=ABCMeta):
-    def __init__(self, **kwargs) -> None:
-        self._engine = 'None'  # type: str
-        self._connection = None  # type: Any
-
-    @property
-    def engine(self) -> str:
-        return self._engine
-
-    @property
-    def connection(self) -> Any:
-        return self._connection
-
-    def __enter__(self) -> Any:
-        self._connection = None
-        return self
-
-    def __exit__(self, type, value, traceback) -> None:
-        if self.connection is not None:
-            self.connection.close()
-
-    @abstractmethod
+class DatabaseNone(DatabaseBase):
     def getAutoJoinsChats(self) -> Iterable[AutoJoinChannel]:
         yield from []
 
-    @abstractmethod
     def getAutoJoinsPriority(self, broadcaster: str) -> Union[int, float]:
         return float('inf')
 
-    @abstractmethod
     def saveAutoJoin(self,
                      broadcaster: str,
-                     priority: Union[int, float] = 0,
-                     cluster: str = 'aws') -> bool:
+                     priority: Union[int, float]=0,
+                     cluster: str='aws') -> bool:
         return False
 
-    @abstractmethod
     def discardAutoJoin(self, broadcaster: str) -> bool:
         return False
 
-    @abstractmethod
     def setAutoJoinPriority(self,
                             broadcaster: str,
                             priority: Union[int, float]) -> bool:
         return False
 
-    @abstractmethod
     def setAutoJoinServer(self,
                           broadcaster: str,
-                          cluster: str = 'aws') -> bool:
+                          cluster: str='aws') -> bool:
         return False
 
-    @abstractmethod
     def getOAuthToken(self, broadcaster: str) -> Optional[str]:
         return None
 
-    @abstractmethod
     def saveBroadcasterToken(self,
                              broadcaster: str,
                              token: str) -> None:
         pass
 
-    @abstractmethod
     def getChatCommands(self,
                         broadcaster: str,
                         command: str) -> Dict[str, Dict[str, str]]:
         return {broadcaster: {}, '#global': {}}
 
-    @abstractmethod
     def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
         return None
 
-    @abstractmethod
     def insertCustomCommand(self,
                             broadcaster: str,
                             permission: str,
@@ -89,7 +52,6 @@ class DatabaseBase(metaclass=ABCMeta):
                             user: str) -> bool:
         return False
 
-    @abstractmethod
     def updateCustomCommand(self,
                             broadcaster: str,
                             permission: str,
@@ -98,7 +60,6 @@ class DatabaseBase(metaclass=ABCMeta):
                             user: str) -> bool:
         return False
 
-    @abstractmethod
     def replaceCustomCommand(self,
                              broadcaster: str,
                              permission: str,
@@ -107,7 +68,6 @@ class DatabaseBase(metaclass=ABCMeta):
                              user: str):
         return False
 
-    @abstractmethod
     def appendCustomCommand(self,
                             broadcaster: str,
                             permission: str,
@@ -116,7 +76,6 @@ class DatabaseBase(metaclass=ABCMeta):
                             user: str):
         return False
 
-    @abstractmethod
     def deleteCustomCommand(self,
                             broadcaster: str,
                             permission: str,
@@ -124,14 +83,12 @@ class DatabaseBase(metaclass=ABCMeta):
                             user: str):
         return True
 
-    @abstractmethod
     def getCustomCommandProperty(
             self,
             broadcaster: str,
             permission: str,
             command: str,
-            property: Optional[Union[str, Sequence[str]]] = None) -> Optional[
-        Union[str, Dict[str, str]]]:
+            property: Optional[Union[str, Sequence[str]]]=None) -> Optional[Union[str, Dict[str, str]]]:
         if property is None:
             return {}
         elif isinstance(property, list):
@@ -139,7 +96,6 @@ class DatabaseBase(metaclass=ABCMeta):
         else:
             return None
 
-    @abstractmethod
     def processCustomCommandProperty(self,
                                      broadcaster: str,
                                      permission: str,
@@ -148,47 +104,39 @@ class DatabaseBase(metaclass=ABCMeta):
                                      value=Optional[str]) -> bool:
         return False
 
-    @abstractmethod
     def hasFeature(self,
                    broadcaster: str,
                    feature: str) -> bool:
         return False
 
-    @abstractmethod
     def addFeature(self,
                    broadcaster: str,
                    feature: str) -> bool:
         return False
 
-    @abstractmethod
     def removeFeature(self,
                       broadcaster: str,
                       feature: str) -> bool:
         return True
 
-    @abstractmethod
     def listBannedChannels(self) -> Iterable[str]:
         yield from []
 
-    @abstractmethod
     def isChannelBannedReason(self, broadcaster: str) -> Optional[str]:
         return None
 
-    @abstractmethod
     def addBannedChannel(self,
                          broadcaster: str,
                          reason: str,
                          nick: str) -> bool:
         return True
 
-    @abstractmethod
     def removeBannedChannel(self,
                             broadcaster: str,
                             reason: str,
                             nick: str) -> bool:
         return True
 
-    @abstractmethod
     def recordTimeout(self,
                       broadcaster: str,
                       user: str,
@@ -200,27 +148,22 @@ class DatabaseBase(metaclass=ABCMeta):
                       reason: Optional[str]) -> bool:
         return False
 
-    @abstractmethod
     def getChatProperty(self,
                         broadcaster: str,
                         property: str,
-                        default: Any = None,
-                        parse: Optional[Callable[[str], Any]] = None) -> Any:
+                        default: Any=None,
+                        parse: Optional[Callable[[str], Any]]=None) -> Any:
         return default
 
-    @abstractmethod
     def getChatProperties(self,
                           broadcaster: str,
                           properties: Sequence[str],
-                          default: Any = None,
-                          parse: Any = None) -> Mapping[str, Any]:
+                          default: Any=None,
+                          parse: Any=None) -> Mapping[str, Any]:
         return {}
 
-    @abstractmethod
     def setChatProperty(self,
                         broadcaster: str,
                         property: str,
-                        value: Optional[str] = None) -> bool:
+                        value: Optional[str]=None) -> bool:
         return False
-
-

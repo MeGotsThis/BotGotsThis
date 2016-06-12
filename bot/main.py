@@ -6,7 +6,7 @@ import source.private.autoload as privateAuto
 import source.public.autoload as publicAuto
 from itertools import chain
 from importlib.abc import PathEntryFinder
-from source.database.databasebase import AutoJoinChannel
+from source.database import AutoJoinChannel
 from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
 from . import config, data, globals, utils

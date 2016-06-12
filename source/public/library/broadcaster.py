@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Union
 from ...api import twitch
 from ...data import Send
 from ...data.message import Message
-from ...database.databasebase import DatabaseBase
+from ...database import DatabaseBase
 
 
 def botCome(database: DatabaseBase,

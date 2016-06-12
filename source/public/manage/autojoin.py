@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Optional, Union
 from ...api import twitch
-from ...database.databasebase import AutoJoinChannel
+from ...database import AutoJoinChannel
 from ...data import ManageBotArgs
 
 
