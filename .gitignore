@@ -1,6 +1,7 @@
 *.pyc
 source/private/*
 lists/private/*
+unittest/private/*
 nohup.out
 *.log
 *.suo

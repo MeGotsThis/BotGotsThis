@@ -210,6 +210,9 @@
     <Folder Include="source\public\manage\" />
     <Folder Include="source\public\tasks\" />
     <Folder Include="source\public\whisper\" />
+    <Folder Include="unittest\" />
+    <Folder Include="unittest\private\" />
+    <Folder Include="unittest\public\" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
