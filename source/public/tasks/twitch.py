@@ -43,8 +43,11 @@ def checkOfflineChannels(timestamp: datetime) -> None:
     ch = random.choice(offlineChannels)  # type: str
     chat = channels[ch]  # type: data.Channel
     with suppress(socket.gaierror):
+        current = twitch.channelStatusAndGame(ch)  # type: Optional[twitch.TwitchStatus]
+        if current is None:
+            return
         (chat.streamingSince, chat.twitchStatus,
-         chat.twitchGame) = twitch.channelStatusAndGame(ch)
+         chat.twitchGame) = current
         chat.twitchCache = timestamp
 
 

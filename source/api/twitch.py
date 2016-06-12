@@ -224,7 +224,7 @@ def _handleStreams(streams: List[Dict[str, Any]],
     return online
 
 
-def channelStatusAndGame(channel: str) -> TwitchStatus:
+def channelStatusAndGame(channel: str) -> Optional[TwitchStatus]:
     uri = '/kraken/channels/' + channel  # type: str
     response, responseData = twitchCall(None, 'GET', uri)  # type: HTTPResponse, bytes
     if response.status != 200:
