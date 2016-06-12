@@ -4,6 +4,7 @@ lists/private/*
 unittest/private/*
 nohup.out
 *.log
+.idea
 *.suo
 config.ini
 twitch.ini
