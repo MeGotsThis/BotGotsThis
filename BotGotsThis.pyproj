@@ -21,10 +21,10 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="bot\twitchmessage\irctags.pyi" />
-    <Content Include="bot\twitchmessage\ircmessage.pyi" />
-    <Content Include="bot\twitchmessage\ircparams.pyi" />
-    <Content Include="bot\twitchmessage\ircprefix.pyi" />
+    <Content Include="bot\twitchmessage\_irctags.pyi" />
+    <Content Include="bot\twitchmessage\_ircmessage.pyi" />
+    <Content Include="bot\twitchmessage\_ircparams.pyi" />
+    <Content Include="bot\twitchmessage\_ircprefix.pyi" />
     <Content Include="config.dist.ini" />
     <Content Include="config.ini" />
     <Content Include="source\database\__init__.pyi" />
@@ -46,10 +46,10 @@
     <Compile Include="bot\thread\join.py" />
     <Compile Include="bot\thread\socket.py" />
     <Compile Include="bot\thread\__init__.py" />
-    <Compile Include="bot\twitchmessage\ircmessage.py" />
-    <Compile Include="bot\twitchmessage\ircparams.py" />
-    <Compile Include="bot\twitchmessage\ircprefix.py" />
-    <Compile Include="bot\twitchmessage\irctags.py" />
+    <Compile Include="bot\twitchmessage\_ircmessage.py" />
+    <Compile Include="bot\twitchmessage\_ircparams.py" />
+    <Compile Include="bot\twitchmessage\_ircprefix.py" />
+    <Compile Include="bot\twitchmessage\_irctags.py" />
     <Compile Include="bot\twitchmessage\__init__.py" />
     <Compile Include="bot\utils.py" />
     <Compile Include="bot\__init__.py" />
