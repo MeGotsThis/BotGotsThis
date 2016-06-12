@@ -51,14 +51,14 @@ def createMessages(command: CustomCommand,
     messages = [''.join(messageParts)]
     processArgument = CustomProcessArgs(
         args.database, args.chat, args.tags, args.nick, args.permissions,
-        command.broadcaster, command.level, args.message.command, messages)  # type: CustomProcessArgs
+        command.broadcaster, command.level, args.message.command,
+        messages)  # type: CustomProcessArgs
     for process in lists.custom.postProcess:  # --type: CustomCommandProcess
         process(processArgument)
     return messages
 
 
-def parseCommandMessageInput(message: Message,
-                             broadcaster: str) -> Optional[CustomCommandTokens]:
+def parseCommandInput(message: Message, broadcaster: str) -> Optional[CustomCommandTokens]:
     allowPermissions = {
         None: '',
         '': '',
@@ -134,7 +134,9 @@ def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
         
         if i == length:
             if noFormat:
-                parsed.append(CustomFieldParts(''.join(noFormat), None, None, None, None, None, None, None))
+                parsed.append(
+                    CustomFieldParts(''.join(noFormat), None, None, None, None,
+                                     None, None, None))
             break
         
         s = i  # type: int

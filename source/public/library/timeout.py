@@ -19,7 +19,8 @@ def timeoutUser(database: DatabaseBase,
                 'timeoutLength1': config.moderatorDefaultTimeout[1],
                 'timeoutLength2': config.moderatorDefaultTimeout[2],
                 }  # type: Dict[str, int]
-    chatProp = database.getChatProperties(chat.channel, properties, defaults, int)  # type: Mapping[str, int]
+    chatProp = database.getChatProperties(chat.channel, properties, defaults,
+                                          int)  # type: Mapping[str, int]
     timeouts = (chatProp['timeoutLength0'],
                 chatProp['timeoutLength1'],
                 chatProp['timeoutLength2'],)  # type: Tuple[int, ...]

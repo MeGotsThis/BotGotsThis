@@ -45,7 +45,8 @@ class SocketsThread(threading.Thread):
         connections = list(filter(isActive, self._socketConnections))  # type: List[data.Socket]
         if connections:
             read, write, exceptional = select.select(
-                connections, connections, connections, 0.01)  # type: List[data.Socket], List[data.Socket], List[data.Socket]
+                connections, connections, connections,
+                0.01)  # type: List[data.Socket], List[data.Socket], List[data.Socket]
             for socketConnection in read:  # --type: Socket
                 socketConnection.read()
             for socketConnection in write:  # --type: Socket

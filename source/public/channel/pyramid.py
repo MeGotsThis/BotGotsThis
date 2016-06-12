@@ -41,8 +41,9 @@ def processPyramid(args: ChatCommandArgs,
             return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
-    messages = itertools.chain((repetition * i for i in range(1, count)),
-                               (repetition * i for i in range(count, 0, -1)))  # type: itertools.chain[str]
+    messages = itertools.chain(
+        (repetition * i for i in range(1, count)),
+        (repetition * i for i in range(count, 0, -1)))  # type: itertools.chain[str]
     if args.permissions.chatModerator:
         timeout.recordTimeoutFromCommand(
             args.database, args.chat, args.nick, repetition * count,

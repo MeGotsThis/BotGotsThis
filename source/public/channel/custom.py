@@ -52,7 +52,8 @@ def commandCommand(args: ChatCommandArgs) -> bool:
 
 @min_args(3)
 def processCommand(args: ChatCommandArgs, broadcaster: str) -> bool:
-    input = custom.parseCommandMessageInput(args.message, broadcaster)  # type: Optional[CustomCommandTokens]
+    input = custom.parseCommandInput(
+        args.message, broadcaster)  # type: Optional[CustomCommandTokens]
     if input is None:
         return False
 

@@ -1,9 +1,10 @@
-﻿from .. import AutoJoinChannel, DatabaseBase
+﻿from .. import AutoJoinChannel, CommandProperty, CommandReturn, DatabaseBase
 from contextlib import closing
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
 from typing import Tuple, Union
 import sqlite3
 
+CommandTuple = Tuple[str, str, str]
 
 class SQLiteDatabase(DatabaseBase):
     def __init__(self,
@@ -104,7 +105,8 @@ SELECT broadcaster, permission, fullMessage
     FROM custom_commands WHERE broadcaster IN (?, \'#global\') AND command=?'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             commands = {broadcaster: {}, '#global': {}}  # type: Dict[str, Dict[str, str]]
-            for row in cursor.execute(query, (broadcaster, command)):  # --type: Optional[Tuple[str, str, str]]
+            for row in cursor.execute(
+                    query, (broadcaster, command)):  # --type: Optional[CommandTuple]
                 commands[row[0]][row[1]] = row[2]
             cursor.close()
             return commands
@@ -275,7 +277,7 @@ INSERT INTO custom_commands_history
             broadcaster: str,
             permission: str,
             command: str,
-            property: Optional[Union[str, Sequence[str]]]=None) -> Optional[Union[str, Dict[str, str]]]:
+            property: Optional[CommandProperty]=None) -> Optional[CommandReturn]:
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             if property is None:
                 query = '''

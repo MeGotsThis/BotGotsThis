@@ -1,12 +1,15 @@
 ﻿from . import data
 from bot import config, globals
 from datetime import datetime
+from types import TracebackType
 from typing import List, Optional, TextIO, Tuple, Union
 import os.path
 import sys
 import threading
 import traceback
 
+ExceptionInfo = Tuple[Optional[type], Optional[BaseException],
+                      Optional[TracebackType]]
 
 def joinChannel(broadcaster: str,
                 priority: Union[int, float]=float('inf'),
@@ -83,8 +86,8 @@ def logException(extraMessage: str=None,
     if config.exceptionLog is None:
         return
     timestamp = timestamp or datetime.utcnow()
-    exceptInfo = sys.exc_info()  # type: Tuple[Optional[type], Optional[BaseException], Optional[traceback.TracebackType]]
-    excep = traceback.format_exception(*exceptInfo)  # type: ignore -- List[traceback.TracebackException]
+    exceptInfo = sys.exc_info()  # type: ExceptionInfo
+    excep = traceback.format_exception(*exceptInfo)  # type: ignore
     with open(config.exceptionLog, 'a', encoding='utf-8') as file:  # --type: TextIO
         if extraMessage and extraMessage[-1] != '\n':
             extraMessage += '\n'

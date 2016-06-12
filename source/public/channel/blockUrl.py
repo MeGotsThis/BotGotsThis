@@ -6,17 +6,18 @@ from ..library import timeout
 from ..library.chat import feature, not_permission, permission
 from bot import config, data, utils
 from datetime import datetime
+from http.client import HTTPResponse
+from urllib.parse import ParseResult, urlparse
 from typing import Tuple
-import http.client
 import re
 import threading
 import urllib.error
-import urllib.parse
 import urllib.request
 
 twitchUrlRegex = (#r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"
                   r"(?:https?:\/\/)?(?:[-a-zA-Z0-9@:%_\+~#=]+\.)+[a-z]{2,6}\b"
                   r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)")
+ThreadParam = Tuple['data.Channel', str, Message, datetime]
 
 
 # This is for banning the users who post a URL with no follows
@@ -25,7 +26,7 @@ twitchUrlRegex = (#r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"
 @permission('chatModerator')
 def filterNoUrlForBots(args: ChatCommandArgs) -> bool:
     if re.search(twitchUrlRegex, str(args.message)):
-        params = args.chat, args.nick, args.message, args.timestamp  # type: Tuple[data.Channel, str, Message, datetime]
+        params = args.chat, args.nick, args.message, args.timestamp  # type: ThreadParam
         threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
     return False
 
@@ -52,12 +53,12 @@ def checkIfUrlMaybeBad(chat: 'data.Channel',
                 url, headers={
                     'User-Agent': 'MeGotsThis/' + config.botnick,
                     })  # type: urllib.request.Request
-            with urllib.request.urlopen(request) as urlRequest:  # --type: http.client.HTTPResponse
-                if not isinstance(urlRequest, http.client.HTTPResponse):
+            with urllib.request.urlopen(request) as urlRequest:  # HTTPResponse
+                if not isinstance(urlRequest, HTTPResponse):
                     raise TypeError()
-                parsedOriginal = urllib.parse.urlparse(url)  # type: urllib.parse.ParseResult
+                parsedOriginal = urlparse(url)  # type: ParseResult
                 responseUrl = urlRequest.geturl()  # type: str
-                parsedReponse = urllib.parse.urlparse(responseUrl)  # type: urllib.parse.ParseResult
+                parsedReponse = urlparse(responseUrl)  # type: ParseResult
                 if parsedOriginal.netloc != parsedReponse.netloc:
                     utils.logIrcMessage(
                         chat.ircChannel + '#blockurl-match.log',
@@ -70,9 +71,9 @@ def checkIfUrlMaybeBad(chat: 'data.Channel',
                             database, chat, nick, 'redirectUrl', 1, str(message))
                     return
         except urllib.error.HTTPError as e:
-            parsedOriginal = urllib.parse.urlparse(url)
+            parsedOriginal = urlparse(url)
             responseUrl = e.geturl()  # type: ignore
-            parsedReponse = urllib.parse.urlparse(responseUrl)
+            parsedReponse = urlparse(responseUrl)
             if parsedOriginal.netloc != parsedReponse.netloc:
                 utils.logIrcMessage(
                     chat.ircChannel + '#blockurl-match.log',

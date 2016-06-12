@@ -6,6 +6,8 @@ AutoJoinChannel = NamedTuple('AutoJoinChannel',
                              [('broadcaster', str),
                               ('priority', Union[int, float]),
                               ('cluster', str)])
+CommandProperty = Union[str, Sequence[str]]
+CommandReturn = Union[str, Dict[str, str]]
 
 
 class DatabaseBase(metaclass=ABCMeta):
@@ -130,8 +132,7 @@ class DatabaseBase(metaclass=ABCMeta):
             broadcaster: str,
             permission: str,
             command: str,
-            property: Optional[Union[str, Sequence[str]]] = None) -> Optional[
-        Union[str, Dict[str, str]]]:
+            property: Optional[CommandProperty]=None) -> Optional[CommandReturn]:
         if property is None:
             return {}
         elif isinstance(property, list):

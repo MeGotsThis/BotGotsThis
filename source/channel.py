@@ -40,7 +40,8 @@ def chatCommand(chat: 'botData.Channel',
     
         with factory.getDatabase() as database:
             arguments = data.ChatCommandArgs(
-                database, chat, tags, nick, message, permissions, timestamp)  # type: data.ChatCommandArgs
+                database, chat, tags, nick, message, permissions,
+                timestamp)  # type: data.ChatCommandArgs
             for command in commandsToProcess(message.command):  # --type: argument.ChatCommand
                 if command(arguments):
                     return

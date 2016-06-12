@@ -7,4 +7,6 @@ try:
 except ImportError:
     from .private.default import manage as privateList  # type: ignore
 
-methods = ChainMap(privateList.methods, publicList.methods)  # type: Mapping[str, Optional[data.ManageBotCommand]]
+MethodDict = Mapping[str, Optional[data.ManageBotCommand]]
+
+methods = ChainMap(privateList.methods, publicList.methods)  # type: MethodDict

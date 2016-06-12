@@ -14,7 +14,8 @@ def checkStreamsAndChannel(timestamp: datetime) -> None:
         return
     with suppress(socket.gaierror):
         channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
-        onlineStreams = twitch.checkOnlineStreams(channels.keys())  # type: Optional[Dict[str, Tuple[datetime, str, str]]]
+        onlineStreams = twitch.checkOnlineStreams(
+            channels.keys())  # type: Optional[twitch.OnlineStreams]
         if onlineStreams is None:
             return
         for channel in onlineStreams:  # --type: str

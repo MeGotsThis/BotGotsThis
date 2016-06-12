@@ -7,4 +7,6 @@ try:
 except ImportError:
     from .private.default import whisper as privateList  # type: ignore
 
-commands = ChainMap(privateList.commands, publicList.commands)  # type: Mapping[str, Optional[data.WhisperCommand]]
+WhisperDict = Mapping[str, Optional[data.WhisperCommand]]
+
+commands = ChainMap(privateList.commands, publicList.commands)  # type: WhisperDict

@@ -1,4 +1,4 @@
-from . import AutoJoinChannel, DatabaseBase
+from . import AutoJoinChannel, CommandProperty, CommandReturn, DatabaseBase
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
 from typing import Union
 
@@ -88,7 +88,7 @@ class DatabaseNone(DatabaseBase):
             broadcaster: str,
             permission: str,
             command: str,
-            property: Optional[Union[str, Sequence[str]]]=None) -> Optional[Union[str, Dict[str, str]]]:
+            property: Optional[CommandProperty]=None) -> Optional[CommandReturn]:
         if property is None:
             return {}
         elif isinstance(property, list):

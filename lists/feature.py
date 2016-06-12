@@ -6,4 +6,6 @@ try:
 except ImportError:
     from .private.default import feature as privateFeature  # type: ignore
 
-features = ChainMap(privateFeature.features, publicFeature.features)  # type: Mapping[str, Optional[str]]
+FeatureDict = Mapping[str, Optional[str]]
+
+features = ChainMap(privateFeature.features, publicFeature.features)  # type: FeatureDict

@@ -3,15 +3,27 @@ from bot import globals
 from collections import defaultdict
 from contextlib import closing, suppress
 from datetime import datetime, timedelta
-from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional
-from typing import Tuple, Union
+from http.client import HTTPConnection, HTTPException, HTTPResponse
+from http.client import HTTPSConnection
+from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
+from typing import NamedTuple, Optional, Tuple, Union
 import configparser
 import email.utils
-import http.client
 import json
 import os.path
 import time
 import urllib.parse
+
+DateTuple = Tuple[int, int, int, int, int, int, int, int, int]
+TwitchStatus = NamedTuple('TwitchStatus',
+                          [('streaming', Optional[datetime]),
+                           ('status', str),
+                           ('game', str)])
+TwitchEmotes = Dict[str, List[Dict[str, Union[str, int]]]]
+TwitchValid = NamedTuple('TwitchValid', [('isValid', bool),
+                                         ('timestamp', datetime)])
+ValidCache = Dict[str, TwitchValid]
+OnlineStreams = Dict[str, TwitchStatus]
 
 
 def getTwitchClientId() -> Optional[str]:
@@ -27,10 +39,10 @@ def twitchCall(channel: Optional[str],
                method: str,
                uri: str,
                headers: MutableMapping[str, str]=None,
-               data: Union[str, Mapping[str, str]]=None) -> Tuple[http.client.HTTPResponse, bytes]:
+               data: Union[str, Mapping[str, str]]=None) -> Tuple[HTTPResponse, bytes]:
     if headers is None:
         headers = {}
-    with closing(http.client.HTTPSConnection('api.twitch.tv')) as connection:  # --type: http.client.HTTPConnection
+    with closing(HTTPSConnection('api.twitch.tv')) as connection:  # --type: HTTPConnection
         if channel is not None and 'Authorization' not in headers:
             token = oauth.getOAuthToken(channel)  # type: Optional[str]
             if token is not None:
@@ -43,21 +55,21 @@ def twitchCall(channel: Optional[str],
             if isinstance(data, Mapping):
                 data = urllib.parse.urlencode(data)
         connection.request(method, uri, data, headers)
-        with connection.getresponse() as response:  # --type: http.client.HTTPResponse
+        with connection.getresponse() as response:  # --type: HTTPResponse
             return response, response.read()
 
 
 def serverTime() -> datetime:
-    with suppress(http.client.HTTPException):
+    with suppress(HTTPException):
         response, data = twitchCall(
             None, 'GET', '/kraken/',
             headers={
                 'Accept': 'application/vnd.twitchtv.v3+json',
-                })  # type: http.client.HTTPResponse, bytes
+                })  # type: HTTPResponse, bytes
         if response.status == 200:
             date = response.getheader('Date')
             if data is not None:
-                dateStruct = email.utils.parsedate(date)  # type: Tuple[int, int, int, int, int, int, int, int, int]
+                dateStruct = email.utils.parsedate(date)  # type: DateTuple
                 unixTimestamp = time.mktime(dateStruct)  # type: float
                 return datetime.fromtimestamp(unixTimestamp)  # type: datetime
     return None
@@ -71,8 +83,8 @@ def getTwitchEmotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
             None, 'GET', uri,
             headers={
                 'Accept': 'application/vnd.twitchtv.v3+json',
-                })  # type: http.client.HTTPResponse, bytes
-        globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']  # type: Dict[str, List[Dict[str, Union[str, int]]]]
+                })  # type: HTTPResponse, bytes
+        globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']  # type: TwitchEmotes
         emotes = {}  # type: Dict[int, str]
         emoteSet = {}  # type: Dict[int, int]
         replaceGlobal = {
@@ -108,7 +120,7 @@ def twitchChatServer(chat:Optional[str],
                      data: Union[str, Mapping[str, str]]=None) -> Optional[str]:
     if headers is None:
         headers = {}
-    with closing(http.client.HTTPSConnection('tmi.twitch.tv')) as connection:  # --type: http.client.HTTPConnection
+    with closing(HTTPSConnection('tmi.twitch.tv')) as connection:  # --type: HTTPConnection
         if chat is not None and 'Authorization' not in headers:
             token = oauth.getOAuthToken(chat)  # type: Optional[str]
             if token is not None:
@@ -122,7 +134,7 @@ def twitchChatServer(chat:Optional[str],
             data = urllib.parse.urlencode(data)
     
         connection.request('GET', '/servers?channel=' + chat, data, headers)
-        with connection.getresponse() as response:  # --type: http.client.HTTPResponse
+        with connection.getresponse() as response:  # --type: HTTPResponse
             responseData = response.read()  # type: bytes
             with suppress(ValueError):
                 jData = json.loads(responseData.decode('utf-8'))  # type: dict
@@ -135,23 +147,23 @@ def checkValidTwitchUser(user: str) -> bool:
     currentTime = datetime.utcnow()  # type: datetime
     if 'validTwitchUser' not in globals.globalSessionData:
         globals.globalSessionData['validTwitchUser'] = defaultdict(
-            lambda: (False, datetime.min))
-    validCache = globals.globalSessionData['validTwitchUser']  # type: Dict[str, Tuple[bool, datetime]]
+            lambda: TwitchValid(False, datetime.min))
+    validCache = globals.globalSessionData['validTwitchUser']  # type: ValidCache
     if (user not in validCache
-            or currentTime - validCache[user][1] > timedelta(minutes=1)):
+            or currentTime-validCache[user].timestamp > timedelta(minutes=1)):
         response, data = twitchCall(
             None, 'GET', '/kraken/channels/' + user,
             headers={
                 'Accept': 'application/vnd.twitchtv.v3+json',
                 })
-        validCache[user] = response.code == 200, currentTime
-    return validCache[user][0]
+        validCache[user] = TwitchValid(response.code == 200, currentTime)
+    return validCache[user].isValid
 
 
 def getFollowerCount(user: str) -> Optional[int]:
     with suppress(BaseException):
         uri = '/kraken/users/' + user + '/follows/channels?limit=1'  # type: str
-        response, data = twitchCall(None, 'GET', uri)  # type: http.client.HTTPResponse, bytes
+        response, data = twitchCall(None, 'GET', uri)  # type: HTTPResponse, bytes
         followerData = json.loads(data.decode('utf-8'))  # type: dict
         return int(followerData['_total'])
     return None
@@ -173,16 +185,16 @@ def updateChannel(channel: str, *,
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/vnd.twitchtv.v3+json',
             },
-        data=postData)  # type: http.client.HTTPResponse, bytes
+        data=postData)  # type: HTTPResponse, bytes
     return response.status == 200
 
 
-def checkOnlineStreams(channels: Iterable[str]) -> Optional[Dict[str, Tuple[datetime, str, str]]]:
+def checkOnlineStreams(channels: Iterable[str]) -> Optional[OnlineStreams]:
     uri = '/kraken/streams?limit=100&channel=' + ','.join(channels)  # type: str
-    response, responseData = twitchCall(None, 'GET', uri)  # type: http.client.HTTPResponse, bytes
+    response, responseData = twitchCall(None, 'GET', uri)  # type: HTTPResponse, bytes
     if response.status != 200:
         return None
-    online = {}  # type: Dict[str, Tuple[datetime, str, str]]
+    online = {}  # type: Dict[str, TwitchStatus]
     streamsData = json.loads(responseData.decode('utf-8'))  # type: dict
     _handleStreams(streamsData['streams'], online)
     if streamsData['_total'] > 100:
@@ -199,22 +211,23 @@ def checkOnlineStreams(channels: Iterable[str]) -> Optional[Dict[str, Tuple[date
 
 
 def _handleStreams(streams: List[Dict[str, Any]],
-                   online: Dict[str, Tuple[datetime, str, str]]=None):
+                   online: Dict[str, TwitchStatus]=None):
     if online is None:
         online = {}
     for stream in streams:  # --type: Dict[str, Any]
         channel = stream['channel']['name'].lower()
         streamingSince = datetime.strptime(stream['created_at'],
                                            '%Y-%m-%dT%H:%M:%SZ')  # type: datetime
-        online[channel] = (streamingSince, stream['channel']['status'],
-                           stream['channel']['game'])
+        online[channel] = TwitchStatus(
+            streamingSince, stream['channel']['status'],
+            stream['channel']['game'])
     return online
 
 
-def channelStatusAndGame(channel: str) -> Tuple[Optional[datetime], str, str]:
+def channelStatusAndGame(channel: str) -> TwitchStatus:
     uri = '/kraken/channels/' + channel  # type: str
-    response, responseData = twitchCall(None, 'GET', uri)  # type: http.client.HTTPResponse, bytes
+    response, responseData = twitchCall(None, 'GET', uri)  # type: HTTPResponse, bytes
     if response.status != 200:
         return None
     channel_ = json.loads(responseData.decode('utf-8'))  # type: Dict[str, str]
-    return None, channel_['status'], channel_['game']
+    return TwitchStatus(None, channel_['status'], channel_['game'])

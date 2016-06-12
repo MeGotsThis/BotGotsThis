@@ -1,8 +1,8 @@
 ﻿from bot import config
 from contextlib import suppress
+from http.client import HTTPResponse
 from typing import Optional
 from ...data import CustomFieldArgs
-import http.client
 import urllib.error
 import urllib.request
 
@@ -16,8 +16,8 @@ def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
         url = url.replace('{streamer}', args.channel)
         with suppress(urllib.error.URLError):
             with urllib.request.urlopen(
-                    url, timeout=config.customMessageUrlTimeout) as req:  # --type: http.client.HTTPResponse
-                if not isinstance(req, http.client.HTTPResponse):
+                    url, timeout=config.customMessageUrlTimeout) as req:  # --type: HTTPResponse
+                if not isinstance(req, HTTPResponse):
                     return None
                 if int(req.status) == 200:
                     data = req.read().decode('utf-8')  # type: str

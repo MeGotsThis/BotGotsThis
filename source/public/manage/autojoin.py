@@ -30,7 +30,8 @@ def manageAutoJoin(args: ManageBotArgs) -> bool:
             return True
         cluster = twitch.twitchChatServer(args.message.lower[3]) or 'aws'
         result = args.database.saveAutoJoin(args.message.lower[3], 0, cluster)  # type: bool
-        priority = args.database.getAutoJoinsPriority(args.message.lower[3])  # type: Union[int, float]
+        priority = args.database.getAutoJoinsPriority(
+            args.message.lower[3])  # type: Union[int, float]
         if result is False:
             args.database.setAutoJoinServer(args.message.lower[3], cluster)
             
