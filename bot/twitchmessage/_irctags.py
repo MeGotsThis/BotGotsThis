@@ -41,6 +41,14 @@ class IrcMessageTagsKey(Hashable):
         if not isinstance(keyVendor, str):
             raise TypeError()
         return cls(*cls.parse(keyVendor))
+
+    @property
+    def key(self) -> str:
+        return self._key
+
+    @property
+    def vendor(self) -> Optional[str]:
+        return self._vendor
     
     def __str__(self) -> str:
         s = self._key
@@ -70,7 +78,7 @@ class IrcMessageTagsKey(Hashable):
         i = 0  # type: int
         
         if i == length:
-            raise ValueError()
+            return ParsedKeyVendor('', None)
         
         v = []  # type: List[str]
         isVendor = False  # type: bool
@@ -141,8 +149,9 @@ class IrcMessageTagsReadOnly(Mapping[IrcMessageTagsKey, TagValue]):
                             and not isinstance(items[key], str)):
                         raise TypeError()
                     self._items[self.fromKey(key)] = items[key]
-            elif isinstance(items, Iterable[Union[IrcMessageTagsKey,str,Tuple[KeyParam,str]]]):
-                for key in items: # --type: Union[IrcMessageTagsKey,str,Tuple[KeyParam,str]]
+            elif isinstance(items, Iterable[Union[IrcMessageTagsKey, str,
+                                                  Tuple[KeyParam, str]]]):
+                for key in items: # --type: Union[IrcMessageTagsKey, str, Tuple[KeyParam, str]]
                     if (isinstance(key, Sequence)
                             and len(key) >= 2):
                         if (key[1] is not True

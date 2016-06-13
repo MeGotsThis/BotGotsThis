@@ -177,6 +177,7 @@
     <Compile Include="source\__init__.py" />
     <Compile Include="timezonedb.py" />
     <Compile Include="twitchOauth.py" />
+    <Compile Include="unittests\twitchmessage\test_irctagskey.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bot\" />
