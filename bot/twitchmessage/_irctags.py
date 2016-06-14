@@ -1,3 +1,5 @@
+from collections.abc import Mapping as MappingAbc
+from collections.abc import MutableMapping as MutableMappingAbc
 from typing import Any, Dict, Hashable, Iterable, Iterator, List, Mapping
 from typing import MutableMapping, NamedTuple, Optional, Sequence, Tuple, Union
 
@@ -125,7 +127,8 @@ class IrcMessageTagsKey(Hashable):
         return ParsedKeyVendor(key, vendor)
 
 
-class IrcMessageTagsReadOnly(Mapping[IrcMessageTagsKey, TagValue]):
+# Mapping[IrcMessageTagsKey, TagValue]
+class IrcMessageTagsReadOnly(MappingAbc):
     __slots__ = '_items',
     
     def __new__(cls, items:Any=None) -> Any:
@@ -152,14 +155,16 @@ class IrcMessageTagsReadOnly(Mapping[IrcMessageTagsKey, TagValue]):
             elif isinstance(items, Iterable[Union[IrcMessageTagsKey, str,
                                                   Tuple[KeyParam, str]]]):
                 for key in items: # --type: Union[IrcMessageTagsKey, str, Tuple[KeyParam, str]]
-                    if (isinstance(key, Sequence)
+                    if isinstance(key, (IrcMessageTagsKey, str)):
+                        self._items[self.fromKey(key)] = True
+                    elif (isinstance(key, Sequence)
                             and len(key) >= 2):
                         if (key[1] is not True
                                 and not isinstance(key[1], str)):
                             raise TypeError()
                         self._items[self.fromKey(key[0])] = key[1]
                     else:
-                        self._items[self.fromKey(key)] = True
+                        raise TypeError()
             else:
                 raise TypeError()
 
@@ -191,7 +196,7 @@ class IrcMessageTagsReadOnly(Mapping[IrcMessageTagsKey, TagValue]):
                 s.append(str(k) + '='
                          + self.formatValue(self._items[k]))
         return ';'.join(s)
-    
+
     @staticmethod
     def formatValue(value) -> str:
         if not isinstance(value, str):
@@ -213,10 +218,11 @@ class IrcMessageTagsReadOnly(Mapping[IrcMessageTagsKey, TagValue]):
         length = len(tags)  # type: int
         i = 0  # type: int
         
-        if i == length:
-            raise ValueError()
-        
         items = {}  # type: Dict[IrcMessageTagsKey, TagValue]
+
+        if i == length:
+            return items
+        
         while True:
             if tags[i] == ';':
                 raise ValueError()
@@ -305,8 +311,8 @@ class IrcMessageTagsReadOnly(Mapping[IrcMessageTagsKey, TagValue]):
         return items
 
 
-class IrcMessageTags(IrcMessageTagsReadOnly,
-                     MutableMapping[IrcMessageTagsKey, TagValue]):
+# MutableMapping[IrcMessageTagsKey, TagValue]
+class IrcMessageTags(IrcMessageTagsReadOnly, MutableMappingAbc):
     __slots__ = '_items',
         
     def __setitem__(self,
