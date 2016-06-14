@@ -19,6 +19,11 @@ class IrcMessageParams:
         if middle is not None:
             if any([s for s in middle.split(' ') if len(s) and s[0] == ':']):
                 raise ValueError()
+        if middle is not None and (not middle or set(middle) == {' '}
+                                   or any(c in '\0\r\n' for c in middle)):
+            raise ValueError()
+        if trailing is not None and any(c in '\0\r\n' for c in trailing):
+            raise ValueError()
 
         self._middle = middle  # type: Optional[str]
         self._trailing = trailing  # type: Optional[str]
@@ -63,7 +68,7 @@ class IrcMessageParams:
     @staticmethod
     def parse(params:str) -> ParsedParams:
         if not isinstance(params, str):
-            raise ValueError()
+            raise TypeError()
         
         length = len(params)  # type: int
         i = 0  # type: int
