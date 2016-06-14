@@ -33,11 +33,23 @@ class IrcMessagePrefix:
                 and (nick is not None or user is not None
                      or host is not None)):
             raise ValueError()
-        if nick is not None and len(nick) == 0:
+        if (servername is not None
+                and (not servername
+                     or any(c in ' \0\r\n' for c in servername))):
             raise ValueError()
-        if user is not None and any(c in ' \0\r\n' for c in user):
+        if (nick is not None
+                and (not nick
+                     or any(c in ' \0\r\n' for c in nick))):
             raise ValueError()
-        
+        if (user is not None
+                and (not user
+                     or any(c in ' \0\r\n' for c in user))):
+            raise ValueError()
+        if (host is not None
+                and (not host
+                     or any(c in ' \0\r\n' for c in host))):
+            raise ValueError()
+
         self._servername = servername  # type: Optional[str]
         self._nick = nick  # type: Optional[str]
         self._user = user  # type: Optional[str]
@@ -91,7 +103,7 @@ class IrcMessagePrefix:
     @staticmethod
     def parse(params:str) -> ParsedPrefix:
         if not isinstance(params, str):
-            raise ValueError()
+            raise TypeError()
         
         length = len(params)  # type: int
         i = 0  # type: int
