@@ -108,11 +108,10 @@ class IrcMessage:
         if char == '@':
             i += 1
             
-            if i == length:
-                raise ValueError()
-            
             tags = IrcMessageTags()
             while True:
+                if i == length:
+                    raise ValueError()
                 if message[i] == ' ':
                     raise ValueError()
                 if message[i] == ';':
@@ -204,6 +203,8 @@ class IrcMessage:
                 
                 tags[tagkey] = value
                 
+                if i == length:
+                    raise ValueError()
                 if char == ' ':
                     char = message[i]
                     break
@@ -355,6 +356,8 @@ class IrcMessage:
                     raise ValueError()
             s.append(char)
         command = None  # type: Command
+        if not s:
+            raise ValueError()
         if s[0].isdigit():
             if len(s) != 3:
                 raise ValueError()
@@ -366,6 +369,7 @@ class IrcMessage:
         middle = None  # type: Optional[str]
         trailing = None  # type: Optional[str]
         if i != length:
+            hasTrailing = False  # type: bool
             s = []
             m = []  # type: List[str]
             t = []  # type: List[str]
@@ -391,6 +395,7 @@ class IrcMessage:
                 del m[-1]
             
             if char == ':':
+                hasTrailing = True
                 while i < length:
                     char = message[i]
                     i += 1
@@ -398,7 +403,7 @@ class IrcMessage:
                     t.append(char)
             
             middle = ''.join(m) if m else None
-            trailing = ''.join(t) if t else None
+            trailing = ''.join(t) if hasTrailing else None
         params = IrcMessageParams(middle, trailing)
         
         return ParsedMessage(tags, prefix, command, params)
