@@ -50,7 +50,6 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertIs(prefix.user, None)
         self.assertIs(prefix.host, None)
         self.assertEqual(str(prefix), 'localhost')
-        self.assertNotEqual(str(prefix), '127.0.0.1')
         with self.assertRaises(AttributeError):
             prefix.servername = 'localhost'
 
@@ -60,7 +59,6 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertIs(prefix.user, None)
         self.assertIs(prefix.host, None)
         self.assertEqual(str(prefix), '127.0.0.1')
-        self.assertNotEqual(str(prefix), 'localhost')
 
     def test_nick(self):
         prefix = IrcMessagePrefix(nick='BotGotsThis')
@@ -69,7 +67,6 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertIs(prefix.user, None)
         self.assertIs(prefix.host, None)
         self.assertEqual(str(prefix), 'BotGotsThis')
-        self.assertNotEqual(str(prefix), 'MeGotsThis')
         with self.assertRaises(AttributeError):
             prefix.nick = None
         with self.assertRaises(AttributeError):
@@ -84,7 +81,6 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertEqual(prefix.user, 'BotGotsThis')
         self.assertIs(prefix.host, None)
         self.assertEqual(str(prefix), 'MeGotsThis!BotGotsThis')
-        self.assertNotEqual(str(prefix), 'MeGotsThis')
 
     def test_nick_host(self):
         prefix = IrcMessagePrefix(nick='MeGotsThis', host='localhost')
@@ -102,7 +98,6 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertEqual(prefix.user, 'BotGotsThis')
         self.assertIs(prefix.host, 'localhost')
         self.assertEqual(str(prefix), 'MeGotsThis!BotGotsThis@localhost')
-        self.assertNotEqual(str(prefix), 'MeGotsThis')
 
     def test_from(self):
         self.assertRaises(TypeError, IrcMessagePrefix.fromPrefix, None)
