@@ -171,6 +171,8 @@ class IrcMessagePrefix:
                 if char in ' \0\r\n':
                     raise ValueError()
                 u.append(char)
+            if len(u) == 0:
+                raise ValueError()
             user = ''.join(u)
             
         if char == '@':
