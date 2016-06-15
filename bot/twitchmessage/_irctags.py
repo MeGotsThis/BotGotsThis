@@ -306,6 +306,8 @@ class IrcMessageTagsReadOnly(MappingAbc):
             items[tagkey] = value
             
             if i == length:
+                if char == ';':
+                    raise ValueError()
                 break
         
         return items
