@@ -154,6 +154,8 @@ class IrcMessagePrefix:
             raise ValueError()
         if len(s) == 0:
             raise ValueError()
+        if char == '.':
+            raise ValueError()
         ss = ''.join(s)  # type: str
         if isServerName:
             servername = ss

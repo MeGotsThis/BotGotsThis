@@ -109,6 +109,8 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertRaises(ValueError, IrcMessagePrefix.fromPrefix, ' a')
         self.assertRaises(ValueError, IrcMessagePrefix.fromPrefix, ' a ')
         self.assertRaises(ValueError, IrcMessagePrefix.fromPrefix, '.')
+        self.assertRaises(ValueError, IrcMessagePrefix.fromPrefix, 'a.')
+        self.assertRaises(ValueError, IrcMessagePrefix.fromPrefix, '.a')
         self.assertRaises(ValueError, IrcMessagePrefix.fromPrefix,
                           'a.b!c.d@e.f')
         self.assertRaises(ValueError, IrcMessagePrefix.fromPrefix,
@@ -166,6 +168,8 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertRaises(ValueError, IrcMessagePrefix.parse, ' a')
         self.assertRaises(ValueError, IrcMessagePrefix.parse, ' a ')
         self.assertRaises(ValueError, IrcMessagePrefix.parse, '.')
+        self.assertRaises(ValueError, IrcMessagePrefix.parse, 'a.')
+        self.assertRaises(ValueError, IrcMessagePrefix.parse, '.a')
         self.assertRaises(ValueError, IrcMessagePrefix.parse, 'a.b!c.d@e.f')
         self.assertRaises(ValueError, IrcMessagePrefix.parse, 'a.b!c.d@e.f')
         self.assertRaises(ValueError, IrcMessagePrefix.parse, 'a\n')
