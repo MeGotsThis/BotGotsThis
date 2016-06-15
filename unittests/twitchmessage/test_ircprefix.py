@@ -86,6 +86,14 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertEqual(str(prefix), 'MeGotsThis!BotGotsThis')
         self.assertNotEqual(str(prefix), 'MeGotsThis')
 
+    def test_nick_host(self):
+        prefix = IrcMessagePrefix(nick='MeGotsThis', host='localhost')
+        self.assertIs(prefix.servername, None)
+        self.assertEqual(prefix.nick, 'MeGotsThis')
+        self.assertIsNone(prefix.user)
+        self.assertEqual(prefix.host, 'localhost')
+        self.assertEqual(str(prefix), 'MeGotsThis@localhost')
+
     def test_nick_user_host(self):
         prefix = IrcMessagePrefix(nick='MeGotsThis', user='BotGotsThis',
                                   host='localhost')
