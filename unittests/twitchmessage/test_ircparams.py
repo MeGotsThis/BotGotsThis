@@ -51,12 +51,18 @@ class TestsIrcParams(unittest.TestCase):
         self.assertIs(params.isEmpty, False)
 
     def test_trailing(self):
+        params = IrcMessageParams(None, '')
+        self.assertIsNone(params.middle)
+        self.assertEqual(params.trailing, '')
+        self.assertEqual(str(params), ':')
+        self.assertEqual(params, IrcMessageParams(None, ''))
+        self.assertIs(params.isEmpty, False)
+
         params = IrcMessageParams(None, 'Kappa')
         self.assertIsNone(params.middle)
         self.assertEqual(params.trailing, 'Kappa')
         self.assertEqual(str(params), ':Kappa')
         self.assertEqual(params, IrcMessageParams(None, 'Kappa'))
-        self.assertIs(params.isEmpty, False)
 
         params = IrcMessageParams(None, ':Kappa')
         self.assertIsNone(params.middle)
@@ -102,6 +108,11 @@ class TestsIrcParams(unittest.TestCase):
         self.assertIsNone(params.trailing)
         self.assertEqual(params, IrcMessageParams('Kappa'))
 
+        params = IrcMessageParams.fromParams(':')
+        self.assertIsNone(params.middle)
+        self.assertEqual(params.trailing, '')
+        self.assertEqual(params, IrcMessageParams(None, ''))
+
         params = IrcMessageParams.fromParams(':Kappa')
         self.assertIsNone(params.middle)
         self.assertEqual(params.trailing, 'Kappa')
@@ -133,6 +144,8 @@ class TestsIrcParams(unittest.TestCase):
         self.assertEqual(IrcMessageParams.parse(''), ParsedParams(None, None))
         self.assertEqual(IrcMessageParams.parse('Kappa'),
                          ParsedParams('Kappa', None))
+        self.assertEqual(IrcMessageParams.parse(':'),
+                         ParsedParams(None, ''))
         self.assertEqual(IrcMessageParams.parse(':Kappa'),
                          ParsedParams(None, 'Kappa'))
         self.assertEqual(IrcMessageParams.parse('::Kappa'),

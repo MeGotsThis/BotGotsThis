@@ -75,7 +75,8 @@ class IrcMessageParams:
         
         if i == length:
             return ParsedParams(None, None)
-        
+
+        hasTrailing = False  # type: bool
         s = []  # type: List[str]
         m = []  # type: List[str]
         t = []  # type: List[str]
@@ -101,6 +102,7 @@ class IrcMessageParams:
             del m[-1]
         
         if char == ':':
+            hasTrailing = True
             while i < length:
                 char = params[i]
                 i += 1
@@ -111,6 +113,6 @@ class IrcMessageParams:
             raise ValueError()
         
         middle = ''.join(m) if m else None  # type: Optional[str]
-        trailing = ''.join(t) if t else None  # type: Optional[str]
+        trailing = ''.join(t) if hasTrailing else None  # type: Optional[str]
         
         return ParsedParams(middle, trailing)
