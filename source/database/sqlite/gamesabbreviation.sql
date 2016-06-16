@@ -448,6 +448,9 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yu
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yugiohlotd', 'Yu-Gi-Oh! Legacy of the Duelist');
 
 
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('smonk', 'Skullmonkeys');
+
+
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gdash', 'Geometry Dash');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('geometrydash', 'Geometry Dash');
 
