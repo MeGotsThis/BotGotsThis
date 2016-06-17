@@ -329,7 +329,9 @@ class IrcMessageTags(IrcMessageTagsReadOnly, MutableMappingAbc):
         elif isinstance(value, str):
             self._items[key] = value
         else:
-            raise ValueError()
+            if value is False:
+                raise ValueError
+            raise TypeError()
     
     def __delitem__(self, key:KeyParam):
         if isinstance(key, str):
