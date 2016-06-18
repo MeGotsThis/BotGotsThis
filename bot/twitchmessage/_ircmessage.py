@@ -288,6 +288,8 @@ class IrcMessage:
                         while i < length and message[i] == ' ':
                             i += 1
                         break
+                    if char == '.':
+                        raise ValueError()
                     if char == '@':
                         break
                     if char in ' \0\r\n':

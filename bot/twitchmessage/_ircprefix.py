@@ -170,6 +170,8 @@ class IrcMessagePrefix:
                     
                 if char == '@':
                     break
+                if char == '.':
+                    raise ValueError()
                 if char in ' \0\r\n':
                     raise ValueError()
                 u.append(char)
