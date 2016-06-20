@@ -184,12 +184,12 @@ class Channel:
         self._socket.messaging.sendChat(self, messages, priority)
 
     def updateFfzEmotes(self) -> None:
-        self._ffzCache = datetime.utcnow()
+        self._ffzCache = utils.now()
         emotes = getFfzEmotes(self._channel)
         self._ffzEmotes = emotes or self._ffzEmotes
 
     def updateBttvEmotes(self) -> None:
-        self._bttvCache = datetime.utcnow()
+        self._bttvCache = utils.now()
         emotes = getBttvEmotes(self._channel)
         self._bttvEmotes = emotes or self._bttvEmotes
 
@@ -244,7 +244,7 @@ class Socket:
         connection.connect((self._server, self._port))
 
         print('{time} {name} Connected {server}'.format(
-            time=datetime.utcnow(), name=self.name, server=self._server))
+            time=utils.now(), name=self.name, server=self._server))
         commands = [
             IrcMessage(None, None, 'PASS', IrcMessageParams(config.password)),
             IrcMessage(None, None, 'NICK', IrcMessageParams(config.botnick)),
@@ -263,8 +263,8 @@ class Socket:
             connection.send(message)
             self._logWrite(command)
         self._socket = connection
-        self.lastSentPing = datetime.utcnow()
-        self.lastPing = datetime.utcnow()
+        self.lastSentPing = utils.now()
+        self.lastPing = utils.now()
         globals.join.connected(self)
 
     def disconnect(self):
@@ -276,7 +276,7 @@ class Socket:
         self.lastSentPing = datetime.max
         self.lastPing = datetime.max
         print('{time} {name} Disconnected {server}'.format(
-            time=datetime.utcnow(), name=self.name, server=self._server))
+            time=utils.now(), name=self.name, server=self._server))
 
     def fileno(self) -> Optional[int]:
         return self._socket and self._socket.fileno()  # type: ignore
@@ -292,10 +292,10 @@ class Socket:
         try:
             message = str(command) + '\r\n'  # type: str
             messageBytes = message.encode('utf-8')  # type: bytes
-            timestamp = datetime.utcnow()  # type: datetime
+            timestamp = utils.now()  # type: datetime
             self._socket.send(messageBytes)
             if command.command == 'PING':
-                self.lastSentPing = datetime.utcnow()
+                self.lastSentPing = utils.now()
             if command.command == 'JOIN':
                 channel.onJoin()
                 globals.join.recordJoin()
@@ -329,7 +329,7 @@ class Socket:
                     continue
                 message = ircmsg.decode('utf-8')  # type: str
                 self._logRead(message)
-                source.ircmessage.parseMessage(self, message, datetime.utcnow())
+                source.ircmessage.parseMessage(self, message, utils.now())
         except ConnectionReset:
             self.disconnect()
         except LoginUnsuccessful:
@@ -340,16 +340,16 @@ class Socket:
         self.queueWrite(IrcMessage(None, None, 'PONG',
                                    IrcMessageParams(None, message)),
                         prepend=True)
-        self.lastPing = datetime.utcnow()
+        self.lastPing = utils.now()
 
     def sendPing(self) -> None:
-        sinceLastSend = datetime.utcnow() - self.lastSentPing  # type: timedelta
-        sinceLast = datetime.utcnow() - self.lastPing  # type: timedelta
+        sinceLastSend = utils.now() - self.lastSentPing  # type: timedelta
+        sinceLast = utils.now() - self.lastPing  # type: timedelta
         if sinceLastSend >= timedelta(minutes=1):
             self.queueWrite(IrcMessage(None, None, 'PING',
                                        IrcMessageParams(config.botnick)),
                             prepend=True)
-            self.lastSentPing = datetime.utcnow()
+            self.lastSentPing = utils.now()
         elif sinceLast >= timedelta(minutes=1, seconds=15):
             self.disconnect()
 
@@ -363,7 +363,7 @@ class Socket:
                   channel: Channel = None,
                   whisper: WhisperMessage = None,
                   timestamp: Optional[datetime] = None) -> None:
-        timestamp = timestamp or datetime.utcnow()
+        timestamp = timestamp or utils.now()
         if command.command == 'PASS':
             command = IrcMessage(command='PASS')
         files = []  # type: List[str]
@@ -424,7 +424,7 @@ class Socket:
             del self._channels[channel.channel]
         globals.join.part(channel.channel)
         print('{time} Parted {channel}'.format(
-            time=datetime.utcnow(), channel=channel.channel))
+            time=utils.now(), channel=channel.channel))
 
     def queueMessages(self) -> None:
         self.messaging.cleanOldTimestamps()
@@ -461,7 +461,7 @@ class MessagingQueue:
             lambda: datetime.min)  # type: Dict[str, datetime]
 
     def cleanOldTimestamps(self) -> None:
-        timestamp = datetime.utcnow()
+        timestamp = utils.now()
         msgDuration = timedelta(seconds=config.messageSpan)
         self._chatSent = [t for t in self._chatSent
                           if timestamp - t <= msgDuration]
@@ -513,7 +513,7 @@ class MessagingQueue:
                 self._whisperQueue.append(WhisperMessage(nick, message))
 
     def popChat(self) -> ChatMessage:
-        timestamp = datetime.utcnow()  # type: datetime
+        timestamp = utils.now()  # type: datetime
         nextMessage = self._getChatMessage(timestamp)  # type: ChatMessage
         if nextMessage:
             self._chatSent.append(timestamp)
@@ -573,7 +573,7 @@ class MessagingQueue:
 
     def popWhisper(self):
         if self._whisperQueue and len(self._whisperSent) < config.whiperLimit:
-            self._whisperSent.append(datetime.utcnow())
+            self._whisperSent.append(utils.now())
             return self._whisperQueue.popleft()
         return None
 

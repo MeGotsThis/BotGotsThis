@@ -18,7 +18,7 @@ class JoinThread(threading.Thread):
     
     def run(self) -> None:
         print('{time} Starting {name}'.format(
-            time=datetime.utcnow(), name=self.__class__.__name__))
+            time=utils.now(), name=self.__class__.__name__))
         while globals.running:
             try:
                 self.process()
@@ -26,10 +26,10 @@ class JoinThread(threading.Thread):
             except:
                 utils.logException()
         print('{time} Ending {name}'.format(
-            time=datetime.utcnow(), name=self.__class__.__name__))
+            time=utils.now(), name=self.__class__.__name__))
 
     def process(self) -> None:
-        timestamp = datetime.utcnow()  # type: datetime
+        timestamp = utils.now()  # type: datetime
         with self._joinTimesLock:
             self._joinTimes = [t for t in self._joinTimes
                                if timestamp - t <= joinDuration]
@@ -57,7 +57,7 @@ class JoinThread(threading.Thread):
     
     def connected(self, socket: 'data.Socket') -> None:
         with self._joinTimesLock:
-            self._joinTimes.append(datetime.utcnow())
+            self._joinTimes.append(utils.now())
     
     def disconnected(self, socket: 'data.Socket') -> None:
         with self._channelsLock:
@@ -68,7 +68,7 @@ class JoinThread(threading.Thread):
             self._channelJoined.discard(channel)
     
     def recordJoin(self) -> None:
-        timestamp = datetime.utcnow()  # type: datetime
+        timestamp = utils.now()  # type: datetime
         with self._joinTimesLock:
             self._joinTimes.append(timestamp)
     

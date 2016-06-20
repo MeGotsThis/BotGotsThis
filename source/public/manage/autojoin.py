@@ -17,7 +17,7 @@ def manageAutoJoin(args: ManageBotArgs) -> bool:
                 utils.ensureServer(autojoin.broadcaster, autojoin.priority,
                                    cluster)
                 print('{time} Set Server for {channel}'.format(
-                    time=datetime.utcnow(), channel=autojoin.broadcaster))
+                    time=utils.now(), channel=autojoin.broadcaster))
         args.send('Auto Join reload server complete')
         return True
     

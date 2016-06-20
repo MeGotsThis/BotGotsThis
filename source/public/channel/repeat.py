@@ -1,6 +1,6 @@
 ﻿import threading
 import time
-from bot import data
+from bot import data, utils
 from contextlib import suppress
 from datetime import datetime, timedelta
 from typing import Optional
@@ -96,8 +96,9 @@ class MessageRepeater(threading.Thread):
             del self._chat.sessionData['repeatThread']
     
     def process(self) -> None:
-        if datetime.utcnow() >= self._lastTime + self._duration:
-            self._lastTime = datetime.utcnow()
+        now = utils.now()
+        if now >= self._lastTime + self._duration:
+            self._lastTime = now
             self._chat.send(self._message)
             if self._chat.isMod:
                 with getDatabase() as database:  # --type: DatabaseBase

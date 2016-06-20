@@ -30,7 +30,7 @@ def timeoutUser(database: DatabaseBase,
             lambda: defaultdict(
                 lambda: (datetime.min, 0)))
     
-    timestamp = datetime.utcnow()  # type: datetime
+    timestamp = utils.now()  # type: datetime
     duration = timedelta(seconds=config.warningDuration)  # type: timedelta
     if timestamp - chat.sessionData['timeouts'][module][user][0] >= duration:
         level = baseLevel  # type: int

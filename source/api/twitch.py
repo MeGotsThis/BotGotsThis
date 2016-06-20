@@ -1,5 +1,5 @@
 ﻿from . import oauth
-from bot import globals
+from bot import globals, utils
 from collections import defaultdict
 from contextlib import closing, suppress
 from datetime import datetime, timedelta
@@ -144,7 +144,7 @@ def twitchChatServer(chat:Optional[str],
 
 def checkValidTwitchUser(user: str) -> bool:
     user = user.lower()
-    currentTime = datetime.utcnow()  # type: datetime
+    currentTime = utils.now()  # type: datetime
     if 'validTwitchUser' not in globals.globalSessionData:
         globals.globalSessionData['validTwitchUser'] = defaultdict(
             lambda: TwitchValid(False, datetime.min))

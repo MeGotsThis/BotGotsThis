@@ -1,6 +1,5 @@
 ﻿import select
 import threading
-from datetime import datetime
 from itertools import filterfalse
 from typing import Callable, List, Tuple
 from .. import data, globals, utils
@@ -17,7 +16,7 @@ class SocketsThread(threading.Thread):
     
     def run(self) -> None:
         print('{time} Starting {name}'.format(
-            time=datetime.utcnow(), name=self.__class__.__name__))
+            time=utils.now(), name=self.__class__.__name__))
         
         while globals.running:
             try:
@@ -27,7 +26,7 @@ class SocketsThread(threading.Thread):
         self.terminate()
         
         print('{time} Ending {name}'.format(
-            time=datetime.utcnow(), name=self.__class__.__name__))
+            time=utils.now(), name=self.__class__.__name__))
 
     def register(self, socketConn: 'data.Socket') -> None:
         self._socketConnections.append(socketConn)

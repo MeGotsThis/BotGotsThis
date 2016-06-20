@@ -11,6 +11,10 @@ import traceback
 ExceptionInfo = Tuple[Optional[type], Optional[BaseException],
                       Optional[TracebackType]]
 
+
+def now() -> datetime:
+    return datetime.utcnow()
+
 def joinChannel(broadcaster: str,
                 priority: Union[int, float]=float('inf'),
                 cluster: str='aws') -> bool:
@@ -73,7 +77,7 @@ def logIrcMessage(filename: str,
                   timestamp: Optional[datetime]=None) -> None:
     if config.ircLogFolder is None:
         return
-    timestamp = timestamp or datetime.utcnow()
+    timestamp = timestamp or now()
     with open(os.path.join(config.ircLogFolder, filename), 'a',
               encoding='utf-8') as file:  # --type: TextIO
         file.write(
@@ -85,7 +89,7 @@ def logException(extraMessage: str=None,
                  timestamp: Optional[datetime]=None) -> None:
     if config.exceptionLog is None:
         return
-    timestamp = timestamp or datetime.utcnow()
+    timestamp = timestamp or now()
     exceptInfo = sys.exc_info()  # type: ExceptionInfo
     excep = traceback.format_exception(*exceptInfo)  # type: ignore
     with open(config.exceptionLog, 'a', encoding='utf-8') as file:  # --type: TextIO

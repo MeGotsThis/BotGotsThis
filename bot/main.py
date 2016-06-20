@@ -1,5 +1,4 @@
 ﻿# Import some necessary libraries.
-import datetime
 import importlib
 import pkgutil
 import source.private.autoload as privateAuto
@@ -16,7 +15,7 @@ from .thread.socket import SocketsThread
 
 
 def main(argv: Optional[List[str]]=None) -> int:
-    print('{time} Starting'.format(time=datetime.datetime.utcnow()))
+    print('{time} Starting'.format(time=utils.now()))
     globals.running = True
     globals.sockets = SocketsThread(name='Sockets Thread')
 
@@ -60,4 +59,4 @@ def main(argv: Optional[List[str]]=None) -> int:
         utils.logException()
         raise
     finally:
-        print('{time} Ended'.format(time=datetime.datetime.utcnow()))
+        print('{time} Ended'.format(time=utils.now()))

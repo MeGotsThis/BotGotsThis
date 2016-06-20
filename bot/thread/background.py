@@ -12,7 +12,7 @@ class BackgroundTasker(threading.Thread):
     
     def run(self) -> None:
         print('{time} Starting {name}'.format(
-            time=datetime.utcnow(), name=self.__class__.__name__))
+            time=utils.now(), name=self.__class__.__name__))
         try:
             while globals.running:
                 self.runTasks()
@@ -22,7 +22,7 @@ class BackgroundTasker(threading.Thread):
             raise
         finally:
             print('{time} Ending {name}'.format(
-                time=datetime.utcnow(), name=self.__class__.__name__))
+                time=utils.now(), name=self.__class__.__name__))
     
     def addTask(self,
                 task: Callable[[datetime], None],
@@ -30,7 +30,7 @@ class BackgroundTasker(threading.Thread):
         self._tasks.append(Task(task, interval))
     
     def runTasks(self) -> None:
-        timestamp = datetime.utcnow()  # type: datetime
+        timestamp = utils.now()  # type: datetime
         for task in self._tasks:  # --type: Task
             if timestamp >= task.timestamp + task.interval:
                 threading.Thread(
