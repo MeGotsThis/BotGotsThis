@@ -3,69 +3,95 @@ import configparser
 import os
 import sys
 
-if not os.path.isfile('twitch.ini'):
-    print('Missing twitch.ini')
-    sys.exit(0)
+botnick = ''  # type: str
+password = ''  # type: str
+owner = ''  # type: str
 
-if not os.path.isfile('config.ini'):
-    print('Missing config.ini')
-    sys.exit(0)
+awsServer = ''  # type: str
+awsPort = 0  # type: int
 
-ini = configparser.ConfigParser()
-ini.read('twitch.ini')
+messageLimit = 500  # type: int
+modLimit = 100  # type: int
+modSpamLimit = 100  # type: int
+publicLimit = 20  # type: int
+publicDelay = 1  # type: float
+messageSpan = 30  # type: float
+whiperLimit = 100  # type: float
+whiperSpan = 30  # type: float
 
-botnick = str(ini['BOT']['botnick']).lower()  # type: str
-password = str(ini['BOT']['password'])  # type: str
-owner = str(ini['BOT']['owner']).lower()  # type: str
+customMessageCooldown = 5  # type: float
+customMessageUserCooldown = 20  # type: float
+customMessageUrlTimeout = 5  # type: float
 
-ini = configparser.ConfigParser()
-ini.read('config.ini')
+spamModeratorCooldown = 20  # type: float
 
-awsServer = str(ini['TWITCH']['awsServer'])  # type: str
-awsPort = int(ini['TWITCH']['awsPort'])  # type: int
-
-messageLimit = int(ini['BOT']['messageLimit'])  # type: int
-modLimit = min(int(ini['BOT']['modLimit']), 100)  # type: int
-modSpamLimit = min(int(ini['BOT']['modSpamLimit']), 100)  # type: int
-publicLimit = min(int(ini['BOT']['publicLimit']), 20)  # type: int
-publicDelay = float(ini['BOT']['publicDelay'])  # type: float
-messageSpan = float(ini['BOT']['messageSpan'])  # type: float
-whiperLimit = float(ini['BOT']['whiperLimit'])  # type: float
-whiperSpan = float(ini['BOT']['whiperSpan'])  # type: float
-
-customMessageCooldown = float(ini['BOT']['customMessageCooldown'])  # type: float
-if customMessageCooldown <= 0:
-    customMessageCooldown = 20
-customMessageUserCooldown = float(ini['BOT']['customMessageUserCooldown'])  # type: float
-if customMessageUserCooldown <= 0:
-    customMessageUserCooldown = 20
-customMessageUrlTimeout = float(ini['BOT']['customMessageUrlTimeout'])  # type: float
-if customMessageUrlTimeout <= 0:
-    customMessageUrlTimeout = 5
-
-spamModeratorCooldown = float(ini['BOT']['spamModeratorCooldown'])  # type: float
-if spamModeratorCooldown <= 0:
-    spamModeratorCooldown = 20
-
-warningDuration = float(ini['BOT']['warningDuration'])  # type: float
-if warningDuration <= 0:
-    warningDuration = 20
+warningDuration = 20  # type: float
 moderatorDefaultTimeout = [0, 0, 0]  # type: List[int]
-moderatorDefaultTimeout[0] = int(ini['BOT']['moderatorDefaultTimeout0'])
-if moderatorDefaultTimeout[0] <= 0:
-    moderatorDefaultTimeout[0] = 0
-moderatorDefaultTimeout[1] = int(ini['BOT']['moderatorDefaultTimeout1'])
-if moderatorDefaultTimeout[1] <= 0:
-    moderatorDefaultTimeout[1] = 0
-moderatorDefaultTimeout[2] = int(ini['BOT']['moderatorDefaultTimeout2'])
-if moderatorDefaultTimeout[2] <= 0:
-    moderatorDefaultTimeout[2] = 0
 
-joinLimit = min(int(ini['BOT']['joinLimit']), 50)  # type: int
-joinPerSecond = float(ini['BOT']['joinPerSecond'])  # type: float
-joinPerSecond = joinPerSecond if joinPerSecond > 0 else 20
+joinLimit = 50  # type: int
+joinPerSecond = 15  # type: float
 
-ircLogFolder = str(ini['BOT']['ircLogFolder'])  # type: str
-exceptionLog = str(ini['BOT']['exceptionLog'])  # type: str
-if ircLogFolder and not os.path.isdir(ircLogFolder):
-    os.mkdir(ircLogFolder)
+ircLogFolder = ''  # type: str
+exceptionLog = ''  # type: str
+
+
+if os.path.isfile('twitch.ini'):
+    ini = configparser.ConfigParser()
+    ini.read('twitch.ini')
+
+    botnick = str(ini['BOT']['botnick']).lower()
+    password = str(ini['BOT']['password'])
+    owner = str(ini['BOT']['owner']).lower()
+
+if os.path.isfile('config.ini'):
+    ini = configparser.ConfigParser()
+    ini.read('config.ini')
+
+    awsServer = str(ini['TWITCH']['awsServer'])
+    awsPort = int(ini['TWITCH']['awsPort'])
+
+    messageLimit = int(ini['BOT']['messageLimit'])
+    modLimit = min(int(ini['BOT']['modLimit']), 100)
+    modSpamLimit = min(int(ini['BOT']['modSpamLimit']), 100)
+    publicLimit = min(int(ini['BOT']['publicLimit']), 20)
+    publicDelay = float(ini['BOT']['publicDelay'])
+    messageSpan = float(ini['BOT']['messageSpan'])
+    whiperLimit = float(ini['BOT']['whiperLimit'])
+    whiperSpan = float(ini['BOT']['whiperSpan'])
+
+    customMessageCooldown = float(ini['BOT']['customMessageCooldown'])
+    if customMessageCooldown <= 0:
+        customMessageCooldown = 20
+    customMessageUserCooldown = float(ini['BOT']['customMessageUserCooldown'])
+    if customMessageUserCooldown <= 0:
+        customMessageUserCooldown = 20
+    customMessageUrlTimeout = float(ini['BOT']['customMessageUrlTimeout'])
+    if customMessageUrlTimeout <= 0:
+        customMessageUrlTimeout = 5
+
+    spamModeratorCooldown = float(ini['BOT']['spamModeratorCooldown'])
+    if spamModeratorCooldown <= 0:
+        spamModeratorCooldown = 20
+
+    warningDuration = float(ini['BOT']['warningDuration'])
+    if warningDuration <= 0:
+        warningDuration = 20
+    moderatorDefaultTimeout = [0, 0, 0]
+    moderatorDefaultTimeout[0] = int(ini['BOT']['moderatorDefaultTimeout0'])
+    if moderatorDefaultTimeout[0] <= 0:
+        moderatorDefaultTimeout[0] = 0
+    moderatorDefaultTimeout[1] = int(ini['BOT']['moderatorDefaultTimeout1'])
+    if moderatorDefaultTimeout[1] <= 0:
+        moderatorDefaultTimeout[1] = 0
+    moderatorDefaultTimeout[2] = int(ini['BOT']['moderatorDefaultTimeout2'])
+    if moderatorDefaultTimeout[2] <= 0:
+        moderatorDefaultTimeout[2] = 0
+
+    joinLimit = min(int(ini['BOT']['joinLimit']), 50)
+    joinPerSecond = float(ini['BOT']['joinPerSecond'])
+    joinPerSecond = joinPerSecond if joinPerSecond > 0 else 20
+
+    ircLogFolder = str(ini['BOT']['ircLogFolder'])
+    exceptionLog = str(ini['BOT']['exceptionLog'])
+    if ircLogFolder and not os.path.isdir(ircLogFolder):
+        os.mkdir(ircLogFolder)
