@@ -1,10 +1,10 @@
 ﻿from bot import data
 from bot.data.error import LoginUnsuccessful
 
-messageLimit = 'Your message was not sent because you are '
-messageLimit += 'sending messages too quickly.'
-messageIdentical = 'Your message was not sent because it is identical to the '
-messageIdentical += 'previous one you sent, less than 30 seconds ago.'
+messageLimit = ('Your message was not sent because you are '
+                'sending messages too quickly.')  # type: str
+messageIdentical = ('Your message was not sent because it is identical to the '
+                    'previous one you sent, less than 30 seconds ago.')  # type: str
 
 
 def parse(chat: 'data.Channel',

@@ -3,8 +3,8 @@ import source.ircmessage
 import threading
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
-from typing import Any, Dict, Iterable, List, Optional, NamedTuple, Set
-from typing import Tuple, Union
+from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple
+from typing import Optional, Set, Tuple, TypeVar, Union
 from source.api.bttv import getBroadcasterEmotes as getBttvEmotes
 from source.api.ffz import getBroadcasterEmotes as getFfzEmotes
 from .error import ConnectionReset, LoginUnsuccessful
@@ -29,6 +29,55 @@ disallowedCommands = {
     '/disconnect',
     }  # type: Set[str]
 
+_KT = TypeVar('_KT')
+_VT = TypeVar('_VT')
+
+
+class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
+    # Source: http://stackoverflow.com/a/6190500/562769
+    def __init__(self,
+                 default_factory: Optional[Callable[[], _VT]]=None,
+                 *args,
+                 **kwargs) -> None:
+        if (default_factory is not None
+                and not isinstance(default_factory, Callable)):  # type: ignore --
+            raise TypeError('first argument must be callable')
+        OrderedDict.__init__(self, *args, **kwargs)
+        self.default_factory = default_factory
+
+    def __getitem__(self, key: _KT) -> _VT:
+        try:
+            return OrderedDict.__getitem__(self, key)
+        except KeyError:
+            return self.__missing__(key)
+
+    def __missing__(self, key: _KT) -> _VT:
+        if self.default_factory is None:
+            raise KeyError(key)
+        self[key] = value = self.default_factory()
+        return value
+
+    def __reduce__(self):
+        if self.default_factory is None:
+            args = tuple()
+        else:
+            args = self.default_factory,
+        return type(self), args, None, None, self.items()
+
+    def copy(self) -> 'DefaultOrderedDict[_KT, _VT]':
+        return self.__copy__()
+
+    def __copy__(self) -> 'DefaultOrderedDict[_KT, _VT]':
+        return type(self)(self.default_factory, self)
+
+    def __deepcopy__(self, memo: Any) -> 'DefaultOrderedDict[_KT, _VT]':
+        import copy
+        return type(self)(self.default_factory,
+                          copy.deepcopy(self.items()))
+
+    def __repr__(self) -> str:
+        return 'OrderedDefaultDict(%s, %s)' % (self.default_factory,
+                                               OrderedDict.__repr__(self))
 
 class Channel:
     __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',
@@ -456,7 +505,7 @@ class MessagingQueue:
         self._queueLock = threading.Lock()  # type: threading.Lock
         self._chatSent = []  # type: List[datetime]
         self._whisperSent = []  # type: List[datetime]
-        self._lowQueueRecent = OrderedDict()  # type: Dict[str, Any]
+        self._lowQueueRecent = OrderedDict()  # type: OrderedDict[str, Any]
         self._publicTime = defaultdict(
             lambda: datetime.min)  # type: Dict[str, datetime]
 
@@ -474,16 +523,23 @@ class MessagingQueue:
                  messages: Union[str, Iterable[str]],
                  priority: int = 1,
                  bypass: bool = False) -> None:
+        if not isinstance(channel, Channel):
+            raise TypeError()
+        listMessages = None  # type: List[str]
         if isinstance(messages, str):
-            messages = messages,
-        elif not isinstance(messages, Iterable):
+            listMessages = [messages]
+        elif isinstance(messages, Iterable):
+            listMessages = list(messages)
+        else:
+            raise TypeError()
+        if any(msg for msg in listMessages if not isinstance(msg, str)):
             raise TypeError()
         if (priority < -len(self._chatQueues)
             or priority >= len(self._chatQueues)):
             raise ValueError()
-        whispers = defaultdict(list)  # type: defaultdict
+        whispers = DefaultOrderedDict(list)  # type: DefaultOrderedDict[str, List[str]]
         with self._queueLock:
-            for message in messages:  # --type: str
+            for message in listMessages:  # --type: str
                 if not message:
                     continue
                 if (not bypass
@@ -493,7 +549,7 @@ class MessagingQueue:
                     tokens = message.split(' ', 2)
                     if len(tokens) < 3:
                         continue
-                    whispers[tokens[1].lower()].append((tokens[2], priority))
+                    whispers[tokens[1].lower()].append(tokens[2])
                 else:
                     self._chatQueues[priority].append(
                         ChatMessage(channel, message))
@@ -512,14 +568,14 @@ class MessagingQueue:
             for message in messages:  # --type: str
                 self._whisperQueue.append(WhisperMessage(nick, message))
 
-    def popChat(self) -> ChatMessage:
+    def popChat(self) -> Optional[ChatMessage]:
         timestamp = utils.now()  # type: datetime
-        nextMessage = self._getChatMessage(timestamp)  # type: ChatMessage
+        nextMessage = self._getChatMessage(timestamp)  # type: Optional[ChatMessage]
         if nextMessage:
             self._chatSent.append(timestamp)
         return nextMessage
 
-    def _getChatMessage(self, timestamp: datetime) -> ChatMessage:
+    def _getChatMessage(self, timestamp: datetime) -> Optional[ChatMessage]:
         publicDelay = timedelta(seconds=config.publicDelay)  # type: timedelta
         isModGood = len(self._chatSent) < config.modLimit  # type: bool
         isModSpamGood = len(self._chatSent) < config.modSpamLimit  # type: bool
@@ -529,24 +585,22 @@ class MessagingQueue:
                 for queue in self._chatQueues:  # --type: List[ChatMessage]
                     for i, message in enumerate(
                             queue):  # --type: i, ChatMessage
-                        last = self._publicTime[
-                            message.channel.channel]  # type: datetime
+                        last = self._publicTime[message.channel.channel]  # type: datetime
                         if (self._isMod(message.channel)
                             or timestamp - last < publicDelay):
                             continue
+                        self._publicTime[message.channel.channel] = timestamp
                         del queue[i]
                         return message
             if isModGood:
                 for queue in self._chatQueues[:-1]:  # --type: List[ChatMessage]
-                    for i, message in enumerate(
-                            queue):  # --type: i, ChatMessage
+                    for i, message in enumerate(queue):  # --type: i, ChatMessage
                         if not self._isMod(message.channel):
                             continue
                         del queue[i]
                         return message
                 else:
-                    for i, message in enumerate(
-                            self._chatQueues[-1]):  # --type: i, ChatMessage
+                    for i, message in enumerate(self._chatQueues[-1]):  # --type: i, ChatMessage
                         if message.channel.channel in self._lowQueueRecent:
                             continue
                         if not self._isMod(message.channel):
@@ -554,24 +608,24 @@ class MessagingQueue:
                         del self._chatQueues[-1][i]
                         self._lowQueueRecent[message.channel.channel] = True
                         return message
-            if isModSpamGood:
-                for i, message in enumerate(
-                        self._chatQueues[-1]):  # --type: i, ChatMessage
-                    if message.channel.channel not in self._lowQueueRecent:
-                        continue
-                    if not self._isMod(message.channel):
-                        continue
-                    del self._lowQueueRecent[message.channel.channel]
-                    del self._chatQueues[-1][i]
-                    self._lowQueueRecent[message.channel.channel] = True
-                    return message
+            if isModSpamGood and self._chatQueues[-1]:
+                for channel in self._lowQueueRecent:
+                    for i, message in enumerate(self._chatQueues[-1]):  # --type: i, ChatMessage
+                        if message.channel.channel != channel:
+                            continue
+                        if not self._isMod(message.channel):
+                            continue
+                        del self._chatQueues[-1][i]
+                        self._lowQueueRecent[message.channel.channel] = True
+                        self._lowQueueRecent.move_to_end(message.channel.channel)
+                        return message
         return None
 
     @staticmethod
     def _isMod(channel: Channel) -> bool:
         return channel.isMod or config.botnick == channel.channel
 
-    def popWhisper(self):
+    def popWhisper(self) -> Optional[WhisperMessage]:
         if self._whisperQueue and len(self._whisperSent) < config.whiperLimit:
             self._whisperSent.append(utils.now())
             return self._whisperQueue.popleft()
