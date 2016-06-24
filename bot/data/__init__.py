@@ -79,6 +79,7 @@ class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
         return 'OrderedDefaultDict(%s, %s)' % (self.default_factory,
                                                OrderedDict.__repr__(self))
 
+
 class Channel:
     __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',
                  '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
@@ -248,7 +249,7 @@ class Socket:
                  name: str,
                  server: str,
                  port: int) -> None:
-        self._writeQueue = deque()  # type: deque
+        self._writeQueue = deque()  # type: deque[Tuple[Tuple[IrcMessage], dict]]
         self._name = name  # type: str
         self._server = server  # type: str
         self._port = port  # type: int
@@ -262,6 +263,18 @@ class Socket:
     @property
     def name(self) -> str:
         return self._name
+
+    @property
+    def server(self) -> str:
+        return self._server
+
+    @property
+    def port(self) -> int:
+        return self._port
+
+    @property
+    def address(self) -> Tuple[str, int]:
+        return self._server, self._port
 
     @property
     def socket(self) -> Optional[socketAlias]:
@@ -281,8 +294,11 @@ class Socket:
         return self._messaging
 
     @property
-    def writeQueue(self) -> deque:
+    def writeQueue(self) -> 'deque[Tuple[Tuple[IrcMessage], dict]]':
         return self._writeQueue
+
+    def fileno(self) -> Optional[int]:
+        return self._socket and self._socket.fileno()  # type: ignore --
 
     def connect(self) -> None:
         if self._socket is not None:
@@ -290,10 +306,19 @@ class Socket:
 
         connection = socket.socket(socket.AF_INET,
                                    socket.SOCK_STREAM)  # type: socketAlias
-        connection.connect((self._server, self._port))
+        connection.connect(self.address)
 
         print('{time} {name} Connected {server}'.format(
-            time=utils.now(), name=self.name, server=self._server))
+            time=utils.now(), name=self.name, server=self.server))
+        self.login(connection)
+        self._socket = connection
+        self.lastSentPing = utils.now()
+        self.lastPing = utils.now()
+        globals.join.connected(self)
+
+    def login(self, connection: socketAlias) -> None:
+        if not isinstance(connection, socketAlias):
+            raise TypeError()
         commands = [
             IrcMessage(None, None, 'PASS', IrcMessageParams(config.password)),
             IrcMessage(None, None, 'NICK', IrcMessageParams(config.botnick)),
@@ -311,14 +336,10 @@ class Socket:
             message = (str(command) + '\r\n').encode('utf-8')  # type: bytes
             connection.send(message)
             self._logWrite(command)
-        self._socket = connection
-        self.lastSentPing = utils.now()
-        self.lastPing = utils.now()
-        globals.join.connected(self)
 
     def disconnect(self):
         if self._socket is None:
-            return
+            raise ConnectionError()
         self._socket.close()
         globals.join.disconnected(self)
         self._socket = None
@@ -327,24 +348,21 @@ class Socket:
         print('{time} {name} Disconnected {server}'.format(
             time=utils.now(), name=self.name, server=self._server))
 
-    def fileno(self) -> Optional[int]:
-        return self._socket and self._socket.fileno()  # type: ignore
-
     def write(self,
               command: IrcMessage, *,
-              channel: Channel = None,
-              whisper: WhisperMessage = None) -> None:
+              channel: Optional[Channel]=None,
+              whisper: Optional[WhisperMessage]=None) -> None:
         if not isinstance(command, IrcMessage):
             raise TypeError()
         if self._socket is None:
-            return
+            raise ConnectionError()
         try:
             message = str(command) + '\r\n'  # type: str
             messageBytes = message.encode('utf-8')  # type: bytes
             timestamp = utils.now()  # type: datetime
             self._socket.send(messageBytes)
             if command.command == 'PING':
-                self.lastSentPing = utils.now()
+                self.lastSentPing = timestamp
             if command.command == 'JOIN':
                 channel.onJoin()
                 globals.join.recordJoin()
@@ -357,11 +375,15 @@ class Socket:
             self.disconnect()
 
     def flushWrite(self) -> None:
+        if self._socket is None:
+            raise ConnectionError()
         while self.writeQueue:
             item = self.writeQueue.popleft()  # type: Tuple[Tuple[IrcMessage], dict]
             self.write(*item[0], **item[1])  # type: ignore
 
     def read(self) -> None:
+        if self._socket is None:
+            raise ConnectionError()
         try:
             ircmsgs = lastRecv = bytes(self._socket.recv(2048))  # type: bytes
             while lastRecv != b'' and lastRecv[-2:] != b'\r\n':
@@ -392,13 +414,14 @@ class Socket:
         self.lastPing = utils.now()
 
     def sendPing(self) -> None:
-        sinceLastSend = utils.now() - self.lastSentPing  # type: timedelta
-        sinceLast = utils.now() - self.lastPing  # type: timedelta
+        now = utils.now()
+        sinceLastSend = now - self.lastSentPing  # type: timedelta
+        sinceLast = now - self.lastPing  # type: timedelta
         if sinceLastSend >= timedelta(minutes=1):
             self.queueWrite(IrcMessage(None, None, 'PING',
                                        IrcMessageParams(config.botnick)),
                             prepend=True)
-            self.lastSentPing = utils.now()
+            self.lastSentPing = now
         elif sinceLast >= timedelta(minutes=1, seconds=15):
             self.disconnect()
 
@@ -409,9 +432,9 @@ class Socket:
 
     def _logWrite(self,
                   command: IrcMessage, *,
-                  channel: Channel = None,
-                  whisper: WhisperMessage = None,
-                  timestamp: Optional[datetime] = None) -> None:
+                  channel: Optional[Channel]=None,
+                  whisper: Optional[WhisperMessage]=None,
+                  timestamp: Optional[datetime]=None) -> None:
         timestamp = timestamp or utils.now()
         if command.command == 'PASS':
             command = IrcMessage(command='PASS')
@@ -420,6 +443,10 @@ class Socket:
         files.append('{bot}-{socket}.log'.format(bot=config.botnick,
                                                  socket=self.name))
         logs.append('> ' + str(command))
+        if whisper and channel:
+            for file, log in zip(files, logs):  # --type: str, str
+                utils.logIrcMessage(file, log, timestamp)
+            raise ValueError()
         if whisper:
             files.append('@{nick}@whisper.log'.format(nick=whisper.nick))
             logs.append('{bot}: {message}'.format(bot=config.botnick,
@@ -431,7 +458,7 @@ class Socket:
                     message=whisper.message))
             files.append('{bot}-Raw Whisper.log'.format(bot=config.botnick))
             logs.append('> ' + str(command))
-        elif channel:
+        if channel:
             files.append(
                 '{channel}#full.log'.format(channel=channel.ircChannel))
             logs.append('> ' + str(command))
@@ -445,18 +472,24 @@ class Socket:
             utils.logIrcMessage(file, log, timestamp)
 
     def queueWrite(self,
-                   command: IrcMessage, *,
-                   channel: Channel = None,
-                   whisper: WhisperMessage = None,
-                   prepend: bool = False) -> None:
-        if not isinstance(command, IrcMessage):
+                   message: IrcMessage, *,
+                   channel: Optional[Channel]=None,
+                   whisper: Optional[WhisperMessage]=None,
+                   prepend: bool=False) -> None:
+        if not isinstance(message, IrcMessage):
             raise TypeError()
         kwargs = {}  # type: dict
         if channel:
+            if not isinstance(channel, Channel):
+                raise TypeError()
             kwargs['channel'] = channel
         if whisper:
+            if not isinstance(whisper, WhisperMessage):
+                raise TypeError()
             kwargs['whisper'] = whisper
-        item = (command,), kwargs
+        if channel and whisper:
+            raise ValueError()
+        item = (message,), kwargs  # type: Tuple[Tuple[IrcMessage], dict]
         if prepend:
             self.writeQueue.appendleft(item)
         else:
@@ -468,6 +501,8 @@ class Socket:
 
     def partChannel(self, channel: Channel) -> None:
         with self._channelsLock:
+            if channel.channel not in self._channels:
+                return
             self.queueWrite(IrcMessage(None, None, 'PART',
                                        IrcMessageParams(channel.ircChannel)))
             del self._channels[channel.channel]
@@ -477,19 +512,16 @@ class Socket:
 
     def queueMessages(self) -> None:
         self.messaging.cleanOldTimestamps()
-        for message in iter(self.messaging.popWhisper,
-                            None):  # --type: WhisperMessage
+        for whisperMessage in iter(self.messaging.popWhisper, None):  # --type: WhisperMessage
+            ircMsg = '.w {nick} {message}'.format(
+                nick=whisperMessage.nick,
+                message=whisperMessage.message)[:config.messageLimit]
             self.queueWrite(
-                IrcMessage(
-                    None, None, 'PRIVMSG',
-                    IrcMessageParams(
-                        globals.groupChannel.ircChannel,
-                        '.w {nick} {message}'.format(
-                            nick=message.nick,
-                            message=message.message)[:config.messageLimit])),
-                whisper=message)
-        for message in iter(self.messaging.popChat,
-                            None):  # --type: ChatMessage
+                IrcMessage(None, None, 'PRIVMSG',
+                           IrcMessageParams(globals.groupChannel.ircChannel,
+                                            ircMsg)),
+                whisper=whisperMessage)
+        for message in iter(self.messaging.popChat, None):  # --type: ChatMessage
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
                            IrcMessageParams(
