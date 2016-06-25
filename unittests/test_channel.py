@@ -203,8 +203,12 @@ class TestChannel(unittest.TestCase):
         self.assertEqual(self.channel.twitchStatus, '')
 
     def test_twitchStatus_set_none(self):
+        self.channel.twitchStatus = None
+        self.assertIsNone(self.channel.twitchStatus)
+
+    def test_twitchStatus_set_bytes(self):
         with self.assertRaises(TypeError):
-            self.channel.twitchStatus = None
+            self.channel.twitchStatus = b''
 
     def test_twitchStatus_set(self):
         self.channel.twitchStatus = 'Kappa'
@@ -214,8 +218,12 @@ class TestChannel(unittest.TestCase):
         self.assertEqual(self.channel.twitchGame, '')
 
     def test_twitchGame_set_none(self):
+        self.channel.twitchGame = None
+        self.assertIsNone(self.channel.twitchGame)
+
+    def test_twitchGame_set_bytes(self):
         with self.assertRaises(TypeError):
-            self.channel.twitchGame = None
+            self.channel.twitchGame = b''
 
     def test_twitchGame_set(self):
         self.channel.twitchGame = 'Kappa'

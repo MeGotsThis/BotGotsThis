@@ -211,7 +211,7 @@ class Channel:
 
     @twitchStatus.setter
     def twitchStatus(self, value: str):
-        if not isinstance(value, str):
+        if value is not None and not isinstance(value, str):
             raise TypeError()
         self._twitchStatus = value
 
@@ -221,7 +221,7 @@ class Channel:
 
     @twitchGame.setter
     def twitchGame(self, value: str):
-        if not isinstance(value, str):
+        if value is not None and not isinstance(value, str):
             raise TypeError()
         self._twitchGame = value
 

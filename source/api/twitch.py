@@ -17,8 +17,8 @@ import urllib.parse
 DateTuple = Tuple[int, int, int, int, int, int, int, int, int]
 TwitchStatus = NamedTuple('TwitchStatus',
                           [('streaming', Optional[datetime]),
-                           ('status', str),
-                           ('game', str)])
+                           ('status', Optional[str]),
+                           ('game', Optional[str])])
 TwitchEmotes = Dict[str, List[Dict[str, Union[str, int]]]]
 TwitchValid = NamedTuple('TwitchValid', [('isValid', bool),
                                          ('timestamp', datetime)])
