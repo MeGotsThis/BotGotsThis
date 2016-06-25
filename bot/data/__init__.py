@@ -92,6 +92,12 @@ class Channel:
                  channel: str,
                  socket: 'Socket',
                  joinPriority: Union[int, float] = float('inf')) -> None:
+        if not isinstance(channel, str):
+            raise TypeError()
+        if not isinstance(socket, Socket):
+            raise TypeError()
+        if not channel:
+            raise ValueError()
         self._channel = channel  # type: str
         self._ircChannel = '#' + channel  # type: str
         self._socket = socket  # type: Socket

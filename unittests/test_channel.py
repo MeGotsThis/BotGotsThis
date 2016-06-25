@@ -12,6 +12,18 @@ class TestChannel(unittest.TestCase):
         self.socket.messaging = Mock(spec=MessagingQueue)
         self.channel = Channel('botgotsthis', self.socket)
 
+    def test_constructor_name_none(self):
+        self.assertRaises(TypeError, Channel, None, self.socket)
+
+    def test_constructor_name_bytes(self):
+        self.assertRaises(TypeError, Channel, b'', self.socket)
+
+    def test_constructor_socket_none(self):
+        self.assertRaises(TypeError, Channel, 'botgotsthis', None)
+
+    def test_constructor_name_empty(self):
+        self.assertRaises(ValueError, Channel, '', self.socket)
+
     def test_channel(self):
         self.assertEqual(self.channel.channel, 'botgotsthis')
 

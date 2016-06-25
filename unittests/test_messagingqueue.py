@@ -1,7 +1,8 @@
 import itertools
 import math
 import unittest
-from bot.data import Channel, ChatMessage, MessagingQueue, WhisperMessage
+from bot.data import Channel, ChatMessage, MessagingQueue, Socket
+from bot.data import WhisperMessage
 from datetime import datetime, timedelta
 from unittest.mock import call, patch
 
@@ -9,11 +10,12 @@ from unittest.mock import call, patch
 class BaseTestMessagingQueue(unittest.TestCase):
     def setUp(self):
         self.queue = MessagingQueue()
-        self.bgt_channel = Channel('botgotsthis', None, -math.inf)
+        socket = Socket('Twitch.TV', 'irc.twitch.tv', 6667)
+        self.bgt_channel = Channel('botgotsthis', socket, -math.inf)
         self.bgt_channel.isMod = False
-        self.mgt_channel = Channel('megotsthis', None, -math.inf)
+        self.mgt_channel = Channel('megotsthis', socket, -math.inf)
         self.mgt_channel.isMod = True
-        self.mbt_channel = Channel('mebotsthis', None, -math.inf)
+        self.mbt_channel = Channel('mebotsthis', socket, -math.inf)
         self.mbt_channel.isMod = False
 
 
