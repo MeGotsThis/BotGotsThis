@@ -107,9 +107,9 @@ class Channel:
         self._bttvCache = datetime.min  # type: datetime
         self._twitchCache = datetime.min  # type: datetime
         self._streamingSince = None  # type: Optional[datetime]
-        self._twitchStatus = None  # type: Optional[str]
-        self._twitchGame = None  # type: Optional[str]
-        self._serverCheck = None  # type: Optional[datetime]
+        self._twitchStatus = ''  # type: str
+        self._twitchGame = ''  # type: str
+        self._serverCheck = datetime.min  # type: datetime
 
     @property
     def channel(self) -> str:
@@ -152,7 +152,7 @@ class Channel:
         return self._joinPriority
 
     @joinPriority.setter
-    def joinPriority(self, value: Union[int, float]) -> None:
+    def joinPriority(self, value: Union[int, float, str]) -> None:
         self._joinPriority = float(value)
 
     @property
@@ -181,6 +181,8 @@ class Channel:
 
     @streamingSince.setter
     def streamingSince(self, value: Optional[datetime]) -> None:
+        if value is not None and not isinstance(value, datetime):
+            raise TypeError()
         self._streamingSince = value
 
     @property
@@ -193,6 +195,8 @@ class Channel:
 
     @twitchCache.setter
     def twitchCache(self, value: datetime):
+        if not isinstance(value, datetime):
+            raise TypeError()
         self._twitchCache = value
 
     @property
@@ -201,6 +205,8 @@ class Channel:
 
     @twitchStatus.setter
     def twitchStatus(self, value: str):
+        if not isinstance(value, str):
+            raise TypeError()
         self._twitchStatus = value
 
     @property
@@ -209,6 +215,8 @@ class Channel:
 
     @twitchGame.setter
     def twitchGame(self, value: str):
+        if not isinstance(value, str):
+            raise TypeError()
         self._twitchGame = value
 
     @property
@@ -217,6 +225,8 @@ class Channel:
 
     @serverCheck.setter
     def serverCheck(self, value: datetime):
+        if not isinstance(value, datetime):
+            raise TypeError()
         self._serverCheck = value
 
     def onJoin(self) -> None:
@@ -225,23 +235,24 @@ class Channel:
 
     def part(self) -> None:
         self.socket.partChannel(self)
-        self._socket.messaging.clearChat(self)
-        self._socket = None
+        self.socket.messaging.clearChat(self)
 
     def send(self,
              messages: Union[str, Iterable[str]],
-             priority: int = 1) -> None:
-        self._socket.messaging.sendChat(self, messages, priority)
+             priority: int=1) -> None:
+        self.socket.messaging.sendChat(self, messages, priority)
 
     def updateFfzEmotes(self) -> None:
-        self._ffzCache = utils.now()
         emotes = getFfzEmotes(self._channel)
-        self._ffzEmotes = emotes or self._ffzEmotes
+        if emotes:
+            self._ffzCache = utils.now()
+            self._ffzEmotes = emotes
 
     def updateBttvEmotes(self) -> None:
-        self._bttvCache = utils.now()
         emotes = getBttvEmotes(self._channel)
-        self._bttvEmotes = emotes or self._bttvEmotes
+        if emotes:
+            self._bttvCache = utils.now()
+            self._bttvEmotes = emotes
 
 
 class Socket:
@@ -553,8 +564,8 @@ class MessagingQueue:
     def sendChat(self,
                  channel: Channel,
                  messages: Union[str, Iterable[str]],
-                 priority: int = 1,
-                 bypass: bool = False) -> None:
+                 priority: int=1,
+                 bypass: bool=False) -> None:
         if not isinstance(channel, Channel):
             raise TypeError()
         listMessages = None  # type: List[str]
