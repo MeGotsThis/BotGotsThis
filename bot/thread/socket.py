@@ -1,19 +1,12 @@
 ﻿import select
 import threading
+from contextlib import suppress
 from itertools import filterfalse
 from typing import Callable, List, Tuple
 from .. import data, globals, utils
 
 
 class SocketsThread(threading.Thread):
-    def __init__(self, **args):
-        threading.Thread.__init__(self, **args)
-        self._socketConnections = []  # type: List[data.Socket]
-    
-    @property
-    def socketConnections(self) -> Tuple['data.Socket', ...]:
-        return tuple(self._socketConnections)
-    
     def run(self) -> None:
         print('{time} Starting {name}'.format(
             time=utils.now(), name=self.__class__.__name__))
@@ -28,31 +21,29 @@ class SocketsThread(threading.Thread):
         print('{time} Ending {name}'.format(
             time=utils.now(), name=self.__class__.__name__))
 
-    def register(self, socketConn: 'data.Socket') -> None:
-        self._socketConnections.append(socketConn)
-    
     def process(self):
+        sockets = list(globals.clusters.values()) # type: List[data.Socket]
         isActive = lambda s: s.isConnected  # type: Callable[[data.Socket], bool]
         try:
-            for socketConnection in filterfalse(
-                    isActive, self._socketConnections):  # --type: Socket
-                socketConnection.connect()
+            for socket in filterfalse(isActive, sockets):  # --type: Socket
+                socket.connect()
         except:
             utils.logException()
-        for socketConnection in filter(isActive, self._socketConnections):  # --type: data.Socket
-            socketConnection.queueMessages()
-        connections = list(filter(isActive, self._socketConnections))  # type: List[data.Socket]
+        for socket in filter(isActive, sockets):  # --type: data.Socket
+            socket.queueMessages()
+        connections = list(filter(isActive, sockets))  # type: List[data.Socket]
         if connections:
             read, write, exceptional = select.select(
                 connections, connections, connections,
                 0.01)  # type: List[data.Socket], List[data.Socket], List[data.Socket]
-            for socketConnection in read:  # --type: Socket
-                socketConnection.read()
-            for socketConnection in write:  # --type: Socket
-                socketConnection.flushWrite()
-        for socketConnection in filter(isActive, self._socketConnections):  # --type: data.Socket
-            socketConnection.sendPing()
+            for socket in read:  # --type: Socket
+                socket.read()
+            for socket in write:  # --type: Socket
+                socket.flushWrite()
+        for socket in filter(isActive, sockets):  # --type: data.Socket
+            socket.sendPing()
     
     def terminate(self):
-        for socketConnection in self._socketConnections:  # --type: data.Socket
-            socketConnection.disconnect()
+        for socket in globals.clusters.values():  # --type: data.Socket
+            with suppress(ConnectionError):
+                socket.disconnect()

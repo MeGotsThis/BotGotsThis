@@ -21,7 +21,6 @@ def main(argv: Optional[List[str]]=None) -> int:
 
     globals.clusters['aws'] = data.Socket(
         'AWS Chat', config.awsServer, config.awsPort)
-    globals.sockets.register(globals.clusters['aws'])
 
     globals.join = JoinThread(name='Join Thread')
     globals.groupChannel = data.Channel('jtv', globals.clusters['aws'],
