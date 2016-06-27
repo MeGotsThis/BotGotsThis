@@ -1,5 +1,5 @@
 ﻿from . import data
-from .thread.background import BackgroundTasker
+from .thread import background as backgroundThread
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
 from datetime import datetime
@@ -14,7 +14,7 @@ sockets = None  # type: SocketsThread
 join = None  # type: JoinThread
 groupChannel = None  # type: data.Channel
 
-background = None  # type: BackgroundTasker
+background = None  # type: backgroundThread.BackgroundTasker
 
 clusters = {
     'aws': None,
