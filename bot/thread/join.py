@@ -15,7 +15,25 @@ class JoinThread(threading.Thread):
         self._joinTimesLock = threading.Lock()  # type: threading.Lock
         self._channelJoined = set()  # type: Set[str]
         self._channelsLock = threading.Lock()  # type: threading.Lock
-    
+
+    @property
+    def canProcess(self) -> bool:
+        timestamp = utils.now()
+        with self._joinTimesLock:
+            self._joinTimes = [t for t in self._joinTimes
+                               if timestamp - t <= joinDuration]
+            return len(self._joinTimes) < config.joinLimit
+
+    @property
+    def connectedChannels(self) -> 'Dict[str, data.Channel]':
+        channels = {}  # type: Dict[str, data.Channel]
+        for socketThread in globals.clusters.values():  # --type: SocketsThread
+            if socketThread.isConnected:
+                chans = socketThread.channels
+                for chan in chans:  # --type: Channel
+                    channels[chan] = chans[chan]
+        return channels
+
     def run(self) -> None:
         print('{time} Starting {name}'.format(
             time=utils.now(), name=self.__class__.__name__))
@@ -29,21 +47,12 @@ class JoinThread(threading.Thread):
             time=utils.now(), name=self.__class__.__name__))
 
     def process(self) -> None:
-        timestamp = utils.now()  # type: datetime
-        with self._joinTimesLock:
-            self._joinTimes = [t for t in self._joinTimes
-                               if timestamp - t <= joinDuration]
-            if len(self._joinTimes) >= config.joinLimit:
-                return
-        
-        channels = {}  # type: Dict[str, data.Channel]
-        for socketThread in globals.clusters.values():  # --type: SocketsThread
-            if socketThread.isConnected:
-                chans = socketThread.channels
-                for chan in chans:  # --type: Channel
-                    channels[chan] = chans[chan]
+        if not self.canProcess:
+            return
+
+        channels = self.connectedChannels  # type: Dict[str, data.Channel]
         with self._channelsLock:
-            notJoined = set(channels.keys() - self._channelJoined)  # type: Set[str]
+            notJoined = set(channels.keys()) - self._channelJoined  # type: Set[str]
             if not notJoined:
                 return
             
@@ -54,7 +63,7 @@ class JoinThread(threading.Thread):
                     None, None, 'JOIN', IrcMessageParams(chat.ircChannel)) # type: IrcMessage
                 chat.socket.queueWrite(ircCommand, channel=chat)
                 self._channelJoined.add(chat.channel)
-    
+
     def connected(self, socket: 'data.Socket') -> None:
         with self._joinTimesLock:
             self._joinTimes.append(utils.now())
@@ -63,7 +72,7 @@ class JoinThread(threading.Thread):
         with self._channelsLock:
             self._channelJoined -= socket.channels.keys()
     
-    def part(self, channel: str) -> None:
+    def onPart(self, channel: str) -> None:
         with self._channelsLock:
             self._channelJoined.discard(channel)
     
@@ -75,7 +84,9 @@ class JoinThread(threading.Thread):
     @staticmethod
     def _getJoinWithLowestPriority(channels: Dict[str, 'data.Channel'],
                                    notJoinedChannels: Set[str]) -> str:
-        priority = float(min(float(channels[c].joinPriority) for c
-                             in notJoinedChannels)) # type: float
-        return [c for c in notJoinedChannels
-                if channels[c].joinPriority == priority][0]
+        notJoined = [channels[nc] for nc in notJoinedChannels]  # type: List[data.Channel]
+        if not notJoined:
+            return None
+        priority = float(min(ch.joinPriority for ch in notJoined)) # type: float
+        return [ch.channel for ch in notJoined
+                if ch.joinPriority == priority][0]

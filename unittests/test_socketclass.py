@@ -13,7 +13,8 @@ class SocketSpec():
     def connect(address):
         pass
 
-    def recv(selfbufsize, flags=0):
+    @staticmethod
+    def recv(bufsize, flags=0):
         pass
 
     @staticmethod
@@ -300,7 +301,7 @@ class TestSocket(unittest.TestCase):
         self.socket.partChannel(self.channel)
         self.assertNotIn(self.channel.channel, self.socket._channels)
         self.assertTrue(mock_queueWrite.called)
-        self.assertTrue(mock_globals.join.part.called)
+        self.assertTrue(mock_globals.join.onPart.called)
         self.assertTrue(any(m for m in mock_queueWrite.call_args_list
                             if m[0][1].command == 'PART'))
         self.assertNotEquals(mock_stdout.getvalue(), '')

@@ -181,6 +181,7 @@
     <Compile Include="unittests\test_messagingqueue.py" />
     <Compile Include="unittests\test_socketclass.py" />
     <Compile Include="unittests\test_thread_background.py" />
+    <Compile Include="unittests\test_thread_join.py" />
     <Compile Include="unittests\twitchmessage\test_ircmessage.py" />
     <Compile Include="unittests\twitchmessage\test_ircparams.py" />
     <Compile Include="unittests\twitchmessage\test_ircprefix.py" />

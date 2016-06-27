@@ -523,7 +523,7 @@ class Socket:
             self.queueWrite(IrcMessage(None, None, 'PART',
                                        IrcMessageParams(channel.ircChannel)))
             del self._channels[channel.channel]
-        globals.join.part(channel.channel)
+        globals.join.onPart(channel.channel)
         print('{time} Parted {channel}'.format(
             time=utils.now(), channel=channel.channel))
 
