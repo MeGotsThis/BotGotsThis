@@ -2,7 +2,7 @@
 from bot import config, globals
 from datetime import datetime
 from types import TracebackType
-from typing import List, Optional, TextIO, Tuple, Union
+from typing import Iterable, List, Optional, TextIO, Tuple, Union
 import os.path
 import sys
 import threading
@@ -16,8 +16,10 @@ def now() -> datetime:
     return datetime.utcnow()
 
 def joinChannel(broadcaster: str,
-                priority: Union[int, float]=float('inf'),
+                priority: Union[int, float, str]=float('inf'),
                 cluster: str='aws') -> bool:
+    if not isinstance(broadcaster, str):
+        raise TypeError()
     if cluster is None or cluster not in globals.clusters:
         return False
     broadcaster = broadcaster.lower()
@@ -32,41 +34,47 @@ def joinChannel(broadcaster: str,
 
 
 def partChannel(channel: str) -> None:
+    if not isinstance(channel, str):
+        raise TypeError()
     if channel in globals.channels:
         globals.channels[channel].part()
         del globals.channels[channel]
 
 
-def whisper(nick: str, message: str) -> None:
+def whisper(nick: str, messages: Union[str, Iterable[str]]) -> None:
     cluster = globals.clusters[globals.whisperCluster]
-    cluster.messaging.sendWhisper(nick, message)
+    cluster.messaging.sendWhisper(nick, messages)
 
 
 def clearAllChat() -> None:
     for c in globals.clusters.values():
         c.messaging.clearAllChat()
 
-ENSURE_CLUSTER_UNKNOWN = -3  # type: int
-ENSURE_CLUSTER_NONE = -2  # type: int
+ENSURE_CLUSTER_UNKNOWN = -2  # type: int
 ENSURE_REJOIN = -1  # type: int
 ENSURE_CORRECT = 0  # type: int
 ENSURE_NOT_JOINED = 1  # type: int
 
 
 def ensureServer(channel: str,
-                 priority: Union[int, float]=float('inf'),
+                 priority: Union[int, float, str, None]=None,
                  cluster: str='aws') -> int:
+    if not isinstance(channel, str):
+        raise TypeError()
+    if cluster is None:
+        raise TypeError()
     if channel not in globals.channels:
         return ENSURE_NOT_JOINED
-    if cluster is None:
-        return ENSURE_CLUSTER_NONE
     if cluster not in globals.clusters:
         partChannel(channel)
         return ENSURE_CLUSTER_UNKNOWN
     if globals.clusters[cluster] is globals.channels[channel].socket:
-        globals.channels[channel].joinPriority = min(
-            globals.channels[channel].joinPriority, priority)
+        if priority is not None:
+            globals.channels[channel].joinPriority = min(
+                globals.channels[channel].joinPriority, priority)
         return ENSURE_CORRECT
+    if priority is None:
+        priority =  globals.channels[channel].joinPriority
     partChannel(channel)
     joinChannel(channel, priority, cluster)
     return ENSURE_REJOIN

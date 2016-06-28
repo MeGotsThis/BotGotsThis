@@ -214,6 +214,13 @@ class TestMessagingQueue(BaseTestMessagingQueue):
              call(self.queue, 'megotsthis', ['KappaPride', 'RalpherZ']),
              call(self.queue, 'mebotsthis', ['KappaClaus', 'ChefFrank'])])
 
+    def test_sendWhisper_None(self):
+        self.assertRaises(TypeError, self.queue.sendWhisper, None, 'PogChamp')
+
+    def test_sendWhisper_str_None(self):
+        self.assertRaises(TypeError,
+                          self.queue.sendWhisper, 'botgotsthis', None)
+
     def test_sendWhisper_str(self):
         self.queue.sendWhisper('botgotsthis', 'PogChamp')
         self.assertEqual(len(self.queue._whisperQueue), 1)

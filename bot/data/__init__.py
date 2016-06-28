@@ -91,7 +91,7 @@ class Channel:
     def __init__(self,
                  channel: str,
                  socket: 'Socket',
-                 joinPriority: Union[int, float] = float('inf')) -> None:
+                 joinPriority: Union[int, float, str]=float('inf')) -> None:
         if not isinstance(channel, str):
             raise TypeError()
         if not isinstance(socket, Socket):
@@ -609,6 +609,8 @@ class MessagingQueue:
     def sendWhisper(self,
                     nick: str,
                     messages: Union[str, Iterable[str]]) -> None:
+        if not isinstance(nick, str):
+            raise TypeError()
         if isinstance(messages, str):
             messages = messages,
         elif not isinstance(messages, Iterable):
