@@ -21,7 +21,7 @@ def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
 def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
     if timestamp - globals.globalFfzEmotesCache >= timedelta(hours=1):
         emotes = ffz.getGlobalEmotes()  # type: Optional[Dict[int, str]]
-        if emotes:
+        if emotes is not None:
             globals.globalFfzEmotesCache = timestamp
             globals.globalFfzEmotes = emotes
     channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
@@ -39,7 +39,7 @@ def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
 def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:
     if timestamp - globals.globalBttvEmotesCache >= timedelta(hours=1):
         emotes = bttv.getGlobalEmotes()
-        if emotes:
+        if emotes is not None:
             globals.globalBttvEmotesCache = timestamp
             globals.globalBttvEmotes = emotes
     channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]

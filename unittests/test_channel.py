@@ -129,6 +129,19 @@ class TestChannel(unittest.TestCase):
 
     @patch('bot.utils.now', autospec=True)
     @patch('bot.data.getFfzEmotes', autospec=True)
+    def test_updateFfzEmotes_empty(self, mock_getFfzEmotes, mock_now):
+        now = datetime(2000, 1, 1)
+        emotes = {}
+        mock_now.return_value = now
+        mock_getFfzEmotes.return_value = emotes
+        self.channel._ffzEmotes = {-1: 'FrankerFaceZ'}
+        self.channel.updateFfzEmotes()
+        mock_getFfzEmotes.assert_called_once_with(self.channel.channel)
+        self.assertEqual(self.channel.ffzCache, now)
+        self.assertEqual(self.channel.ffzEmotes, emotes)
+
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.data.getFfzEmotes', autospec=True)
     def test_updateFfzEmotes_error(self, mock_getFfzEmotes, mock_now):
         now = datetime(2000, 1, 1)
         emotes = {-1: 'FrankerFaceZ'}
@@ -146,6 +159,19 @@ class TestChannel(unittest.TestCase):
         emotes = {'': 'BetterTwitch.Tv'}
         mock_now.return_value = now
         mock_getBttvEmotes.return_value = emotes
+        self.channel.updateBttvEmotes()
+        mock_getBttvEmotes.assert_called_once_with(self.channel.channel)
+        self.assertEqual(self.channel.bttvCache, now)
+        self.assertEqual(self.channel.bttvEmotes, emotes)
+
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.data.getBttvEmotes', autospec=True)
+    def test_updateBttvEmotes_empty(self, mock_getBttvEmotes, mock_now):
+        now = datetime(2000, 1, 1)
+        emotes = {}
+        mock_now.return_value = now
+        mock_getBttvEmotes.return_value = emotes
+        self.channel._bttvEmotes = {'': 'BetterTwitch.Tv'}
         self.channel.updateBttvEmotes()
         mock_getBttvEmotes.assert_called_once_with(self.channel.channel)
         self.assertEqual(self.channel.bttvCache, now)

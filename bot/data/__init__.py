@@ -250,13 +250,13 @@ class Channel:
 
     def updateFfzEmotes(self) -> None:
         emotes = getFfzEmotes(self._channel)
-        if emotes:
+        if emotes is not None:
             self._ffzCache = utils.now()
             self._ffzEmotes = emotes
 
     def updateBttvEmotes(self) -> None:
         emotes = getBttvEmotes(self._channel)
-        if emotes:
+        if emotes is not None:
             self._bttvCache = utils.now()
             self._bttvEmotes = emotes
 
