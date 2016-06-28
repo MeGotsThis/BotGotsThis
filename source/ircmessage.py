@@ -2,7 +2,7 @@
 from bot.twitchmessage import IrcMessage, IrcMessageTagsReadOnly
 from bot import data
 from datetime import datetime
-from typing import Any, Callable, Dict, Mapping, List, Optional, Union
+from typing import Callable, Dict, Mapping, List, Optional, Union
 from . import channel, whisper
 from .irccommand import clearchat, notice, userstate
 try:
@@ -10,7 +10,7 @@ try:
 except ImportError:
     from .public.default import ircmessage  # type: ignore
 
-IrcHandler = 'Callable[[data.Socket, IrcMessage, datetime], None]'
+IrcHandler = Callable[['data.Socket', IrcMessage, datetime], None]
 ircHandlers = {}  # type: Dict[Union[str, int], IrcHandler]
 
 _logCommandPerChannel = [
