@@ -23,10 +23,7 @@ def parseMessage(socket: 'data.Socket',
                  ircmsg: str,
                  timestamp: datetime) -> None:
     message = IrcMessage.fromMessage(ircmsg)  # type: IrcMessage
-    if message.command == 'PRIVMSG':
-        # This allows PRIVMSG to be processed first
-        irc_privmsg(socket, message, timestamp)
-    elif message.command in ircHandlers:
+    if message.command in ircHandlers:
         ircHandlers[message.command](socket, message, timestamp)
 
     ircmessage.parseMessage(socket, ircmsg, timestamp)
