@@ -2,7 +2,7 @@
 from bot.twitchmessage import IrcMessage, IrcMessageTagsReadOnly
 from bot import data
 from datetime import datetime
-from typing import Mapping, List, Optional
+from typing import Any, Callable, Dict, Mapping, List, Optional, Union
 from . import channel, whisper
 from .irccommand import clearchat, notice, userstate
 try:
@@ -10,150 +10,237 @@ try:
 except ImportError:
     from .public.default import ircmessage  # type: ignore
 
+IrcHandler = 'Callable[[data.Socket, IrcMessage, datetime], None]'
+ircHandlers = {}  # type: Dict[Union[str, int], IrcHandler]
+
 _logCommandPerChannel = [
     'PRIVMSG', 'NOTICE', 'MODE', 'JOIN', 'PART', 'USERSTATE', 'HOSTTARGET',
     'CLEARCHAT', 'ROOMSTATE',
-    ]
+    ]  # type: List[str]
 
 
 def parseMessage(socket: 'data.Socket',
                  ircmsg: str,
                  timestamp: datetime) -> None:
-    files = []  # type: List[str]
-    logs = []  # type: List[str]
-    channels = socket.channels  # type: Mapping[str, data.Channel]
     message = IrcMessage.fromMessage(ircmsg)  # type: IrcMessage
     if message.command == 'PRIVMSG':
-        tags = message.tags  # type: IrcMessageTagsReadOnly
-        nick = message.prefix.nick # type: Optional[str]
-        where = message.params.middle # type: str
-        msg = message.params.trailing # type: str
-        if where[0] == '#':
-            files.append(where + '#msg.log')
-            logs.append(nick + ': ' + msg)
-        if config.botnick in msg.lower().split():
-            files.append(config.botnick + '-Mentions.log')
-            logs.append(nick + ' -> ' + where + ': ' + msg)
-        if where[0] == '#' and where[1:] in channels:
-            chan = channels[where[1:]] # type: Optional[data.Channel]
-            channel.parse(chan, tags, nick, msg, timestamp)
-        
-    if message.command == 'WHISPER':
-        tags = message.tags
-        nick = message.prefix.nick
-        msg = message.params.trailing
-        files.append('@' + nick + '@whisper.log')
-        logs.append(nick + ': ' + msg)
-        files.append(config.botnick + '-All Whisper.log')
-        logs.append(nick + ' -> ' + config.botnick + ': ' + msg)
-        files.append(config.botnick + '-Raw Whisper.log')
-        logs.append('< ' + ircmsg)
-        whisper.parse(tags, nick, msg, timestamp)
-        
-    if message.command == 'NOTICE':
-        nick = None
-        chan = None
-        msg = message.params.trailing
-        if message.prefix.nick is not None:
-            nick = message.prefix.nick
-        where = message.params.middle
-        if where[0] == '#' and where[1:] in channels:
-            chan = channels[where[1:]]
-        if where[0] == '#':
-            files.append(where + '#notice.log')
-            logs.append(msg)
-        notice.parse(chan, nick, msg)
-        
-    if message.command == 'CLEARCHAT':
-        nick = None
-        chan = None
-        if message.params.trailing is not None:
-            nick = message.params.trailing
-        where = message.params.middle
-        if where[0] == '#' and where[1:] in channels:
-            chan = channels[where[1:]]
-        if where[0] == '#':
-            files.append(where + '#clearchat.log')
-            logs.append(nick if nick else '#chat')
-        clearchat.parse(chan, nick)
-    
-    if message.command == 'ROOMSTATE':
-        msg = message.params.trailing
-        where = message.params.middle
-        if where[0] == '#':
-            files.append(where + '#roomstate.log')
-            logs.append(str(message))
-    
-    if message.command == 'HOSTTARGET':
-        msg = message.params.trailing
-        where = message.params.middle
-        if where[0] == '#':
-            files.append(where + '#hosttarget.log')
-            logs.append(str(message))
-    
-    if message.command == 'MODE':
-        where, mode, nick = message.params.middle.split()
-        if where[0] == '#' and where[1:] in channels:
-            if mode == '+o':
-                channels[where[1:]].ircOps.add(nick)
-            if mode == '-o':
-                channels[where[1:]].ircOps.discard(nick)
-        
-    if message.command == 'JOIN':
-        where = message.params.middle
-        nick = message.prefix.nick
-        if where[0] == '#' and where[1:] in channels:
-            channels[where[1:]].ircUsers.add(nick)
-        
-    if message.command == 353:
-        where = message.params.middle.split()[-1]
-        nicks = message.params.trailing.split(' ')  # List[str]
-        if where[0] == '#':
-            files.append(where + '#full.log')
-            logs.append('< ' + ircmsg)
-            if where[1:] in channels:
-                channels[where[1:]].ircUsers.update(nicks)
-        
-    if message.command == 366:
-        where = message.params.middle.split()[-1]
-        if where[0] == '#':
-            files.append(where + '#full.log')
-            logs.append('< ' + ircmsg)
-        
-    if message.command == 'PART':
-        where = message.params.middle
-        nick = message.prefix.nick
-        if where[0] == '#' and where[1:] in channels:
-            channels[where[1:]].ircUsers.discard(nick)
+        # This allows PRIVMSG to be processed first
+        irc_privmsg(socket, message, timestamp)
+    elif message.command in ircHandlers:
+        ircHandlers[message.command](socket, message, timestamp)
 
-    if message.command == 'PING' and message.params.trailing is not None:
+    ircmessage.parseMessage(socket, ircmsg, timestamp)
+
+
+def registerIrc(command: Union[str, int]) -> Callable[[IrcHandler], IrcHandler]:
+    def decorator(func: IrcHandler) -> IrcHandler:
+        ircHandlers[command] = func
+        return func
+    return decorator
+
+
+@registerIrc('PRIVMSG')
+def irc_privmsg(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    channels = socket.channels  # type: Mapping[str, data.Channel]
+    tags = message.tags  # type: IrcMessageTagsReadOnly
+    nick = message.prefix.nick  # type: Optional[str]
+    where = message.params.middle  # type: str
+    msg = message.params.trailing  # type: Optional[str]
+    if where[0] == '#' and where[1:] in channels:
+        chan = channels[where[1:]] # type: Optional[data.Channel]
+        channel.parse(chan, tags, nick, msg, timestamp)
+    if where[0] == '#':
+        utils.logIrcMessage(where + '#msg.log', nick + ': ' + msg, timestamp)
+    if config.botnick in msg.lower().split():
+        utils.logIrcMessage(config.botnick + '-Mentions.log',
+                            nick + ' -> ' + where + ': ' + msg, timestamp)
+
+
+@registerIrc('WHISPER')
+def irc_whisper(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    tags = message.tags  # type: IrcMessageTagsReadOnly
+    nick = message.prefix.nick  # type: Optional[str]
+    msg = message.params.trailing  # type: Optional[str]
+    utils.logIrcMessage(
+        '@' + nick + '@whisper.log', nick + ': ' + msg, timestamp)
+    utils.logIrcMessage(config.botnick + '-All Whisper.log',
+                        nick + ' -> ' + config.botnick + ': ' + msg, timestamp)
+    utils.logIrcMessage(
+        config.botnick + '-Raw Whisper.log', '< ' + str(message), timestamp)
+    whisper.parse(tags, nick, msg, timestamp)
+
+
+@registerIrc('NOTICE')
+def irc_notice(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    channels = socket.channels  # type: Mapping[str, data.Channel]
+    nick = None  # type: Optional[str]
+    chan = None  # type: Optional[data.Channel]
+    msg = message.params.trailing
+    if message.prefix.nick is not None:
+        nick = message.prefix.nick
+    where = message.params.middle
+    if where[0] == '#' and where[1:] in channels:
+        chan = channels[where[1:]]
+    if where[0] == '#':
+        utils.logIrcMessage(where + '#notice.log', msg, timestamp)
+    notice.parse(chan, nick, msg)
+
+
+@registerIrc('CLEARCHAT')
+def irc_clearchat(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    channels = socket.channels  # type: Mapping[str, data.Channel]
+    nick = None  # type: Optional[str]
+    chan = None  # type: Optional[data.Channel]
+    if message.params.trailing is not None:
+        nick = message.params.trailing
+    where = message.params.middle  # type: Optional[str]
+    if where[0] == '#' and where[1:] in channels:
+        chan = channels[where[1:]]
+    if where[0] == '#':
+        utils.logIrcMessage(where + '#clearchat.log',
+                            nick if nick else '#chat', timestamp)
+    clearchat.parse(chan, nick)
+
+
+@registerIrc('ROOMSTATE')
+def irc_roomstate(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    where = message.params.middle  # type: Optional[str]
+    if where[0] == '#':
+        utils.logIrcMessage(where + '#roomstate.log', str(message), timestamp)
+
+
+@registerIrc('HOSTTARGET')
+def irc_hosttarget(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    where = message.params.middle  # type: Optional[str]
+    if where[0] == '#':
+        utils.logIrcMessage(where + '#hosttarget.log', str(message), timestamp)
+
+
+@registerIrc('MODE')
+def irc_mode(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    channels = socket.channels  # type: Mapping[str, data.Channel]
+    where, mode, nick = message.params.middle.split()  # type: str, str, str
+    if where[0] == '#' and where[1:] in channels:
+        if mode == '+o':
+            channels[where[1:]].ircOps.add(nick)
+        if mode == '-o':
+            channels[where[1:]].ircOps.discard(nick)
+
+
+@registerIrc('JOIN')
+def irc_join(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    channels = socket.channels  # type: Mapping[str, data.Channel]
+    where = message.params.middle  # type: str
+    nick = message.prefix.nick  # type: str
+    if where[0] == '#' and where[1:] in channels:
+        channels[where[1:]].ircUsers.add(nick)
+
+
+@registerIrc(353)
+def irc_353(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    channels = socket.channels  # type: Mapping[str, data.Channel]
+    where = message.params.middle.split()[-1]  # type: str
+    nicks = message.params.trailing.split(' ')  # type: List[str]
+    if where[0] == '#':
+        utils.logIrcMessage(where + '#full.log', '< ' + str(message),
+                            timestamp)
+        if where[1:] in channels:
+            channels[where[1:]].ircUsers.update(nicks)
+
+
+@registerIrc(366)
+def irc_366(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    where = message.params.middle.split()[-1]  # type: str
+    if where[0] == '#':
+        utils.logIrcMessage(where + '#full.log', '< ' + str(message),
+                            timestamp)
+
+
+@registerIrc('PART')
+def irc_part(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    channels = socket.channels  # type: Mapping[str, data.Channel]
+    where = message.params.middle  # type: Optional[str]
+    nick = message.prefix.nick  # type: Optional[str]
+    if where[0] == '#' and where[1:] in channels:
+        channels[where[1:]].ircUsers.discard(nick)
+
+
+@registerIrc('PING')
+def irc_ping(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    if message.params.trailing is not None:
         socket.ping(message.params.trailing)
-        
-    if (message.command == 'PONG' and message.prefix is not None
+
+
+@registerIrc('PONG')
+def irc_pong(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    if (message.prefix is not None
             and message.prefix.servername is not None
             and message.prefix.servername == 'tmi.twitch.tv'
             and not message.params.isEmpty
             and message.params.middle == 'tmi.twitch.tv'
             and message.params.trailing == config.botnick):
         socket.lastPing = timestamp
-        
-    if message.command == 'USERSTATE':
-        where = message.params.middle
-        if where[0] == '#':
-            files.append(where + '#userstate.log')
-            logs.append(str(message))
-        if where[0] == '#' and where[1:] in channels:
-            chan = channels[where[1:]]
-            tags = message.tags
-            userstate.parse(chan, tags)
-        
+
+
+@registerIrc('USERSTATE')
+def irc_userstate(
+        socket: 'data.Socket',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    channels = socket.channels  # type: Mapping[str, data.Channel]
+    where = message.params.middle  # type:str
+    if where[0] == '#':
+        utils.logIrcMessage(where + '#userstate.log', '< ' + str(message),
+                            timestamp)
+    if where[0] == '#' and where[1:] in channels:
+        chan = channels[where[1:]]
+        tags = message.tags
+        userstate.parse(chan, tags)
+
+
+def log_channel_message(message: IrcMessage,
+                        timestamp: datetime):
     if message.command in _logCommandPerChannel:
         where = message.params.middle.split(None, 1)[0]
         if where[0] == '#':
-            files.append(where + '#full.log')
-            logs.append('< ' + ircmsg)
-    
-    for file, log in zip(files, logs):
-        utils.logIrcMessage(file, log, timestamp)
-    
-    ircmessage.parseMessage(socket, ircmsg, timestamp)
+            utils.logIrcMessage(where + '#full.log', '< ' + str(message),
+                                timestamp)
