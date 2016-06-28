@@ -25,7 +25,7 @@ def joinChannel(broadcaster: str,
     broadcaster = broadcaster.lower()
     if broadcaster in globals.channels:
         t = min(globals.channels[broadcaster].joinPriority, priority)
-        globals.channels[broadcaster].joinPriority = t
+        globals.channels[broadcaster].joinPriority = float(t)
         return False
     globals.channels[broadcaster] = data.Channel(
         broadcaster, globals.clusters[cluster], priority)
@@ -70,8 +70,8 @@ def ensureServer(channel: str,
         return ENSURE_CLUSTER_UNKNOWN
     if globals.clusters[cluster] is globals.channels[channel].socket:
         if priority is not None:
-            globals.channels[channel].joinPriority = min(
-                globals.channels[channel].joinPriority, priority)
+            globals.channels[channel].joinPriority = float(min(
+                globals.channels[channel].joinPriority, priority))
         return ENSURE_CORRECT
     if priority is None:
         priority =  globals.channels[channel].joinPriority
