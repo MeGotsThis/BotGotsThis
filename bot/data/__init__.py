@@ -83,9 +83,10 @@ class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
 class Channel:
     __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',
                  '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
-                 '_joinPriority', '_ffzEmotes', '_ffzCache', '_bttvEmotes',
-                 '_bttvCache', '_twitchCache', '_streamingSince',
-                 '_twitchStatus', '_twitchGame', '_serverCheck',
+                 '_joinPriority', '_ffzEmotes', '_ffzCache', '_ffzLock',
+                 '_bttvEmotes', '_bttvCache', '_twitchCache', '_bttvLock',
+                 '_streamingSince', '_twitchStatus', '_twitchGame',
+                 '_serverCheck',
                  ]
 
     def __init__(self,
@@ -109,8 +110,10 @@ class Channel:
         self._sessionData = {}  # type: Dict[Any, Any]
         self._ffzEmotes = {}  # type: Dict[int, str]
         self._ffzCache = datetime.min  # type: datetime
+        self._ffzLock = threading.Lock()  # type: threading.Lock
         self._bttvEmotes = {}  # type: Dict[str, str]
         self._bttvCache = datetime.min  # type: datetime
+        self._bttvLock = threading.Lock()  # type: threading.Lock
         self._twitchCache = datetime.min  # type: datetime
         self._streamingSince = None  # type: Optional[datetime]
         self._twitchStatus = ''  # type: str
@@ -167,7 +170,8 @@ class Channel:
 
     @property
     def ffzCache(self) -> datetime:
-        return self._ffzCache
+        with self._ffzLock:
+            return self._ffzCache
 
     @property
     def ffzEmotes(self) -> Dict[int, str]:
@@ -175,7 +179,8 @@ class Channel:
 
     @property
     def bttvCache(self) -> datetime:
-        return self._bttvCache
+        with self._bttvLock:
+            return self._bttvCache
 
     @property
     def bttvEmotes(self) -> Dict[str, str]:
@@ -249,16 +254,28 @@ class Channel:
         self.socket.messaging.sendChat(self, messages, priority)
 
     def updateFfzEmotes(self) -> None:
+        with self._ffzLock:
+            oldTimestamp, self._ffzCache = self._ffzCache, utils.now()
         emotes = getFfzEmotes(self._channel)
         if emotes is not None:
-            self._ffzCache = utils.now()
             self._ffzEmotes = emotes
+            with self._ffzLock:
+                self._ffzCache = utils.now()
+        else:
+            with self._ffzLock:
+                self._ffzCache = oldTimestamp
 
     def updateBttvEmotes(self) -> None:
+        with self._bttvLock:
+            oldTimestamp, self._bttvCache = self._bttvCache, utils.now()
         emotes = getBttvEmotes(self._channel)
         if emotes is not None:
-            self._bttvCache = utils.now()
             self._bttvEmotes = emotes
+            with self._bttvLock:
+                self._bttvCache = utils.now()
+        else:
+            with self._bttvLock:
+                self._bttvCache = oldTimestamp
 
 
 class Socket:
