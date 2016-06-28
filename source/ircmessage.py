@@ -26,6 +26,8 @@ def parseMessage(socket: 'data.Socket',
     if message.command in ircHandlers:
         ircHandlers[message.command](socket, message, timestamp)
 
+    log_channel_message(message, timestamp)
+
     ircmessage.parseMessage(socket, ircmsg, timestamp)
 
 
