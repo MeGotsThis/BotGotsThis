@@ -36,9 +36,9 @@ class SocketsThread(threading.Thread):
             read, write, exceptional = select.select(
                 connections, connections, connections,
                 0.01)  # type: List[data.Socket], List[data.Socket], List[data.Socket]
-            for socket in read:  # --type: Socket
+            for socket in filter(isActive, read):  # --type: Socket
                 socket.read()
-            for socket in write:  # --type: Socket
+            for socket in filter(isActive, write):  # --type: Socket
                 socket.flushWrite()
         for socket in filter(isActive, sockets):  # --type: data.Socket
             socket.sendPing()

@@ -46,6 +46,33 @@ class TestSocketThread(unittest.TestCase):
         self.socket1.flushWrite.assert_called_once_with()
         self.assertFalse(self.socket1.read.called)
 
+    @patch('bot.thread.socket.select.select')
+    def test_process_read_write(self, mock_select):
+        mock_select.return_value = [self.socket1], [self.socket1], []
+        self.socketThead.process()
+        self.socket1.read.assert_called_once_with()
+        self.socket1.flushWrite.assert_called_once_with()
+        self.socket1.sendPing.assert_called_once_with()
+
+    @patch('bot.thread.socket.select.select')
+    def test_process_read_reset_write(self, mock_select):
+        mock_select.return_value = [self.socket1], [self.socket1], []
+        def changeConnection():
+            self.socket1_isConnected.return_value = False
+        self.socket1.read = changeConnection
+        self.socketThead.process()
+        self.assertFalse(self.socket1.flushWrite.called)
+        self.assertFalse(self.socket1.sendPing.called)
+
+    @patch('bot.thread.socket.select.select')
+    def test_process_reset_read_write(self, mock_select):
+        mock_select.return_value = [self.socket1], [self.socket1], []
+        self.socket1_isConnected.side_effect = [True, True, True, False, False, False]
+        self.socketThead.process()
+        self.assertFalse(self.socket1.read.called)
+        self.assertFalse(self.socket1.flushWrite.called)
+        self.assertFalse(self.socket1.sendPing.called)
+
     def test_terminate(self):
         self.socketThead.terminate()
         self.socket1.disconnect.assert_called_once_with()
