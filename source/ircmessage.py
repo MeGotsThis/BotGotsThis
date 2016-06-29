@@ -44,13 +44,11 @@ def irc_privmsg(
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels = socket.channels  # type: Mapping[str, data.Channel]
-    tags = message.tags  # type: IrcMessageTagsReadOnly
     nick = message.prefix.nick  # type: Optional[str]
     where = message.params.middle  # type: str
     msg = message.params.trailing  # type: Optional[str]
     if where[0] == '#' and where[1:] in channels:
-        chan = channels[where[1:]] # type: Optional[data.Channel]
-        channel.parse(chan, tags, nick, msg, timestamp)
+        channel.parse(channels[where[1:]], message.tags, nick, msg, timestamp)
     if where[0] == '#':
         utils.logIrcMessage(where + '#msg.log', nick + ': ' + msg, timestamp)
     if config.botnick in msg.lower().split():
