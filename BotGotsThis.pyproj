@@ -179,6 +179,7 @@
     <Compile Include="twitchOauth.py" />
     <Compile Include="unittests\public\test_ircmessage.py" />
     <Compile Include="unittests\public\test_irc_channel.py" />
+    <Compile Include="unittests\public\test_irc_whisper.py" />
     <Compile Include="unittests\test_channel.py" />
     <Compile Include="unittests\test_messagingqueue.py" />
     <Compile Include="unittests\test_socketclass.py" />
