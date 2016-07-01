@@ -279,6 +279,10 @@ class TestChannel(unittest.TestCase):
         self.socket.partChannel.assert_called_once_with(self.channel)
         self.socket.messaging.clearChat.assert_called_once_with(self.channel)
 
+    def test_clear(self):
+        self.channel.clear()
+        self.socket.messaging.clearChat.assert_called_once_with(self.channel)
+
     def test_send(self):
         self.channel.send('Kappa')
         self.socket.messaging.sendChat.assert_called_once_with(

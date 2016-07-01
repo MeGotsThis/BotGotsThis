@@ -45,7 +45,7 @@ def botEmpty(channel: str,
              send: Send) -> None:
     if channel in globals.channels:
         chan = globals.channels[channel]
-        chan.socket.messaging.clearChat(chan)
+        chan.clear()
         send('Cleared all queued messages '
              'for {channel}'.format(channel=channel))
 

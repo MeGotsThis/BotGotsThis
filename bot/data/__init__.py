@@ -253,6 +253,9 @@ class Channel:
              priority: int=1) -> None:
         self.socket.messaging.sendChat(self, messages, priority)
 
+    def clear(self):
+        self.socket.messaging.clearChat(self)
+
     def updateFfzEmotes(self) -> None:
         with self._ffzLock:
             oldTimestamp, self._ffzCache = self._ffzCache, utils.now()

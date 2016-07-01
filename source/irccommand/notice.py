@@ -14,4 +14,4 @@ def parse(chat: 'data.Channel',
         raise LoginUnsuccessful()
     if message.startswith('You are permanently banned from talking in '):
         chat.isMod = False
-        chat.socket.messaging.clearChat(chat)
+        chat.clear()
