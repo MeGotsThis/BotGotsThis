@@ -81,15 +81,15 @@ def irc_notice(
     channels = socket.channels  # type: Mapping[str, data.Channel]
     nick = None  # type: Optional[str]
     chan = None  # type: Optional[data.Channel]
-    msg = message.params.trailing
+    msg = message.params.trailing  # type: Optional[str]
     if message.prefix.nick is not None:
         nick = message.prefix.nick
-    where = message.params.middle
+    where = message.params.middle  # type: Optional[str]
     if where[0] == '#' and where[1:] in channels:
         chan = channels[where[1:]]
     if where[0] == '#':
         utils.logIrcMessage(where + '#notice.log', msg, timestamp)
-    notice.parse(chan, nick, msg)
+    notice.parse(message.tags, chan, nick, msg)
 
 
 @registerIrc('CLEARCHAT')
