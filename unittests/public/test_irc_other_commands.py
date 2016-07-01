@@ -2,7 +2,7 @@ import unittest
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from datetime import datetime
-from source.ircmessage import userstate
+from source.ircmessage import clearchat, userstate
 from unittest.mock import Mock, patch
 
 
@@ -115,3 +115,33 @@ class TestUserState(unittest.TestCase):
 
     def test_parse_tags_none(self):
         userstate.parse(self.channel, None)
+
+
+class TestClearChat(unittest.TestCase):
+    def setUp(self):
+        patcher = patch('source.irccommand.clearchat.config', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_config = patcher.start()
+        self.mock_config.botnick = 'botgotsthis'
+        self.channel = Mock(spec=Channel)
+        self.channel.isMod = True
+
+    def test(self):
+        clearchat.parse(self.channel, 'botgotsthis')
+        self.assertIs(self.channel.isMod, False)
+        self.channel.clear.assert_called_once_with()
+
+    def test_channel_None(self):
+        clearchat.parse(None, 'botgotsthis')
+        self.assertIs(self.channel.isMod, True)
+        self.assertFalse(self.channel.clear.called)
+
+    def test_nick_None(self):
+        clearchat.parse(self.channel, None)
+        self.assertIs(self.channel.isMod, True)
+        self.assertFalse(self.channel.clear.called)
+
+    def test_nick_not_bot(self):
+        clearchat.parse(self.channel, 'megotsthis')
+        self.assertIs(self.channel.isMod, True)
+        self.assertFalse(self.channel.clear.called)
