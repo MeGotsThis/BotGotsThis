@@ -357,7 +357,8 @@ class Socket:
         if not isinstance(connection, socketAlias):
             raise TypeError()
         commands = [
-            IrcMessage(None, None, 'PASS', IrcMessageParams(config.password)),
+            IrcMessage(None, None, 'PASS',
+                       IrcMessageParams(config.password or None)),
             IrcMessage(None, None, 'NICK', IrcMessageParams(config.botnick)),
             IrcMessage(None, None, 'USER',
                        IrcMessageParams(config.botnick + ' 0 *',
