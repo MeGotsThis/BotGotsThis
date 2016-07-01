@@ -12,7 +12,7 @@ invalidLogin = [
     'Improperly formatted auth',
     ]
 
-def parse(tags: IrcMessageTagsReadOnly,
+def parse(tags: Optional[IrcMessageTagsReadOnly],
           chat: 'Optional[data.Channel]',
           nick: Optional[str],
           message: Optional[str]) -> None:

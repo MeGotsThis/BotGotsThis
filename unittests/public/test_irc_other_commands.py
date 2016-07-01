@@ -1,8 +1,9 @@
 import unittest
 from bot.data import Channel
+from bot.data.error import LoginUnsuccessful
 from bot.twitchmessage import IrcMessageTags
 from datetime import datetime
-from source.ircmessage import clearchat, userstate
+from source.ircmessage import clearchat, notice, userstate
 from unittest.mock import Mock, patch
 
 
@@ -145,3 +146,25 @@ class TestClearChat(unittest.TestCase):
         clearchat.parse(self.channel, 'megotsthis')
         self.assertIs(self.channel.isMod, True)
         self.assertFalse(self.channel.clear.called)
+
+
+class TestNotice(unittest.TestCase):
+    def setUp(self):
+        self.channel = Mock(spec=Channel)
+        self.channel.isMod = True
+
+    def test_invalid_login(self):
+        self.assertRaises(LoginUnsuccessful, notice.parse, None, None, None,
+                          'Login unsuccessful')
+
+    def test_sending_messages_quickly(self):
+        tags = IrcMessageTags(IrcMessageTags.parseTags('msg-id=msg_ratelimit'))
+        notice.parse(
+            tags, self.channel, None,
+            'Your message was not sent because you are sending messages too '
+            'quickly.')
+        self.assertIs(self.channel.isMod, False)
+        self.assertFalse(self.channel.clear.called)
+
+    def test_None(self):
+        notice.parse(None, None, None, None)
