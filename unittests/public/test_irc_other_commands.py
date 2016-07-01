@@ -1,0 +1,117 @@
+import unittest
+from bot.data import Channel
+from bot.twitchmessage import IrcMessageTags
+from datetime import datetime
+from source.ircmessage import userstate
+from unittest.mock import Mock, patch
+
+
+class TestUserState(unittest.TestCase):
+    def setUp(self):
+        patcher = patch('source.irccommand.userstate.bot.globals',
+                        autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_globals = patcher.start()
+        self.cache = datetime(2000, 1, 1)
+        self.mock_globals.emoteset = [0]
+        self.mock_globals.globalEmotesCache = self.cache
+        self.tags = IrcMessageTags(IrcMessageTags.parseTags(
+            'badges=broadcaster/1;color=;display-name=BotGotsThis;'
+            'emote-sets=0;mod=0;subscriber=0;turbo=0;user-type='))
+        self.channel = Mock(spec=Channel)
+        self.channel.isMod = False
+        self.channel.isSubscriber = False
+
+    def test_parse(self):
+        userstate.parse(self.channel, self.tags)
+        self.assertEqual(self.mock_globals.displayName, 'BotGotsThis')
+        self.assertIs(self.mock_globals.isTwitchStaff, False)
+        self.assertIs(self.mock_globals.isTwitchAdmin, False)
+        self.assertIs(self.mock_globals.isGlobalMod, False)
+        self.assertIs(self.mock_globals.isTwitchTurbo, False)
+        self.assertIs(self.channel.isMod, False)
+        self.assertIs(self.channel.isSubscriber, False)
+
+    def test_parse_twitch_staff(self):
+        self.tags['user-type'] = 'staff'
+        userstate.parse(self.channel, self.tags)
+        self.assertIs(self.mock_globals.isTwitchStaff, True)
+        self.assertIs(self.mock_globals.isTwitchAdmin, True)
+        self.assertIs(self.mock_globals.isGlobalMod, True)
+        self.assertIs(self.mock_globals.isTwitchTurbo, False)
+        self.assertIs(self.channel.isMod, True)
+        self.assertIs(self.channel.isSubscriber, False)
+
+    def test_parse_twitch_admin(self):
+        self.tags['user-type'] = 'admin'
+        userstate.parse(self.channel, self.tags)
+        self.assertIs(self.mock_globals.isTwitchStaff, False)
+        self.assertIs(self.mock_globals.isTwitchAdmin, True)
+        self.assertIs(self.mock_globals.isGlobalMod, True)
+        self.assertIs(self.mock_globals.isTwitchTurbo, False)
+        self.assertIs(self.channel.isMod, True)
+        self.assertIs(self.channel.isSubscriber, False)
+
+    def test_parse_global_mod(self):
+        self.tags['user-type'] = 'global_mod'
+        userstate.parse(self.channel, self.tags)
+        self.assertIs(self.mock_globals.isTwitchStaff, False)
+        self.assertIs(self.mock_globals.isTwitchAdmin, False)
+        self.assertIs(self.mock_globals.isGlobalMod, True)
+        self.assertIs(self.mock_globals.isTwitchTurbo, False)
+        self.assertIs(self.channel.isMod, True)
+        self.assertIs(self.channel.isSubscriber, False)
+
+    def test_parse_moderator(self):
+        self.tags['user-type'] = 'mod'
+        self.tags['mod'] = '1'
+        userstate.parse(self.channel, self.tags)
+        self.assertIs(self.mock_globals.isTwitchStaff, False)
+        self.assertIs(self.mock_globals.isTwitchAdmin, False)
+        self.assertIs(self.mock_globals.isGlobalMod, False)
+        self.assertIs(self.mock_globals.isTwitchTurbo, False)
+        self.assertIs(self.channel.isMod, True)
+        self.assertIs(self.channel.isSubscriber, False)
+
+    def test_parse_subscriber(self):
+        self.tags['subscriber'] = '1'
+        userstate.parse(self.channel, self.tags)
+        self.assertIs(self.mock_globals.isTwitchTurbo, False)
+        self.assertIs(self.channel.isSubscriber, True)
+
+    def test_parse_turbo(self):
+        self.tags['turbo'] = '1'
+        userstate.parse(self.channel, self.tags)
+        self.assertIs(self.mock_globals.isTwitchTurbo, True)
+        self.assertIs(self.channel.isSubscriber, False)
+
+    def test_parse_emote_sets(self):
+        self.tags['emote-sets'] = '0'
+        userstate.parse(self.channel, self.tags)
+        self.assertCountEqual(self.mock_globals.emoteset, [0])
+        self.assertEqual(self.mock_globals.globalEmotesCache, self.cache)
+
+    def test_parse_emote_sets_changed(self):
+        self.tags['emote-sets'] = '0,1'
+        userstate.parse(self.channel, self.tags)
+        self.assertCountEqual(self.mock_globals.emoteset, [0, 1])
+        self.assertNotEqual(self.mock_globals.globalEmotesCache, self.cache)
+
+    def test_parse_emote_sets_turbo_special(self):
+        self.tags['emote-sets'] = '0,33,42'
+        userstate.parse(self.channel, self.tags)
+        self.assertCountEqual(self.mock_globals.emoteset, [0])
+
+    def test_parse_channel_none(self):
+        self.tags['user-type'] = 'staff'
+        userstate.parse(None, self.tags)
+        self.assertEqual(self.mock_globals.displayName, 'BotGotsThis')
+        self.assertIs(self.mock_globals.isTwitchStaff, True)
+        self.assertIs(self.mock_globals.isTwitchAdmin, True)
+        self.assertIs(self.mock_globals.isGlobalMod, True)
+        self.assertIs(self.mock_globals.isTwitchTurbo, False)
+        self.assertIs(self.channel.isMod, False)
+        self.assertIs(self.channel.isSubscriber, False)
+
+    def test_parse_tags_none(self):
+        userstate.parse(self.channel, None)

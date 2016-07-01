@@ -229,9 +229,7 @@ def irc_userstate(
         utils.logIrcMessage(where + '#userstate.log', '< ' + str(message),
                             timestamp)
     if where[0] == '#' and where[1:] in channels:
-        chan = channels[where[1:]]
-        tags = message.tags
-        userstate.parse(chan, tags)
+        userstate.parse(channels[where[1:]], message.tags)
 
 
 def log_channel_message(message: IrcMessage,

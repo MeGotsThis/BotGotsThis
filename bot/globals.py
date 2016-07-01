@@ -26,6 +26,7 @@ displayName = config.botnick  # type: str
 isTwitchTurbo = False  # type: bool
 isTwitchAdmin = False  # type: bool
 isTwitchStaff = False  # type: bool
+isGlobalMod = False  # type: bool
 emoteset = [0]  # type: List[int]
 globalEmotes = {
     25: 'Kappa',
