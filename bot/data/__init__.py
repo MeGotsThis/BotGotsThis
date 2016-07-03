@@ -399,18 +399,24 @@ class Socket:
             messageBytes = message.encode('utf-8')  # type: bytes
             timestamp = utils.now()  # type: datetime
             self._socket.send(messageBytes)
-            if command.command == 'PING':
-                self.lastSentPing = timestamp
-            if command.command == 'JOIN':
-                channel.onJoin()
-                globals.join.recordJoin()
-                print('{time} Joined {channel} on {socket}'.format(
-                    time=timestamp, channel=channel.channel, socket=self.name))
+            self._onWrite(command, timestamp, channel=channel)
             self._logWrite(command, channel=channel, whisper=whisper,
                            timestamp=timestamp)
         except socket.error:
             utils.logException()
             self.disconnect()
+
+    def _onWrite(self,
+                 command: IrcMessage,
+                 timestamp: datetime, *,
+                 channel: Optional[Channel]=None) -> None:
+        if command.command == 'PING':
+            self.lastSentPing = timestamp
+        if command.command == 'JOIN' and isinstance(channel, Channel):
+            channel.onJoin()
+            globals.join.recordJoin()
+            print('{time} Joined {channel} on {socket}'.format(
+                time=timestamp, channel=channel.channel, socket=self.name))
 
     def flushWrite(self) -> None:
         if self._socket is None:

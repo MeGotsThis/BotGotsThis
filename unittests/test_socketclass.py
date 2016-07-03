@@ -104,6 +104,24 @@ class TestSocket(unittest.TestCase):
         self.assertRaises(ConnectionError, self.socket.write,
                           IrcMessage(None, None, 'PING'))
 
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('bot.data.globals', autospec=True)
+    @patch.object(Channel, 'onJoin', autospec=True)
+    def test_onwrite_join(self, mock_onJoin, mock_globals, mock_stdout):
+        now = datetime(2000, 1, 1)
+        message = IrcMessage(None, None, 'JOIN')
+        mock_globals.join = Mock(spec=JoinThread)
+        self.socket._onWrite(message, now, channel=self.channel)
+        mock_onJoin.assert_called_once_with(self.channel)
+        mock_globals.join.recordJoin.assert_called_once_with()
+        self.assertNotEquals(mock_stdout.getvalue(), '')
+
+    def test_onwrite_ping(self):
+        now = datetime(2000, 1, 1)
+        message = IrcMessage(None, None, 'PING')
+        self.socket._onWrite(message, now, channel=self.channel)
+        self.assertEqual(self.socket.lastSentPing, now)
+
     @patch.object(Socket, 'write', autospec=True)
     def test_flushWrite(self, mock_write):
         self.assertRaises(ConnectionError, self.socket.flushWrite)
@@ -426,8 +444,9 @@ class TestSocketConnected(unittest.TestCase):
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch('bot.data.socket.socket.send', spec=SocketSpec.send)
+    @patch.object(Socket, '_onWrite', autospec=True)
     @patch.object(Socket, '_logWrite', autospec=True)
-    def test_write(self, mock_logWrite, mock_send, mock_logException,
+    def test_write(self, mock_logWrite, mock_onWrite, mock_send, mock_logException,
                    mock_disconnect):
         message = IrcMessage(None, None, 1)
         self.socket.write(message)
@@ -435,6 +454,8 @@ class TestSocketConnected(unittest.TestCase):
                                               channel=None, whisper=None,
                                               timestamp=self.now)
         mock_send.assert_called_once_with(b'001\r\n')
+        mock_onWrite.assert_called_once_with(self.socket, message, self.now, channel=None)
+        self.assertFalse(mock_logException.called)
         self.assertFalse(mock_logException.called)
         self.assertFalse(mock_disconnect.called)
 
@@ -453,37 +474,6 @@ class TestSocketConnected(unittest.TestCase):
         mock_send.assert_called_once_with(b'001\r\n')
         self.assertFalse(mock_logException.called)
         self.assertFalse(mock_disconnect.called)
-
-    @patch('sys.stdout', new_callable=StringIO)
-    @patch('bot.data.globals', autospec=True)
-    @patch.object(Channel, 'onJoin', autospec=True)
-    @patch.object(Socket, 'disconnect', autospec=True)
-    @patch('bot.data.socket.socket.send', spec=SocketSpec.send)
-    @patch.object(Socket, '_logWrite', autospec=True)
-    def test_write_channel_join(
-            self, mock_logWrite, mock_send, mock_disconnect, mock_onJoin,
-            mock_globals, mock_stdout):
-        message = IrcMessage(None, None, 'JOIN')
-        mock_globals.join = Mock(spec=JoinThread)
-        self.socket.write(message, channel=self.channel)
-        self.assertTrue(mock_logWrite.called)
-        self.assertTrue(mock_send.called)
-        self.assertFalse(mock_disconnect.called)
-        mock_onJoin.assert_called_once_with(self.channel)
-        mock_globals.join.recordJoin.assert_called_once_with()
-        self.assertNotEquals(mock_stdout.getvalue(), '')
-
-    @patch.object(Socket, 'disconnect', autospec=True)
-    @patch('bot.data.socket.socket.send', spec=SocketSpec.send)
-    @patch.object(Socket, '_logWrite', autospec=True)
-    def test_write_channel_ping(self, mock_logWrite, mock_send,
-                                mock_disconnect):
-        message = IrcMessage(None, None, 'PING')
-        self.socket.write(message, channel=self.channel)
-        self.assertTrue(mock_logWrite.called)
-        self.assertTrue(mock_send.called)
-        self.assertFalse(mock_disconnect.called)
-        self.assertEqual(self.socket.lastSentPing, self.now)
 
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch('bot.utils.logException', autospec=True)
