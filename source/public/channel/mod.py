@@ -6,7 +6,7 @@ from ...data import ChatCommandArgs
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 def commandStatus(args: ChatCommandArgs) -> bool:
-    if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
+    if oauth.token(args.chat.channel, database=args.database) is None:
         return False
     if twitch.updateChannel(args.chat.channel, status=args.message.query):
         msg = 'Channel Status set as: ' + args.message.query
@@ -19,7 +19,7 @@ def commandStatus(args: ChatCommandArgs) -> bool:
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 def commandGame(args: ChatCommandArgs) -> bool:
-    if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
+    if oauth.token(args.chat.channel, database=args.database) is None:
         return False
     game = args.message.query  # type: str
     game = args.database.getFullGameTitle(args.message.lower[1:]) or game
@@ -38,7 +38,7 @@ def commandGame(args: ChatCommandArgs) -> bool:
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 def commandRawGame(args: ChatCommandArgs) -> bool:
-    if oauth.getOAuthTokenWithDB(args.database, args.chat.channel) is None:
+    if oauth.token(args.chat.channel, database=args.database) is None:
         return False
     if twitch.updateChannel(args.chat.channel, game=args.message.query):
         if args.message.query:

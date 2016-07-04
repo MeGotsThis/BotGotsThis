@@ -44,7 +44,7 @@ def twitchCall(channel: Optional[str],
         headers = {}
     with closing(HTTPSConnection('api.twitch.tv')) as connection:  # --type: HTTPConnection
         if channel is not None and 'Authorization' not in headers:
-            token = oauth.getOAuthToken(channel)  # type: Optional[str]
+            token = oauth.token(channel)  # type: Optional[str]
             if token is not None:
                 headers['Authorization'] = 'OAuth ' + token
             headers['Accept'] = 'application/vnd.twitchtv.v3+json'
@@ -122,7 +122,7 @@ def twitchChatServer(chat:Optional[str],
         headers = {}
     with closing(HTTPSConnection('tmi.twitch.tv')) as connection:  # --type: HTTPConnection
         if chat is not None and 'Authorization' not in headers:
-            token = oauth.getOAuthToken(chat)  # type: Optional[str]
+            token = oauth.token(chat)  # type: Optional[str]
             if token is not None:
                 headers['Authorization'] = 'OAuth ' + token
             headers['Accept'] = 'application/vnd.twitchtv.v3+json'
