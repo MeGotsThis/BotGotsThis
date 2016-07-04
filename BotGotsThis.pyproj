@@ -177,6 +177,7 @@
     <Compile Include="source\__init__.py" />
     <Compile Include="timezonedb.py" />
     <Compile Include="twitchOauth.py" />
+    <Compile Include="unittests\public\test_api_ffz.py" />
     <Compile Include="unittests\public\test_ircmessage.py" />
     <Compile Include="unittests\public\test_irc_channel.py" />
     <Compile Include="unittests\public\test_irc_whisper.py" />
