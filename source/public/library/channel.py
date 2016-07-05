@@ -14,7 +14,7 @@ def botJoin(database: DatabaseBase,
         return True
     priority = database.getAutoJoinsPriority(channel)  # type: Union[int, float]
 
-    cluster = twitch.twitchChatServer(channel) or 'aws'  # type: str
+    cluster = twitch.chat_server(channel) or 'aws'  # type: str
     if utils.joinChannel(channel, priority, cluster):
         send('Joining ' + channel)
     else:

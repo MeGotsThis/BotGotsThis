@@ -15,7 +15,7 @@ try:
     
     if 'code' in queryParts and len(queryParts['code']):
         for code in queryParts['code']:
-            response, data = twitch.twitchCall(
+            response, data = twitch.api_call(
                 None, 'POST', '/kraken/oauth2/token/',
                 headers={
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -33,7 +33,7 @@ try:
                 oauthTokens = json.loads(data.decode('utf-8'))
                 token = oauthTokens['access_token']
                 
-                response, data = twitch.twitchCall(
+                response, data = twitch.api_call(
                     None, 'GET', '/kraken/',
                     headers={
                         'Authorization': 'OAuth ' + token,

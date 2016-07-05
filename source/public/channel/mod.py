@@ -8,7 +8,7 @@ from ...data import ChatCommandArgs
 def commandStatus(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
-    if twitch.updateChannel(args.chat.channel, status=args.message.query):
+    if twitch.update(args.chat.channel, status=args.message.query):
         msg = 'Channel Status set as: ' + args.message.query
     else:
         msg = 'Channel Status failed to set'
@@ -24,7 +24,7 @@ def commandGame(args: ChatCommandArgs) -> bool:
     game = args.message.query  # type: str
     game = args.database.getFullGameTitle(args.message.lower[1:]) or game
     game = game.replace('Pokemon', 'Pokémon').replace('Pokepark', 'Poképark')
-    if twitch.updateChannel(args.chat.channel, game=game):
+    if twitch.update(args.chat.channel, game=game):
         if game:
             msg = 'Channel Game set as: ' + game
         else:
@@ -40,7 +40,7 @@ def commandGame(args: ChatCommandArgs) -> bool:
 def commandRawGame(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
-    if twitch.updateChannel(args.chat.channel, game=args.message.query):
+    if twitch.update(args.chat.channel, game=args.message.query):
         if args.message.query:
             msg = 'Channel Game set as: ' + args.message.query
         else:

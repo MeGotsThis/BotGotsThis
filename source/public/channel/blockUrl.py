@@ -35,7 +35,7 @@ def checkIfUrlMaybeBad(chat: 'data.Channel',
                        nick: str,
                        message: Message,
                        timestamp: datetime):
-    if not twitch.getFollowerCount(nick):
+    if not twitch.num_followers(nick):
         return
     
     # Record all urls with users of no follows

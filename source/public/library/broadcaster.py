@@ -19,7 +19,7 @@ def botCome(database: DatabaseBase,
         send('I am already in {channel}'.format(channel=channel))
         return True
     
-    cluster = twitch.twitchChatServer(channel)
+    cluster = twitch.chat_server(channel)
     if utils.joinChannel(channel, priority, cluster):
         send('Joining {channel}'.format(channel=channel))
     else:
@@ -72,7 +72,7 @@ def botAutoJoin(database: DatabaseBase,
                      'enabled'.format(channel=channel))
             return True
     
-    cluster = twitch.twitchChatServer(channel) or 'aws'  # type: str
+    cluster = twitch.chat_server(channel) or 'aws'  # type: str
     result = database.saveAutoJoin(channel, 0, cluster)
     priority = database.getAutoJoinsPriority(channel)  # type: Union[int, float]
     if result is False:

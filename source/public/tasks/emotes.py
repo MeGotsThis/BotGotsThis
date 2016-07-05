@@ -10,7 +10,7 @@ from ...api import twitch
 
 def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - globals.globalEmotesCache >= timedelta(hours=1):
-        data = twitch.getTwitchEmotes()  # type: Optional[Tuple[Dict[int, str], Dict[int, int]]]
+        data = twitch.twitch_emotes()  # type: Optional[Tuple[Dict[int, str], Dict[int, int]]]
         if data:
             emotes, emoteSets = data
             globals.globalEmotesCache = timestamp

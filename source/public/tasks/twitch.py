@@ -14,7 +14,7 @@ def checkStreamsAndChannel(timestamp: datetime) -> None:
         return
     with suppress(socket.gaierror):
         channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
-        onlineStreams = twitch.checkOnlineStreams(
+        onlineStreams = twitch.active_streams(
             channels.keys())  # type: Optional[twitch.OnlineStreams]
         if onlineStreams is None:
             return
@@ -43,7 +43,7 @@ def checkOfflineChannels(timestamp: datetime) -> None:
     ch = random.choice(offlineChannels)  # type: str
     chat = channels[ch]  # type: data.Channel
     with suppress(socket.gaierror):
-        current = twitch.channelStatusAndGame(ch)  # type: Optional[twitch.TwitchStatus]
+        current = twitch.channel_properties(ch)  # type: Optional[twitch.TwitchStatus]
         if current is None:
             return
         (chat.streamingSince, chat.twitchStatus,
@@ -61,7 +61,7 @@ def checkChatServers(timestamp: datetime) -> None:
         return
     channel = random.choice(toCheck)  # type: str
     channels[channel].serverCheck = timestamp
-    cluster = twitch.twitchChatServer(channel)  # type: Optional[str]
+    cluster = twitch.chat_server(channel)  # type: Optional[str]
     if (cluster is not None and cluster in globals.clusters
             and globals.clusters[cluster] is not channels[channel].socket):
         with getDatabase() as db:

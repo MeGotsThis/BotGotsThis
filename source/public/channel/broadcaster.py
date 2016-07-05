@@ -50,7 +50,7 @@ def commandUptime(args: ChatCommandArgs) -> bool:
             'minute'.format(channel=args.chat.channel))
         return True
 
-    currentTime = twitch.serverTime()  # type: datetime
+    currentTime = twitch.server_time()  # type: datetime
     if currentTime:
         uptime = currentTime - args.chat.streamingSince  # type: timedelta
         args.chat.send('Uptime: {uptime}'.format(uptime=uptime))
