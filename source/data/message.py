@@ -8,6 +8,19 @@ class Tokenized(Sequence[str]):
         self._string = string  # type: str
         self._tokens = self._string.split()  # type: List[str]
 
+    def __eq__(self, other:object) -> bool:
+        if isinstance(other, Tokenized):
+            return self._string == other._string
+        if isinstance(other, str):
+            return self._string == other
+        return False
+
+    def __ne__(self, other:object) -> bool:
+        return not self.__eq__(other)
+
+    def __hash__(self) -> int:
+        return self._string.__hash__()
+
     def __str__(self) -> str:
         return self._string
     
