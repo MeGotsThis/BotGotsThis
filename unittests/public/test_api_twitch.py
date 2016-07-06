@@ -223,6 +223,7 @@ channelProperties = b'''{
     }
 }'''
 
+
 class TestApiTwitchApiCalls(unittest.TestCase):
     def setUp(self):
         patcher = patch('source.api.twitch.client_id')
