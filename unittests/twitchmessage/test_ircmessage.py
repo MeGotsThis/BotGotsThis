@@ -554,3 +554,12 @@ class TestsIrcMessage(unittest.TestCase):
                        command=1,
                        params=IrcMessageParams(middle='botgotsthis',
                                                trailing='Welcome, GLHF!')))
+
+    def test_from_twitch_privmsg_bits(self):
+        IrcMessage.fromMessage(
+            '@badges=staff/1,bits/1000;bits=100;color=;'
+            'display-name=TWITCH_UserNaME;emotes=;'
+            'id=b34ccfc7-4977-403a-8a94-33c6bac34fb8;mod=0;room-id=1337;'
+            'subscriber=0;turbo=1;user-id=1337;user-type=staff '
+            ':twitch_username!twitch_username@twitch_username.tmi.twitch.tv '
+            'PRIVMSG #channel :cheer100')
