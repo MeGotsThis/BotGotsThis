@@ -182,6 +182,10 @@
     <Compile Include="unittests\public\test_api_ffz.py" />
     <Compile Include="unittests\public\test_api_oauth.py" />
     <Compile Include="unittests\public\test_api_twitch.py" />
+    <Compile Include="unittests\public\test_data_message.py" />
+    <Compile Include="unittests\public\test_data_permissions.py" />
+    <Compile Include="unittests\public\test_data_timedelta.py" />
+    <Compile Include="unittests\public\test_data_timezones.py" />
     <Compile Include="unittests\public\test_ircmessage.py" />
     <Compile Include="unittests\public\test_irc_channel.py" />
     <Compile Include="unittests\public\test_irc_other_commands.py" />
