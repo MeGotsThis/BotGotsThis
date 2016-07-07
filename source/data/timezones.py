@@ -1,15 +1,20 @@
 ﻿from abc import ABCMeta, abstractmethod
 from contextlib import closing
-from typing import Dict, List, Optional, Tuple
+from datetime import datetime, timedelta, tzinfo
+from typing import Dict, NamedTuple, Optional, Sequence
 import configparser
-import datetime
 import os
 import sqlite3
 
-ZERO = datetime.timedelta(0)
+Transition = NamedTuple('Transition',
+                        [('start', int),  # in unix timestamp
+                         ('abbreviation', str),
+                         ('offset', int)])  # in seconds
+
+ZERO = timedelta(0)
 
 
-class BaseTimeZone(datetime.tzinfo, metaclass=ABCMeta):
+class BaseTimeZone(tzinfo, metaclass=ABCMeta):
     @abstractmethod
     def zone(self) -> str:
         return 'zone'
@@ -22,19 +27,23 @@ class BasicTimeZone(BaseTimeZone):
     def __init__(self,
                  offset: int,
                  name: str) -> None:
-        self.__offset = datetime.timedelta(minutes=offset)  # type: datetime.timedelta
+        if not isinstance(offset, int):
+            raise TypeError()
+        if not isinstance(name, str):
+            raise TypeError()
+        self.__offset = timedelta(minutes=offset)  # type: timedelta
         self.__name = name  # type: str
     
     def zone(self) -> str:
         return self.__name
     
-    def tzname(self, dt: datetime.datetime) -> str:
+    def tzname(self, dt: Optional[datetime]) -> str:
         return self.__name
     
-    def utcoffset(self, dt: Optional[datetime.datetime]) -> int:
+    def utcoffset(self, dt: Optional[datetime]) -> int:
         return self.__offset.seconds // 60
     
-    def dst(self, dt: Optional[datetime.datetime]) -> int:
+    def dst(self, dt: Optional[datetime]) -> int:
         return ZERO.seconds // 60
 
 
@@ -44,43 +53,61 @@ class TimeZone(BaseTimeZone):
     
     def __init__(self,
                  zone :str,
-                 transitions: List[Tuple[int, str, int]]) -> None:
+                 transitions: Sequence[Transition]) -> None:
+        if not isinstance(zone, str):
+            raise TypeError()
+        if not isinstance(transitions, Sequence[Transition]):
+            raise TypeError()
+        if not transitions:
+            raise ValueError()
         self.__zone = zone  # type: str
-        self._transitions = transitions  # type: List[Tuple[int, str, int]]
+        self._transitions = transitions  # type: Sequence[Transition]
     
     def zone(self) -> str:
         return self.__zone
     
-    def tzname(self, dt: datetime.datetime) -> str:
+    def tzname(self, dt: Optional[datetime]) -> str:
+        if dt is None:
+            return self._transitions[0].abbreviation
+        if not isinstance(dt, datetime):
+            raise TypeError()
         unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
-        transistion = self._transitions[0]  # type: Tuple[int, str, int]
-        for t in self._transitions[::-1]:
-            if unixTime >= t[0]:
+        transistion = self._transitions[0]  # type: Transition
+        for t in self._transitions[::-1]:  # --type: Transition
+            if unixTime >= t.start:
                 transistion = t
                 break
-        return transistion[1]
+        return transistion.abbreviation
     
-    def utcoffset(self, dt: Optional[datetime.datetime]) -> int:
-        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
-        transistion = self._transitions[0]
-        for t in self._transitions[::-1]:
-            if unixTime >= t[0]:
+    def utcoffset(self, dt: Optional[datetime]) -> int:
+        if dt is None:
+            return self._transitions[0].offset // 60
+        if not isinstance(dt, datetime):
+            raise TypeError()
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
+        transistion = self._transitions[0]  # type: Transition
+        for t in self._transitions[::-1]:  # --type: Transition
+            if unixTime >= t.start:
                 transistion = t
                 break
-        return transistion[2] // 60
+        return transistion.offset // 60
      
-    def dst(self, dt: Optional[datetime.datetime]) -> int:
-        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
-        transistion = self._transitions[0]
-        for t in self._transitions[::-1]:
-            if unixTime >= t[0]:
+    def dst(self, dt: Optional[datetime]) -> int:
+        if dt is None:
+            return ZERO.seconds // 60
+        if not isinstance(dt, datetime):
+            raise TypeError()
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
+        transistion = self._transitions[0]  # type: Transition
+        for t in self._transitions[::-1]:  # --type: Transition
+            if unixTime >= t.start:
                 transistion = t
                 break
-        delta = transistion[2] - self._transitions[0][2]
+        delta = transistion.offset - self._transitions[0].offset  # type: int
         return delta // 60
 
 utc = BasicTimeZone(0, 'UTC')
-unixEpoch = datetime.datetime(1970, 1, 1, 0, 0, 0, 0)
+unixEpoch = datetime(1970, 1, 1, 0, 0, 0, 0)
 
 timezones = [
     utc,
@@ -135,7 +162,7 @@ UNION ALL SELECT abbreviation, gmt_offset FROM timezone
         for _row in _cursor:
             timezones.append(BasicTimeZone(_row[1] // 60, _row[0]))
         _zones = {}  # type: Dict[int, str]
-        _transitions = {}  # type: Dict[int, List[Tuple[int, str, int]]]
+        _transitions = {}  # type: Dict[int, List[Transition]]
         _cursor.execute('SELECT zone_id, zone_name FROM zone ORDER BY zone_id')
         for _row in _cursor:
             _zones[_row[0]] = _row[1]
@@ -144,11 +171,11 @@ UNION ALL SELECT abbreviation, gmt_offset FROM timezone
                         "FROM timezone WHERE abbreviation != 'UTC' "
                         'ORDER BY zone_id, time_start')
         for _row in _cursor:
-            _transitions[_row[0]].append((_row[2], _row[1], _row[3]))
+            _transitions[_row[0]].append(Transition(_row[2], _row[1], _row[3]))
         for _z in _zones:
             timezones.append(TimeZone(_zones[_z], _transitions[_z]))
     del _ini, _connection, _cursor, _row, _z, _zones, _transitions
 
 abbreviations = {tz.zone().lower(): tz for tz in timezones}
 
-del closing, configparser, datetime, sqlite3, os
+del closing, configparser, os, sqlite3, tzinfo
