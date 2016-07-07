@@ -134,7 +134,7 @@ def num_followers(user: str) -> Optional[int]:
 
 def update(channel: str, *,
            status:Optional[str]=None,
-           game:Optional[str]=None):
+           game:Optional[str]=None) -> Optional[bool]:
     postData = {}  # type: Dict[str, str]
     if isinstance(status, str):
         postData['channel[status]'] = status or ' '
@@ -142,13 +142,15 @@ def update(channel: str, *,
         postData['channel[game]'] = game
     if not postData:
         return None
-    response, data = api_call(
-        channel, 'PUT', '/kraken/channels/' + channel,
-        headers={
-            'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        data=postData)  # type: HTTPResponse, bytes
-    return response.status == 200
+    with suppress(ConnectionError, HTTPException):
+        response, data = api_call(
+            channel, 'PUT', '/kraken/channels/' + channel,
+            headers={
+                'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            data=postData)  # type: HTTPResponse, bytes
+        return response.status == 200
+    return None
 
 
 def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:

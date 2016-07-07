@@ -366,8 +366,7 @@ class TestApiTwitch(unittest.TestCase):
 
     def test_update_except(self):
         self.mock_api_call.side_effect = HTTPException
-        self.assertRaises(HTTPException, twitch.update, 'botgotsthis',
-                          status='Kappa')
+        self.assertIsNone(twitch.update('botgotsthis', status='Kappa'))
 
     def test_active_streams(self):
         self.mock_response.status = 404
