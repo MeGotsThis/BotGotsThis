@@ -157,6 +157,13 @@ class TestTasksEmotes(unittest.TestCase):
         bgtchannel.updateFfzEmotes.assert_called_once_with()
         self.assertFalse(mgtchannel.updateFfzEmotes.called)
 
+    @patch('source.public.tasks.emotes.random.choice', autospec=True)
+    def test_ffz_broadcaster_empty(self, mock_choice):
+        now = datetime(2000, 1, 1)
+        self.mock_globals.channels = {}
+        emotes.refreshFfzRandomBroadcasterEmotes(now + timedelta(hours=1))
+        self.assertFalse(mock_choice.called)
+
     @patch('source.public.tasks.emotes.refreshBttvGlobalEmotes',
            autospec=True)
     @patch('source.public.tasks.emotes.refreshBttvRandomBroadcasterEmotes',
@@ -257,3 +264,10 @@ class TestTasksEmotes(unittest.TestCase):
         emotes.refreshBttvRandomBroadcasterEmotes(now + timedelta(hours=1))
         bgtchannel.updateBttvEmotes.assert_called_once_with()
         self.assertFalse(mgtchannel.updateBttvEmotes.called)
+
+    @patch('source.public.tasks.emotes.random.choice', autospec=True)
+    def test_bttv_broadcaster_empty(self, mock_choice):
+        now = datetime(2000, 1, 1)
+        self.mock_globals.channels = {}
+        emotes.refreshBttvRandomBroadcasterEmotes(now + timedelta(hours=1))
+        self.assertFalse(mock_choice.called)
