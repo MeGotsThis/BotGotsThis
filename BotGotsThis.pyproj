@@ -190,6 +190,7 @@
     <Compile Include="unittests\public\test_irc_channel.py" />
     <Compile Include="unittests\public\test_irc_other_commands.py" />
     <Compile Include="unittests\public\test_irc_whisper.py" />
+    <Compile Include="unittests\public\test_tasks_emotes.py" />
     <Compile Include="unittests\test_channel.py" />
     <Compile Include="unittests\test_messagingqueue.py" />
     <Compile Include="unittests\test_socketclass.py" />
