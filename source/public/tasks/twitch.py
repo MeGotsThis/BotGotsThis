@@ -12,58 +12,54 @@ from ...database.factory import getDatabase
 def checkStreamsAndChannel(timestamp: datetime) -> None:
     if not globals.channels:
         return
-    with suppress(socket.gaierror):
-        channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
-        onlineStreams = twitch.active_streams(
-            channels.keys())  # type: Optional[twitch.OnlineStreams]
-        if onlineStreams is None:
-            return
-        for channel in onlineStreams:  # --type: str
-            chat = channels[channel]
-            chat.twitchCache = timestamp
-            (chat.streamingSince, chat.twitchStatus,
-             chat.twitchGame) = onlineStreams[channel]
-        
-        for channel in channels:
-            if channel in onlineStreams:
-                continue
-            channels[channel].streamingSince = None
+    channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
+    onlineStreams = twitch.active_streams(
+        channels.keys())  # type: Optional[twitch.OnlineStreams]
+    if onlineStreams is None:
+        return
+    for channel in onlineStreams:  # --type: str
+        chat = channels[channel]
+        chat.twitchCache = timestamp
+        (chat.streamingSince, chat.twitchStatus,
+         chat.twitchGame) = onlineStreams[channel]
+
+    for channel in channels:
+        if channel in onlineStreams:
+            continue
+        channels[channel].streamingSince = None
 
 
 def checkOfflineChannels(timestamp: datetime) -> None:
     if not globals.channels:
         return
     cacheDuration = timedelta(seconds=300)  # type: timedelta
-    channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
-    offlineChannels = [c for c, ch in channels.items()
-                       if (ch.streamingSince is None
+    offlineChannels = [ch for ch in globals.channels.values()
+                       if (not ch.isStreaming
                            and timestamp - ch.twitchCache >= cacheDuration)]  # type: List[str]
     if not offlineChannels:
         return
-    ch = random.choice(offlineChannels)  # type: str
-    chat = channels[ch]  # type: data.Channel
-    with suppress(socket.gaierror):
-        current = twitch.channel_properties(ch)  # type: Optional[twitch.TwitchStatus]
-        if current is None:
-            return
-        (chat.streamingSince, chat.twitchStatus,
-         chat.twitchGame) = current
-        chat.twitchCache = timestamp
+    chat = random.choice(offlineChannels)  # type: data.Channel
+    current = twitch.channel_properties(chat.channel)  # type: Optional[twitch.TwitchStatus]
+    if current is None:
+        return
+    (chat.streamingSince, chat.twitchStatus,
+     chat.twitchGame) = current
+    chat.twitchCache = timestamp
 
 
 def checkChatServers(timestamp: datetime) -> None:
     cooldown = timedelta(seconds=3600)  # type: timedelta
     channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
     toCheck = [c for c, ch in channels.items()
-               if (ch.serverCheck is None
-                   or timestamp - ch.serverCheck >= cooldown)]  # type: List[str]
+               if (timestamp - ch.serverCheck >= cooldown)]  # type: List[str]
     if not toCheck:
         return
     channel = random.choice(toCheck)  # type: str
     channels[channel].serverCheck = timestamp
     cluster = twitch.chat_server(channel)  # type: Optional[str]
-    if (cluster is not None and cluster in globals.clusters
-            and globals.clusters[cluster] is not channels[channel].socket):
+    if (cluster is not None
+            and (cluster not in globals.clusters
+                 or globals.clusters[cluster] is not channels[channel].socket)):
         with getDatabase() as db:
             priority = db.getAutoJoinsPriority(channel)  # type: Union[int, float]
             utils.ensureServer(channel, priority, cluster)

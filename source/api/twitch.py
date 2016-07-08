@@ -154,24 +154,26 @@ def update(channel: str, *,
 
 
 def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
-    uri = '/kraken/streams?limit=100&channel=' + ','.join(channels)  # type: str
-    response, responseData = api_call(None, 'GET', uri)  # type: HTTPResponse, bytes
-    if response.status != 200:
-        return None
-    online = {}  # type: Dict[str, TwitchStatus]
-    streamsData = json.loads(responseData.decode('utf-8'))  # type: dict
-    _handle_streams(streamsData['streams'], online)
-    if streamsData['_total'] > 100:
-        while streamsData['streams']:
-            time.sleep(0.05)
-            fullUrl = streamsData['_links']['next']
-            uri = fullUrl[fullUrl.index('/kraken'):]
-            response, responseData = api_call(None, 'GET', uri)
-            if response.status != 200:
-                break
-            streamsData = json.loads(responseData.decode('utf-8'))
-            _handle_streams(streamsData['streams'], online)
-    return online
+    with suppress(ConnectionError, HTTPException):
+        uri = '/kraken/streams?limit=100&channel=' + ','.join(channels)  # type: str
+        response, responseData = api_call(None, 'GET', uri)  # type: HTTPResponse, bytes
+        if response.status != 200:
+            return None
+        online = {}  # type: Dict[str, TwitchStatus]
+        streamsData = json.loads(responseData.decode('utf-8'))  # type: dict
+        _handle_streams(streamsData['streams'], online)
+        if streamsData['_total'] > 100:
+            while streamsData['streams']:
+                time.sleep(0.05)
+                fullUrl = streamsData['_links']['next']
+                uri = fullUrl[fullUrl.index('/kraken'):]
+                response, responseData = api_call(None, 'GET', uri)
+                if response.status != 200:
+                    break
+                streamsData = json.loads(responseData.decode('utf-8'))
+                _handle_streams(streamsData['streams'], online)
+        return online
+    return None
 
 
 def _handle_streams(streams: List[Dict[str, Any]],
