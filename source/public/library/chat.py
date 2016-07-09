@@ -19,24 +19,24 @@ def sendPriority(chat: Any,
     return sendMessages
 
 
-def permission(permission: str) -> _AnyDecorator:
+def permission(level: str) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         def command(args: _AnyArgs,
                     *pargs, **kwargs) -> Any:
-            if not args.permissions[permission]:
+            if not args.permissions[level]:
                 return False
             return func(args, *pargs, **kwargs)
         return command
     return decorator
 
 
-def not_permission(permission: str) -> _AnyDecorator:
+def not_permission(level: str) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         def command(args: _AnyArgs,
                     *pargs, **kwargs) -> Any:
-            if not args.permissions[permission]:
+            if args.permissions[level]:
                 return False
             return func(args, *pargs, **kwargs)
         return command
@@ -46,47 +46,47 @@ def not_permission(permission: str) -> _AnyDecorator:
 def ownerChannel(func: _AnyCallable) -> _AnyCallable:
     @wraps(func)
     def chatCommand(args: data.ChatCommandArgs,
-                *pargs, **kwargs) -> Any:
+                    *pargs, **kwargs) -> Any:
         if not args.permissions.inOwnerChannel:
             return False
         return func(args, *pargs, **kwargs)
     return chatCommand
 
 
-def feature(feature: str):
+def feature(featureKey: str):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            if not args.database.hasFeature(args.chat.channel, feature):
+            if not args.database.hasFeature(args.chat.channel, featureKey):
                 return False
             return func(args, *pargs, **kwargs)
         return chatCommand
     return decorator
 
 
-def not_feature(feature: str):
+def not_feature(featureKey: str):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            if args.database.hasFeature(args.chat.channel, feature):
+            if args.database.hasFeature(args.chat.channel, featureKey):
                 return False
             return func(args, *pargs, **kwargs)
         return chatCommand
     return decorator
 
 
-def permission_feature(*permissionFeatures: Tuple[str, str]):
+def permission_feature(*levelFeatures: Tuple[str, str]):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            for permission, feature in permissionFeatures:  # --type: str, str
-                hasPermission = not permission or args.permissions[permission]
-                hasFeature = (not feature
+            for level, featureKey in levelFeatures:  # --type: str, str
+                hasPermission = level is None or args.permissions[level]
+                hasFeature = (featureKey is None
                               or args.database.hasFeature(args.chat.channel,
-                                                          feature))
+                                                          featureKey))
                 if hasPermission and hasFeature:
                     break
             else:
@@ -96,16 +96,16 @@ def permission_feature(*permissionFeatures: Tuple[str, str]):
     return decorator
 
 
-def permission_not_feature(*permissionFeatures: Tuple[str, str]):
+def permission_not_feature(*levelFeatures: Tuple[str, str]):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            for permission, feature in permissionFeatures:  # --type: str, str
-                hasPermission = not permission or args.permissions[permission]
-                hasFeature = (not feature
+            for level, featureKey in levelFeatures:  # --type: str, str
+                hasPermission = level is None or args.permissions[level]
+                hasFeature = (featureKey is None
                               or not args.database.hasFeature(
-                                  args.chat.channel, feature))
+                                  args.chat.channel, featureKey))
                 if hasPermission and hasFeature:
                     break
             else:
@@ -117,12 +117,12 @@ def permission_not_feature(*permissionFeatures: Tuple[str, str]):
 
 def cooldown(duration: timedelta,
              key: Any,
-             permission: Optional[str]=None):
+             level: Optional[str]=None):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            if inCooldown(args, duration, key, permission):
+            if inCooldown(args, duration, key, level):
                 return False
             return func(args, *pargs, **kwargs)
         return chatCommand
@@ -132,8 +132,8 @@ def cooldown(duration: timedelta,
 def inCooldown(args: data.ChatCommandArgs,
                duration: timedelta,
                key: Any,
-               permission: Optional[str]=None):
-    if ((permission is None or not args.permissions[permission])
+               level: Optional[str]=None):
+    if ((level is None or not args.permissions[level])
             and key in args.chat.sessionData
             and args.timestamp - args.chat.sessionData[key] < duration):
         return True
