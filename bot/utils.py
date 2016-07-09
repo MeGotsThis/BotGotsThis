@@ -15,13 +15,14 @@ ExceptionInfo = Tuple[Optional[type], Optional[BaseException],
 def now() -> datetime:
     return datetime.utcnow()
 
+
 def joinChannel(broadcaster: str,
                 priority: Union[int, float, str]=float('inf'),
-                cluster: str='aws') -> bool:
+                cluster: str='aws') -> Optional[bool]:
     if not isinstance(broadcaster, str):
         raise TypeError()
     if cluster is None or cluster not in globals.clusters:
-        return False
+        return None
     broadcaster = broadcaster.lower()
     if broadcaster in globals.channels:
         t = min(globals.channels[broadcaster].joinPriority, priority)

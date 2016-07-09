@@ -20,7 +20,11 @@ def botCome(database: DatabaseBase,
         return True
     
     cluster = twitch.chat_server(channel)
-    if utils.joinChannel(channel, priority, cluster):
+    result = utils.joinChannel(channel, priority, cluster)
+    if result is None:
+        send('Unable to join {channel} on a specified server according to '
+             'twitch'.format(channel=channel))
+    elif result:
         send('Joining {channel}'.format(channel=channel))
     else:
         result = utils.ensureServer(channel, priority, cluster)
