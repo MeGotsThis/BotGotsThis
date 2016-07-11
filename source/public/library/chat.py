@@ -1,5 +1,5 @@
 from datetime import timedelta
-from functools import wraps
+from functools import partial, wraps
 from typing import Any, Callable, Iterable, Optional, Tuple, Union
 from ... import data
 
@@ -14,9 +14,7 @@ def send(chat: Any) -> data.Send:
 
 def sendPriority(chat: Any,
                  priority: int) -> data.Send:
-    def sendMessages(messages: Union[str, Iterable[str]]):
-        return chat.send(messages, priority)
-    return sendMessages
+    return partial(chat.send, priority=priority)
 
 
 def permission(level: str) -> _AnyDecorator:

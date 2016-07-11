@@ -25,10 +25,11 @@ class TestLibraryChat(unittest.TestCase):
     def test_send(self):
         self.assertIs(chat.send(self.channel), self.channel.send)
         chat.send(self.channel)('Kappa')
+        self.channel.send.assert_called_once_with('Kappa')
 
     def test_send_priority(self):
-        self.assertIs(chat.send(self.channel), self.channel.send)
         chat.sendPriority(self.channel, 0)('Kappa')
+        self.channel.send.assert_called_once_with('Kappa', priority=0)
 
     def test_permission(self):
         self.permissions.__getitem__.return_value = True
