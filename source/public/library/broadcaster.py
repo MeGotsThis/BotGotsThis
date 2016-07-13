@@ -7,18 +7,13 @@ from ...data.message import Message
 from ...database import DatabaseBase
 
 
-def botCome(database: DatabaseBase,
-            channel: str,
-            send: Send):
-    if database.isChannelBannedReason(channel):
+def come(database: DatabaseBase,
+         channel: str,
+         send: Send) -> bool:
+    if database.isChannelBannedReason(channel) is not None:
         send('Chat {channel} is banned from joining'.format(channel=channel))
         return True
     priority = database.getAutoJoinsPriority(channel)  # type: Union[float, int]
-
-    if channel in globals.channels:
-        send('I am already in {channel}'.format(channel=channel))
-        return True
-    
     cluster = twitch.chat_server(channel)
     result = utils.joinChannel(channel, priority, cluster)
     if result is None:
@@ -29,14 +24,17 @@ def botCome(database: DatabaseBase,
     else:
         result = utils.ensureServer(channel, priority, cluster)
         if result == utils.ENSURE_CORRECT:
-            send('Already joined {channel}'.format(channel=channel))
+            send('I am already in {channel}'.format(channel=channel))
         elif result == utils.ENSURE_REJOIN:
             send('Moved {channel} to correct chat '
                  'server'.format(channel=channel))
+        else:
+            send('Unknown Error')
+    return True
 
 
-def botLeave(channel: str,
-             send: Send) -> bool:
+def leave(channel: str,
+          send: Send) -> bool:
     if channel == config.botnick:
         return False
     send('Bye {channel}'.format(channel=channel))
@@ -45,20 +43,21 @@ def botLeave(channel: str,
     return True
 
 
-def botEmpty(channel: str,
-             send: Send) -> None:
+def empty(channel: str,
+          send: Send) -> bool:
     if channel in globals.channels:
         chan = globals.channels[channel]
         chan.clear()
         send('Cleared all queued messages '
              'for {channel}'.format(channel=channel))
+    return True
 
 
-def botAutoJoin(database: DatabaseBase,
-                channel: str,
-                send: Send,
-                message: Message) -> bool:
-    if database.isChannelBannedReason(channel):
+def auto_join(database: DatabaseBase,
+              channel: str,
+              send: Send,
+              message: Message) -> bool:
+    if database.isChannelBannedReason(channel) is not None:
         send('Chat {channel} is banned from '
              'joining'.format(channel=channel))
         return True
@@ -67,28 +66,32 @@ def botAutoJoin(database: DatabaseBase,
         removeMsgs = ['0', 'false', 'no', 'remove', 'rem', 'delete', 'del',
                       'leave', 'part']  # type: List[str]
         if message.lower[1] in removeMsgs:
-            result = database.discardAutoJoin(channel)  # type: bool
-            if result:
-                send('Auto join for {channel} is now '
-                     'disabled'.format(channel=channel))
-            else:
-                send('Auto join for {channel} was never '
-                     'enabled'.format(channel=channel))
-            return True
-    
-    cluster = twitch.chat_server(channel) or 'aws'  # type: str
+            return auto_join_delete(database, channel, send)
+    return auto_join_add(database, channel, send)
+
+
+def auto_join_add(database: DatabaseBase,
+                  channel: str,
+                  send: Send) -> bool:
+    cluster = twitch.chat_server(channel)  # type: str
+    if cluster is None:
+        send('Auto join for {channel} failed due to Twitch '
+             'error'.format(channel=channel))
+        return True
+    if cluster not in globals.clusters:
+        send('Auto join for {channel} failed due to unsupported chat '
+             'server'.format(channel=channel))
+        return True
     result = database.saveAutoJoin(channel, 0, cluster)
     priority = database.getAutoJoinsPriority(channel)  # type: Union[int, float]
     if result is False:
         database.setAutoJoinServer(channel, cluster)
-    
-    wasInChat = channel in globals.channels
+
+    wasInChat = not utils.joinChannel(channel, priority, cluster)
     rejoin = 0  # type: int
-    if not wasInChat:
-        utils.joinChannel(channel, priority, cluster)
-    else:
+    if wasInChat:
         rejoin = utils.ensureServer(channel, priority, cluster)
-    
+
     if result and not wasInChat:
         msg = ('Auto join for {channel} is now enabled and joined {channel} '
                'chat')  # type: str
@@ -112,10 +115,23 @@ def botAutoJoin(database: DatabaseBase,
     return True
 
 
-def botSetTimeoutLevel(database: DatabaseBase,
-                       channel: str,
-                       send: Send,
-                       message: Message) -> bool:
+def auto_join_delete(database: DatabaseBase,
+                     channel: str,
+                     send: Send) -> bool:
+    result = database.discardAutoJoin(channel)  # type: bool
+    if result:
+        send('Auto join for {channel} is now '
+             'disabled'.format(channel=channel))
+    else:
+        send('Auto join for {channel} was never '
+             'enabled'.format(channel=channel))
+    return True
+
+
+def set_timeout_level(database: DatabaseBase,
+                      channel: str,
+                      send: Send,
+                      message: Message) -> bool:
     propertyDict = {
         '1': 'timeoutLength0',
         '2': 'timeoutLength1',
@@ -135,7 +151,8 @@ def botSetTimeoutLevel(database: DatabaseBase,
         value = None
     timeout = config.moderatorDefaultTimeout[int(k) - 1]  # type: int
     default = '{} seconds'.format(timeout) if timeout else 'Banned'  # type: str
-    database.setChatProperty(channel, propertyDict[k], str(value))
+    saveValue = str(value) if value is not None else None  # type: Optional[str]
+    database.setChatProperty(channel, propertyDict[k], saveValue)
     if value is None:
         msg = ('Setting the timeout length for {ordinal} offense to defaulted '
                'amount ({default})')

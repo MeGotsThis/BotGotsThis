@@ -4,21 +4,18 @@ from ...data import WhisperCommandArgs
 
 
 def commandCome(args: WhisperCommandArgs) -> bool:
-    broadcaster.botCome(args.database, args.nick, send(args.nick))
-    return True
+    return broadcaster.come(args.database, args.nick, send(args.nick))
 
 
 def commandLeave(args: WhisperCommandArgs) -> bool:
-    return broadcaster.botLeave(args.nick, send(args.nick))
+    return broadcaster.leave(args.nick, send(args.nick))
 
 
 def commandEmpty(args: WhisperCommandArgs) -> bool:
-    broadcaster.botEmpty(args.nick, send(args.nick))
-    return True
+    return broadcaster.empty(args.nick, send(args.nick))
 
 
 def commandAutoJoin(args: WhisperCommandArgs) -> bool:
-    broadcaster.botAutoJoin(args.database, args.nick, send(args.nick),
-                            args.message)
-    return True
+    return broadcaster.auto_join(args.database, args.nick, send(args.nick),
+                                 args.message)
 

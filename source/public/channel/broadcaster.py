@@ -13,32 +13,29 @@ def commandHello(args: ChatCommandArgs) -> bool:
 
 @ownerChannel
 def commandCome(args: ChatCommandArgs) -> bool:
-    broadcaster.botCome(args.database, args.nick, send(args.chat))
-    return True
+    return broadcaster.come(args.database, args.nick, send(args.chat))
 
 
 @permission('broadcaster')
 def commandLeave(args: ChatCommandArgs) -> bool:
-    return broadcaster.botLeave(args.chat.channel, send(args.chat))
+    return broadcaster.leave(args.chat.channel, send(args.chat))
 
 
 @permission('broadcaster')
 def commandEmpty(args: ChatCommandArgs) -> bool:
-    broadcaster.botEmpty(args.chat.channel, send(args.chat))
-    return True
+    return broadcaster.empty(args.chat.channel, send(args.chat))
 
 
 @ownerChannel
 def commandAutoJoin(args: ChatCommandArgs) -> bool:
-    broadcaster.botAutoJoin(args.database, args.nick, send(args.chat),
-                            args.message)
-    return True
+    return broadcaster.auto_join(args.database, args.nick, send(args.chat),
+                                 args.message)
 
 
 @permission('broacaster')
 def commandSetTimeoutLevel(args: ChatCommandArgs) -> bool:
-    broadcaster.botSetTimeoutLevel(args.database, args.chat.channel,
-                                   send(args.chat), args.message)
+    broadcaster.set_timeout_level(args.database, args.chat.channel,
+                                  send(args.chat), args.message)
     return True
 
 

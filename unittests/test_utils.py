@@ -24,7 +24,7 @@ class TestUtils(unittest.TestCase):
             'twitch': Mock(spec=Socket)
             }
         self.assertIs(
-            utils.joinChannel('botgotsthis', cluster='botgotsthis'), False)
+            utils.joinChannel('botgotsthis', cluster='botgotsthis'), None)
         self.assertNotIn('botgotsthis', mock_globals.channels)
 
     @patch('bot.utils.globals', autospec=True)
