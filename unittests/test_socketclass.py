@@ -79,6 +79,27 @@ class TestSocket(unittest.TestCase):
         mock_login.assert_called_once_with(self.socket, self.socket.socket)
         self.assertEqual(self.socket.lastSentPing, now)
         self.assertEqual(self.socket.lastPing, now)
+        self.assertEqual(self.socket.lastConnectAttempt, now)
+
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.data.globals', autospec=True)
+    @patch('bot.data.socket.socket.connect', spec=SocketSpec.connect)
+    @patch.object(Socket, 'login', autospec=True)
+    def test_connect_throttle(self, mock_login, mock_connect, mock_globals,
+                              mock_now, mock_stdout):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.join = Mock(spec=JoinThread)
+        self.socket.lastConnectAttempt = now
+        self.socket.connect()
+        mock_connect.assert_not_called()
+        mock_globals.join.connected.assert_not_called()
+        self.assertEquals(mock_stdout.getvalue(), '')
+        self.assertFalse(mock_login.called)
+        self.assertEqual(self.socket.lastSentPing, datetime.max)
+        self.assertEqual(self.socket.lastPing, datetime.max)
+        self.assertEqual(self.socket.lastConnectAttempt, now)
 
     def test_login_none(self):
         self.assertRaises(TypeError, self.socket.login, None)

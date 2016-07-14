@@ -296,6 +296,7 @@ class Socket:
         self._messaging = MessagingQueue()  # type: MessagingQueue
         self.lastSentPing = datetime.max  # type: datetime
         self.lastPing = datetime.max  # type: datetime
+        self.lastConnectAttempt = datetime.min  # type: datetime
 
     @property
     def name(self) -> str:
@@ -341,6 +342,11 @@ class Socket:
         if self._socket is not None:
             raise ConnectionError('connection already exists')
 
+        now = utils.now()
+        if now - self.lastConnectAttempt < timedelta(seconds=5):
+            return
+        self.lastConnectAttempt = now
+
         connection = socket.socket(socket.AF_INET,
                                    socket.SOCK_STREAM)  # type: socketAlias
         connection.connect(self.address)
@@ -349,8 +355,9 @@ class Socket:
             time=utils.now(), name=self.name, server=self.server))
         self.login(connection)
         self._socket = connection
-        self.lastSentPing = utils.now()
-        self.lastPing = utils.now()
+        now = utils.now()
+        self.lastSentPing = now
+        self.lastPing = now
         globals.join.connected(self)
 
     def login(self, connection: socketAlias) -> None:
