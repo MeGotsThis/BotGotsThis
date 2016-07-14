@@ -6,16 +6,18 @@ from ...data import Send
 from ...database import DatabaseBase
 
 
-def botJoin(database: DatabaseBase,
-            channel: str,
-            send: Send) -> bool:
+def join(database: DatabaseBase,
+         channel: str,
+         send: Send) -> bool:
     if database.isChannelBannedReason(channel):
         send('Chat ' + channel + ' is banned from joining')
         return True
     priority = database.getAutoJoinsPriority(channel)  # type: Union[int, float]
 
-    cluster = twitch.chat_server(channel) or 'aws'  # type: str
-    if utils.joinChannel(channel, priority, cluster):
+    cluster = twitch.chat_server(channel)  # type: Optional[str]
+    if cluster not in globals.clusters:
+        send('Unknown chat server for ' + channel)
+    elif utils.joinChannel(channel, priority, cluster):
         send('Joining ' + channel)
     else:
         result = utils.ensureServer(channel, priority, cluster)  # type: int
@@ -23,35 +25,43 @@ def botJoin(database: DatabaseBase,
             send('Already joined ' + channel)
         elif result == utils.ENSURE_REJOIN:
             send('Moved ' + channel + ' to correct chat server')
-    return False
+        else:
+            send('Unknown error joining ' + channel)
+    return True
 
 
-def botPart(channel: str,
-            send: Send) -> None:
+def part(channel: str,
+         send: Send) -> bool:
     if channel == config.botnick:
-        return
+        return False
     utils.partChannel(channel)
     send('Leaving ' + channel)
+    return True
 
 
-def botSay(database: DatabaseBase,
-           nick: str,
-           channel: str,
-           message: str) -> None:
+def say(database: DatabaseBase,
+        nick: str,
+        channel: str,
+        message: str) -> bool:
     if channel in globals.channels:
         timeout.recordTimeoutFromCommand(
             database, globals.channels[channel], nick, message, None, 'say')
         globals.channels[channel].send(message)
+        return True
+    return False
 
 
-def botEmptyAll(send: Send) -> None:
+def empty_all(send: Send) -> bool:
     utils.clearAllChat()
     send('Cleared all queued messages')
+    return True
 
 
-def botEmpty(channel: str,
-             send: Send) -> None:
+def empty(channel: str,
+          send: Send) -> bool:
     if channel in globals.channels:
         chan = globals.channels[channel]
         chan.clear()
         send('Cleared all queued messages for ' + channel)
+        return True
+    return False

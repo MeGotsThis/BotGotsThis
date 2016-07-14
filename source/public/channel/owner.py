@@ -16,41 +16,35 @@ def commandExit(args: ChatCommandArgs) -> bool:
 @ownerChannel
 @permission('owner')
 def commandSay(args: ChatCommandArgs) -> bool:
-    if args.message.lower[1] in globals.channels:
-        channel.botSay(args.database, args.nick, args.message.lower[1],
+    return channel.say(args.database, args.nick, args.message.lower[1],
                        args.message[2:])
-    return True
 
 
 @min_args(2)
 @ownerChannel
 @permission('admin')
 def commandJoin(args: ChatCommandArgs) -> bool:
-    channel.botJoin(args.database, args.message.lower[1], send(args.chat))
-    return True
+    return channel.join(args.database, args.message.lower[1], send(args.chat))
 
 
 @min_args(2)
 @ownerChannel
 @permission('admin')
 def commandPart(args: ChatCommandArgs) -> bool:
-    channel.botPart(args.message.lower[1], send(args.chat))
-    return True
+    return channel.part(args.message.lower[1], send(args.chat))
 
 
 @ownerChannel
 @permission('admin')
 def commandEmptyAll(args: ChatCommandArgs) -> bool:
-    channel.botEmptyAll(send(args.chat))
-    return True
+    return channel.empty_all(send(args.chat))
 
 
 @min_args(2)
 @ownerChannel
 @permission('admin')
 def commandEmpty(args: ChatCommandArgs) -> bool:
-    channel.botEmpty(args.message.lower[1], send(args.chat))
-    return True
+    return channel.empty(args.message.lower[1], send(args.chat))
 
 
 @min_args(2)

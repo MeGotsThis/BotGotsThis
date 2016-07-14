@@ -18,35 +18,30 @@ def commandExit(args: WhisperCommandArgs) -> bool:
 
 @permission('owner')
 def commandSay(args: WhisperCommandArgs) -> bool:
-    if args.message.lower[1] in globals.channels:
-        channel.botSay(args.database, args.nick, args.message.lower[1],
+    return channel.say(args.database, args.nick, args.message.lower[1],
                        args.message[2:])
-    return True
 
 
 @min_args(2)
 def commandJoin(args: WhisperCommandArgs) -> bool:
-    channel.botJoin(args.database, args.message.lower[1], send(args.nick))
-    return True
+    return channel.join(args.database, args.message.lower[1],
+                        send(args.nick))
 
 
 @min_args(2)
 def commandPart(args: WhisperCommandArgs) -> bool:
-    channel.botPart(args.message.lower[1], send(args.nick))
-    return True
+    return channel.part(args.message.lower[1], send(args.nick))
 
 
 @permission('admin')
 def commandEmptyAll(args: WhisperCommandArgs) -> bool:
-    channel.botEmptyAll(send(args.nick))
-    return True
+    return channel.empty_all(send(args.nick))
 
 
 @min_args(2)
 @permission('admin')
 def commandEmpty(args: WhisperCommandArgs) -> bool:
-    channel.botEmpty(args.message.lower[1], send(args.nick))
-    return True
+    return channel.empty(args.message.lower[1], send(args.nick))
 
 
 @min_args(2)
