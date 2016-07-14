@@ -8,8 +8,7 @@ from ...data import ChatCommandArgs
 @ownerChannel
 @permission('owner')
 def commandExit(args: ChatCommandArgs) -> bool:
-    exit.botExit(sendPriority(args.chat, 0))
-    return True
+    return exit.exit(sendPriority(args.chat, 0))
 
 
 @min_args(3)

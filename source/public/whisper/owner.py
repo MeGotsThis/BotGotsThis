@@ -12,8 +12,7 @@ def commandHello(args: WhisperCommandArgs) -> bool:
 
 @permission('owner')
 def commandExit(args: WhisperCommandArgs) -> bool:
-    exit.botExit(send(args.nick))
-    return True
+    return exit.exit(send(args.nick))
 
 
 @permission('owner')

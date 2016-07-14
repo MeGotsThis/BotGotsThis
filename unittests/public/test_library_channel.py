@@ -2,10 +2,9 @@ import math
 import unittest
 from bot import utils
 from bot.data import Channel, Socket
-from source.data.message import Message
 from source.database import DatabaseBase
 from source.public.library import channel
-from unittest.mock import ANY, MagicMock, Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 
 def send(messages):
