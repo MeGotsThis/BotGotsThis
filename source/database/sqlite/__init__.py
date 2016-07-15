@@ -6,6 +6,7 @@ import sqlite3
 
 CommandTuple = Tuple[str, str, str]
 
+
 class SQLiteDatabase(DatabaseBase):
     def __init__(self,
                  ini: Mapping[str, str],

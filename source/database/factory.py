@@ -1,6 +1,6 @@
 ﻿from . import DatabaseBase
 from .databasenone import DatabaseNone
-from .sqlite.sqlite import SQLiteDatabase
+from .sqlite import SQLiteDatabase
 import configparser
 import os.path
 
