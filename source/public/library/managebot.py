@@ -4,13 +4,13 @@ from ...database import DatabaseBase
 from lists.manage import methods
 
 
-def botManageBot(database: DatabaseBase,
-                 send: Send,
-                 nick: str,
-                 message: Message) -> bool:
+def manage_bot(database: DatabaseBase,
+               send: Send,
+               nick: str,
+               message: Message) -> bool:
     argument = ManageBotArgs(database, send, nick, message)  # type: ManageBotArgs
     
-    m = message.lower[1]  # type: str
-    if m in methods and methods[m]:
-        return methods[m](argument)
+    method = message.lower[1]  # type: str
+    if method in methods and methods[method] is not None:
+        return methods[method](argument)
     return False
