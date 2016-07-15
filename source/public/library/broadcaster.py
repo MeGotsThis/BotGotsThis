@@ -15,17 +15,17 @@ def come(database: DatabaseBase,
         return True
     priority = database.getAutoJoinsPriority(channel)  # type: Union[float, int]
     cluster = twitch.chat_server(channel)
-    result = utils.joinChannel(channel, priority, cluster)
-    if result is None:
+    joinResult = utils.joinChannel(channel, priority, cluster)  # type: bool
+    if joinResult is None:
         send('Unable to join {channel} on a specified server according to '
              'twitch'.format(channel=channel))
-    elif result:
+    elif joinResult:
         send('Joining {channel}'.format(channel=channel))
     else:
-        result = utils.ensureServer(channel, priority, cluster)
-        if result == utils.ENSURE_CORRECT:
+        ensureResult = utils.ensureServer(channel, priority, cluster)  # type: int
+        if ensureResult == utils.ENSURE_CORRECT:
             send('I am already in {channel}'.format(channel=channel))
-        elif result == utils.ENSURE_REJOIN:
+        elif ensureResult == utils.ENSURE_REJOIN:
             send('Moved {channel} to correct chat '
                  'server'.format(channel=channel))
         else:

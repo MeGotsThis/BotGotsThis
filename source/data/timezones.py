@@ -52,11 +52,11 @@ class TimeZone(BaseTimeZone):
     __slots__ = ('__zone', '_transitions')
     
     def __init__(self,
-                 zone :str,
+                 zone: str,
                  transitions: Sequence[Transition]) -> None:
         if not isinstance(zone, str):
             raise TypeError()
-        if not isinstance(transitions, Sequence[Transition]):
+        if not isinstance(transitions, Sequence):
             raise TypeError()
         if not transitions:
             raise ValueError()
