@@ -1,11 +1,11 @@
-﻿from ..library import custom, timeout
+﻿import lists.custom
+from ..library import custom, timeout
 from ..library.chat import inCooldown, min_args, not_feature, permission
 from ..library.chat import ownerChannel
 from ...data import ChatCommandArgs, CustomCommand, CustomCommandTokens
 from bot import config
 from collections import defaultdict
 from datetime import datetime, timedelta
-from lists import custom as customItems
 from typing import List, Optional
 
 
@@ -81,7 +81,7 @@ def processCommand(args: ChatCommandArgs, broadcaster: str) -> bool:
         if len(parts) < 2:
             parts.append(None)
         property, value = parts
-        if property not in customItems.properties:
+        if property not in lists.custom.properties:
             args.chat.send('{user} -> That property does not '
                            'exist'.format(user=args.nick))
             return True

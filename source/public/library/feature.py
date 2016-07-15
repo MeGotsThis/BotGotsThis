@@ -1,4 +1,4 @@
-﻿from lists.feature import features
+﻿import lists.feature
 from typing import Set
 from ...data import Send
 from ...data.message import Message
@@ -24,7 +24,8 @@ def feature(database: DatabaseBase,
     action = message.lower[2] if len(message) >= 3 else ''  # type: str
 
     feature_ = message.lower[1]
-    if feature_ not in features or features[feature_] is None:
+    if (feature_ not in lists.feature.features
+            or lists.feature.features[feature_] is None):
         send('Unrecognized feature: ' + feature_)
         return True
 
@@ -50,7 +51,7 @@ def feature_add(database: DatabaseBase,
         msg = 'The feature {feature} has already been enabled in {channel}'  # type: str
     else:
         msg = 'The feature {feature} has been enabled in {channel}'
-    send(msg.format(feature=features[feature_], channel=channel))
+    send(msg.format(feature=lists.feature.features[feature_], channel=channel))
     return True
 
 
@@ -66,5 +67,5 @@ def feature_remove(database: DatabaseBase,
         msg = 'The feature {feature} has been disabled in {channel}'  # type: str
     else:
         msg = 'The feature {feature} was not enabled in {channel}'
-    send(msg.format(feature=features[feature_], channel=channel))
+    send(msg.format(feature=lists.feature.features[feature_], channel=channel))
     return True

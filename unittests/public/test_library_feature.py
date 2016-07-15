@@ -14,11 +14,12 @@ class TestLibraryFeatureFeature(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict('source.public.library.feature.features')
+        patcher = patch.dict(
+            'source.public.library.feature.lists.feature.features')
         self.addCleanup(patcher.stop)
         patcher.start()
-        feature.features['feature'] = 'Feature'
-        feature.features['none'] = None
+        feature.lists.feature.features['feature'] = 'Feature'
+        feature.lists.feature.features['none'] = None
 
         patcher = patch('source.public.library.feature.feature_add',
                         autospec=True)
@@ -96,10 +97,11 @@ class TestLibraryFeatureAdd(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict('source.public.library.feature.features')
+        patcher = patch.dict(
+            'source.public.library.feature.lists.feature.features')
         self.addCleanup(patcher.stop)
         patcher.start()
-        feature.features['feature'] = 'Feature'
+        feature.lists.feature.features['feature'] = 'Feature'
 
     def test(self):
         self.database.hasFeature.return_value = False
@@ -130,10 +132,11 @@ class TestLibraryFeatureRemove(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict('source.public.library.feature.features')
+        patcher = patch.dict(
+            'source.public.library.feature.lists.feature.features')
         self.addCleanup(patcher.stop)
         patcher.start()
-        feature.features['feature'] = 'Feature'
+        feature.lists.feature.features['feature'] = 'Feature'
 
     def test(self):
         self.database.hasFeature.return_value = True

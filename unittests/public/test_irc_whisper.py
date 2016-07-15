@@ -77,7 +77,7 @@ class TestWhisper(unittest.TestCase):
 
 class TestWhisperCommandToProcess(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.whisper.whisper', autospec=True)
+        patcher = patch('source.whisper.lists.whisper', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.commands = {}

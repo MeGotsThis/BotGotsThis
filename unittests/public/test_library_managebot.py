@@ -19,11 +19,12 @@ class TestLibraryManageBot(unittest.TestCase):
         self.send = Mock(spec=send)
         self.method = Mock(spec=method, return_value=True)
 
-        patcher = patch.dict('source.public.library.managebot.methods')
+        patcher = patch.dict(
+            'source.public.library.managebot.lists.manage.methods')
         self.addCleanup(patcher.stop)
         patcher.start()
-        managebot.methods['method'] = self.method
-        managebot.methods['none'] = None
+        managebot.lists.manage.methods['method'] = self.method
+        managebot.lists.manage.methods['none'] = None
 
     def test(self):
         message = Message('!managebot method')

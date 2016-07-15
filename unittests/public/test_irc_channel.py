@@ -84,7 +84,7 @@ class TestChannel(unittest.TestCase):
 
 class TestChannelCommandToProcess(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.channel.commandList', autospec=True)
+        patcher = patch('source.channel.lists.channel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.filterMessage = []

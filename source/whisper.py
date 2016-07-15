@@ -1,9 +1,9 @@
-﻿import threading
+﻿import lists.whisper
+import threading
 import time
 from bot import utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
-from lists import whisper
 from typing import Iterator
 from . import data
 from .data.message import Message
@@ -50,6 +50,6 @@ def whisperCommand(tags: IrcMessageTagsReadOnly,
 
 
 def commandsToProcess(command: str) -> Iterator[data.WhisperCommand]:
-    if command in whisper.commands:
-        if whisper.commands[command] is not None:
-            yield whisper.commands[command]
+    if command in lists.whisper.commands:
+        if lists.whisper.commands[command] is not None:
+            yield lists.whisper.commands[command]

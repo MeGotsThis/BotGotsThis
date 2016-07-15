@@ -1,9 +1,9 @@
-﻿import threading
+﻿import lists.channel
+import threading
 import time
 from bot import data as botData, utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
-from lists import channel as commandList
 from typing import Iterator
 from . import data
 from .data.message import Message
@@ -52,12 +52,12 @@ def chatCommand(chat: 'botData.Channel',
 
 
 def commandsToProcess(command: str) -> Iterator[data.ChatCommand]:
-    yield from commandList.filterMessage
-    if command in commandList.commands:
-        if commandList.commands[command] is not None:
-            yield commandList.commands[command]
-    for starting in commandList.commandsStartWith:
+    yield from lists.channel.filterMessage
+    if command in lists.channel.commands:
+        if lists.channel.commands[command] is not None:
+            yield lists.channel.commands[command]
+    for starting in lists.channel.commandsStartWith:
         if command.startswith(starting):
-            if commandList.commandsStartWith[starting] is not None:
-                yield commandList.commandsStartWith[starting]
-    yield from commandList.processNoCommand
+            if lists.channel.commandsStartWith[starting] is not None:
+                yield lists.channel.commandsStartWith[starting]
+    yield from lists.channel.processNoCommand
