@@ -6,19 +6,16 @@ from ...data import ChatCommandArgs
 @ownerChannel
 @permission('owner')
 def commandReload(args: ChatCommandArgs) -> bool:
-    reload.botReload(sendPriority(args.chat, 0))
-    return True
+    return reload.full_reload(sendPriority(args.chat, 0))
 
 
 @ownerChannel
 @permission('owner')
 def commandReloadCommands(args: ChatCommandArgs) -> bool:
-    reload.botReloadCommands(sendPriority(args.chat, 0))
-    return True
+    return reload.reload_commands(sendPriority(args.chat, 0))
 
 
 @ownerChannel
 @permission('owner')
 def commandReloadConfig(args: ChatCommandArgs) -> bool:
-    reload.botReloadConfig(sendPriority(args.chat, 0))
-    return True
+    return reload.reload_config(sendPriority(args.chat, 0))

@@ -5,17 +5,14 @@ from ...data import WhisperCommandArgs
 
 @permission('owner')
 def commandReload(args: WhisperCommandArgs) -> bool:
-    reload.botReload(send(args.nick))
-    return True
+    return reload.full_reload(send(args.nick))
 
 
 @permission('owner')
 def commandReloadCommands(args: WhisperCommandArgs) -> bool:
-    reload.botReloadCommands(send(args.nick))
-    return True
+    return reload.reload_commands(send(args.nick))
 
 
 @permission('owner')
 def commandReloadConfig(args: WhisperCommandArgs) -> bool:
-    reload.botReloadConfig(send(args.nick))
-    return True
+    return reload.reload_config(send(args.nick))
