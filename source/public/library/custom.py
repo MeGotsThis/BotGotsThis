@@ -380,5 +380,5 @@ def format(string: str,
            format: str,
            hasTextConvert: bool) -> str:
     if hasTextConvert:
-        return textformat.format(string=string, format=format)
+        return textformat.format(string=string, format_=format)
     return string

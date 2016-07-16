@@ -14,31 +14,28 @@ def textCommand(name: str, asciiTo: Callable[[str], str]):
     command.__name__ = name
     return command
 
-commandFull = textCommand('commandFull', textformat.asciiToFullWidth)
+commandFull = textCommand('commandFull', textformat.to_full_width)
 commandParenthesized = textCommand(
-    'commandParenthesized', textformat.asciiToParenthesized)
-commandCircled = textCommand('commandCircled', textformat.asciiToCircled)
-commandSmallCaps = textCommand('commandSmallCaps', textformat.asciiToSmallCaps)
-commandUpsideDown = textCommand(
-    'commandUpsideDown', textformat.asciiToUpsideDown)
-commandSerifBold = textCommand('commandSerifBold', textformat.asciiToSerifBold)
+    'commandParenthesized', textformat.to_parenthesized)
+commandCircled = textCommand('commandCircled', textformat.to_circled)
+commandSmallCaps = textCommand('commandSmallCaps', textformat.to_small_caps)
+commandUpsideDown = textCommand('commandUpsideDown', textformat.to_upside_down)
+commandSerifBold = textCommand('commandSerifBold', textformat.to_serif_bold)
 commandSerifItalic = textCommand(
-    'commandSerifItalic', textformat.asciiToSerifItalic)
+    'commandSerifItalic', textformat.to_serif_italic)
 commandSerifBoldItalic = textCommand(
-    'commandSerifBoldItalic', textformat.asciiToSerifBoldItalic)
-commandSanSerif = textCommand('commandSanSerif', textformat.asciiToSanSerif)
+    'commandSerifBoldItalic', textformat.to_serif_bold_italic)
+commandSanSerif = textCommand('commandSanSerif', textformat.to_sanserif)
 commandSanSerifBold = textCommand(
-    'commandSanSerifBold', textformat.asciiToSanSerifBold)
+    'commandSanSerifBold', textformat.to_sanserif_bold)
 commandSanSerifItalic = textCommand(
-    'commandSanSerifItalic', textformat.asciiToSanSerifItalic)
+    'commandSanSerifItalic', textformat.to_sanserif_italic)
 commandSanSerifBoldItalic = textCommand(
-    'commandSanSerifBoldItalic', textformat.asciiToSanSerifBoldItalic)
-commandScript = textCommand('commandScript', textformat.asciiToScript)
-commandScriptBold = textCommand(
-    'commandScriptBold', textformat.asciiToScriptBold)
-commandFraktur = textCommand('commandFraktur', textformat.asciiToFraktur)
-commandFrakturBold = textCommand(
-    'commandFrakturBold', textformat.asciiToFrakturBold)
-commandMonospace = textCommand('commandMonospace', textformat.asciiToMonospace)
+    'commandSanSerifBoldItalic', textformat.to_sanserif_bold_italic)
+commandScript = textCommand('commandScript', textformat.to_script)
+commandScriptBold = textCommand('commandScriptBold', textformat.to_script_bold)
+commandFraktur = textCommand('commandFraktur', textformat.to_fraktur)
+commandFrakturBold = textCommand('commandFrakturBold', textformat.to_fraktur_bold)
+commandMonospace = textCommand('commandMonospace', textformat.to_monospace)
 commandDoubleStruck = textCommand(
-    'commandDoubleStruck', textformat.asciiToDoubleStruck)
+    'commandDoubleStruck', textformat.to_double_struck)
