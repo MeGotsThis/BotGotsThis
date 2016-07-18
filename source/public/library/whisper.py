@@ -9,7 +9,7 @@ _AnyDecorator = Callable[..., _AnyCallable]
 
 
 def send(nick: Any) -> data.Send:
-    return partial(utils.whisper, nick)  # type: ignore
+    return partial(utils.whisper, nick)  # type: ignore --
 
 permission = chat.permission
 not_permission = chat.not_permission

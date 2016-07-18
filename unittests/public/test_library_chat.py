@@ -19,7 +19,7 @@ class TestLibraryChat(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.args = ChatCommandArgs(self.database, self.channel, self.tags,
-                                        'botgotsthis', Message(''),
+                                    'botgotsthis', Message(''),
                                     self.permissions, self.now)
 
     def test_send(self):

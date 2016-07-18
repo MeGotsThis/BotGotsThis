@@ -14,7 +14,7 @@ def send(chat: Any) -> data.Send:
 
 def sendPriority(chat: Any,
                  priority: int) -> data.Send:
-    return partial(chat.send, priority=priority)  # type: ignore
+    return partial(chat.send, priority=priority)  # type: ignore --
 
 
 def permission(level: str) -> _AnyDecorator:
