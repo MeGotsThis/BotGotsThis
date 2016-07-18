@@ -35,7 +35,7 @@ def checkOfflineChannels(timestamp: datetime) -> None:
     cacheDuration = timedelta(seconds=300)  # type: timedelta
     offlineChannels = [ch for ch in globals.channels.values()
                        if (not ch.isStreaming
-                           and timestamp - ch.twitchCache >= cacheDuration)]  # type: List[str]
+                           and timestamp - ch.twitchCache >= cacheDuration)]  # type: List[data.Channel]
     if not offlineChannels:
         return
     chat = random.choice(offlineChannels)  # type: data.Channel
