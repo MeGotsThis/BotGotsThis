@@ -7,13 +7,13 @@ from typing import Union
 from ...database import DatabaseBase
 
 
-def timeoutUser(database: DatabaseBase,
-                chat: 'data.Channel',
-                user: str,
-                module: str,
-                baseLevel: int=0,
-                message: Optional[str]=None,
-                reason: Optional[str]=None):
+def timeout_user(database: DatabaseBase,
+                 chat: 'data.Channel',
+                 user: str,
+                 module: str,
+                 base_level: int=0,
+                 message: Optional[str]=None,
+                 reason: Optional[str]=None):
     properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2']  # type: List[str]
     defaults = {'timeoutLength0': config.moderatorDefaultTimeout[0],
                 'timeoutLength1': config.moderatorDefaultTimeout[1],
@@ -33,10 +33,10 @@ def timeoutUser(database: DatabaseBase,
     timestamp = utils.now()  # type: datetime
     duration = timedelta(seconds=config.warningDuration)  # type: timedelta
     if timestamp - chat.sessionData['timeouts'][module][user][0] >= duration:
-        level = baseLevel  # type: int
+        level = min(max(base_level, 0), 2)  # type: int
     else:
         prevLevel = chat.sessionData['timeouts'][module][user][1]  # type: int
-        level = min(max(baseLevel + 1, prevLevel + 1), 2)
+        level = min(max(base_level + 1, prevLevel + 1, 0), 2)
     chat.sessionData['timeouts'][module][user] = timestamp, level
     length = timeouts[level]  # type: int
     if length:
@@ -53,23 +53,26 @@ def timeoutUser(database: DatabaseBase,
             '{reason} ({length})'.format(reason=reason, length=lengthText))
 
 
-def recordTimeoutFromCommand(database: DatabaseBase,
-                             chat: 'data.Channel',
-                             user: Optional[str],
-                             messages: Union[str, Iterable[str], Iterator[str]],
-                             sourceMessage: Optional[str],
-                             module: str='custom'):
+def record_timeout(database: DatabaseBase,
+                   chat: 'data.Channel',
+                   user: Optional[str],
+                   messages: Union[str, Iterable[str]],
+                   source_message: Optional[str],
+                   module: str):
     if isinstance(messages, str):
         messages = messages,
     for message in messages:  # --type: str
-        who, length = None, None  # type: Optional[str], Optional[int]
+        who, length = None, None  # type: Optional[str], Optional[Union[int, bool]]
         if message.startswith(('.ban', '/ban')):
             with suppress(ValueError, IndexError):
                 who, length = message.split()[1], 0
         if message.startswith(('.timeout', '/timeout')):
             with suppress(ValueError, IndexError):
                 parts = message.split()
-                who, length = parts[1], int(parts[2])
-        if length is not None:
+                if len(parts) < 3:
+                    who = parts[1]
+                else:
+                    who, length = parts[1], int(parts[2])
+        if who is not None:
             database.recordTimeout(chat.channel, who, user, module, None,
-                                   length, sourceMessage, None)
+                                   length, source_message, None)

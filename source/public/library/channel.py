@@ -44,7 +44,7 @@ def say(database: DatabaseBase,
         channel: str,
         message: str) -> bool:
     if channel in globals.channels:
-        timeout.recordTimeoutFromCommand(
+        timeout.record_timeout(
             database, globals.channels[channel], nick, message, None, 'say')
         globals.channels[channel].send(message)
         return True

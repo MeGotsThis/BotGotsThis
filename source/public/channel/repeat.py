@@ -102,9 +102,8 @@ class MessageRepeater(threading.Thread):
             self._chat.send(self._message)
             if self._chat.isMod:
                 with getDatabase() as database:  # --type: DatabaseBase
-                    timeout.recordTimeoutFromCommand(
-                        database, self._chat, None, self._message, None,
-                        'autorepeat')
+                    timeout.record_timeout(database, self._chat, None,
+                                           self._message, None, 'autorepeat')
             with self._countLock:
                 if self._count is not None:
                     self._count -= 1

@@ -47,7 +47,6 @@ def processWall(args: ChatCommandArgs,
                 for i in range(rows))  # type: Iterator[str]
     args.chat.send(messages, -1)
     if args.permissions.chatModerator:
-        timeout.recordTimeoutFromCommand(
-            args.database, args.chat, args.nick, repetition,
-            str(args.message), 'wall')
+        timeout.record_timeout(args.database, args.chat, args.nick, repetition,
+                               str(args.message), 'wall')
     return True

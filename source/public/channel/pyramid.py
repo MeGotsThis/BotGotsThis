@@ -45,9 +45,8 @@ def processPyramid(args: ChatCommandArgs,
         (repetition * i for i in range(1, count)),
         (repetition * i for i in range(count, 0, -1)))  # type: itertools.chain[str]
     if args.permissions.chatModerator:
-        timeout.recordTimeoutFromCommand(
-            args.database, args.chat, args.nick, repetition * count,
-            str(args.message), 'pyramid')
+        timeout.record_timeout(args.database, args.chat, args.nick,
+                               repetition * count, str(args.message), 'pyramid')
     args.chat.send(messages, -1)
     return True
 

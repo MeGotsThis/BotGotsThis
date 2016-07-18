@@ -191,7 +191,7 @@ class TestLibraryChannelSay(unittest.TestCase):
         self.mock_globals.channels = {'botgotsthis': self.channel}
 
         patcher = patch(
-            'source.public.library.channel.timeout.recordTimeoutFromCommand',
+            'source.public.library.channel.timeout.record_timeout',
             autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_record = patcher.start()

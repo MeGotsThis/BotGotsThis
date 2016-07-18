@@ -67,7 +67,7 @@ def checkIfUrlMaybeBad(chat: 'data.Channel',
                             response=responseUrl),
                         timestamp)
                     with factory.getDatabase() as database:
-                        timeout.timeoutUser(
+                        timeout.timeout_user(
                             database, chat, nick, 'redirectUrl', 1, str(message))
                     return
         except urllib.error.HTTPError as e:
@@ -81,7 +81,7 @@ def checkIfUrlMaybeBad(chat: 'data.Channel',
                         nick=nick, original=originalUrl, response=responseUrl),
                     timestamp)
                 with factory.getDatabase() as database:
-                    timeout.timeoutUser(
+                    timeout.timeout_user(
                         database, chat, nick, 'redirectUrl', 1, str(message))
                 return
         except urllib.error.URLError as e:

@@ -32,8 +32,8 @@ def customCommands(args: ChatCommandArgs) -> bool:
         msgs = custom.createMessages(command, args)
         args.chat.send(msgs)
         if args.permissions.chatModerator:
-            timeout.recordTimeoutFromCommand(
-                args.database, args.chat, args.nick, msgs, str(args.message))
+            timeout.record_timeout(args.database, args.chat, args.nick, msgs,
+                                   str(args.message), 'custom')
         return True
     return False
 
