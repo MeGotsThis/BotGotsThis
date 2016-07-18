@@ -143,7 +143,7 @@ class DatabaseNone(DatabaseBase):
                       fromUser: Optional[str],
                       module: str,
                       level: Optional[int],
-                      length: int,
+                      length: Optional[int],
                       message: Optional[str],
                       reason: Optional[str]) -> bool:
         return False

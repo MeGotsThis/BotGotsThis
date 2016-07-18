@@ -6,7 +6,7 @@ CREATE TABLE timeout_logs (
     fromUser VARCHAR,
     module VARCHAR NOT NULL,
     level INTEGER,
-    length INTEGER NOT NULL,
+    length INTEGER,
     message VARCHAR NULL,
     reason VARCHAR
 );

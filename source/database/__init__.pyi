@@ -132,7 +132,7 @@ class DatabaseBase(metaclass=ABCMeta):
                       fromUser: Optional[str],
                       module: str,
                       level: Optional[int],
-                      length: int,
+                      length: Optional[int],
                       message: Optional[str],
                       reason: Optional[str]) -> bool: ...
     @abstractmethod
