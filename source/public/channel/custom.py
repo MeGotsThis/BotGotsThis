@@ -2,7 +2,7 @@
 from ..library import custom, timeout
 from ..library.chat import inCooldown, min_args, not_feature, permission
 from ..library.chat import ownerChannel
-from ...data import ChatCommandArgs, CustomCommand, CustomCommandTokens
+from ...data import ChatCommandArgs, CustomCommand, CommandActionTokens
 from bot import config
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -11,8 +11,9 @@ from typing import List, Optional
 
 @not_feature('nocustom')
 def customCommands(args: ChatCommandArgs) -> bool:
-    command = custom.getCustomCommand(args.database, args.message.command,
-                                      args.chat.channel, args.permissions)
+    command = custom.get_command(args.database, args.message.command,
+                                 args.chat.channel,
+                                 args.permissions)  # type: Optional[CustomCommand]
     if command:
         cooldown = timedelta(seconds=config.customMessageCooldown)  # type: timedelta
         if inCooldown(args, cooldown, 'customCommand', 'moderator'):
@@ -29,7 +30,7 @@ def customCommands(args: ChatCommandArgs) -> bool:
                 return False
         args.chat.sessionData['customUserCommand'][args.nick] = args.timestamp
         
-        msgs = custom.createMessages(command, args)
+        msgs = custom.create_messages(command, args)
         args.chat.send(msgs)
         if args.permissions.chatModerator:
             timeout.record_timeout(args.database, args.chat, args.nick, msgs,
@@ -52,8 +53,8 @@ def commandCommand(args: ChatCommandArgs) -> bool:
 
 @min_args(3)
 def processCommand(args: ChatCommandArgs, broadcaster: str) -> bool:
-    input = custom.parseCommandInput(
-        args.message, broadcaster)  # type: Optional[CustomCommandTokens]
+    input = custom.parse_action_message(
+        args.message, broadcaster)  # type: Optional[CommandActionTokens]
     if input is None:
         return False
 

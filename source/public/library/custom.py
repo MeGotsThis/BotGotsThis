@@ -1,6 +1,6 @@
 from typing import Dict, Iterable, List, Optional
 from ...data import ChatCommandArgs, CustomFieldArgs, CustomCommand
-from ...data import CustomCommandTokens, CustomCommandProcess
+from ...data import CommandActionTokens, CustomCommandProcess
 from ...data import CustomFieldParts, CustomProcessArgs
 from ...data.message import Message
 from ...data.permissions import ChatPermissionSet
@@ -9,46 +9,46 @@ from ..library import textformat
 import lists.custom
 
 
-def getCustomCommand(database: DatabaseBase,
-                     command: str,
-                     channel: str,
-                     permissions: ChatPermissionSet) -> Optional[CustomCommand]:
+def get_command(database: DatabaseBase,
+                command: str,
+                channel: str,
+                permissions: ChatPermissionSet) -> Optional[CustomCommand]:
     commands = database.getChatCommands(channel, command)  # type: Dict[str, Dict[str, str]]
     permissionsSet = ['', 'turbo', 'subscriber', 'moderator', 'broadcaster',
                       'globalMod', 'admin', 'staff', 'owner']  # type: List[str]
     for permission in reversed(permissionsSet):  # --type: str
         if not permission or permissions[permission]:
             for broadcaster in [channel, '#global']:  # --type: str
-                if permission in commands[channel]:
-                    message = commands[broadcaster][permission]  # --type: str
+                if permission in commands[broadcaster]:
+                    message = commands[broadcaster][permission]  # type: str
                     return CustomCommand(message, broadcaster, permission)
     return None
 
 
-def createMessages(command: CustomCommand,
-                   args: ChatCommandArgs) -> List[str]:
+def create_messages(command: CustomCommand,
+                    args: ChatCommandArgs) -> List[str]:
     textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
     messageParts = []  # type: List[str]
     try:
-        for formats in parseFormatMessage(command.message):
-            messageParts.append(formats.plainText)
+        for parts in split_message(command.message):  # --type: CustomFieldParts
+            messageParts.append(parts.plainText)
             try:
-                if formats.field is not None:
+                if parts.field is not None:
                     fieldArgument = CustomFieldArgs(
-                        formats.field, formats.param, formats.prefix,
-                        formats.suffix, formats.default, args.message,
+                        parts.field, parts.param, parts.prefix,
+                        parts.suffix, parts.default, args.message,
                         args.chat.channel, args.nick, args.timestamp)  # type: CustomFieldArgs
-                    string = fieldString(fieldArgument)  # type: Optional[str]
+                    string = convert_field(fieldArgument)  # type: Optional[str]
                     if string is not None:
-                        string = format(string, formats.format, textFormat)
+                        string = format(string, parts.format, textFormat)
                     else:
-                        string = formats.original
+                        string = parts.original
                     messageParts.append(string)
             except Exception:
-                messageParts.append(formats.original)
-    except Exception:
-        messageParts = [str(command.message)]
-    messages = [''.join(messageParts)]
+                messageParts.append(parts.original)
+    except ValueError:
+        return [str(command.message)]
+    messages = [''.join(messageParts)]  # type: List[str]
     processArgument = CustomProcessArgs(
         args.database, args.chat, args.tags, args.nick, args.permissions,
         command.broadcaster, command.level, args.message.command,
@@ -58,7 +58,7 @@ def createMessages(command: CustomCommand,
     return messages
 
 
-def parseCommandInput(message: Message, broadcaster: str) -> Optional[CustomCommandTokens]:
+def parse_action_message(message: Message, broadcaster: str) -> Optional[CommandActionTokens]:
     allowPermissions = {
         None: '',
         '': '',
@@ -74,7 +74,6 @@ def parseCommandInput(message: Message, broadcaster: str) -> Optional[CustomComm
         'broadcaster': 'broadcaster',
         'streamer': 'broadcaster',
         'me': 'broadcaster',
-        'globalMod': 'globalMod',
         'globalmod': 'globalMod',
         'global_mod': 'globalMod',
         'gmod': 'globalMod',
@@ -93,7 +92,7 @@ def parseCommandInput(message: Message, broadcaster: str) -> Optional[CustomComm
         level = None  # type: Optional[str]
         if message[2].startswith('level='):
             i = 3
-            level = message[2][len('level='):]
+            level = message.lower[2][len('level='):]
         if level in allowPermissions:
             level = allowPermissions[level]
         else:
@@ -101,12 +100,12 @@ def parseCommandInput(message: Message, broadcaster: str) -> Optional[CustomComm
         command = message[i]
         text = message[i+1:]
         
-        return CustomCommandTokens(action, broadcaster, level, command, text)
+        return CommandActionTokens(action, broadcaster, level, command, text)
     except:
         return None
 
 
-def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
+def split_message(message: str) -> Iterable[CustomFieldParts]:
     # Format: {field:format<prefix>suffix@param!default}
     parsed = []  # type: List[CustomFieldParts]
     i = 0  # type: int
@@ -190,8 +189,9 @@ def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
                     break
             field.append(char)
 
-        format = []  # type: List[str]
+        format = None  # type: Optional[List[str]]
         if char == ':':
+            format = []
             while True:
                 if i == length:
                     raise ValueError()
@@ -232,8 +232,9 @@ def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
                         break
                 format.append(char)
 
-        prefix = []  # type: List[str]
+        prefix = None  # type: Optional[List[str]]
         if char == '<':
+            prefix = []
             while True:
                 if i == length:
                     raise ValueError()
@@ -269,8 +270,9 @@ def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
                         break
                 prefix.append(char)
 
-        suffix = []  # type: List[str]
+        suffix = None  # type: Optional[List[str]]
         if char == '>':
+            suffix = []
             while True:
                 if i == length:
                     raise ValueError()
@@ -301,8 +303,9 @@ def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
                         break
                 suffix.append(char)
 
-        param = []  # type: List[str]
+        param = None  # type: Optional[List[str]]
         if char == '@':
+            param = []
             while True:
                 if i == length:
                     raise ValueError()
@@ -328,8 +331,9 @@ def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
                         break
                 param.append(char)
 
-        default = []  # type: List[str]
+        default = None  # type: Optional[List[str]]
         if char == '!':
+            default = []
             while True:
                 if i == length:
                     raise ValueError()
@@ -356,21 +360,22 @@ def parseFormatMessage(message:str) -> Iterable[CustomFieldParts]:
         original = message[s:i]
         
         parsed.append(
-            CustomFieldParts(''.join(noFormat),
-                             ''.join(field),
-                             ''.join(format),
-                             ''.join(prefix),
-                             ''.join(suffix),
-                             ''.join(param),
-                             ''.join(default),
-                             original))
+            CustomFieldParts(
+                ''.join(noFormat),
+                ''.join(field),
+                ''.join(format) if format is not None else None,
+                ''.join(prefix) if prefix is not None else None,
+                ''.join(suffix) if suffix is not None else None,
+                ''.join(param) if param is not None else None,
+                ''.join(default) if default is not None else None,
+                original))
         
     return parsed
 
 
-def fieldString(args: CustomFieldArgs) -> Optional[str]:
-    for fieldConvert in lists.custom.fields:  # --type: CustomCommandField
-        result = fieldConvert(args)  # type: Optional[str]
+def convert_field(args: CustomFieldArgs) -> Optional[str]:
+    for convert in lists.custom.fields:  # --type: CustomCommandField
+        result = convert(args)  # type: Optional[str]
         if result is not None:
             return result
     return None
