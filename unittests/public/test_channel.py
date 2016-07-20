@@ -1,7 +1,6 @@
 import unittest
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
-from collections import defaultdict
 from datetime import datetime
 from source.data import ChatCommandArgs
 from source.data.message import Message
@@ -16,8 +15,20 @@ class TestChannel(unittest.TestCase):
         self.tags = IrcMessageTags()
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
+        self.channel.sessionData = {}
         self.database = Mock(spec=DatabaseBase)
-        self.permissionSet = defaultdict(bool)
+        self.permissionSet = {
+            'owner': False,
+            'inOwnerChannel': False,
+            'staff': False,
+            'admin': False,
+            'globalMod': False,
+            'broadcaster': False,
+            'moderator': False,
+            'subscriber': False,
+            'turbo': False,
+            'channelModerator': False,
+            }
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.permissions.inOwnerChannel = False
         _ = lambda k: self.permissionSet[k]

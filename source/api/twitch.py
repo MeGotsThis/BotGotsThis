@@ -57,7 +57,7 @@ def api_call(channel: Optional[str],
             return response, response.read()
 
 
-def server_time() -> datetime:
+def server_time() -> Optional[datetime]:
     with suppress(HTTPException):
         response, data = api_call(None, 'GET', '/kraken/')  # type: HTTPResponse, bytes
         if response.status == 200:
