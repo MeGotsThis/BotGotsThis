@@ -118,7 +118,8 @@ class TestLibraryReloadKey(unittest.TestCase):
                  'source.ircmessage',
                  ]
         for first, second in zip(order, order[1:]):
-            self.assertLess(reload.key(first), reload.key(second))
+            self.assertLess(reload.key(first), reload.key(second),
+                            (first, second))
 
 
 class TestLibraryReload(unittest.TestCase):

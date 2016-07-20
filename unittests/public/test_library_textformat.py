@@ -183,7 +183,8 @@ class TestLibraryTextFormat(unittest.TestCase):
                    'serifitalicbold',
                    ]
         for format_ in formats:
-            self.assertEqual(textformat.format('Kappa', format_), 'Kappa')
+            self.assertEqual(textformat.format('Kappa', format_), 'Kappa',
+                             format_)
             mock_to.assert_called_once_with('Kappa')
             mock_to.reset_mock()
 
@@ -229,7 +230,8 @@ class TestLibraryTextFormat(unittest.TestCase):
                    'italicbold',
                    ]
         for format_ in formats:
-            self.assertEqual(textformat.format('Kappa', format_), 'Kappa')
+            self.assertEqual(textformat.format('Kappa', format_), 'Kappa',
+                             format_)
             mock_to.assert_called_once_with('Kappa')
             mock_to.reset_mock()
 
