@@ -17,6 +17,8 @@ class TestChannel(unittest.TestCase):
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
         self.database = Mock(spec=DatabaseBase)
+        self.features = []
+        self.database.hasFeature.side_effect = lambda c, f: f in self.features
         self.permissionSet = {
             'owner': False,
             'inOwnerChannel': False,
@@ -27,7 +29,7 @@ class TestChannel(unittest.TestCase):
             'moderator': False,
             'subscriber': False,
             'turbo': False,
-            'channelModerator': False,
+            'chatModerator': False,
             }
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.permissions.inOwnerChannel = False
