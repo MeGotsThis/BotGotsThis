@@ -17,7 +17,7 @@ def commandWall(args: ChatCommandArgs) -> bool:
         # If this line generate an IndexError it does not get evaluated
         length, rows = rows, int(args.message[3])
     length = min(length, config.messageLimit // (len(args.message[1]) + 1))
-    return processWall(args, (args.message[1] + ' ') * length, rows)
+    return process_wall(args, ' '.join((args.message[1],) * length), rows)
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
@@ -28,12 +28,12 @@ def commandWallLong(args: ChatCommandArgs) -> bool:
     # only the above line gets used
     with suppress(ValueError, IndexError):
         rows = int(args.message.command.split('wall-')[1])
-    return processWall(args, args.message.query, rows)
+    return process_wall(args, args.message.query, rows)
 
 
-def processWall(args: ChatCommandArgs,
-                repetition: str,
-                rows: int) -> bool:
+def process_wall(args: ChatCommandArgs,
+                 repetition: str,
+                 rows: int) -> bool:
     if not args.permissions.broadcaster:
         rows = min(rows, 10)
         
