@@ -34,7 +34,7 @@ commands = {
     '!empty': broadcaster.commandEmpty,
     '!autorepeat': repeat.commandAutoRepeat,
     '!pyramid': pyramid.commandPyramid,
-    '!rpyramid': pyramid.commandRPyramid,
+    '!rpyramid': pyramid.commandRandomPyramid,
     '!wall': wall.commandWall,
     '!status': mod.commandStatus,
     '!title': mod.commandStatus,

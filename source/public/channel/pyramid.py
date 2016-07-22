@@ -17,7 +17,7 @@ def commandPyramid(args: ChatCommandArgs) -> bool:
     # only the above line gets used
     with suppress(ValueError, IndexError):
         count = int(args.message[2])
-    return processPyramid(args, args.message[1] + ' ', count)
+    return process_pyramid(args, args.message[1], count)
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
@@ -26,13 +26,13 @@ def commandPyramidLong(args: ChatCommandArgs) -> bool:
     count = 5 if args.permissions.broadcaster else 3  # type: int
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('pyramid-')[1])
-    return processPyramid(args, args.message.query + ' ', count)
+    return process_pyramid(args, args.message.query, count)
 
 
-def processPyramid(args: ChatCommandArgs,
-                   repetition: str,
-                   count: int) -> bool:
-    count = min(count, config.messageLimit // len(repetition))
+def process_pyramid(args: ChatCommandArgs,
+                    repetition: str,
+                    count: int) -> bool:
+    count = min(count, (config.messageLimit + 1) // (len(repetition) + 1))
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
@@ -42,18 +42,22 @@ def processPyramid(args: ChatCommandArgs,
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     messages = itertools.chain(
-        (repetition * i for i in range(1, count)),
-        (repetition * i for i in range(count, 0, -1)))  # type: itertools.chain[str]
+        (' '.join((repetition,) * i) for i in range(1, count)),
+        (' '.join((repetition,) * i) for i in range(count, 0, -1))
+        )  # type: itertools.chain[str]
     if args.permissions.chatModerator:
-        timeout.record_timeout(args.database, args.chat, args.nick,
-                               repetition * count, str(args.message), 'pyramid')
+        timeout.record_timeout(
+            args.database, args.chat, args.nick,
+            ' '.join((repetition,) * count), str(args.message), 'pyramid')
     args.chat.send(messages, -1)
     return True
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
-def commandRPyramid(args: ChatCommandArgs) -> bool:
-    emotes = globals.globalEmotes  # type: Dict[int, str]
+def commandRandomPyramid(args: ChatCommandArgs) -> bool:
+    if not globals.globalEmotes:
+        return False
+    emotes = globals.globalEmotes.copy()  # type: Dict[int, str]
     count = 5 if args.permissions.broadcaster else 3  # type: int
     # If below generate a ValueError or IndexError,
     # only the above line gets used
@@ -73,6 +77,7 @@ def commandRPyramid(args: ChatCommandArgs) -> bool:
         rep.append(emotes[random.choice(emoteIds)])
         if len(' '.join(rep)) > config.messageLimit:
             del rep[-1]
+            count = len(rep)
             break
     messages = itertools.chain(
         (' '.join(rep[0:i]) for i in range(1, count)),
