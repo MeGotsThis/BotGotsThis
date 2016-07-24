@@ -1,4 +1,5 @@
-from datetime import timedelta
+from collections import defaultdict
+from datetime import datetime, timedelta
 from functools import partial, wraps
 from typing import Any, Callable, Iterable, Optional, Tuple, Union
 from ... import data
@@ -136,6 +137,20 @@ def inCooldown(args: data.ChatCommandArgs,
             and args.timestamp - args.chat.sessionData[key] < duration):
         return True
     args.chat.sessionData[key] = args.timestamp
+    return False
+
+
+def in_user_cooldown(args: data.ChatCommandArgs,
+                     cooldown: timedelta,
+                     key: Any,
+                     level: Optional[str]=None) -> bool:
+    if key not in args.chat.sessionData:
+        args.chat.sessionData[key] = defaultdict(lambda: datetime.min)
+    if level is None or not args.permissions[level]:
+        since = args.timestamp - args.chat.sessionData[key][args.nick]  # type: timedelta
+        if since < cooldown:
+            return True
+    args.chat.sessionData[key][args.nick] = args.timestamp
     return False
 
 

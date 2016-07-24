@@ -1,12 +1,12 @@
 ﻿import lists.custom
 from ..library import custom, timeout
-from ..library.chat import inCooldown, min_args, not_feature, permission
+from ..library.chat import inCooldown, in_user_cooldown, min_args, not_feature
+from ..library.chat import permission
 from ..library.chat import ownerChannel
 from ...data import ChatCommandArgs, CustomCommand, CommandActionTokens
 from bot import config
-from collections import defaultdict
-from datetime import datetime, timedelta
-from typing import List, Optional
+from datetime import timedelta
+from typing import Callable, Dict, List, Optional
 
 
 @not_feature('nocustom')
@@ -14,21 +14,14 @@ def customCommands(args: ChatCommandArgs) -> bool:
     command = custom.get_command(args.database, args.message.command,
                                  args.chat.channel,
                                  args.permissions)  # type: Optional[CustomCommand]
-    if command:
+    if command is not None:
         cooldown = timedelta(seconds=config.customMessageCooldown)  # type: timedelta
         if inCooldown(args, cooldown, 'customCommand', 'moderator'):
             return False
 
         cooldown = timedelta(seconds=config.customMessageUserCooldown)
-        if 'customUserCommand' not in args.chat.sessionData:
-            args.chat.sessionData['customUserCommand'] = defaultdict(
-                lambda: datetime.min)
-        if not args.permissions.moderator:
-            oldTime = args.chat.sessionData['customUserCommand'][args.nick]
-            since = args.timestamp - oldTime
-            if since < cooldown:
-                return False
-        args.chat.sessionData['customUserCommand'][args.nick] = args.timestamp
+        if in_user_cooldown(args, cooldown, 'customUserCommand', 'moderator'):
+            return False
         
         msgs = custom.create_messages(command, args)
         args.chat.send(msgs)
@@ -42,25 +35,23 @@ def customCommands(args: ChatCommandArgs) -> bool:
 @ownerChannel
 @permission('admin')
 def commandGlobal(args: ChatCommandArgs) -> bool:
-    return processCommand(args, '#global')
+    return process_command(args, '#global')
 
 
 @not_feature('nocustom')
 @permission('moderator')
 def commandCommand(args: ChatCommandArgs) -> bool:
-    return processCommand(args, args.chat.channel)
+    return process_command(args, args.chat.channel)
 
 
 @min_args(3)
-def processCommand(args: ChatCommandArgs, broadcaster: str) -> bool:
+def process_command(args: ChatCommandArgs,
+                    broadcaster: str) -> bool:
     input = custom.parse_action_message(
         args.message, broadcaster)  # type: Optional[CommandActionTokens]
     if input is None:
         return False
 
-    message = ''  # type: str
-    property = None  # type: Optional[str]
-    value = None  # type: Optional[str]
     if input.level is None:
         args.chat.send(
             '{user} -> Invalid level, command ignored'.format(user=args.nick))
@@ -76,67 +67,115 @@ def processCommand(args: ChatCommandArgs, broadcaster: str) -> bool:
                            'ignored'.format(user=args.nick))
             return True
 
-    if (input.action in ['property'] and args.permissions.broadcaster
-            and input.text):
-        parts = input.text.split(None, 1)  # type: List[Optional[str]]
-        if len(parts) < 2:
-            parts.append(None)
-        property, value = parts
-        if property not in lists.custom.properties:
-            args.chat.send('{user} -> That property does not '
-                           'exist'.format(user=args.nick))
-            return True
-        if args.database.processCustomCommandProperty(
-                input.broadcaster, input.level, input.command, property,
-                value):
-            if value is None:
-                message = '{command} with {property} has been unset'
-            else:
-                message = ('{command} with {property} has been set with the '
-                           'value of {value}')
-        else:
-            message = '{command} with {property} could not be processed'
-    elif input.action in ['add', 'insert', 'new']:
-        if args.database.insertCustomCommand(
-                input.broadcaster, input.level, input.command, input.text,
-                args.nick):
-            message = '{command} was added successfully'
-        else:
-            message = ('{command} was not added successfully. There might be '
-                       'an existing command')
-    elif input.action in ['edit', 'update']:
-        if args.database.updateCustomCommand(
-                input.broadcaster, input.level, input.command, input.text,
-                args.nick):
-            message = '{command} was updated successfully'
-        else:
-            message = ('{command} was not updated successfully. The command '
-                       'might not exist')
-    elif input.action in ['replace', 'override']:
-        if args.database.replaceCustomCommand(
-                input.broadcaster, input.level, input.command, input.text,
-                args.nick):
-            message = '{command} was updated successfully'
-        else:
-            message = ('{command} was not updated successfully. The command '
-                       'might not exist')
-    elif input.action in ['append']:
-        if args.database.appendCustomCommand(
-                input.broadcaster, input.level, input.command, input.text,
-                args.nick):
-            message = '{command} was appended successfully'
-        else:
-            message = ('{command} was not appended successfully. The command '
-                       'might not exist')
-    elif input.action in ['del', 'delete', 'rem', 'remove']:
-        if args.database.deleteCustomCommand(
-                input.broadcaster, input.level, input.command, args.nick):
-            message = '{command} was removed successfully'
-        else:
-            message = ('{command} was not removed successfully. The command '
-                       'might not exist')
+    actions = {
+        'add': insert_command,
+        'insert': insert_command,
+        'new': insert_command,
+        'edit': update_command,
+        'update': update_command,
+        'replace': replace_command,
+        'override': replace_command,
+        'append': append_command,
+        'del': delete_command,
+        'delete': delete_command,
+        'rem': delete_command,
+        'remove': delete_command,
+        'property': command_property,
+        }  # type: Dict[str, Callable[[ChatCommandArgs, CommandActionTokens], bool]]
+    if input.action in actions:
+        return actions[input.action](args, input)
     else:
         return False
-    args.chat.send(message.format(command=input.command, property=property,
-                                  value=value))
+
+
+def insert_command(args: ChatCommandArgs,
+                   input: CommandActionTokens) -> bool:
+    if args.database.insertCustomCommand(
+            input.broadcaster, input.level, input.command, input.text,
+            args.nick):
+        message = '{command} was added successfully'
+    else:
+        message = ('{command} was not added successfully. There might be '
+                   'an existing command')
+    args.chat.send(message.format(command=input.command))
     return True
+
+
+def update_command(args: ChatCommandArgs,
+                   input: CommandActionTokens) -> bool:
+    if args.database.updateCustomCommand(
+            input.broadcaster, input.level, input.command, input.text,
+            args.nick):
+        message = '{command} was updated successfully'
+    else:
+        message = ('{command} was not updated successfully. The command might '
+                   'not exist')
+    args.chat.send(message.format(command=input.command))
+    return True
+
+
+def append_command(args: ChatCommandArgs,
+                   input: CommandActionTokens) -> bool:
+    if args.database.appendCustomCommand(input.broadcaster, input.level,
+                                         input.command, input.text, args.nick):
+        message = '{command} was appended successfully'
+    else:
+        message = ('{command} was not appended successfully. The command '
+                   'might not exist')
+    args.chat.send(message.format(command=input.command))
+    return True
+
+
+def replace_command(args: ChatCommandArgs,
+                    input: CommandActionTokens) -> bool:
+    if args.database.replaceCustomCommand(
+            input.broadcaster, input.level, input.command, input.text,
+            args.nick):
+        message = '{command} was updated successfully'
+    else:
+        message = ('{command} was not updated successfully. The command might '
+                   'not exist')
+    args.chat.send(message.format(command=input.command))
+    return True
+
+
+def delete_command(args: ChatCommandArgs,
+                   input: CommandActionTokens) -> bool:
+    if args.database.deleteCustomCommand(input.broadcaster, input.level,
+                                         input.command, args.nick):
+        message = '{command} was removed successfully'
+    else:
+        message = ('{command} was not removed successfully. The command '
+                   'might not exist')
+    args.chat.send(message.format(command=input.command))
+    return True
+
+
+@permission('broadcaster')
+def command_property(args: ChatCommandArgs,
+                     input: CommandActionTokens) -> bool:
+    if not input.text:
+        return False
+    parts = input.text.split(None, 1)  # type: List[Optional[str]]
+    if len(parts) < 2:
+        parts.append(None)
+    property, value = parts
+    if property not in lists.custom.properties:
+        args.chat.send('{user} -> That property does not '
+                       'exist'.format(user=args.nick))
+        return True
+    if args.database.processCustomCommandProperty(
+            input.broadcaster, input.level, input.command, property,
+            value):
+        if value is None:
+            message = '{command} with {property} has been unset'
+        else:
+            message = ('{command} with {property} has been set with the value '
+                       'of {value}')
+    else:
+        message = '{command} with {property} could not be processed'
+    args.chat.send(message.format(command=input.command,
+                                  property=property, value=value))
+    return True
+
+

@@ -368,21 +368,60 @@ class TestLibraryChat(unittest.TestCase):
         self.assertEqual(sessionData[''], self.now)
 
     def test_in_cooldown_recent(self):
-        sessionData = {'': self.now}
+        sessionData = {'': self.now - timedelta(seconds=1)}
         self.channel.sessionData = sessionData
         self.assertIs(
             chat.inCooldown(self.args, timedelta(hours=1), ''), True)
         self.assertIn('', sessionData)
-        self.assertEqual(sessionData[''], self.now)
+        self.assertEqual(sessionData[''], self.now - timedelta(seconds=1))
 
     def test_in_cooldown_level_override(self):
-        sessionData = {'': self.now}
+        sessionData = {'': self.now - timedelta(seconds=1)}
         self.channel.sessionData = sessionData
         self.permissions.__getitem__.return_value = True
         self.assertIs(
             chat.inCooldown(self.args, timedelta(hours=1), '', ''), False)
         self.assertIn('', sessionData)
         self.assertEqual(sessionData[''], self.now)
+
+    def test_in_user_cooldown(self):
+        sessionData = {}
+        self.channel.sessionData = sessionData
+        self.assertIs(
+            chat.in_user_cooldown(self.args, timedelta(hours=1), ''), False)
+        self.assertIn('', sessionData)
+        self.assertIn('botgotsthis', sessionData[''])
+        self.assertEqual(sessionData['']['botgotsthis'], self.now)
+        
+    def test_in_user_cooldown_existing(self):
+        sessionData = {'': {'botgotsthis': self.now - timedelta(hours=1)}}
+        self.channel.sessionData = sessionData
+        self.assertIs(
+            chat.in_user_cooldown(self.args, timedelta(hours=1), ''), False)
+        self.assertIn('', sessionData)
+        self.assertIn('botgotsthis', sessionData[''])
+        self.assertEqual(sessionData['']['botgotsthis'], self.now)
+
+    def test_in_user_cooldown_recent(self):
+        sessionData = {'': {'botgotsthis': self.now - timedelta(seconds=1)}}
+        self.channel.sessionData = sessionData
+        self.assertIs(
+            chat.in_user_cooldown(self.args, timedelta(hours=1), ''), True)
+        self.assertIn('', sessionData)
+        self.assertIn('botgotsthis', sessionData[''])
+        self.assertEqual(sessionData['']['botgotsthis'],
+                         self.now - timedelta(seconds=1))
+
+    def test_in_user_cooldown_level_override(self):
+        sessionData = {'': {'botgotsthis': self.now - timedelta(seconds=1)}}
+        self.channel.sessionData = sessionData
+        self.permissions.__getitem__.return_value = True
+        self.assertIs(
+            chat.in_user_cooldown(self.args, timedelta(hours=1), '', ''),
+            False)
+        self.assertIn('', sessionData)
+        self.assertIn('botgotsthis', sessionData[''])
+        self.assertEqual(sessionData['']['botgotsthis'], self.now)
 
     def test_min_args(self):
         @chat.min_args(0)

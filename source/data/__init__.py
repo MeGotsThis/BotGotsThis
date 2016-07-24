@@ -69,7 +69,7 @@ CustomCommand = NamedTuple('CustomCommand',
 CommandActionTokens = NamedTuple('CommandActionTokens',
                                  [('action', str),
                                   ('broadcaster', str),
-                                  ('level', str),
+                                  ('level', Optional[str]),
                                   ('command', str),
                                   ('text', str)])
 
