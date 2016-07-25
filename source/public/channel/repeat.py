@@ -1,6 +1,6 @@
 ﻿import threading
 import time
-from bot import data, utils
+from bot import data, globals, utils
 from contextlib import suppress
 from datetime import datetime, timedelta
 from typing import Optional
@@ -19,7 +19,7 @@ def commandAutoRepeat(args: ChatCommandArgs) -> bool:
     """
     
     count = None  # type: Optional[int]
-    return processAutoRepeat(args, count)
+    return process_auto_repeat(args, count)
 
 
 @permission('broadcaster')
@@ -33,18 +33,18 @@ def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
     count = 10  # type: Optional[int]
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('autorepeat-')[1])
-    return processAutoRepeat(args, count)
+    return process_auto_repeat(args, count)
 
 
 @min_args(2)
-def processAutoRepeat(args: ChatCommandArgs,
-                      count: Optional[int]) -> bool:
+def process_auto_repeat(args: ChatCommandArgs,
+                        count: Optional[int]) -> bool:
     if args.message.lower[1] == 'off':
         minutesDuration = 0  # type: float
     else:
         try:
             minutesDuration = float(args.message[1])
-        except (ValueError):
+        except ValueError:
             return False
     
     message = args.message[2:] or None  # type: Optional[str]
@@ -86,14 +86,17 @@ class MessageRepeater(threading.Thread):
     def count(self, value: Optional[int]) -> None:
         with self._countLock:
             self._count = value
+            
+    @property
+    def running(self) -> bool:
+        with self._countLock:
+            return (self._count is None or self._count > 0) and globals.running
     
     def run(self) -> None:
-        while self._continueRunning():
+        while self.running:
             self.process()
             time.sleep(1 / 20)
-        if ('repeatThread' in self._chat.sessionData
-                and self._chat.sessionData['repeatThread'] is self):
-            del self._chat.sessionData['repeatThread']
+        self.end()
     
     def process(self) -> None:
         now = utils.now()
@@ -107,7 +110,8 @@ class MessageRepeater(threading.Thread):
             with self._countLock:
                 if self._count is not None:
                     self._count -= 1
-    
-    def _continueRunning(self):
-        with self._countLock:
-            return self._count is None or self._count > 0
+                    
+    def end(self) -> None:
+        if ('repeatThread' in self._chat.sessionData
+                and self._chat.sessionData['repeatThread'] is self):
+            del self._chat.sessionData['repeatThread']
