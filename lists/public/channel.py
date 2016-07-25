@@ -1,5 +1,5 @@
 ﻿from source import data
-from source.public.channel import blockUrl
+from source.public.channel import block_url
 from source.public.channel import broadcaster
 from source.public.channel import custom
 from source.public.channel import feature
@@ -13,7 +13,7 @@ from source.public.channel import wall
 from typing import Callable, List, Mapping, Optional
 
 filterMessage = [
-    blockUrl.filterNoUrlForBots
+    block_url.filterNoUrlForBots
     ]  # type: List[data.ChatCommand]
 
 commands = {

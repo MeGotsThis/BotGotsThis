@@ -125,7 +125,7 @@
     <Compile Include="source\public\autoload\emotes.py" />
     <Compile Include="source\public\autoload\twitch.py" />
     <Compile Include="source\public\autoload\__init__.py" />
-    <Compile Include="source\public\channel\blockUrl.py" />
+    <Compile Include="source\public\channel\block_url.py" />
     <Compile Include="source\public\channel\broadcaster.py" />
     <Compile Include="source\public\channel\custom.py" />
     <Compile Include="source\public\channel\feature.py" />
