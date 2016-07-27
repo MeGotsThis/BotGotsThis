@@ -10,13 +10,14 @@ from http.client import HTTPResponse
 from urllib.parse import ParseResult, urlparse
 from typing import Tuple
 import re
+import socket
 import threading
 import urllib.error
 import urllib.request
 
 twitchUrlRegex = (#r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"
                   r"(?:https?:\/\/)?(?:[-a-zA-Z0-9@:%_\+~#=]+\.)+[a-z]{2,6}\b"
-                  r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)")
+                  r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)")  # type: str
 ThreadParam = Tuple['data.Channel', str, Message, datetime]
 
 
@@ -27,14 +28,14 @@ ThreadParam = Tuple['data.Channel', str, Message, datetime]
 def filterNoUrlForBots(args: ChatCommandArgs) -> bool:
     if re.search(twitchUrlRegex, str(args.message)):
         params = args.chat, args.nick, args.message, args.timestamp  # type: ThreadParam
-        threading.Thread(target=checkIfUrlMaybeBad, args=params).start()
+        threading.Thread(target=check_domain_redirect, args=params).start()
     return False
 
 
-def checkIfUrlMaybeBad(chat: 'data.Channel',
-                       nick: str,
-                       message: Message,
-                       timestamp: datetime):
+def check_domain_redirect(chat: 'data.Channel',
+                          nick: str,
+                          message: Message,
+                          timestamp: datetime) -> None:
     if not twitch.num_followers(nick):
         return
     
@@ -51,44 +52,54 @@ def checkIfUrlMaybeBad(chat: 'data.Channel',
         try:
             request = urllib.request.Request(
                 url, headers={
-                    'User-Agent': 'MeGotsThis/' + config.botnick,
+                    'User-Agent': 'BotGotsThis/' + config.botnick,
                     })  # type: urllib.request.Request
-            with urllib.request.urlopen(request) as urlRequest:  # HTTPResponse
-                if not isinstance(urlRequest, HTTPResponse):
+            with urllib.request.urlopen(request) as response:  # HTTPResponse
+                if not isinstance(response, HTTPResponse):
                     raise TypeError()
-                parsedOriginal = urlparse(url)  # type: ParseResult
-                responseUrl = urlRequest.geturl()  # type: str
-                parsedReponse = urlparse(responseUrl)  # type: ParseResult
-                if parsedOriginal.netloc != parsedReponse.netloc:
-                    utils.logIrcMessage(
-                        chat.ircChannel + '#blockurl-match.log',
-                        '{nick}: {original} -> {response}'.format(
-                            nick=nick, original=originalUrl,
-                            response=responseUrl),
-                        timestamp)
-                    with factory.getDatabase() as database:
-                        timeout.timeout_user(
-                            database, chat, nick, 'redirectUrl', 1, str(message))
+                if compare_domains(url, response.geturl(),
+                                   chat=chat, nick=nick, timestamp=timestamp):
+                    handle_different_domains(chat, nick, message)
                     return
         except urllib.error.HTTPError as e:
-            parsedOriginal = urlparse(url)
-            responseUrl = e.geturl()  # type: ignore
-            parsedReponse = urlparse(responseUrl)
-            if parsedOriginal.netloc != parsedReponse.netloc:
-                utils.logIrcMessage(
-                    chat.ircChannel + '#blockurl-match.log',
-                    '{nick}: {original} -> {response}'.format(
-                        nick=nick, original=originalUrl, response=responseUrl),
-                    timestamp)
-                with factory.getDatabase() as database:
-                    timeout.timeout_user(
-                        database, chat, nick, 'redirectUrl', 1, str(message))
+            if compare_domains(url, e.geturl(),  # type: ignore --
+                               chat=chat, nick=nick, timestamp=timestamp):
+                handle_different_domains(chat, nick, message)
                 return
         except urllib.error.URLError as e:
-            try:
-                if e.reason.errno not in [-2, 11001]:  # type: ignore
-                    utils.logException(str(message), timestamp)
-            except BaseException:
+            if (not isinstance(e.reason, OSError)  # type: ignore --
+                    or e.reason.errno != socket.EAI_NONAME):  # type: ignore --
                 utils.logException(str(message), timestamp)
         except:
             utils.logException(str(message), timestamp)
+
+
+def compare_domains(originalUrl: str,
+                    responseUrl: str, *,
+                    chat: 'data.Channel',
+                    nick: str,
+                    timestamp: datetime) -> bool:
+    parsedOriginal = urlparse(originalUrl)  # type: ParseResult
+    parsedResponse = urlparse(responseUrl)  # type: ParseResult
+    original = parsedOriginal.netloc  # type: str
+    response = parsedResponse.netloc  # type: str
+    if original.startswith('www.'):
+        original = original[len('www.'):]
+    if response.startswith('www.'):
+        response = response[len('www.'):]
+    if original != response:
+        utils.logIrcMessage(
+            chat.ircChannel + '#blockurl-match.log',
+            '{nick}: {original} -> {response}'.format(
+                nick=nick, original=originalUrl, response=responseUrl),
+            timestamp)
+        return True
+    return False
+
+
+def handle_different_domains(chat: 'data.Channel',
+                             nick: str,
+                             message: Message) -> None:
+    with factory.getDatabase() as database:
+        timeout.timeout_user(database, chat, nick, 'redirectUrl', 1,
+                             str(message))
