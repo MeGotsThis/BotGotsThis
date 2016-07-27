@@ -5,7 +5,7 @@ from unittests.public.test_channel import TestChannel
 
 
 class TestChannelBroadcaster(TestChannel):
-    def test_exit(self):
+    def test_hello(self):
         self.assertIs(broadcaster.commandHello(self.args), False)
         self.permissionSet['broadcaster'] = True
         self.assertIs(broadcaster.commandHello(self.args), True)
