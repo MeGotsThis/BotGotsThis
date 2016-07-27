@@ -216,6 +216,11 @@
     <Compile Include="unittests\public\test_library_whisper.py" />
     <Compile Include="unittests\public\test_tasks_emotes.py" />
     <Compile Include="unittests\public\test_tasks_twitch.py" />
+    <Compile Include="unittests\public\test_whisper.py" />
+    <Compile Include="unittests\public\test_whisper_broadcaster.py" />
+    <Compile Include="unittests\public\test_whisper_feature.py" />
+    <Compile Include="unittests\public\test_whisper_owner.py" />
+    <Compile Include="unittests\public\test_whisper_reload.py" />
     <Compile Include="unittests\test_channel.py" />
     <Compile Include="unittests\test_messagingqueue.py" />
     <Compile Include="unittests\test_socketclass.py" />
