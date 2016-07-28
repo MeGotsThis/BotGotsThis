@@ -120,8 +120,7 @@ def auto_join_delete(database: DatabaseBase,
                      send: Send) -> bool:
     result = database.discardAutoJoin(channel)  # type: bool
     if result:
-        send('Auto join for {channel} is now '
-             'disabled'.format(channel=channel))
+        send('Auto join for {channel} is now disabled'.format(channel=channel))
     else:
         send('Auto join for {channel} was never '
              'enabled'.format(channel=channel))

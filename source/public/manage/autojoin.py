@@ -1,88 +1,64 @@
-﻿from bot import globals, utils
-from datetime import datetime
-from typing import Optional, Union
+﻿from bot import utils
+from contextlib import suppress
+from typing import Optional
+from ..library import broadcaster
 from ...api import twitch
-from ...database import AutoJoinChannel
-from ...data import ManageBotArgs
+from ...database import AutoJoinChannel, DatabaseBase
+from ...data import ManageBotArgs, Send
 
 
 def manageAutoJoin(args: ManageBotArgs) -> bool:
     if len(args.message) < 3:
         return False
     if args.message.lower[2] in ['reloadserver']:
-        for autojoin in args.database.getAutoJoinsChats():  # --type: AutoJoinChannel
-            cluster = twitch.chat_server(autojoin.broadcaster)  # type: Optional[str]
-            if cluster is not None and autojoin.cluster != cluster:
-                args.database.setAutoJoinServer(autojoin.broadcaster, cluster)
-                utils.ensureServer(autojoin.broadcaster, autojoin.priority,
-                                   cluster)
-                print('{time} Set Server for {channel}'.format(
-                    time=utils.now(), channel=autojoin.broadcaster))
-        args.send('Auto Join reload server complete')
-        return True
+        return reload_server(args.database, args.send)
     
     if len(args.message) < 4:
         return False
+
+    if args.database.isChannelBannedReason(args.message.lower[3]) is not None:
+        args.send('Chat {channel} is banned from joining'.format(
+            channel=args.message.lower[3]))
+        return True
+
     if args.message.lower[2] in ['add', 'insert', 'join']:
-        if args.database.isChannelBannedReason(args.message.lower[3]):
-            args.send('Chat {channel} is banned from joining'.format(
-                channel=args.message.lower[3]))
-            return True
-        cluster = twitch.chat_server(args.message.lower[3]) or 'aws'
-        result = args.database.saveAutoJoin(args.message.lower[3], 0, cluster)  # type: bool
-        priority = args.database.getAutoJoinsPriority(
-            args.message.lower[3])  # type: Union[int, float]
-        if result is False:
-            args.database.setAutoJoinServer(args.message.lower[3], cluster)
-            
-        wasInChat = args.message.lower[3] in globals.channels  # type: bool
-        if not wasInChat:
-            utils.joinChannel(args.message.lower[3], priority, cluster)
-        else:
-            rejoin = utils.ensureServer(
-                args.message.lower[3], priority, cluster)
-        
-        if result and not wasInChat:
-            msg = ('Auto join for {channel} is now enabled and joined '
-                   '{channel} chat')
-        elif result:
-            if rejoin < 0:
-                msg = ('Auto join for {channel} is now enabled and moved to '
-                       'the correct server')
-            else:
-                msg = 'Auto join for {channel} is now enabled'
-        elif not wasInChat:
-            msg = ('Auto join for {channel} is already enabled but now joined '
-                   '{channel} chat')
-        else:
-            if rejoin < 0:
-                msg = ('Auto join for {channel} is already enabled and moved '
-                       'to the correct server')
-            else:
-                msg = ('Auto join for {channel} is already enabled and '
-                       'already in chat')
-        args.send(msg.format(channel=args.message.lower[3]))
-        return True
-    if args.message.lower[2] in ['del', 'delete', 'rem', 'remove', 'remove']:
-        result = args.database.discardAutoJoin(args.message.lower[3])
-        if result:
-            msg = 'Auto join for {channel} is now disabled'
-        else:
-            msg = 'Auto join for {channel} was never enabled'
-        args.send(msg.format(channel=args.message.lower[3]))
-        return True
+        return broadcaster.auto_join_add(
+            args.database, args.message.lower[3], args.send)
+    if args.message.lower[2] in ['del', 'delete', 'rem', 'remove' ,'part']:
+        return broadcaster.auto_join_delete(
+            args.database, args.message.lower[3], args.send)
     if args.message.lower[2] in ['pri', 'priority']:
-        try:
+        priority = 0  # type: int
+        with suppress(ValueError, IndexError):
             priority = int(args.message[4])
-        except (ValueError, IndexError):
-            priority = 0
-        result = args.database.setAutoJoinPriority(
-            args.message.lower[3], priority)
-        if result:
-            msg = 'Auto join for {channel} is set to priority {priority}'
-        else:
-            msg = 'Auto join for {channel} was never enabled'
-        args.send(msg.format(channel=args.message.lower[3],
-                             priority=priority))
-        return True
+        return auto_join_priority(
+            args.database, args.message.lower[3], priority, args.send)
     return False
+
+
+def auto_join_priority(database: DatabaseBase,
+                       channel: str,
+                       priority: int,
+                       send: Send) -> bool:
+        result = database.setAutoJoinPriority(channel, priority)  # type: bool
+        if result:
+            send('Auto join for {channel} is set to priority '
+                 '{priority}'.format(channel=channel, priority=priority))
+        else:
+            send('Auto join for {channel} was never '
+                 'enabled'.format(channel=channel))
+        return True
+
+
+def reload_server(database: DatabaseBase,
+                  send: Send) -> bool:
+    for autojoin in database.getAutoJoinsChats():  # --type: AutoJoinChannel
+        cluster = twitch.chat_server(autojoin.broadcaster)  # type: Optional[str]
+        if cluster is not None and autojoin.cluster != cluster:
+            database.setAutoJoinServer(autojoin.broadcaster, cluster)
+            utils.ensureServer(autojoin.broadcaster, autojoin.priority,
+                               cluster)
+            print('{time} Set Server for {channel}'.format(
+                time=utils.now(), channel=autojoin.broadcaster))
+    send('Auto Join reload server complete')
+    return True
