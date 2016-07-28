@@ -3,9 +3,9 @@ from ...data import CustomFieldArgs
 
 
 def fieldUser(args: CustomFieldArgs) -> Optional[str]:
-    if args.field.lower() == 'user' or args.field.lower() == 'args.nick':
+    if args.field.lower() == 'user' or args.field.lower() == 'nick':
         if args.nick:
-            return args.prefix + args.nick + args.suffix
+            return (args.prefix or '') + args.nick + (args.suffix or '')
         else:
-            return args.default
+            return args.default or ''
     return None
