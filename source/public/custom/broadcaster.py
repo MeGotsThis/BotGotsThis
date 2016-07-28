@@ -3,9 +3,9 @@ from ...data import CustomFieldArgs
 
 
 def fieldBroadcaster(args: CustomFieldArgs) -> Optional[str]:
-    if args.field.lower() == 'broadcaster' or args.field.lower() == 'streamer':
+    if args.field.lower() in ['broadcaster', 'streamer']:
         if args.channel:
-            return args.prefix + args.channel + args.suffix
+            return (args.prefix or '') + args.channel + (args.suffix or '')
         else:
-            return args.default
+            return args.default or ''
     return None
