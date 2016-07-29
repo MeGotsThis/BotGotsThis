@@ -16,14 +16,12 @@ def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
         url = url.replace('{streamer}', args.channel)
         with suppress(urllib.error.URLError):
             with urllib.request.urlopen(
-                    url, timeout=config.customMessageUrlTimeout) as req:  # --type: HTTPResponse
-                if not isinstance(req, HTTPResponse):
-                    return None
-                if int(req.status) == 200:
-                    data = req.read().decode('utf-8')  # type: str
+                    url, timeout=config.customMessageUrlTimeout) as res:  # --type: HTTPResponse
+                if isinstance(res, HTTPResponse) and int(res.status) == 200:
+                    data = res.read().decode('utf-8')  # type: str
                     data = data.replace('\r\n', ' ')
                     data = data.replace('\n', ' ')
                     data = data.replace('\r', ' ')
-                    return args.prefix + data + args.suffix
-        return args.default
+                    return (args.prefix or '') + data + (args.suffix or '')
+        return args.default or ''
     return None
