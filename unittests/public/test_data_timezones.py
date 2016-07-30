@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 from source.data import timezones
 
 
@@ -17,10 +17,10 @@ class TestDataBasicTimeZone(unittest.TestCase):
         self.assertEqual(self.timezone.tzname(None), 'BASE')
 
     def test_utcoffset(self):
-        self.assertEqual(self.timezone.utcoffset(None), 60)
+        self.assertEqual(self.timezone.utcoffset(None), timedelta(minutes=60))
 
     def test_dst(self):
-        self.assertEqual(self.timezone.dst(None), 0)
+        self.assertEqual(self.timezone.dst(None), timedelta())
 
 
 class TestDataTimeZone(unittest.TestCase):
@@ -61,10 +61,10 @@ class TestDataTimeZone(unittest.TestCase):
         self.assertEqual(self.timezone.tzname(None), 'START')
 
     def test_utcoffset_none(self):
-        self.assertEqual(self.timezone.utcoffset(None), 60)
+        self.assertEqual(self.timezone.utcoffset(None), timedelta(minutes=60))
 
     def test_dst_none(self):
-        self.assertEqual(self.timezone.dst(None), 0)
+        self.assertEqual(self.timezone.dst(None), timedelta())
 
     def test_tzname_datetime(self):
         self.assertEqual(self.timezone.tzname(datetime(1969, 1, 1)), 'START')
@@ -75,17 +75,25 @@ class TestDataTimeZone(unittest.TestCase):
         self.assertEqual(self.timezone.tzname(datetime(3000, 1, 1)), 'END')
 
     def test_utcoffset_datetime(self):
-        self.assertEqual(self.timezone.utcoffset(datetime(1969, 1, 1)), 60)
-        self.assertEqual(self.timezone.utcoffset(datetime(1970, 1, 1)), 120)
-        self.assertEqual(self.timezone.utcoffset(datetime(1970, 1, 2)), 60)
-        self.assertEqual(self.timezone.utcoffset(datetime(1970, 1, 3)), 120)
-        self.assertEqual(self.timezone.utcoffset(datetime(1970, 1, 4)), 60)
-        self.assertEqual(self.timezone.utcoffset(datetime(3000, 1, 1)), 60)
+        self.assertEqual(self.timezone.utcoffset(datetime(1969, 1, 1)),
+                         timedelta(minutes=60))
+        self.assertEqual(self.timezone.utcoffset(datetime(1970, 1, 1)),
+                         timedelta(minutes=120))
+        self.assertEqual(self.timezone.utcoffset(datetime(1970, 1, 2)),
+                         timedelta(minutes=60))
+        self.assertEqual(self.timezone.utcoffset(datetime(1970, 1, 3)),
+                         timedelta(minutes=120))
+        self.assertEqual(self.timezone.utcoffset(datetime(1970, 1, 4)),
+                         timedelta(minutes=60))
+        self.assertEqual(self.timezone.utcoffset(datetime(3000, 1, 1)),
+                         timedelta(minutes=60))
 
     def test_dst_datetime(self):
-        self.assertEqual(self.timezone.dst(datetime(1969, 1, 1)), 0)
-        self.assertEqual(self.timezone.dst(datetime(1970, 1, 1)), 60)
-        self.assertEqual(self.timezone.dst(datetime(1970, 1, 2)), 0)
-        self.assertEqual(self.timezone.dst(datetime(1970, 1, 3)), 60)
-        self.assertEqual(self.timezone.dst(datetime(1970, 1, 4)), 0)
-        self.assertEqual(self.timezone.dst(datetime(3000, 1, 1)), 0)
+        self.assertEqual(self.timezone.dst(datetime(1969, 1, 1)), timedelta())
+        self.assertEqual(self.timezone.dst(datetime(1970, 1, 1)),
+                         timedelta(minutes=60))
+        self.assertEqual(self.timezone.dst(datetime(1970, 1, 2)), timedelta())
+        self.assertEqual(self.timezone.dst(datetime(1970, 1, 3)),
+                         timedelta(minutes=60))
+        self.assertEqual(self.timezone.dst(datetime(1970, 1, 4)), timedelta())
+        self.assertEqual(self.timezone.dst(datetime(3000, 1, 1)), timedelta())

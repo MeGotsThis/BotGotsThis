@@ -40,11 +40,11 @@ class BasicTimeZone(BaseTimeZone):
     def tzname(self, dt: Optional[datetime]) -> str:
         return self.__name
     
-    def utcoffset(self, dt: Optional[datetime]) -> int:
-        return self.__offset.seconds // 60
+    def utcoffset(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
+        return timedelta(minutes=self.__offset.seconds // 60)
     
-    def dst(self, dt: Optional[datetime]) -> int:
-        return ZERO.seconds // 60
+    def dst(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
+        return ZERO
 
 
 class TimeZone(BaseTimeZone):
@@ -79,9 +79,9 @@ class TimeZone(BaseTimeZone):
                 break
         return transistion.abbreviation
     
-    def utcoffset(self, dt: Optional[datetime]) -> int:
+    def utcoffset(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
         if dt is None:
-            return self._transitions[0].offset // 60
+            return timedelta(minutes=self._transitions[0].offset // 60)
         if not isinstance(dt, datetime):
             raise TypeError()
         unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
@@ -90,11 +90,11 @@ class TimeZone(BaseTimeZone):
             if unixTime >= t.start:
                 transistion = t
                 break
-        return transistion.offset // 60
+        return timedelta(minutes=transistion.offset // 60)
      
-    def dst(self, dt: Optional[datetime]) -> int:
+    def dst(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
         if dt is None:
-            return ZERO.seconds // 60
+            return ZERO
         if not isinstance(dt, datetime):
             raise TypeError()
         unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
@@ -104,39 +104,94 @@ class TimeZone(BaseTimeZone):
                 transistion = t
                 break
         delta = transistion.offset - self._transitions[0].offset  # type: int
-        return delta // 60
+        return timedelta(minutes=delta // 60)
 
 utc = BasicTimeZone(0, 'UTC')
 unixEpoch = datetime(1970, 1, 1, 0, 0, 0, 0)
 
 timezones = [
     utc,
-    BasicTimeZone(0, 'UTC+0:00'),
-    BasicTimeZone(60, 'UTC+1:00'),
-    BasicTimeZone(120, 'UTC+2:00'),
-    BasicTimeZone(180, 'UTC+3:00'),
-    BasicTimeZone(240, 'UTC+4:00'),
-    BasicTimeZone(300, 'UTC+5:00'),
-    BasicTimeZone(360, 'UTC+6:00'),
-    BasicTimeZone(420, 'UTC+7:00'),
-    BasicTimeZone(480, 'UTC+8:00'),
-    BasicTimeZone(540, 'UTC+9:00'),
+    BasicTimeZone(0, 'UTC±00:00'),
+    BasicTimeZone(0, 'UTC+00:00'),
+    BasicTimeZone(60, 'UTC+01:00'),
+    BasicTimeZone(120, 'UTC+02:00'),
+    BasicTimeZone(180, 'UTC+03:00'),
+    BasicTimeZone(240, 'UTC+04:00'),
+    BasicTimeZone(300, 'UTC+05:00'),
+    BasicTimeZone(360, 'UTC+06:00'),
+    BasicTimeZone(420, 'UTC+07:00'),
+    BasicTimeZone(480, 'UTC+08:00'),
+    BasicTimeZone(540, 'UTC+09:00'),
     BasicTimeZone(600, 'UTC+10:00'),
     BasicTimeZone(660, 'UTC+11:00'),
     BasicTimeZone(720, 'UTC+12:00'),
-    BasicTimeZone(-0, 'UTC-0:00'),
-    BasicTimeZone(-60, 'UTC-1:00'),
-    BasicTimeZone(-120, 'UTC-2:00'),
-    BasicTimeZone(-180, 'UTC-3:00'),
-    BasicTimeZone(-240, 'UTC-4:00'),
-    BasicTimeZone(-300, 'UTC-5:00'),
-    BasicTimeZone(-360, 'UTC-6:00'),
-    BasicTimeZone(-420, 'UTC-7:00'),
-    BasicTimeZone(-480, 'UTC-8:00'),
-    BasicTimeZone(-540, 'UTC-9:00'),
+    BasicTimeZone(-0, 'UTC-00:00'),
+    BasicTimeZone(-60, 'UTC-01:00'),
+    BasicTimeZone(-120, 'UTC-02:00'),
+    BasicTimeZone(-180, 'UTC-03:00'),
+    BasicTimeZone(-240, 'UTC-04:00'),
+    BasicTimeZone(-300, 'UTC-05:00'),
+    BasicTimeZone(-360, 'UTC-06:00'),
+    BasicTimeZone(-420, 'UTC-07:00'),
+    BasicTimeZone(-480, 'UTC-08:00'),
+    BasicTimeZone(-540, 'UTC-09:00'),
     BasicTimeZone(-600, 'UTC-10:00'),
     BasicTimeZone(-660, 'UTC-11:00'),
     BasicTimeZone(-720, 'UTC-12:00'),
+    BasicTimeZone(0, 'UTC±0000'),
+    BasicTimeZone(0, 'UTC+0000'),
+    BasicTimeZone(60, 'UTC+0100'),
+    BasicTimeZone(120, 'UTC+0200'),
+    BasicTimeZone(180, 'UTC+0300'),
+    BasicTimeZone(240, 'UTC+0400'),
+    BasicTimeZone(300, 'UTC+0500'),
+    BasicTimeZone(360, 'UTC+0600'),
+    BasicTimeZone(420, 'UTC+0700'),
+    BasicTimeZone(480, 'UTC+0800'),
+    BasicTimeZone(540, 'UTC+0900'),
+    BasicTimeZone(600, 'UTC+1000'),
+    BasicTimeZone(660, 'UTC+1100'),
+    BasicTimeZone(720, 'UTC+1200'),
+    BasicTimeZone(-0, 'UTC-0000'),
+    BasicTimeZone(-60, 'UTC-0100'),
+    BasicTimeZone(-120, 'UTC-0200'),
+    BasicTimeZone(-180, 'UTC-0300'),
+    BasicTimeZone(-240, 'UTC-0400'),
+    BasicTimeZone(-300, 'UTC-0500'),
+    BasicTimeZone(-360, 'UTC-0600'),
+    BasicTimeZone(-420, 'UTC-0700'),
+    BasicTimeZone(-480, 'UTC-0800'),
+    BasicTimeZone(-540, 'UTC-0900'),
+    BasicTimeZone(-600, 'UTC-1000'),
+    BasicTimeZone(-660, 'UTC-1100'),
+    BasicTimeZone(-720, 'UTC-1200'),
+    BasicTimeZone(0, 'UTC±00'),
+    BasicTimeZone(0, 'UTC+00'),
+    BasicTimeZone(60, 'UTC+01'),
+    BasicTimeZone(120, 'UTC+02'),
+    BasicTimeZone(180, 'UTC+03'),
+    BasicTimeZone(240, 'UTC+04'),
+    BasicTimeZone(300, 'UTC+05'),
+    BasicTimeZone(360, 'UTC+06'),
+    BasicTimeZone(420, 'UTC+07'),
+    BasicTimeZone(480, 'UTC+08'),
+    BasicTimeZone(540, 'UTC+09'),
+    BasicTimeZone(600, 'UTC+10'),
+    BasicTimeZone(660, 'UTC+11'),
+    BasicTimeZone(720, 'UTC+12'),
+    BasicTimeZone(-0, 'UTC-00'),
+    BasicTimeZone(-60, 'UTC-01'),
+    BasicTimeZone(-120, 'UTC-02'),
+    BasicTimeZone(-180, 'UTC-03'),
+    BasicTimeZone(-240, 'UTC-04'),
+    BasicTimeZone(-300, 'UTC-05'),
+    BasicTimeZone(-360, 'UTC-06'),
+    BasicTimeZone(-420, 'UTC-07'),
+    BasicTimeZone(-480, 'UTC-08'),
+    BasicTimeZone(-540, 'UTC-09'),
+    BasicTimeZone(-600, 'UTC-10'),
+    BasicTimeZone(-660, 'UTC-11'),
+    BasicTimeZone(-720, 'UTC-12'),
     ]  # type: List[BaseTimeZone]
 
 if os.path.isfile('config.ini'):
