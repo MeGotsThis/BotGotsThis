@@ -16,7 +16,8 @@ def commandWall(args: ChatCommandArgs) -> bool:
         length, rows = length, int(args.message[2])
         # If this line generate an IndexError it does not get evaluated
         length, rows = rows, int(args.message[3])
-    length = min(length, bot.config.messageLimit // (len(args.message[1]) + 1))
+    limit = (bot.config.messageLimit + 1) // (len(args.message[1]) + 1)
+    length = min(length, limit)
     return process_wall(args, ' '.join((args.message[1],) * length), rows)
 
 

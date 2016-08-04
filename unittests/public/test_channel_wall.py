@@ -12,6 +12,11 @@ class TestChannelWall(TestChannel):
         self.permissions.globalModerator = False
         self.permissions.chatModerator = False
 
+        patcher = patch('bot.config', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_config = patcher.start()
+        self.mock_config.messageLimit = 100
+
         patcher = patch('source.public.channel.wall.process_wall',
                         autospec=True)
         self.addCleanup(patcher.stop)
@@ -52,6 +57,28 @@ class TestChannelWall(TestChannel):
         self.assertIs(
             wall.commandWall(self.args._replace(message=message)), True)
         self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa Kappa', 10)
+
+    def test_wall_repeat_rows_limit(self):
+        self.mock_config.messageLimit = 25
+        self.permissions.broadcaster = True
+        self.permissionSet['broadcaster'] = True
+        self.mock_process.return_value = True
+        message = Message('!wall Kappa 10 10')
+        self.assertIs(
+            wall.commandWall(self.args._replace(message=message)), True)
+        self.mock_process.assert_called_once_with(
+            ANY, 'Kappa Kappa Kappa Kappa', 10)
+
+    def test_wall_repeat_rows_limit_exact(self):
+        self.mock_config.messageLimit = 29
+        self.permissions.broadcaster = True
+        self.permissionSet['broadcaster'] = True
+        self.mock_process.return_value = True
+        message = Message('!wall Kappa 10 10')
+        self.assertIs(
+            wall.commandWall(self.args._replace(message=message)), True)
+        self.mock_process.assert_called_once_with(
+            ANY, 'Kappa Kappa Kappa Kappa Kappa', 10)
 
     def test_wall_moderator(self):
         self.permissionSet['moderator'] = True
