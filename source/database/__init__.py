@@ -23,13 +23,21 @@ class DatabaseBase(metaclass=ABCMeta):
     def connection(self) -> Any:
         return self._connection
 
-    def __enter__(self) -> Any:
+    @abstractmethod
+    def connect(self) -> None:
+        pass
+
+    def close(self) -> None:
+        if self.connection is not None:
+            self.connection.close()
+
+    def __enter__(self) -> 'DatabaseBase':
         self._connection = None
+        self.connect()
         return self
 
     def __exit__(self, type, value, traceback) -> None:
-        if self.connection is not None:
-            self.connection.close()
+        self.close()
 
     @abstractmethod
     def getAutoJoinsChats(self) -> Iterable[AutoJoinChannel]:

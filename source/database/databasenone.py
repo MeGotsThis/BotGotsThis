@@ -2,7 +2,11 @@ from . import AutoJoinChannel, CommandProperty, CommandReturn, DatabaseBase
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
 from typing import Union
 
+
 class DatabaseNone(DatabaseBase):
+    def connect(self) -> None:
+        pass
+
     def getAutoJoinsChats(self) -> Iterable[AutoJoinChannel]:
         yield from []
 

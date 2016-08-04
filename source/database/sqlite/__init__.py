@@ -17,14 +17,12 @@ class SQLiteDatabase(DatabaseBase):
         self._oauthfile = ini['oauth']  # type: str
         self._timeoutlogfile = ini['timeoutlog']  # type: str
     
-    def __enter__(self):
-        kwargs = {
-            'database': self._dbfile,
-            'detect_types': sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
-            }
-        self._connection = sqlite3.connect(**kwargs)  # type: sqlite3.Connection
-        return self
-    
+    def connect(self) -> None:
+        self._connection = sqlite3.connect(
+            database=self._dbfile,
+            detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
+            )  # type: sqlite3.Connection
+
     def getAutoJoinsChats(self) -> Iterable[AutoJoinChannel]:
         query = '''
 SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC'''  # type: str
