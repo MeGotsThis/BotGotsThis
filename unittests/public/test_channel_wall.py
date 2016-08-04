@@ -12,206 +12,187 @@ class TestChannelWall(TestChannel):
         self.permissions.globalModerator = False
         self.permissions.chatModerator = False
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_wall_false(self, mock_process):
+        patcher = patch('source.public.channel.wall.process_wall',
+                        autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_process = patcher.start()
+
+    def test_wall_false(self):
         self.assertIs(wall.commandWall(self.args), False)
         self.permissionSet['moderator'] = True
         self.assertIs(wall.commandWall(self.args), False)
-        self.assertFalse(mock_process.called)
+        self.assertFalse(self.mock_process.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_wall(self, mock_process):
+    def test_wall(self):
         self.permissions.broadcaster = True
         self.permissionSet['broadcaster'] = True
-        mock_process.return_value = True
+        self.mock_process.return_value = True
         message = Message('!wall Kappa')
         self.assertIs(
             wall.commandWall(self.args._replace(message=message)), True)
-        mock_process.assert_called_once_with(
+        self.mock_process.assert_called_once_with(
             ANY, 'Kappa Kappa Kappa Kappa Kappa', 20)
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_wall_rows(self, mock_process):
+    def test_wall_rows(self):
         self.permissions.broadcaster = True
         self.permissionSet['broadcaster'] = True
-        mock_process.return_value = True
+        self.mock_process.return_value = True
         message = Message('!wall Kappa 10')
         self.assertIs(
             wall.commandWall(self.args._replace(message=message)), True)
-        mock_process.assert_called_once_with(
+        self.mock_process.assert_called_once_with(
             ANY, 'Kappa Kappa Kappa Kappa Kappa', 10)
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_wall_repeat_rows(self, mock_process):
+    def test_wall_repeat_rows(self):
         self.permissions.broadcaster = True
         self.permissionSet['broadcaster'] = True
-        mock_process.return_value = True
+        self.mock_process.return_value = True
         message = Message('!wall Kappa 3 10')
         self.assertIs(
             wall.commandWall(self.args._replace(message=message)), True)
-        mock_process.assert_called_once_with(ANY, 'Kappa Kappa Kappa', 10)
+        self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa Kappa', 10)
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_wall_moderator(self, mock_process):
+    def test_wall_moderator(self):
         self.permissionSet['moderator'] = True
         self.features.append('modwall')
-        mock_process.return_value = True
+        self.mock_process.return_value = True
         message = Message('!wall Kappa')
         self.assertIs(
             wall.commandWall(self.args._replace(message=message)), True)
-        mock_process.assert_called_once_with(ANY, 'Kappa Kappa Kappa', 5)
+        self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa Kappa', 5)
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_long_wall_false(self, mock_process):
+    def test_long_wall_false(self):
         self.assertIs(wall.commandWallLong(self.args), False)
         self.permissionSet['moderator'] = True
         self.assertIs(wall.commandWallLong(self.args), False)
-        self.assertFalse(mock_process.called)
+        self.assertFalse(self.mock_process.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_long_wall(self, mock_process):
+    def test_long_wall(self):
         self.permissions.broadcaster = True
         self.permissionSet['broadcaster'] = True
-        mock_process.return_value = True
+        self.mock_process.return_value = True
         message = Message('!wall- Kappa Kappa')
         self.assertIs(
             wall.commandWallLong(self.args._replace(message=message)),
             True)
-        mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 20)
+        self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 20)
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_long_wall_count(self, mock_process):
+    def test_long_wall_count(self):
         self.permissions.broadcaster = True
         self.permissionSet['broadcaster'] = True
-        mock_process.return_value = True
+        self.mock_process.return_value = True
         message = Message('!wall-10 Kappa Kappa')
         self.assertIs(
             wall.commandWallLong(self.args._replace(message=message)),
             True)
-        mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 10)
+        self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 10)
 
-    @patch('source.public.channel.wall.process_wall', autospec=True)
-    def test_long_wall_moderator(self, mock_process):
+    def test_long_wall_moderator(self):
         self.permissionSet['moderator'] = True
         self.features.append('modwall')
-        mock_process.return_value = True
+        self.mock_process.return_value = True
         message = Message('!wall- Kappa Kappa')
         self.assertIs(
             wall.commandWallLong(self.args._replace(message=message)),
             True)
-        mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 5)
+        self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 5)
 
-    @patch('bot.config', autospec=True)
-    @patch('source.public.library.chat.inCooldown', autospec=True)
-    @patch('source.public.library.timeout.record_timeout', autospec=True)
-    def test_process_wall(self, mock_timeout, mock_cooldown, mock_config):
-        mock_config.spamModeratorCooldown = 30
+
+class TestChannelWallProcess(TestChannel):
+    def setUp(self):
+        super().setUp()
+        self.permissions.broadcaster = False
+        self.permissions.globalModerator = False
+        self.permissions.chatModerator = False
+
+        patcher = patch('bot.config', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_config = patcher.start()
+        self.mock_config.spamModeratorCooldown = 30
+
+        patcher = patch('source.public.library.chat.inCooldown', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_cooldown = patcher.start()
+
+        patcher = patch('source.public.library.timeout.record_timeout', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_timeout = patcher.start()
+
+    def test(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(wall.process_wall(self.args, 'Kappa', 0), True)
         self.channel.send.assert_called_once_with(ANY, -1)
-        self.assertFalse(mock_cooldown.called)
-        self.assertFalse(mock_timeout.called)
+        self.assertFalse(self.mock_cooldown.called)
+        self.assertFalse(self.mock_timeout.called)
         self.assertEqual(list(self.channel.send.call_args[0][0]), [])
 
-    @patch('bot.config', autospec=True)
-    @patch('source.public.library.chat.inCooldown', autospec=True)
-    @patch('source.public.library.timeout.record_timeout', autospec=True)
-    def test_process_wall_1(self, mock_timeout, mock_cooldown, mock_config):
-        mock_config.spamModeratorCooldown = 30
+    def test_1(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(wall.process_wall(self.args, 'Kappa', 1), True)
         self.channel.send.assert_called_once_with(ANY, -1)
-        self.assertFalse(mock_cooldown.called)
-        self.assertFalse(mock_timeout.called)
+        self.assertFalse(self.mock_cooldown.called)
+        self.assertFalse(self.mock_timeout.called)
         self.assertEqual(list(self.channel.send.call_args[0][0]), ['Kappa'])
 
-    @patch('bot.config', autospec=True)
-    @patch('source.public.library.chat.inCooldown', autospec=True)
-    @patch('source.public.library.timeout.record_timeout', autospec=True)
-    def test_process_wall_2(self, mock_timeout, mock_cooldown, mock_config):
-        mock_config.spamModeratorCooldown = 30
+    def test_2(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(wall.process_wall(self.args, 'Kappa', 2), True)
         self.channel.send.assert_called_once_with(ANY, -1)
-        self.assertFalse(mock_cooldown.called)
-        self.assertFalse(mock_timeout.called)
+        self.assertFalse(self.mock_cooldown.called)
+        self.assertFalse(self.mock_timeout.called)
         self.assertEqual(list(self.channel.send.call_args[0][0]),
                          ['Kappa', 'Kappa \ufeff'])
 
-    @patch('bot.config', autospec=True)
-    @patch('source.public.library.chat.inCooldown', autospec=True)
-    @patch('source.public.library.timeout.record_timeout', autospec=True)
-    def test_process_wall_5(self, mock_timeout, mock_cooldown, mock_config):
-        mock_config.spamModeratorCooldown = 30
+    def test_5(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(wall.process_wall(self.args, 'Kappa', 5), True)
         self.channel.send.assert_called_once_with(ANY, -1)
-        self.assertFalse(mock_cooldown.called)
-        self.assertFalse(mock_timeout.called)
+        self.assertFalse(self.mock_cooldown.called)
+        self.assertFalse(self.mock_timeout.called)
         self.assertEqual(
             list(self.channel.send.call_args[0][0]),
             ['Kappa', 'Kappa \ufeff', 'Kappa', 'Kappa \ufeff', 'Kappa'])
 
-    @patch('bot.config', autospec=True)
-    @patch('source.public.library.chat.inCooldown', autospec=True)
-    @patch('source.public.library.timeout.record_timeout', autospec=True)
-    def test_process_wall_channel_mod(self, mock_timeout, mock_cooldown,
-                                      mock_config):
-        mock_config.spamModeratorCooldown = 30
+    def test_channel_mod(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.permissions.chatModerator = True
         self.assertIs(wall.process_wall(self.args, 'Kappa', 2), True)
         self.channel.send.assert_called_once_with(ANY, -1)
-        self.assertFalse(mock_cooldown.called)
-        mock_timeout.assert_called_once_with(
+        self.assertFalse(self.mock_cooldown.called)
+        self.mock_timeout.assert_called_once_with(
             self.database, self.channel, 'botgotsthis', 'Kappa',
             str(self.args.message), 'wall')
         self.assertEqual(list(self.channel.send.call_args[0][0]),
                          ['Kappa', 'Kappa'])
 
-    @patch('bot.config', autospec=True)
-    @patch('source.public.library.chat.inCooldown', autospec=True)
-    @patch('source.public.library.timeout.record_timeout', autospec=True)
-    def test_process_wall_broadcaster_limit(
-            self, mock_timeout, mock_cooldown, mock_config):
-        mock_config.spamModeratorCooldown = 30
+    def test_broadcaster_limit(self):
         self.permissions.broadcaster = True
         self.assertIs(wall.process_wall(self.args, 'Kappa ', 1000), True)
         self.channel.send.assert_called_once_with(ANY, -1)
-        self.assertFalse(mock_cooldown.called)
-        self.assertFalse(mock_timeout.called)
+        self.assertFalse(self.mock_cooldown.called)
+        self.assertFalse(self.mock_timeout.called)
         self.assertEqual(len(list(self.channel.send.call_args[0][0])), 500)
 
-    @patch('bot.config', autospec=True)
-    @patch('source.public.library.chat.inCooldown', autospec=True)
-    @patch('source.public.library.timeout.record_timeout', autospec=True)
-    def test_process_wall_moderator_limit(
-            self, mock_timeout, mock_cooldown, mock_config):
-        mock_config.spamModeratorCooldown = 30
-        mock_cooldown.return_value = False
+    def test_moderator_limit(self):
+        self.mock_cooldown.return_value = False
         self.assertIs(wall.process_wall(self.args, 'Kappa', 100), True)
         self.channel.send.assert_called_once_with(ANY, -1)
-        self.assertFalse(mock_timeout.called)
-        mock_cooldown.assert_called_once_with(
+        self.assertFalse(self.mock_timeout.called)
+        self.mock_cooldown.assert_called_once_with(
             self.args, timedelta(seconds=30), ANY)
         self.assertEqual(len(list(self.channel.send.call_args[0][0])), 10)
 
-    @patch('bot.config', autospec=True)
-    @patch('source.public.library.chat.inCooldown', autospec=True)
-    @patch('source.public.library.timeout.record_timeout', autospec=True)
-    def test_process_wall_moderator_cooldown(
-            self, mock_timeout, mock_cooldown, mock_config):
-        mock_config.spamModeratorCooldown = 30
-        mock_cooldown.return_value = True
+    def test_moderator_cooldown(self):
+        self.mock_cooldown.return_value = True
         self.assertIs(wall.process_wall(self.args, 'Kappa', 2), False)
         self.assertFalse(self.channel.send.called)
-        self.assertFalse(mock_timeout.called)
-        mock_cooldown.assert_called_once_with(
+        self.assertFalse(self.mock_timeout.called)
+        self.mock_cooldown.assert_called_once_with(
             self.args, timedelta(seconds=30), ANY)
