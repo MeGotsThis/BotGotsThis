@@ -1,6 +1,6 @@
 from source.public.whisper import broadcaster
+from tests.unittest.public.test_whisper import TestWhisper
 from unittest.mock import ANY, patch
-from unittests.public.test_whisper import TestWhisper
 
 
 class TestWhisperBroadcaster(TestWhisper):

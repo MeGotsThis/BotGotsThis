@@ -4,8 +4,8 @@ from io import StringIO
 from source.data import Message
 from source.database import AutoJoinChannel, DatabaseBase
 from source.public.manage import autojoin
+from tests.unittest.public.test_managebot import TestManageBot, send
 from unittest.mock import ANY, Mock, patch
-from unittests.public.test_managebot import TestManageBot, send
 
 
 class TestManageBotAutoJoin(TestManageBot):

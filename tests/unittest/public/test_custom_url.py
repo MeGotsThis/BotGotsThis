@@ -2,8 +2,8 @@ import urllib.error
 from http.client import HTTPResponse
 from source.data.message import Message
 from source.public.custom import url
+from tests.unittest.public.test_custom import TestCustomField
 from unittest.mock import Mock, patch
-from unittests.public.test_custom import TestCustomField
 
 
 class TestCustomQuery(TestCustomField):

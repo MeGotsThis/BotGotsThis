@@ -1,5 +1,5 @@
 from source.public.custom import broadcaster
-from unittests.public.test_custom import TestCustomField
+from tests.unittest.public.test_custom import TestCustomField
 
 
 class TestCustomBroadcaster(TestCustomField):

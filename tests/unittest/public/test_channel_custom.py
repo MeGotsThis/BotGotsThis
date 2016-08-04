@@ -2,8 +2,8 @@ from datetime import timedelta
 from source.data import CustomCommand, CommandActionTokens
 from source.data.message import Message
 from source.public.channel import custom
+from tests.unittest.public.test_channel import TestChannel
 from unittest.mock import ANY, patch
-from unittests.public.test_channel import TestChannel
 
 
 class TestChannelCustomCustomCommand(TestChannel):

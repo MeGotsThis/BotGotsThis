@@ -1,14 +1,15 @@
-from source.public.whisper import reload
+from source.public.channel import reload
+from tests.unittest.public.test_channel import TestChannel
 from unittest.mock import ANY, patch
-from unittests.public.test_whisper import TestWhisper
 
 
-class TestWhisperReload(TestWhisper):
+class TestChannelFeature(TestChannel):
     @patch('source.public.library.reload.full_reload', autospec=True)
     def test_reload(self, mock_reload):
         self.assertIs(reload.commandReload(self.args), False)
         self.assertFalse(mock_reload.called)
         mock_reload.return_value = True
+        self.permissions.inOwnerChannel = True
         self.permissionSet['owner'] = True
         self.assertIs(reload.commandReload(self.args), True)
         mock_reload.assert_called_once_with(ANY)
@@ -18,6 +19,7 @@ class TestWhisperReload(TestWhisper):
         self.assertIs(reload.commandReloadCommands(self.args), False)
         self.assertFalse(mock_reload.called)
         mock_reload.return_value = True
+        self.permissions.inOwnerChannel = True
         self.permissionSet['owner'] = True
         self.assertIs(reload.commandReloadCommands(self.args), True)
         mock_reload.assert_called_once_with(ANY)
@@ -27,6 +29,7 @@ class TestWhisperReload(TestWhisper):
         self.assertIs(reload.commandReloadConfig(self.args), False)
         self.assertFalse(mock_reload.called)
         mock_reload.return_value = True
+        self.permissions.inOwnerChannel = True
         self.permissionSet['owner'] = True
         self.assertIs(reload.commandReloadConfig(self.args), True)
         mock_reload.assert_called_once_with(ANY)

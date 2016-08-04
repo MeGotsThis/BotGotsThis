@@ -1,7 +1,6 @@
 from source.data.message import Message
 from source.public.channel import textformat
-from unittest.mock import ANY, patch
-from unittests.public.test_channel import TestChannel
+from tests.unittest.public.test_channel import TestChannel
 
 
 class TestChannelTextFormat(TestChannel):

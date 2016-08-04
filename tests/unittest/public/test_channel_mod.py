@@ -1,7 +1,7 @@
 from source.data.message import Message
 from source.public.channel import mod
+from tests.unittest.public.test_channel import TestChannel
 from unittest.mock import ANY, patch
-from unittests.public.test_channel import TestChannel
 
 
 class TestChannelMod(TestChannel):

@@ -1,6 +1,6 @@
 from source.data.message import Message
 from source.public.custom import params
-from unittests.public.test_custom import TestCustomField
+from tests.unittest.public.test_custom import TestCustomField
 
 
 class TestCustomParams(TestCustomField):

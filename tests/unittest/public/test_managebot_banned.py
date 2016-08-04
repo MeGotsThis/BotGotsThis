@@ -2,8 +2,8 @@ import unittest
 from source.data import Message
 from source.database import DatabaseBase
 from source.public.manage import banned
+from tests.unittest.public.test_managebot import TestManageBot, send
 from unittest.mock import ANY, Mock, patch
-from unittests.public.test_managebot import TestManageBot, send
 
 
 class TestManageBotBanned(TestManageBot):

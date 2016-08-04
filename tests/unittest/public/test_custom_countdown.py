@@ -4,8 +4,8 @@ from datetime import datetime, time, timedelta
 from source.data import timezones
 from source.data.timedelta import format
 from source.public.custom import countdown
+from tests.unittest.public.test_custom import TestCustomField
 from unittest.mock import patch
-from unittests.public.test_custom import TestCustomField
 
 
 class TestCustomCountdownParse(unittest.TestCase):

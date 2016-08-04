@@ -1,14 +1,15 @@
 import socket
 import unittest
 import urllib.error
-from bot.data import Channel
-from datetime import datetime, timedelta
+from datetime import datetime
 from http.client import HTTPResponse
-from source.database import DatabaseBase
-from source.data.message import Message
-from source.public.channel import block_url
 from unittest.mock import ANY, Mock, call, patch
-from unittests.public.test_channel import TestChannel
+
+from bot.data import Channel
+from source.data.message import Message
+from source.database import DatabaseBase
+from source.public.channel import block_url
+from tests.unittest.public.test_channel import TestChannel
 
 
 @patch('source.public.channel.block_url.check_domain_redirect', autospec=True)

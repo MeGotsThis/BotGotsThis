@@ -1,5 +1,5 @@
 from source.public.custom import user
-from unittests.public.test_custom import TestCustomField
+from tests.unittest.public.test_custom import TestCustomField
 
 
 class TestCustomUser(TestCustomField):
