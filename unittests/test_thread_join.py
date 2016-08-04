@@ -3,7 +3,7 @@ import unittest
 from bot.data import Channel, Socket
 from bot.thread.join import JoinThread
 from datetime import datetime, timedelta
-from unittest.mock import ANY, Mock, PropertyMock, patch
+from unittest.mock import Mock, PropertyMock, patch
 
 
 class TestJoinThread(unittest.TestCase):
@@ -13,19 +13,19 @@ class TestJoinThread(unittest.TestCase):
         self.channel = Channel('botgotsthis', self.socket)
         self.socket._channels[self.channel.channel] = self.channel
 
-        patcher = patch('bot.thread.join.globals', autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.clusters = {'Twitch': self.socket}
 
-    @patch('bot.thread.join.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_canProcess(self, mock_now, mock_config):
         mock_config.joinLimit = 5
         mock_now.return_value = datetime(2000, 1, 1)
         self.assertIs(self.join.canProcess, True)
 
-    @patch('bot.thread.join.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_canProcess_partial(self, mock_now, mock_config):
         mock_config.joinLimit = 5
@@ -35,7 +35,7 @@ class TestJoinThread(unittest.TestCase):
         self.assertIs(self.join.canProcess, True)
         self.assertEqual(self.join._joinTimes, [datetime(2000, 1, 1)] * 4)
 
-    @patch('bot.thread.join.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_canProcess_full(self, mock_now, mock_config):
         mock_config.joinLimit = 5
@@ -66,7 +66,6 @@ class TestJoinThread(unittest.TestCase):
         mock_isConnected.return_value = True
         self.assertEquals(self.join.connectedChannels,
                           {'botgotsthis': self.channel})
-
 
     @patch('bot.utils.now', autospec=True)
     def test_connected(self, mock_now):

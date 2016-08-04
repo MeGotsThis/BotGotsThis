@@ -1,4 +1,5 @@
-from bot import config, data, utils
+import bot.config
+from bot import data, utils
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timedelta
@@ -15,9 +16,9 @@ def timeout_user(database: DatabaseBase,
                  message: Optional[str]=None,
                  reason: Optional[str]=None):
     properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2']  # type: List[str]
-    defaults = {'timeoutLength0': config.moderatorDefaultTimeout[0],
-                'timeoutLength1': config.moderatorDefaultTimeout[1],
-                'timeoutLength2': config.moderatorDefaultTimeout[2],
+    defaults = {'timeoutLength0': bot.config.moderatorDefaultTimeout[0],
+                'timeoutLength1': bot.config.moderatorDefaultTimeout[1],
+                'timeoutLength2': bot.config.moderatorDefaultTimeout[2],
                 }  # type: Dict[str, int]
     chatProp = database.getChatProperties(chat.channel, properties, defaults,
                                           int)  # type: Mapping[str, int]
@@ -31,7 +32,7 @@ def timeout_user(database: DatabaseBase,
                 lambda: (datetime.min, 0)))
     
     timestamp = utils.now()  # type: datetime
-    duration = timedelta(seconds=config.warningDuration)  # type: timedelta
+    duration = timedelta(seconds=bot.config.warningDuration)  # type: timedelta
     if timestamp - chat.sessionData['timeouts'][module][user][0] >= duration:
         level = min(max(base_level, 0), 2)  # type: int
     else:

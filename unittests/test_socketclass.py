@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from io import StringIO
 from unittest.mock import Mock, patch
 
+
 class SocketSpec():
     @staticmethod
     def connect(address):
@@ -64,7 +65,7 @@ class TestSocket(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.utils.now', autospec=True)
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch('bot.data.socket.socket.connect', spec=SocketSpec.connect)
     @patch.object(Socket, 'login', autospec=True)
     def test_connect(self, mock_login, mock_connect, mock_globals, mock_now,
@@ -83,7 +84,7 @@ class TestSocket(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.utils.now', autospec=True)
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch('bot.data.socket.socket.connect', spec=SocketSpec.connect)
     @patch.object(Socket, 'login', autospec=True)
     def test_connect_throttle(self, mock_login, mock_connect, mock_globals,
@@ -105,7 +106,7 @@ class TestSocket(unittest.TestCase):
         self.assertRaises(TypeError, self.socket.login, None)
 
     @patch('socket.socket', spec=True)
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch.object(Socket, '_logWrite', autospec=True)
     def test_login(self, mock_logWrite, mock_config, MockSocket):
         socket = MockSocket()
@@ -126,7 +127,7 @@ class TestSocket(unittest.TestCase):
                           IrcMessage(None, None, 'PING'))
 
     @patch('sys.stdout', new_callable=StringIO)
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(Channel, 'onJoin', autospec=True)
     def test_onwrite_join(self, mock_onJoin, mock_globals, mock_stdout):
         now = datetime(2000, 1, 1)
@@ -175,7 +176,7 @@ class TestSocket(unittest.TestCase):
 
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch.object(Socket, 'queueWrite', autospec=True)
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_sendPing(self, mock_now, mock_config, mock_queueWrite,
                       mock_disconnect):
@@ -192,7 +193,7 @@ class TestSocket(unittest.TestCase):
 
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch.object(Socket, 'queueWrite', autospec=True)
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_sendPing_noresponse(self, mock_now, mock_config, mock_queueWrite,
                               mock_disconnect):
@@ -207,7 +208,7 @@ class TestSocket(unittest.TestCase):
 
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch.object(Socket, 'queueWrite', autospec=True)
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_sendPing_noresponse_late(self, mock_now, mock_config,
                                       mock_queueWrite, mock_disconnect):
@@ -222,35 +223,35 @@ class TestSocket(unittest.TestCase):
         self.assertTrue(any(m for m in mock_queueWrite.call_args_list
                             if m[0][1].command == 'PING'))
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.logIrcMessage', autospec=True)
     def test_logRead(self, mock_logIrcMessage, mock_config):
         mock_config.botnick = 'botgotsthis'
         self.socket._logRead('')
         self.assertTrue(mock_logIrcMessage.called)
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.logIrcMessage', autospec=True)
     def test_logWrite(self, mock_logIrcMessage, mock_config):
         mock_config.botnick = 'botgotsthis'
         self.socket._logWrite(IrcMessage(None, None, 1))
         self.assertTrue(mock_logIrcMessage.called)
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.logIrcMessage', autospec=True)
     def test_logWrite_channel(self, mock_logIrcMessage, mock_config):
         mock_config.botnick = 'botgotsthis'
         self.socket._logWrite(IrcMessage(None, None, 1), channel=self.channel)
         self.assertEqual(mock_logIrcMessage.call_count, 2)
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.logIrcMessage', autospec=True)
     def test_logWrite_whisper(self, mock_logIrcMessage, mock_config):
         mock_config.botnick = 'botgotsthis'
         self.socket._logWrite(IrcMessage(None, None, 1), whisper=self.whisper)
         self.assertEqual(mock_logIrcMessage.call_count, 4)
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.logIrcMessage', autospec=True)
     def test_logWrite_channel_whisper(self, mock_logIrcMessage, mock_config):
         mock_config.botnick = 'botgotsthis'
@@ -323,7 +324,7 @@ class TestSocket(unittest.TestCase):
         self.assertIs(self.socket._channels[self.channel.channel],
                       self.channel)
 
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(Socket, 'queueWrite', autospec=True)
     def test_partChannel(self, mock_queueWrite, mock_globals):
         self.socket.partChannel(self.channel)
@@ -331,7 +332,7 @@ class TestSocket(unittest.TestCase):
         self.assertFalse(mock_queueWrite.called)
 
     @patch('sys.stdout', new_callable=StringIO)
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(Socket, 'queueWrite', autospec=True)
     def test_partChannel_contains(self, mock_queueWrite, mock_globals,
                                   mock_stdout):
@@ -345,7 +346,7 @@ class TestSocket(unittest.TestCase):
                             if m[0][1].command == 'PART'))
         self.assertNotEquals(mock_stdout.getvalue(), '')
 
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(MessagingQueue, 'popChat', autospec=True)
     @patch.object(MessagingQueue, 'popWhisper', autospec=True)
     @patch.object(Socket, 'queueWrite', autospec=True)
@@ -378,7 +379,7 @@ class TestSocketConnected(unittest.TestCase):
         self.channel = Channel('botgotsthis', self.socket)
         self.whisper = WhisperMessage('botgotsthis', 'Kappa')
 
-        patcher = patch('bot.data.config', autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.botnick = 'botgotsthis'
@@ -389,15 +390,11 @@ class TestSocketConnected(unittest.TestCase):
         self.now = datetime(2000, 1, 1, 0, 0, 0)
         self.mock_now.return_value = self.now
 
-        patcher = patch('bot.data.globals', autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
 
-        patcher = patch('bot.data.config', autospec=True)
-        self.addCleanup(patcher.stop)
-        self.mock_config = patcher.start()
-
-        patch_connect = patch('bot.data.socket.socket.connect',
+        patch_connect = patch('socket.socket.connect',
                               spec=SocketSpec.connect)
         patch_connect.start()
         patch_stdout = patch('sys.stdout', new_callable=StringIO)
@@ -510,7 +507,7 @@ class TestSocketConnected(unittest.TestCase):
         mock_logException.assert_called_once_with()
         mock_disconnect.assert_called_once_with(self.socket)
 
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch.object(Socket, '_logRead', autospec=True)
@@ -527,7 +524,7 @@ class TestSocketConnected(unittest.TestCase):
         self.assertFalse(mock_disconnect.called)
         self.assertTrue(mock_globals.running)
 
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch.object(Socket, '_logRead', autospec=True)
@@ -545,7 +542,7 @@ class TestSocketConnected(unittest.TestCase):
         mock_disconnect.assert_called_once_with(self.socket)
         self.assertTrue(mock_globals.running)
 
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch.object(Socket, '_logRead', autospec=True)
@@ -564,7 +561,7 @@ class TestSocketConnected(unittest.TestCase):
         mock_disconnect.assert_called_once_with(self.socket)
         self.assertTrue(mock_globals.running)
 
-    @patch('bot.data.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(Socket, 'disconnect', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch.object(Socket, '_logRead', autospec=True)

@@ -18,7 +18,7 @@ class TestLibraryWhisper(unittest.TestCase):
         self.args = WhisperCommandArgs(self.database, 'botgotsthis',
                                        Message(''), self.permissions, self.now)
 
-    @patch('source.public.library.whisper.utils.whisper', autospec=True)
+    @patch('bot.utils.whisper', autospec=True)
     def test_send(self, mock_whisper):
         whisper.send('botgotsthis')('Kappa')
         mock_whisper.assert_called_once_with('botgotsthis','Kappa')
@@ -77,7 +77,7 @@ class TestLibraryWhisper(unittest.TestCase):
             return False
         self.assertIs(t(self.args), True)
 
-    @patch('source.public.library.whisper.utils.whisper', autospec=True)
+    @patch('bot.utils.whisper', autospec=True)
     def test_min_args_not_reason(self, mock_whisper):
         @whisper.min_args(1, reason='Kappa')
         def t(args):

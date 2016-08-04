@@ -1,6 +1,7 @@
-﻿from bot import config, utils
+﻿import bot.config
+from bot import utils
 from typing import Iterable, List, Optional
-from ..library.message import messagesFromItems
+from ..library import message
 from ...data import ManageBotArgs, Send
 from ...database import DatabaseBase
 
@@ -32,7 +33,7 @@ def list_banned_channels(database: DatabaseBase,
                          send: Send) -> bool:
     bannedChannels = database.listBannedChannels()  # type: Iterable[str]
     if bannedChannels:
-        send(messagesFromItems(bannedChannels, 'Banned Channels: '))
+        send(message.messagesFromItems(bannedChannels, 'Banned Channels: '))
     else:
         send('There are no banned channels')
     return True
@@ -43,7 +44,7 @@ def insert_banned_channel(channel: str,
                           nick: str,
                           database: DatabaseBase,
                           send: Send) -> bool:
-    if channel == config.botnick:
+    if channel == bot.config.botnick:
         send('Cannot ban the bot itself')
         return True
     isBannedOrReason = database.isChannelBannedReason(channel)  # type: Optional[str]

@@ -14,36 +14,35 @@ class TestChannelCustomCustomCommand(TestChannel):
         self.permissions.chatModerator = False
         self.command = CustomCommand('Kappa', '#global', '')
         
-        patcher = patch('source.public.channel.custom.config', autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.customMessageCooldown = 5
         self.mock_config.customMessageUserCooldown = 30
         
-        patcher = patch('source.public.channel.custom.inCooldown',
-                        autospec=True)
+        patcher = patch('source.public.library.chat.inCooldown', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_channel_cooldown = patcher.start()
         self.mock_channel_cooldown.return_value = False
         
-        patcher = patch('source.public.channel.custom.in_user_cooldown',
+        patcher = patch('source.public.library.chat.in_user_cooldown',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_user_cooldown = patcher.start()
         self.mock_user_cooldown.return_value = False
         
-        patcher = patch('source.public.channel.custom.timeout.record_timeout',
+        patcher = patch('source.public.library.timeout.record_timeout',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
         
-        patcher = patch('source.public.channel.custom.custom.get_command',
+        patcher = patch('source.public.library.custom.get_command',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_command = patcher.start()
         self.mock_command.return_value = self.command
         
-        patcher = patch('source.public.channel.custom.custom.create_messages',
+        patcher = patch('source.public.library.custom.create_messages',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_messages = patcher.start()
@@ -159,9 +158,8 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.args = self.args._replace(message=self.message)
         self.broadcaster = '#global'
         
-        patcher = patch(
-            'source.public.channel.custom.custom.parse_action_message',
-            autospec=True)
+        patcher = patch('source.public.library.custom.parse_action_message',
+                        autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_input = patcher.start()
         self.mock_input.return_value = None
@@ -454,7 +452,7 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.assertFalse(self.database.processCustomCommandProperty.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('source.public.channel.custom.lists.custom', autospec=True)
+    @patch('lists.custom', autospec=True)
     def test_command_property_empty(self, mock_list):
         mock_list.properties = []
         input = CommandActionTokens('', self.broadcaster, '',
@@ -464,7 +462,7 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.assertFalse(self.database.processCustomCommandProperty.called)
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.custom.lists.custom', autospec=True)
+    @patch('lists.custom', autospec=True)
     def test_command_property(self, mock_list):
         mock_list.properties = ['property']
         input = CommandActionTokens('', self.broadcaster, '',
@@ -476,7 +474,7 @@ class TestChannelCustomProcessCommand(TestChannel):
             self.broadcaster, '', 'Kappa', 'property', 'PogChamp')
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.custom.lists.custom', autospec=True)
+    @patch('lists.custom', autospec=True)
     def test_command_property_dberror(self, mock_list):
         mock_list.properties = ['property']
         input = CommandActionTokens('', self.broadcaster, '',

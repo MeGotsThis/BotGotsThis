@@ -7,13 +7,13 @@ from unittest.mock import Mock, patch
 
 class TestTasksEmotes(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.public.tasks.emotes.globals', autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
 
         self.now = datetime(2000, 1, 1)
 
-    @patch('source.public.tasks.emotes.twitch.twitch_emotes', autospec=True)
+    @patch('source.api.twitch.twitch_emotes', autospec=True)
     def test_twitch(self, mock_emotes):
         self.mock_globals.globalEmotesCache = self.now
         self.mock_globals.globalEmotes = {}
@@ -28,7 +28,7 @@ class TestTasksEmotes(unittest.TestCase):
         self.assertEqual(self.mock_globals.globalEmoteSets, emotesets)
         mock_emotes.assert_called_once_with()
 
-    @patch('source.public.tasks.emotes.twitch.twitch_emotes', autospec=True)
+    @patch('source.api.twitch.twitch_emotes', autospec=True)
     def test_twitch_recent(self, mock_emotes):
         self.mock_globals.globalEmotesCache = self.now
         self.mock_globals.globalEmotes = {}
@@ -42,7 +42,7 @@ class TestTasksEmotes(unittest.TestCase):
         self.assertEqual(self.mock_globals.globalEmoteSets, {})
         self.assertFalse(mock_emotes.called)
 
-    @patch('source.public.tasks.emotes.twitch.twitch_emotes', autospec=True)
+    @patch('source.api.twitch.twitch_emotes', autospec=True)
     def test_twitch_none(self, mock_emotes):
         self.mock_globals.globalEmotesCache = self.now
         self.mock_globals.globalEmotes = {}
@@ -64,7 +64,7 @@ class TestTasksEmotes(unittest.TestCase):
         mock_broadcaster.assert_called_once_with(self.now)
         mock_global.assert_called_once_with(self.now)
 
-    @patch('source.public.tasks.emotes.ffz.getGlobalEmotes', autospec=True)
+    @patch('source.api.ffz.getGlobalEmotes', autospec=True)
     def test_ffz_global(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -76,7 +76,7 @@ class TestTasksEmotes(unittest.TestCase):
         self.assertEqual(self.mock_globals.globalFfzEmotes, emotes_)
         mock_emotes.assert_called_once_with()
 
-    @patch('source.public.tasks.emotes.ffz.getGlobalEmotes', autospec=True)
+    @patch('source.api.ffz.getGlobalEmotes', autospec=True)
     def test_ffz_global_recent(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -87,7 +87,7 @@ class TestTasksEmotes(unittest.TestCase):
         self.assertEqual(self.mock_globals.globalFfzEmotes, {})
         self.assertFalse(mock_emotes.called)
 
-    @patch('source.public.tasks.emotes.ffz.getGlobalEmotes', autospec=True)
+    @patch('source.api.ffz.getGlobalEmotes', autospec=True)
     def test_ffz_global_none(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -131,7 +131,7 @@ class TestTasksEmotes(unittest.TestCase):
         mgtchannel.updateFfzEmotes.assert_called_once_with()
         self.assertFalse(bgtchannel.updateFfzEmotes.called)
 
-    @patch('source.public.tasks.emotes.random.choice', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_ffz_broadcaster_onlyone(self, mock_choice):
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
@@ -148,7 +148,7 @@ class TestTasksEmotes(unittest.TestCase):
         bgtchannel.updateFfzEmotes.assert_called_once_with()
         self.assertFalse(mgtchannel.updateFfzEmotes.called)
 
-    @patch('source.public.tasks.emotes.random.choice', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_ffz_broadcaster_empty(self, mock_choice):
         self.mock_globals.channels = {}
         emotes.refreshFfzRandomBroadcasterEmotes(self.now + timedelta(hours=1))
@@ -163,7 +163,7 @@ class TestTasksEmotes(unittest.TestCase):
         mock_broadcaster.assert_called_once_with(self.now)
         mock_global.assert_called_once_with(self.now)
 
-    @patch('source.public.tasks.emotes.bttv.getGlobalEmotes', autospec=True)
+    @patch('source.api.bttv.getGlobalEmotes', autospec=True)
     def test_bttv_global(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}
@@ -175,7 +175,7 @@ class TestTasksEmotes(unittest.TestCase):
         self.assertEqual(self.mock_globals.globalBttvEmotes, emotes_)
         mock_emotes.assert_called_once_with()
 
-    @patch('source.public.tasks.emotes.bttv.getGlobalEmotes', autospec=True)
+    @patch('source.api.bttv.getGlobalEmotes', autospec=True)
     def test_bttv_global_recent(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}
@@ -186,7 +186,7 @@ class TestTasksEmotes(unittest.TestCase):
         self.assertEqual(self.mock_globals.globalBttvEmotes, {})
         self.assertFalse(mock_emotes.called)
 
-    @patch('source.public.tasks.emotes.bttv.getGlobalEmotes', autospec=True)
+    @patch('source.api.bttv.getGlobalEmotes', autospec=True)
     def test_bttv_global_none(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}
@@ -230,7 +230,7 @@ class TestTasksEmotes(unittest.TestCase):
         mgtchannel.updateBttvEmotes.assert_called_once_with()
         self.assertFalse(bgtchannel.updateBttvEmotes.called)
 
-    @patch('source.public.tasks.emotes.random.choice', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_bttv_broadcaster_onlyone(self, mock_choice):
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
@@ -247,7 +247,7 @@ class TestTasksEmotes(unittest.TestCase):
         bgtchannel.updateBttvEmotes.assert_called_once_with()
         self.assertFalse(mgtchannel.updateBttvEmotes.called)
 
-    @patch('source.public.tasks.emotes.random.choice', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_bttv_broadcaster_empty(self, mock_choice):
         self.mock_globals.channels = {}
         emotes.refreshBttvRandomBroadcasterEmotes(self.now + timedelta(hours=1))

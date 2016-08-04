@@ -2,7 +2,6 @@ import math
 import unittest
 from datetime import datetime, time, timedelta
 from source.data import timezones
-from source.data.message import Message
 from source.data.timedelta import format
 from source.public.custom import countdown
 from unittest.mock import patch

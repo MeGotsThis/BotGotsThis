@@ -5,7 +5,7 @@ from bot.twitchmessage import IrcMessageTags
 from source.data.message import Message
 from source.database import DatabaseBase
 from source.public.library import broadcaster
-from unittest.mock import ANY, MagicMock, Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 
 def send(messages):
@@ -18,24 +18,20 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.broadcaster.globals',
-                        autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': Mock(spec=Channel)}
 
-        patcher = patch('source.public.library.broadcaster.twitch.chat_server',
-                        autospec=True)
+        patcher = patch('source.api.twitch.chat_server', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_chat_server = patcher.start()
 
-        patcher = patch('source.public.library.broadcaster.utils.joinChannel',
-                        autospec=True)
+        patcher = patch('bot.utils.joinChannel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_join = patcher.start()
 
-        patcher = patch('source.public.library.broadcaster.utils.ensureServer',
-                        autospec=True)
+        patcher = patch('bot.utils.ensureServer', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_ensure = patcher.start()
 
@@ -155,20 +151,18 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
 
 class TestLibraryBroadcasterLeave(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.public.library.broadcaster.config',
-                        autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.botnick = 'botgotsthis'
 
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.broadcaster.time.sleep',
-                        autospec=True)
+        patcher = patch('time.sleep', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_sleep = patcher.start()
 
-        patcher = patch('source.public.library.broadcaster.utils.partChannel',
+        patcher = patch('bot.utils.partChannel',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_part = patcher.start()
@@ -192,8 +186,7 @@ class TestLibraryBroadcasterEmpty(unittest.TestCase):
         self.channel.channel = 'botgotsthis'
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.broadcaster.globals',
-                        autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}
@@ -293,24 +286,20 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.broadcaster.globals',
-                        autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.clusters = {'twitch': Mock(spec=Socket)}
 
-        patcher = patch('source.public.library.broadcaster.twitch.chat_server',
-                        autospec=True)
+        patcher = patch('source.api.twitch.chat_server', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_chat_server = patcher.start()
 
-        patcher = patch('source.public.library.broadcaster.utils.joinChannel',
-                        autospec=True)
+        patcher = patch('bot.utils.joinChannel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_join = patcher.start()
 
-        patcher = patch('source.public.library.broadcaster.utils.ensureServer',
-                        autospec=True)
+        patcher = patch('bot.utils.ensureServer', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_ensure = patcher.start()
 
@@ -547,8 +536,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.broadcaster.config',
-                        autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.moderatorDefaultTimeout = [60, 600, 0]

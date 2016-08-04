@@ -1,7 +1,7 @@
-﻿from ..library import timeout
-from ..library.chat import inCooldown, min_args, permission_feature
+﻿import bot.config
+from ..library import chat, timeout
+from ..library.chat import min_args, permission_feature
 from ...data import ChatCommandArgs
-from bot import config
 from contextlib import suppress
 from datetime import timedelta
 from typing import Iterator
@@ -16,7 +16,7 @@ def commandWall(args: ChatCommandArgs) -> bool:
         length, rows = length, int(args.message[2])
         # If this line generate an IndexError it does not get evaluated
         length, rows = rows, int(args.message[3])
-    length = min(length, config.messageLimit // (len(args.message[1]) + 1))
+    length = min(length, bot.config.messageLimit // (len(args.message[1]) + 1))
     return process_wall(args, ' '.join((args.message[1],) * length), rows)
 
 
@@ -37,8 +37,8 @@ def process_wall(args: ChatCommandArgs,
     if not args.permissions.broadcaster:
         rows = min(rows, 10)
         
-        cooldown = timedelta(seconds=config.spamModeratorCooldown)  # type: timedelta
-        if inCooldown(args, cooldown, 'modWall'):
+        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)  # type: timedelta
+        if chat.inCooldown(args, cooldown, 'modWall'):
             return False
     elif not args.permissions.globalModerator:
         rows = min(rows, 500)

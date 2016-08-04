@@ -115,7 +115,7 @@ broadcasterEmotes = b'''{
 
 
 class TestApiFfz(unittest.TestCase):
-    @patch('source.api.ffz.urlopen', autospec=True)
+    @patch('urllib.request.urlopen', autospec=True)
     def test_globalEmotes(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
@@ -125,21 +125,21 @@ class TestApiFfz(unittest.TestCase):
         mockResponse.read.return_value = globalEmotes
         self.assertEqual(ffz.getGlobalEmotes(), {3: 'BeanieHipster'})
 
-    @patch('source.api.ffz.urlopen')
+    @patch('urllib.request.urlopen')
     def test_globalEmotes_404(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = HTTPError(None, 404, None, None, None)
         self.assertEqual(ffz.getGlobalEmotes(), {})
 
-    @patch('source.api.ffz.urlopen')
+    @patch('urllib.request.urlopen')
     def test_globalEmotes_error(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = URLError(None)
         self.assertIsNone(ffz.getGlobalEmotes())
 
-    @patch('source.api.ffz.urlopen')
+    @patch('urllib.request.urlopen')
     def test_broadcasterEmotes(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
@@ -149,14 +149,14 @@ class TestApiFfz(unittest.TestCase):
         mockResponse.read.return_value = broadcasterEmotes
         self.assertEqual(ffz.getBroadcasterEmotes('pokemonspeedrunstv'), {18146: 'KevinSquirtle'})
 
-    @patch('source.api.ffz.urlopen')
+    @patch('urllib.request.urlopen')
     def test_broadcasterEmotes_404(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = HTTPError(None, 404, None, None, None)
         self.assertEqual(ffz.getBroadcasterEmotes('pokemonspeedrunstv'), {})
 
-    @patch('source.api.ffz.urlopen')
+    @patch('urllib.request.urlopen')
     def test_broadcasterEmotes_error(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse

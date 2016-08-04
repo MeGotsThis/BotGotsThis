@@ -16,24 +16,20 @@ class TestLibraryChannelJoin(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.channel.globals',
-                        autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.clusters = {'twitch': Mock(spec=Socket)}
 
-        patcher = patch('source.public.library.channel.twitch.chat_server',
-                        autospec=True)
+        patcher = patch('source.api.twitch.chat_server', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_chat_server = patcher.start()
 
-        patcher = patch('source.public.library.channel.utils.joinChannel',
-                        autospec=True)
+        patcher = patch('bot.utils.joinChannel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_join = patcher.start()
 
-        patcher = patch('source.public.library.channel.utils.ensureServer',
-                        autospec=True)
+        patcher = patch('bot.utils.ensureServer', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_ensure = patcher.start()
 
@@ -157,14 +153,12 @@ class TestLibraryChannelPart(unittest.TestCase):
     def setUp(self):
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.channel.config',
-                        autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.botnick = 'botgotsthis'
 
-        patcher = patch('source.public.library.channel.utils.partChannel',
-                        autospec=True)
+        patcher = patch('bot.utils.partChannel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_part = patcher.start()
 
@@ -184,15 +178,13 @@ class TestLibraryChannelSay(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.channel = Mock(spec=Channel)
 
-        patcher = patch('source.public.library.channel.globals',
-                        autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}
 
-        patcher = patch(
-            'source.public.library.channel.timeout.record_timeout',
-            autospec=True)
+        patcher = patch('source.public.library.timeout.record_timeout',
+                        autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_record = patcher.start()
 
@@ -213,7 +205,7 @@ class TestLibraryChannelSay(unittest.TestCase):
 
 
 class TestLibraryChannelEmptyAll(unittest.TestCase):
-    @patch('source.public.library.channel.utils.clearAllChat', autospec=True)
+    @patch('bot.utils.clearAllChat', autospec=True)
     def test(self, mock_clear):
         mock_send = Mock(spec=send)
         self.assertIs(channel.empty_all(mock_send), True)
@@ -226,8 +218,7 @@ class TestLibraryChannelEmpty(unittest.TestCase):
         self.send = Mock(spec=send)
         self.channel = Mock(spec=Channel)
 
-        patcher = patch('source.public.library.channel.globals',
-                        autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}

@@ -19,19 +19,17 @@ class TestLibraryTimeoutUser(unittest.TestCase):
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
 
-        patcher = patch('source.public.library.timeout.config', autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.moderatorDefaultTimeout = [60, 3600, 86400]
         self.mock_config.warningDuration = 7200
 
-        patcher = patch('source.public.library.timeout.utils.whisper',
-                        autospec=True)
+        patcher = patch('bot.utils.whisper', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_whisper = patcher.start()
 
-        patcher = patch('source.public.library.timeout.utils.now',
-                        autospec=True, return_value=self.now)
+        patcher = patch('bot.utils.now', autospec=True, return_value=self.now)
         self.addCleanup(patcher.stop)
         self.mock_now = patcher.start()
 

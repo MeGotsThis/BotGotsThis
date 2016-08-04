@@ -1,9 +1,9 @@
+import bot.globals
 import json
 import unittest
 from collections import defaultdict
 from datetime import datetime
 from http.client import HTTPException, HTTPResponse
-from source import api
 from source.api import twitch
 from unittest.mock import ANY, MagicMock, Mock, patch
 
@@ -231,11 +231,11 @@ class TestApiTwitchApiCalls(unittest.TestCase):
         self.mock_clientid = patcher.start()
         self.mock_clientid.return_value = '0123456789abcdef'
 
-        patcher = patch('source.api.twitch.HTTPSConnection', autospec=True)
+        patcher = patch('http.client.HTTPSConnection', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_httpconnection = patcher.start()
 
-        patcher = patch('source.api.twitch.oauth.token', autospec=True)
+        patcher = patch('source.api.oauth.token', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_token = patcher.start()
         self.mock_token.return_value = 'abcdef0123456789'
@@ -324,16 +324,16 @@ class TestApiTwitch(unittest.TestCase):
         self.mock_api_call.side_effect = ConnectionError
         self.assertIsNone(twitch.twitch_emotes())
 
-    @patch.dict('source.api.globals.globalSessionData')
+    @patch.dict('bot.globals.globalSessionData')
     def test_is_valid_user(self):
-        api.globals.globalSessionData['validTwitchUser'] = defaultdict(
+        bot.globals.globalSessionData['validTwitchUser'] = defaultdict(
             lambda: (datetime.min, None))
         self.mock_response.code = 200
         self.assertIs(twitch.is_valid_user('botgotsthis'), True)
 
-    @patch.dict('source.api.globals.globalSessionData')
+    @patch.dict('bot.globals.globalSessionData')
     def test_is_valid_user_except(self):
-        api.globals.globalSessionData['validTwitchUser'] = defaultdict(
+        bot.globals.globalSessionData['validTwitchUser'] = defaultdict(
             lambda: (datetime.min, None))
         self.mock_api_call.side_effect = ConnectionError
         self.assertIsNone(twitch.is_valid_user('botgotsthis'))
@@ -395,11 +395,11 @@ class TestApiTwitch(unittest.TestCase):
                          {'botgotsthis': twitch.TwitchStatus(
                              datetime(2000, 1, 1), None, None)})
 
-    def test_active_streams(self):
+    def test_active_streams_404(self):
         self.mock_response.status = 404
         self.assertIsNone(twitch.channel_properties('botgotsthis'))
 
-    def test_active_streams(self):
+    def test_active_streams_exception(self):
         self.mock_api_call.side_effect = HTTPException
         self.assertIsNone(twitch.channel_properties('botgotsthis'))
 

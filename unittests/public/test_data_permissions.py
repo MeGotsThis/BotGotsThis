@@ -4,6 +4,7 @@ from bot.twitchmessage import IrcMessageTags
 from source.data import permissions
 from unittest.mock import Mock, patch
 
+
 class TestDataChatPermissions(unittest.TestCase):
     def setUp(self):
         self.tags = IrcMessageTags()
@@ -21,7 +22,7 @@ class TestDataChatPermissions(unittest.TestCase):
         self.channel.channel = 'mebotsthis'
         self.channel.isMod = False
 
-        patcher = patch('source.data.permissions.config')
+        patcher = patch('bot.config')
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.botnick = 'botgotsthis'
@@ -259,11 +260,10 @@ class TestDataWhisperPermissions(unittest.TestCase):
         self.tags['thread-id'] = '1'
         self.user = 'botgotsthis'
 
-        patcher = patch('source.data.permissions.config')
+        patcher = patch('bot.config')
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.owner = 'megotsthis'
-
 
     def test_readonly(self):
         perm = permissions.WhisperPermissionSet(self.tags, self.user)

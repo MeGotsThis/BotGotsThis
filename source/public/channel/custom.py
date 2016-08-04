@@ -1,10 +1,8 @@
-﻿import lists.custom
-from ..library import custom, timeout
-from ..library.chat import inCooldown, in_user_cooldown, min_args, not_feature
-from ..library.chat import permission
-from ..library.chat import ownerChannel
+﻿import bot.config
+import lists.custom
+from ..library import chat, custom, timeout
+from ..library.chat import min_args, not_feature, permission, ownerChannel
 from ...data import ChatCommandArgs, CustomCommand, CommandActionTokens
-from bot import config
 from datetime import timedelta
 from typing import Callable, Dict, List, Optional
 
@@ -15,12 +13,12 @@ def customCommands(args: ChatCommandArgs) -> bool:
                                  args.chat.channel,
                                  args.permissions)  # type: Optional[CustomCommand]
     if command is not None:
-        cooldown = timedelta(seconds=config.customMessageCooldown)  # type: timedelta
-        if inCooldown(args, cooldown, 'customCommand', 'moderator'):
+        cooldown = timedelta(seconds=bot.config.customMessageCooldown)  # type: timedelta
+        if chat.inCooldown(args, cooldown, 'customCommand', 'moderator'):
             return False
 
-        cooldown = timedelta(seconds=config.customMessageUserCooldown)
-        if in_user_cooldown(args, cooldown, 'customUserCommand', 'moderator'):
+        cooldown = timedelta(seconds=bot.config.customMessageUserCooldown)
+        if chat.in_user_cooldown(args, cooldown, 'customUserCommand', 'moderator'):
             return False
         
         msgs = custom.create_messages(command, args)

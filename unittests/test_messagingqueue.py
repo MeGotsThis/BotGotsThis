@@ -20,22 +20,22 @@ class BaseTestMessagingQueue(unittest.TestCase):
 
 
 class TestMessagingQueue(BaseTestMessagingQueue):
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     def test_ismod_own_channel(self, mock_config):
         mock_config.botnick = 'botgotsthis'
         self.assertIs(MessagingQueue._isMod(self.bgt_channel), True)
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     def test_ismod_mod_in_channel(self, mock_config):
         mock_config.botnick = 'botgotsthis'
         self.assertIs(MessagingQueue._isMod(self.mgt_channel), True)
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     def test_ismod_mod_in_channel_and_owner(self, mock_config):
         mock_config.botnick = 'megotsthis'
         self.assertIs(MessagingQueue._isMod(self.mgt_channel), True)
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     def test_ismod_not_own_(self, mock_config):
         mock_config.botnick = 'botgotsthis'
         self.assertIs(MessagingQueue._isMod(self.mbt_channel), False)
@@ -258,7 +258,7 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         self.assertEqual(self.queue._whisperQueue[1].message, 'bleedPurple')
 
     @patch('bot.utils.now', autospec=True)
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     def test_cleanOldTimestamps(self, mock_config, mock_now):
         # Setup
         now = datetime(2000, 1, 1, 0, 0, 0)
@@ -367,7 +367,7 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         self.assertIsNone(self.queue.popWhisper())
         self.assertFalse(self.queue._whisperSent)
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_popWhisper(self, mock_now, mock_config):
         mock_config.whiperLimit = 5
@@ -378,7 +378,7 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         self.assertIs(self.queue.popWhisper(), msg)
         self.assertEqual(self.queue._whisperSent, [now])
 
-    @patch('bot.data.config', autospec=True)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_popWhisper_full(self, mock_now, mock_config):
         mock_config.whiperLimit = 5
@@ -394,7 +394,7 @@ class TestMessagingQueue(BaseTestMessagingQueue):
 class TestMessagingQueueGetChatMessage(BaseTestMessagingQueue):
     def setUp(self):
         super().setUp()
-        patcher = patch('bot.data.config', autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.botnick = 'botgotsthis'

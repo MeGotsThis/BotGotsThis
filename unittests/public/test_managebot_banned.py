@@ -112,7 +112,7 @@ class TestManageBotBannedListBannedChannels(unittest.TestCase):
             banned.list_banned_channels(self.database, self.send), True)
         self.send.assert_called_once_with(ANY)
 
-    @patch('source.public.manage.banned.messagesFromItems', autospec=True)
+    @patch('source.public.library.message.messagesFromItems', autospec=True)
     def test_one(self, mock_messages):
         self.database.listBannedChannels.return_value = ['botgotsthis']
         mock_messages.return_value = ''
@@ -121,7 +121,7 @@ class TestManageBotBannedListBannedChannels(unittest.TestCase):
         mock_messages.assert_called_once_with(['botgotsthis'], ANY)
         self.send.assert_called_once_with(ANY)
 
-    @patch('source.public.manage.banned.messagesFromItems', autospec=True)
+    @patch('source.public.library.message.messagesFromItems', autospec=True)
     def test_many(self, mock_messages):
         self.database.listBannedChannels.return_value = ['botgotsthis',
                                                          'megotsthis']
@@ -138,13 +138,11 @@ class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.manage.banned.utils.partChannel',
-                        autospec=True)
+        patcher = patch('bot.utils.partChannel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_part = patcher.start()
 
-        patcher = patch('source.public.manage.banned.config',
-                        autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.botnick = 'botgotsthis'

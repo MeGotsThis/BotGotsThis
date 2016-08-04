@@ -33,7 +33,7 @@ class TestChannel(unittest.TestCase):
         channel.parse(self.channel, self.tags, 'botgotsthis', '  ', self.now)
         self.assertFalse(mock_chatCommand.called)
 
-    @patch('source.channel.factory.getDatabase', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.channel.commandsToProcess', autospec=True)
     def test_chatCommand(self, mock_commands, mock_database):
         command1 = Mock(spec=lambda args: False, return_value=False)
@@ -52,8 +52,8 @@ class TestChannel(unittest.TestCase):
         self.assertEqual(command2.call_count, 1)
         self.assertEqual(command3.call_count, 0)
 
-    @patch('source.channel.utils.logException', autospec=True)
-    @patch('source.channel.factory.getDatabase', autospec=True)
+    @patch('bot.utils.logException', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.channel.commandsToProcess', autospec=True)
     def test_chatCommand_except(self, mock_commands, mock_database, mock_log):
         command = Mock(spec=lambda args: False, side_effect=Exception)
@@ -69,8 +69,8 @@ class TestChannel(unittest.TestCase):
         self.assertEqual(command.call_count, 1)
         self.assertTrue(mock_log.called)
 
-    @patch('source.channel.utils.logException', autospec=True)
-    @patch('source.channel.factory.getDatabase', autospec=True)
+    @patch('bot.utils.logException', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.channel.commandsToProcess', autospec=True)
     def test_chatCommand_database_except(self, mock_commands, mock_database, mock_log):
         mock_database.side_effect = Exception
@@ -84,7 +84,7 @@ class TestChannel(unittest.TestCase):
 
 class TestChannelCommandToProcess(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.channel.lists.channel', autospec=True)
+        patcher = patch('lists.channel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.filterMessage = []

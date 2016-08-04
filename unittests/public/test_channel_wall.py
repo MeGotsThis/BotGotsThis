@@ -103,10 +103,9 @@ class TestChannelWall(TestChannel):
             True)
         mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 5)
 
-    @patch('source.public.channel.wall.config', autospec=True)
-    @patch('source.public.channel.wall.inCooldown', autospec=True)
-    @patch('source.public.channel.wall.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_wall(self, mock_timeout, mock_cooldown, mock_config):
         mock_config.spamModeratorCooldown = 30
         self.permissions.broadcaster = True
@@ -117,10 +116,9 @@ class TestChannelWall(TestChannel):
         self.assertFalse(mock_timeout.called)
         self.assertEqual(list(self.channel.send.call_args[0][0]), [])
 
-    @patch('source.public.channel.wall.config', autospec=True)
-    @patch('source.public.channel.wall.inCooldown', autospec=True)
-    @patch('source.public.channel.wall.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_wall_1(self, mock_timeout, mock_cooldown, mock_config):
         mock_config.spamModeratorCooldown = 30
         self.permissions.broadcaster = True
@@ -131,10 +129,9 @@ class TestChannelWall(TestChannel):
         self.assertFalse(mock_timeout.called)
         self.assertEqual(list(self.channel.send.call_args[0][0]), ['Kappa'])
 
-    @patch('source.public.channel.wall.config', autospec=True)
-    @patch('source.public.channel.wall.inCooldown', autospec=True)
-    @patch('source.public.channel.wall.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_wall_2(self, mock_timeout, mock_cooldown, mock_config):
         mock_config.spamModeratorCooldown = 30
         self.permissions.broadcaster = True
@@ -146,10 +143,9 @@ class TestChannelWall(TestChannel):
         self.assertEqual(list(self.channel.send.call_args[0][0]),
                          ['Kappa', 'Kappa \ufeff'])
 
-    @patch('source.public.channel.wall.config', autospec=True)
-    @patch('source.public.channel.wall.inCooldown', autospec=True)
-    @patch('source.public.channel.wall.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_wall_5(self, mock_timeout, mock_cooldown, mock_config):
         mock_config.spamModeratorCooldown = 30
         self.permissions.broadcaster = True
@@ -162,10 +158,9 @@ class TestChannelWall(TestChannel):
             list(self.channel.send.call_args[0][0]),
             ['Kappa', 'Kappa \ufeff', 'Kappa', 'Kappa \ufeff', 'Kappa'])
 
-    @patch('source.public.channel.wall.config', autospec=True)
-    @patch('source.public.channel.wall.inCooldown', autospec=True)
-    @patch('source.public.channel.wall.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_wall_channel_mod(self, mock_timeout, mock_cooldown,
                                       mock_config):
         mock_config.spamModeratorCooldown = 30
@@ -181,10 +176,9 @@ class TestChannelWall(TestChannel):
         self.assertEqual(list(self.channel.send.call_args[0][0]),
                          ['Kappa', 'Kappa'])
 
-    @patch('source.public.channel.wall.config', autospec=True)
-    @patch('source.public.channel.wall.inCooldown', autospec=True)
-    @patch('source.public.channel.wall.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_wall_broadcaster_limit(
             self, mock_timeout, mock_cooldown, mock_config):
         mock_config.spamModeratorCooldown = 30
@@ -195,10 +189,9 @@ class TestChannelWall(TestChannel):
         self.assertFalse(mock_timeout.called)
         self.assertEqual(len(list(self.channel.send.call_args[0][0])), 500)
 
-    @patch('source.public.channel.wall.config', autospec=True)
-    @patch('source.public.channel.wall.inCooldown', autospec=True)
-    @patch('source.public.channel.wall.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_wall_moderator_limit(
             self, mock_timeout, mock_cooldown, mock_config):
         mock_config.spamModeratorCooldown = 30
@@ -210,10 +203,9 @@ class TestChannelWall(TestChannel):
             self.args, timedelta(seconds=30), ANY)
         self.assertEqual(len(list(self.channel.send.call_args[0][0])), 10)
 
-    @patch('source.public.channel.wall.config', autospec=True)
-    @patch('source.public.channel.wall.inCooldown', autospec=True)
-    @patch('source.public.channel.wall.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_wall_moderator_cooldown(
             self, mock_timeout, mock_cooldown, mock_config):
         mock_config.spamModeratorCooldown = 30

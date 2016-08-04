@@ -1,4 +1,5 @@
-﻿from bot import config, utils
+﻿import bot.config
+from bot import utils
 from bot.twitchmessage import IrcMessage, IrcMessageTagsReadOnly
 from bot import data
 from datetime import datetime
@@ -51,8 +52,8 @@ def irc_privmsg(
         channel.parse(channels[where[1:]], message.tags, nick, msg, timestamp)
     if where[0] == '#':
         utils.logIrcMessage(where + '#msg.log', nick + ': ' + msg, timestamp)
-    if config.botnick in msg.lower().split():
-        utils.logIrcMessage(config.botnick + '-Mentions.log',
+    if bot.config.botnick in msg.lower().split():
+        utils.logIrcMessage(bot.config.botnick + '-Mentions.log',
                             nick + ' -> ' + where + ': ' + msg, timestamp)
 
 
@@ -66,10 +67,12 @@ def irc_whisper(
     msg = message.params.trailing  # type: Optional[str]
     utils.logIrcMessage(
         '@' + nick + '@whisper.log', nick + ': ' + msg, timestamp)
-    utils.logIrcMessage(config.botnick + '-All Whisper.log',
-                        nick + ' -> ' + config.botnick + ': ' + msg, timestamp)
+    utils.logIrcMessage(bot.config.botnick + '-All Whisper.log',
+                        nick + ' -> ' + bot.config.botnick + ': ' + msg,
+                        timestamp)
     utils.logIrcMessage(
-        config.botnick + '-Raw Whisper.log', '< ' + str(message), timestamp)
+        bot.config.botnick + '-Raw Whisper.log', '< ' + str(message),
+        timestamp)
     whisper.parse(tags, nick, msg, timestamp)
 
 
@@ -214,7 +217,7 @@ def irc_pong(
             and message.prefix.servername == 'tmi.twitch.tv'
             and not message.params.isEmpty
             and message.params.middle == 'tmi.twitch.tv'
-            and message.params.trailing == config.botnick):
+            and message.params.trailing == bot.config.botnick):
         socket.lastPing = timestamp
 
 

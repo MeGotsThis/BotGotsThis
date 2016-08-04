@@ -35,8 +35,9 @@ broadcasterEmotes = b'''{
     ]
 }'''
 
-class TestApiFfz(unittest.TestCase):
-    @patch('source.api.bttv.urlopen', autospec=True)
+
+class TestApiBttv(unittest.TestCase):
+    @patch('urllib.request.urlopen', autospec=True)
     def test_globalEmotes(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
@@ -46,21 +47,21 @@ class TestApiFfz(unittest.TestCase):
         mockResponse.read.return_value = globalEmotes
         self.assertEqual(bttv.getGlobalEmotes(), {'54fa925e01e468494b85b54d': 'OhMyGoodness'})
 
-    @patch('source.api.bttv.urlopen')
+    @patch('urllib.request.urlopen')
     def test_globalEmotes_404(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = HTTPError(None, 404, None, None, None)
         self.assertEqual(bttv.getGlobalEmotes(), {})
 
-    @patch('source.api.bttv.urlopen')
+    @patch('urllib.request.urlopen')
     def test_globalEmotes_error(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = URLError(None)
         self.assertIsNone(bttv.getGlobalEmotes())
 
-    @patch('source.api.bttv.urlopen')
+    @patch('urllib.request.urlopen')
     def test_broadcasterEmotes(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
@@ -70,14 +71,14 @@ class TestApiFfz(unittest.TestCase):
         mockResponse.read.return_value = broadcasterEmotes
         self.assertEqual(bttv.getBroadcasterEmotes('pokemonspeedrunstv'), {'554da1a289d53f2d12781907': '(ditto)'})
 
-    @patch('source.api.bttv.urlopen')
+    @patch('urllib.request.urlopen')
     def test_broadcasterEmotes_404(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = HTTPError(None, 404, None, None, None)
         self.assertEqual(bttv.getBroadcasterEmotes('pokemonspeedrunstv'), {})
 
-    @patch('source.api.bttv.urlopen')
+    @patch('urllib.request.urlopen')
     def test_broadcasterEmotes_error(self, mock_urlopen):
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse

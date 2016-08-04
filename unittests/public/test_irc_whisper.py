@@ -29,7 +29,7 @@ class TestWhisper(unittest.TestCase):
         whisper.parse(self.tags, 'botgotsthis', '  ', self.now)
         self.assertFalse(mock_whisperCommand.called)
 
-    @patch('source.whisper.getDatabase', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.whisper.commandsToProcess', autospec=True)
     def test_whisperCommand(self, mock_commands, mock_database):
         command1 = Mock(spec=lambda args: False, return_value=False)
@@ -47,8 +47,8 @@ class TestWhisper(unittest.TestCase):
         self.assertEqual(command2.call_count, 1)
         self.assertEqual(command3.call_count, 0)
 
-    @patch('source.whisper.utils.logException', autospec=True)
-    @patch('source.whisper.getDatabase', autospec=True)
+    @patch('bot.utils.logException', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.whisper.commandsToProcess', autospec=True)
     def test_whisperCommand_except(self, mock_commands, mock_database, mock_log):
         command = Mock(spec=lambda args: False, side_effect=Exception)
@@ -63,8 +63,8 @@ class TestWhisper(unittest.TestCase):
         self.assertEqual(command.call_count, 1)
         self.assertTrue(mock_log.called)
 
-    @patch('source.whisper.utils.logException', autospec=True)
-    @patch('source.whisper.getDatabase', autospec=True)
+    @patch('bot.utils.logException', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.whisper.commandsToProcess', autospec=True)
     def test_whisperCommand_database_except(self, mock_commands, mock_database, mock_log):
         mock_database.side_effect = Exception
@@ -77,7 +77,7 @@ class TestWhisper(unittest.TestCase):
 
 class TestWhisperCommandToProcess(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.whisper.lists.whisper', autospec=True)
+        patcher = patch('lists.whisper', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.commands = {}

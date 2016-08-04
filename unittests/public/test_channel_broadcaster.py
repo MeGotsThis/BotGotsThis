@@ -11,7 +11,7 @@ class TestChannelBroadcaster(TestChannel):
         self.assertIs(broadcaster.commandHello(self.args), True)
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.broadcaster.broadcaster.come', autospec=True)
+    @patch('source.public.library.broadcaster.come', autospec=True)
     def test_come(self, mock_come):
         self.assertIs(broadcaster.commandCome(self.args), False)
         self.assertFalse(mock_come.called)
@@ -20,7 +20,7 @@ class TestChannelBroadcaster(TestChannel):
         self.assertIs(broadcaster.commandCome(self.args), True)
         mock_come.assert_called_once_with(self.database, 'botgotsthis', ANY)
 
-    @patch('source.public.channel.broadcaster.broadcaster.leave', autospec=True)
+    @patch('source.public.library.broadcaster.leave', autospec=True)
     def test_leave(self, mock_leave):
         self.assertIs(broadcaster.commandLeave(self.args), False)
         self.assertFalse(mock_leave.called)
@@ -29,7 +29,7 @@ class TestChannelBroadcaster(TestChannel):
         self.assertIs(broadcaster.commandLeave(self.args), True)
         mock_leave.assert_called_once_with('botgotsthis', ANY)
 
-    @patch('source.public.channel.broadcaster.broadcaster.empty', autospec=True)
+    @patch('source.public.library.broadcaster.empty', autospec=True)
     def test_empty(self, mock_empty):
         self.assertIs(broadcaster.commandEmpty(self.args), False)
         self.assertFalse(mock_empty.called)
@@ -38,8 +38,7 @@ class TestChannelBroadcaster(TestChannel):
         self.assertIs(broadcaster.commandEmpty(self.args), True)
         mock_empty.assert_called_once_with('botgotsthis', ANY)
 
-    @patch('source.public.channel.broadcaster.broadcaster.auto_join',
-           autospec=True)
+    @patch('source.public.library.broadcaster.auto_join', autospec=True)
     def test_auto_join(self, mock_autojoin):
         self.assertIs(broadcaster.commandAutoJoin(self.args), False)
         self.assertFalse(mock_autojoin.called)
@@ -49,7 +48,7 @@ class TestChannelBroadcaster(TestChannel):
         mock_autojoin.assert_called_once_with(self.database, 'botgotsthis',
                                               ANY, self.args.message)
 
-    @patch('source.public.channel.broadcaster.broadcaster.set_timeout_level',
+    @patch('source.public.library.broadcaster.set_timeout_level',
            autospec=True)
     def test_set_timeout_level(self, mock_set_timeout):
         self.assertIs(broadcaster.commandSetTimeoutLevel(self.args), False)
@@ -60,16 +59,14 @@ class TestChannelBroadcaster(TestChannel):
         mock_set_timeout.assert_called_once_with(self.database, 'botgotsthis',
                                                  ANY, self.args.message)
 
-    @patch('source.public.channel.broadcaster.twitch.server_time',
-           autospec=True)
+    @patch('source.api.twitch.server_time', autospec=True)
     def test_uptime(self, mock_server_time):
         self.channel.isStreaming = False
         self.assertIs(broadcaster.commandUptime(self.args), True)
         self.assertFalse(mock_server_time.called)
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.broadcaster.twitch.server_time',
-           autospec=True)
+    @patch('source.api.twitch.server_time', autospec=True)
     def test_uptime_isstreaming(self, mock_server_time):
         self.channel.isStreaming = True
         self.channel.streamingSince = self.now
@@ -78,8 +75,7 @@ class TestChannelBroadcaster(TestChannel):
         mock_server_time.assert_called_once_with()
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.broadcaster.twitch.server_time',
-           autospec=True)
+    @patch('source.api.twitch.server_time', autospec=True)
     def test_uptime_server_error(self, mock_server_time):
         self.channel.isStreaming = True
         mock_server_time.return_value = None

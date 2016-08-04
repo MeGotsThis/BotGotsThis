@@ -1,8 +1,8 @@
 ﻿import json
 from http.client import HTTPResponse
 from typing import Dict, Optional, Union
+from urllib import request
 from urllib.error import HTTPError, URLError
-from urllib.request import urlopen
 
 FfzEmoteDict = Dict[str, Union[int, str]]
 
@@ -10,7 +10,7 @@ FfzEmoteDict = Dict[str, Union[int, str]]
 def getGlobalEmotes() -> Optional[Dict[int, str]]:
     url = 'https://api.frankerfacez.com/v1/set/global'
     try:
-        with urlopen(url) as response:
+        with request.urlopen(url) as response:
             if not isinstance(response, HTTPResponse):
                 raise TypeError()
             if response.status == 200:
@@ -32,7 +32,7 @@ def getGlobalEmotes() -> Optional[Dict[int, str]]:
 def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[int, str]]:
     url = 'https://api.frankerfacez.com/v1/room/' + broadcaster
     try:
-        with urlopen(url) as response:
+        with request.urlopen(url) as response:
             if not isinstance(response, HTTPResponse):
                 raise TypeError()
             if response.status == 200:

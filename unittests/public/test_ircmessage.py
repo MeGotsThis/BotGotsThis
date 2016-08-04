@@ -32,7 +32,6 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.assertTrue(mock_log.called)
         self.assertTrue(mock_privateParse.called)
 
-
     @patch.dict('source.ircmessage.ircHandlers')
     def test_registerIrc(self):
         @ircmessage.registerIrc('KAPPA')
@@ -52,8 +51,8 @@ class PublicTestIrcMessage(unittest.TestCase):
         ircmessage.log_channel_message(IrcMessage(command=0), self.now)
         self.assertFalse(self.mock_log.called)
 
-    @patch('source.ircmessage.config', autospec=True)
-    @patch('source.ircmessage.channel.parse', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.channel.parse', autospec=True)
     def test_log_irc_privmsg(self, mock_parse, mock_config):
         mock_config.botnick = 'botgotsthis'
         message = IrcMessage.fromMessage(
@@ -63,8 +62,8 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.assertTrue(mock_parse.called)
         self.assertTrue(self.mock_log.called)
 
-    @patch('source.ircmessage.config', autospec=True)
-    @patch('source.ircmessage.channel.parse', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.channel.parse', autospec=True)
     def test_log_irc_privmsg_no_channel(self, mock_parse, mock_config):
         mock_config.botnick = 'botgotsthis'
         message = IrcMessage.fromMessage(
@@ -74,8 +73,8 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.assertFalse(mock_parse.called)
         self.assertTrue(self.mock_log.called)
 
-    @patch('source.ircmessage.config', autospec=True)
-    @patch('source.ircmessage.channel.parse', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.channel.parse', autospec=True)
     def test_log_irc_privmsg_mention(self, mock_parse, mock_config):
         mock_config.botnick = 'botgotsthis'
         message = IrcMessage.fromMessage(
@@ -85,8 +84,8 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.assertTrue(mock_parse.called)
         self.assertGreaterEqual(self.mock_log.call_count, 2)
 
-    @patch('source.ircmessage.config', autospec=True)
-    @patch('source.ircmessage.whisper.parse', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.whisper.parse', autospec=True)
     def test_log_irc_whisper(self, mock_parse, mock_config):
         mock_config.botnick = 'botgotsthis'
         message = IrcMessage.fromMessage(
@@ -96,7 +95,7 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.assertTrue(mock_parse.called)
         self.assertGreaterEqual(self.mock_log.call_count, 3)
 
-    @patch('source.ircmessage.notice.parse', autospec=True)
+    @patch('source.irccommand.notice.parse', autospec=True)
     def test_log_irc_notice(self, mock_parse):
         message = IrcMessage.fromMessage(
             '@msg-id=bad_timeout_broadcaster :tmi.twitch.tv NOTICE '
@@ -105,7 +104,7 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.assertTrue(mock_parse.called)
         self.assertTrue(self.mock_log.called)
 
-    @patch('source.ircmessage.clearchat.parse', autospec=True)
+    @patch('source.irccommand.clearchat.parse', autospec=True)
     def test_log_irc_clearchat(self, mock_parse):
         message = IrcMessage.fromMessage(
             ':tmi.twitch.tv CLEARCHAT #botgotsthis')
@@ -188,7 +187,7 @@ class PublicTestIrcMessage(unittest.TestCase):
         ircmessage.irc_ping(self.socket, message, self.now)
         self.assertTrue(self.socket.ping.called)
 
-    @patch('source.ircmessage.config', autospec=True)
+    @patch('bot.config', autospec=True)
     def test_log_irc_pong(self, mock_config):
         mock_config.botnick = 'botgotsthis'
         message = IrcMessage.fromMessage(
@@ -196,7 +195,7 @@ class PublicTestIrcMessage(unittest.TestCase):
         ircmessage.irc_pong(self.socket, message, self.now)
         self.assertEqual(self.socket.lastPing, self.now)
 
-    @patch('source.ircmessage.userstate.parse', autospec=True)
+    @patch('source.irccommand.userstate.parse', autospec=True)
     def test_log_irc_userstate(self, mock_parse):
         message = IrcMessage.fromMessage(
             ':tmi.twitch.tv CLEARCHAT #botgotsthis')

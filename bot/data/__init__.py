@@ -1,3 +1,5 @@
+import bot.config
+import bot.globals
 import socket
 import source.ircmessage
 import threading
@@ -5,10 +7,9 @@ from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple
 from typing import Optional, Set, Tuple, TypeVar, Union
-from source.api.bttv import getBroadcasterEmotes as getBttvEmotes
-from source.api.ffz import getBroadcasterEmotes as getFfzEmotes
+from source.api import bttv, ffz
 from .error import ConnectionReset, LoginUnsuccessful
-from .. import config, globals, utils
+from .. import utils
 from ..twitchmessage import IrcMessage, IrcMessageParams
 
 socketAlias = socket.socket
@@ -259,7 +260,7 @@ class Channel:
     def updateFfzEmotes(self) -> None:
         with self._ffzLock:
             oldTimestamp, self._ffzCache = self._ffzCache, utils.now()
-        emotes = getFfzEmotes(self._channel)
+        emotes = ffz.getBroadcasterEmotes(self._channel)
         if emotes is not None:
             self._ffzEmotes = emotes
             with self._ffzLock:
@@ -271,7 +272,7 @@ class Channel:
     def updateBttvEmotes(self) -> None:
         with self._bttvLock:
             oldTimestamp, self._bttvCache = self._bttvCache, utils.now()
-        emotes = getBttvEmotes(self._channel)
+        emotes = bttv.getBroadcasterEmotes(self._channel)
         if emotes is not None:
             self._bttvEmotes = emotes
             with self._bttvLock:
@@ -358,18 +359,19 @@ class Socket:
         now = utils.now()
         self.lastSentPing = now
         self.lastPing = now
-        globals.join.connected(self)
+        bot.globals.join.connected(self)
 
     def login(self, connection: socketAlias) -> None:
         if not isinstance(connection, socketAlias):
             raise TypeError()
         commands = [
             IrcMessage(None, None, 'PASS',
-                       IrcMessageParams(config.password or None)),
-            IrcMessage(None, None, 'NICK', IrcMessageParams(config.botnick)),
+                       IrcMessageParams(bot.config.password or None)),
+            IrcMessage(None, None, 'NICK',
+                       IrcMessageParams(bot.config.botnick)),
             IrcMessage(None, None, 'USER',
-                       IrcMessageParams(config.botnick + ' 0 *',
-                                        config.botnick)),
+                       IrcMessageParams(bot.config.botnick + ' 0 *',
+                                        bot.config.botnick)),
             IrcMessage(None, None, 'CAP',
                        IrcMessageParams('REQ', 'twitch.tv/membership')),
             IrcMessage(None, None, 'CAP',
@@ -386,7 +388,7 @@ class Socket:
         if self._socket is None:
             raise ConnectionError()
         self._socket.close()
-        globals.join.disconnected(self)
+        bot.globals.join.disconnected(self)
         self._socket = None
         self.lastSentPing = datetime.max
         self.lastPing = datetime.max
@@ -421,7 +423,7 @@ class Socket:
             self.lastSentPing = timestamp
         if command.command == 'JOIN' and isinstance(channel, Channel):
             channel.onJoin()
-            globals.join.recordJoin()
+            bot.globals.join.recordJoin()
             print('{time} Joined {channel} on {socket}'.format(
                 time=timestamp, channel=channel.channel, socket=self.name))
 
@@ -456,7 +458,7 @@ class Socket:
             self.disconnect()
         except LoginUnsuccessful:
             self.disconnect()
-            globals.running = False
+            bot.globals.running = False
 
     def ping(self, message: str = 'ping') -> None:
         self.queueWrite(IrcMessage(None, None, 'PONG',
@@ -470,14 +472,14 @@ class Socket:
         sinceLast = now - self.lastPing  # type: timedelta
         if sinceLastSend >= timedelta(minutes=1):
             self.queueWrite(IrcMessage(None, None, 'PING',
-                                       IrcMessageParams(config.botnick)),
+                                       IrcMessageParams(bot.config.botnick)),
                             prepend=True)
             self.lastSentPing = now
         elif sinceLast >= timedelta(minutes=1, seconds=15):
             self.disconnect()
 
     def _logRead(self, message: str) -> None:
-        file = '{nick}-{server}.log'.format(nick=config.botnick,
+        file = '{nick}-{server}.log'.format(nick=bot.config.botnick,
                                             server=self.name)  # type: str
         utils.logIrcMessage(file, '< ' + message)
 
@@ -491,7 +493,7 @@ class Socket:
             command = IrcMessage(command='PASS')
         files = []  # type: List[str]
         logs = []  # type: List[str]
-        files.append('{bot}-{socket}.log'.format(bot=config.botnick,
+        files.append('{bot}-{socket}.log'.format(bot=bot.config.botnick,
                                                  socket=self.name))
         logs.append('> ' + str(command))
         if whisper and channel:
@@ -500,14 +502,16 @@ class Socket:
             raise ValueError()
         if whisper:
             files.append('@{nick}@whisper.log'.format(nick=whisper.nick))
-            logs.append('{bot}: {message}'.format(bot=config.botnick,
+            logs.append('{bot}: {message}'.format(bot=bot.config.botnick,
                                                   message=whisper.message))
-            files.append('{bot}-All Whisper.log'.format(bot=config.botnick))
+            files.append(
+                '{bot}-All Whisper.log'.format(bot=bot.config.botnick))
             logs.append(
                 '{bot} -> {nick}: {message}'.format(
-                    bot=config.botnick, nick=whisper.nick,
+                    bot=bot.config.botnick, nick=whisper.nick,
                     message=whisper.message))
-            files.append('{bot}-Raw Whisper.log'.format(bot=config.botnick))
+            files.append(
+                '{bot}-Raw Whisper.log'.format(bot=bot.config.botnick))
             logs.append('> ' + str(command))
         if channel:
             files.append(
@@ -517,7 +521,7 @@ class Socket:
                 files.append(
                     '{channel}#msg.log'.format(channel=channel.ircChannel))
                 logs.append(
-                    '{bot}: {message}'.format(bot=config.botnick,
+                    '{bot}: {message}'.format(bot=bot.config.botnick,
                                               message=command.params.trailing))
         for file, log in zip(files, logs):  # --type: str, str
             utils.logIrcMessage(file, log, timestamp)
@@ -557,7 +561,7 @@ class Socket:
             self.queueWrite(IrcMessage(None, None, 'PART',
                                        IrcMessageParams(channel.ircChannel)))
             del self._channels[channel.channel]
-        globals.join.onPart(channel.channel)
+        bot.globals.join.onPart(channel.channel)
         print('{time} Parted {channel}'.format(
             time=utils.now(), channel=channel.channel))
 
@@ -566,18 +570,18 @@ class Socket:
         for whisperMessage in iter(self.messaging.popWhisper, None):  # --type: WhisperMessage
             ircMsg = '.w {nick} {message}'.format(
                 nick=whisperMessage.nick,
-                message=whisperMessage.message)[:config.messageLimit]
+                message=whisperMessage.message)[:bot.config.messageLimit]
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
-                           IrcMessageParams(globals.groupChannel.ircChannel,
-                                            ircMsg)),
+                           IrcMessageParams(
+                               bot.globals.groupChannel.ircChannel, ircMsg)),
                 whisper=whisperMessage)
         for message in iter(self.messaging.popChat, None):  # --type: ChatMessage
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
                            IrcMessageParams(
                                message.channel.ircChannel,
-                               message.message[:config.messageLimit])),
+                               message.message[:bot.config.messageLimit])),
                 channel=message.channel)
 
 
@@ -594,10 +598,10 @@ class MessagingQueue:
 
     def cleanOldTimestamps(self) -> None:
         timestamp = utils.now()
-        msgDuration = timedelta(seconds=config.messageSpan)
+        msgDuration = timedelta(seconds=bot.config.messageSpan)
         self._chatSent = [t for t in self._chatSent
                           if timestamp - t <= msgDuration]
-        msgDuration = timedelta(seconds=config.whiperSpan)
+        msgDuration = timedelta(seconds=bot.config.whiperSpan)
         self._whisperSent = [t for t in self._whisperSent
                              if timestamp - t <= msgDuration]
 
@@ -661,10 +665,10 @@ class MessagingQueue:
         return nextMessage
 
     def _getChatMessage(self, timestamp: datetime) -> Optional[ChatMessage]:
-        publicDelay = timedelta(seconds=config.publicDelay)  # type: timedelta
-        isModGood = len(self._chatSent) < config.modLimit  # type: bool
-        isModSpamGood = len(self._chatSent) < config.modSpamLimit  # type: bool
-        isPublicGood = len(self._chatSent) < config.publicLimit  # type: bool
+        publicDelay = timedelta(seconds=bot.config.publicDelay)  # type: timedelta
+        isModGood = len(self._chatSent) < bot.config.modLimit  # type: bool
+        isModSpamGood = len(self._chatSent) < bot.config.modSpamLimit  # type: bool
+        isPublicGood = len(self._chatSent) < bot.config.publicLimit  # type: bool
         with self._queueLock:
             if isPublicGood:
                 for queue in self._chatQueues:  # --type: List[ChatMessage]
@@ -708,10 +712,10 @@ class MessagingQueue:
 
     @staticmethod
     def _isMod(channel: Channel) -> bool:
-        return channel.isMod or config.botnick == channel.channel
+        return channel.isMod or bot.config.botnick == channel.channel
 
     def popWhisper(self) -> Optional[WhisperMessage]:
-        if self._whisperQueue and len(self._whisperSent) < config.whiperLimit:
+        if self._whisperQueue and len(self._whisperSent) < bot.config.whiperLimit:
             self._whisperSent.append(utils.now())
             return self._whisperQueue.popleft()
         return None

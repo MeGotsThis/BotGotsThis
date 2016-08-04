@@ -260,8 +260,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.mock_format = patcher.start()
         self.mock_format.side_effect = lambda string, format, has: string
 
-        patcher = patch('source.public.library.custom.lists.custom',
-                        autospec=True)
+        patcher = patch('lists.custom', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.postProcess = []
@@ -980,8 +979,7 @@ class TestLibraryCustomConvertField(unittest.TestCase):
                                     Mock(spec=Channel), 'botgotsthis',
                                     datetime(2000, 1, 1))
 
-        patcher = patch('source.public.library.custom.lists.custom',
-                        autospec=True)
+        patcher = patch('lists.custom', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.fields = []
@@ -1008,7 +1006,7 @@ class TestLibraryCustomConvertField(unittest.TestCase):
 
 class TestLibraryCustomFormat(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.public.library.custom.textformat.format',
+        patcher = patch('source.public.library.textformat.format',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_format = patcher.start()

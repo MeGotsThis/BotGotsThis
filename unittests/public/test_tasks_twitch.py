@@ -6,6 +6,7 @@ from source.public.tasks import twitch
 from source.api.twitch import TwitchStatus
 from unittest.mock import MagicMock, Mock, PropertyMock, call, patch
 
+
 class TestTasksTwitchBase(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
@@ -13,7 +14,7 @@ class TestTasksTwitchBase(unittest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
 
-        patcher = patch('source.public.tasks.twitch.globals', autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}
@@ -35,13 +36,13 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.game_property = PropertyMock(return_value=None)
         type(self.channel).twitchGame = self.game_property
 
-    @patch('source.public.tasks.twitch.twitch.active_streams')
+    @patch('source.api.twitch.active_streams')
     def test_streams_empty(self, mock_active):
         self.mock_globals.channels = {}
         twitch.checkStreamsAndChannel(self.now)
         self.assertFalse(mock_active.called)
 
-    @patch('source.public.tasks.twitch.twitch.active_streams')
+    @patch('source.api.twitch.active_streams')
     def test_streams_none(self, mock_active):
         mock_active.return_value = None
         twitch.checkStreamsAndChannel(self.now)
@@ -51,7 +52,7 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @patch('source.public.tasks.twitch.twitch.active_streams')
+    @patch('source.api.twitch.active_streams')
     def test_streams(self, mock_active):
         streamed = datetime(1999, 1, 1)
         mock_active.return_value = {
@@ -64,7 +65,7 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.status_property.assert_called_once_with('Kappa')
         self.game_property.assert_called_once_with('Creative')
 
-    @patch('source.public.tasks.twitch.twitch.active_streams')
+    @patch('source.api.twitch.active_streams')
     def test_streams_offline(self, mock_active):
         streamed = datetime(1999, 1, 1)
         mock_active.return_value = {}
@@ -75,7 +76,7 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @patch('source.public.tasks.twitch.twitch.channel_properties')
+    @patch('source.api.twitch.channel_properties')
     def test_offline_empty(self, mock_channel):
         self.mock_globals.channels = {}
         twitch.checkOfflineChannels(self.now)
@@ -85,7 +86,7 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @patch('source.public.tasks.twitch.twitch.channel_properties')
+    @patch('source.api.twitch.channel_properties')
     def test_offline_streaming(self, mock_channel):
         self.channel.isStreaming = True
         self.cache_property.return_value = self.now - timedelta(hours=1)
@@ -96,7 +97,7 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @patch('source.public.tasks.twitch.twitch.channel_properties')
+    @patch('source.api.twitch.channel_properties')
     def test_offline_recent(self, mock_channel):
         self.channel.isStreaming = False
         self.cache_property.return_value = self.now
@@ -107,7 +108,7 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @patch('source.public.tasks.twitch.twitch.channel_properties')
+    @patch('source.api.twitch.channel_properties')
     def test_offline_none(self, mock_channel):
         mock_channel.return_value = None
         self.channel.isStreaming = False
@@ -119,7 +120,7 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @patch('source.public.tasks.twitch.twitch.channel_properties')
+    @patch('source.api.twitch.channel_properties')
     def test_offline(self, mock_channel):
         mock_channel.return_value = TwitchStatus(None, 'Keepo', 'Music')
         self.channel.isStreaming = False
@@ -145,18 +146,18 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.socket_property = PropertyMock(return_value=self.socket1)
         type(self.channel).socket = self.socket_property
 
-        patcher = patch('source.public.tasks.twitch.getDatabase')
+        patcher = patch('source.database.factory.getDatabase')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
 
         self.database = MagicMock(spec=DatabaseBase)
         self.mock_database.return_value.__enter__.return_value = self.database
 
-        patcher = patch('source.public.tasks.twitch.twitch.chat_server')
+        patcher = patch('source.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_chatserver = patcher.start()
 
-        patcher = patch('source.public.tasks.twitch.utils.ensureServer')
+        patcher = patch('bot.utils.ensureServer')
         self.addCleanup(patcher.stop)
         self.mock_ensureserver = patcher.start()
 

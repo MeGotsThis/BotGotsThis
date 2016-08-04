@@ -40,24 +40,19 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.channel.ircChannel = '#botgotsthis'
         self.now = datetime(2000, 1, 1)
 
-        patcher = patch('source.public.channel.block_url.twitch.num_followers',
-                        autospec=True)
+        patcher = patch('source.api.twitch.num_followers', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_followers = patcher.start()
 
-        patcher = patch('source.public.channel.block_url.utils.logIrcMessage',
-                        autospec=True)
+        patcher = patch('bot.utils.logIrcMessage', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_log = patcher.start()
 
-        patcher = patch('source.public.channel.block_url.utils.logException',
-                        autospec=True)
+        patcher = patch('bot.utils.logException', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_except = patcher.start()
 
-        patcher = patch(
-            'source.public.channel.block_url.urllib.request.urlopen',
-            autospec=True)
+        patcher = patch('urllib.request.urlopen', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_request = patcher.start()
         self.response = Mock(spec=HTTPResponse)
@@ -259,8 +254,7 @@ class TestChannelBlockUrlCompareDomain(unittest.TestCase):
         self.message = Message('')
         self.now = datetime(2000, 1, 1)
 
-        patcher = patch('source.public.channel.block_url.utils.logIrcMessage',
-                        autospec=True)
+        patcher = patch('bot.utils.logIrcMessage', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_log = patcher.start()
 
@@ -331,13 +325,12 @@ class TestChannelBlockUrlHandleDifferentDomain(unittest.TestCase):
         self.message = Message('')
         self.now = datetime(2000, 1, 1)
 
-        patcher = patch('source.public.channel.block_url.factory.getDatabase',
-                        autospec=True)
+        patcher = patch('source.database.factory.getDatabase', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value.__enter__.return_value = self.database
 
-        patcher = patch('source.public.channel.block_url.timeout.timeout_user',
+        patcher = patch('source.public.library.timeout.timeout_user',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()

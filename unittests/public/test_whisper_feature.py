@@ -5,7 +5,7 @@ from unittests.public.test_whisper import TestWhisper
 
 
 class TestWhisperFeature(TestWhisper):
-    @patch('source.public.whisper.feature.feature.feature', autospec=True)
+    @patch('source.public.library.feature.feature', autospec=True)
     def test_feature(self, mock_feature):
         self.assertIs(feature.commandFeature(self.args), False)
         self.assertFalse(mock_feature.called)

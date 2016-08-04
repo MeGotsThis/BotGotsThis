@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 
 class TestApi(unittest.TestCase):
-    @patch('source.api.utils.now', autospec=True)
-    @patch('source.api.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_cache(self, mock_globals, mock_now):
         basenow = datetime(2000, 1, 1)
         data = {}
@@ -38,8 +38,8 @@ class TestApi(unittest.TestCase):
             mock_globals.globalSessionData['Kappa'][(), ()][0])
         self.assertEqual(mock_globals.globalSessionData['Kappa'][(), ()][1], 2)
 
-    @patch('source.api.utils.now', autospec=True)
-    @patch('source.api.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_cache_except(self, mock_globals, mock_now):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_globals.globalSessionData = {}

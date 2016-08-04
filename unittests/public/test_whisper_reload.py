@@ -4,7 +4,7 @@ from unittests.public.test_whisper import TestWhisper
 
 
 class TestWhisperReload(TestWhisper):
-    @patch('source.public.whisper.reload.reload.full_reload', autospec=True)
+    @patch('source.public.library.reload.full_reload', autospec=True)
     def test_reload(self, mock_reload):
         self.assertIs(reload.commandReload(self.args), False)
         self.assertFalse(mock_reload.called)
@@ -13,7 +13,7 @@ class TestWhisperReload(TestWhisper):
         self.assertIs(reload.commandReload(self.args), True)
         mock_reload.assert_called_once_with(ANY)
 
-    @patch('source.public.whisper.reload.reload.reload_commands', autospec=True)
+    @patch('source.public.library.reload.reload_commands', autospec=True)
     def test_reload_commands(self, mock_reload):
         self.assertIs(reload.commandReloadCommands(self.args), False)
         self.assertFalse(mock_reload.called)
@@ -22,7 +22,7 @@ class TestWhisperReload(TestWhisper):
         self.assertIs(reload.commandReloadCommands(self.args), True)
         mock_reload.assert_called_once_with(ANY)
 
-    @patch('source.public.whisper.reload.reload.reload_config', autospec=True)
+    @patch('source.public.library.reload.reload_config', autospec=True)
     def test_reload_config(self, mock_reload):
         self.assertIs(reload.commandReloadConfig(self.args), False)
         self.assertFalse(mock_reload.called)

@@ -19,8 +19,7 @@ class TestLibraryManageBot(unittest.TestCase):
         self.send = Mock(spec=send)
         self.method = Mock(spec=method, return_value=True)
 
-        patcher = patch.dict(
-            'source.public.library.managebot.lists.manage.methods')
+        patcher = patch.dict('lists.manage.methods')
         self.addCleanup(patcher.stop)
         patcher.start()
         managebot.lists.manage.methods['method'] = self.method

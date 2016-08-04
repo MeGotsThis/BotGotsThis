@@ -35,7 +35,7 @@ class TestManageBotAutoJoin(TestManageBot):
         self.assertFalse(self.send.called)
         self.database.isChannelBannedReason.assert_called_with('no_arg')
 
-    @patch('source.public.manage.autojoin.reload_server')
+    @patch('source.public.manage.autojoin.reload_server', autospec=True)
     def test_banned_channel(self, mock_reload):
         self.database.isChannelBannedReason.return_value = 'Reason'
         mock_reload.return_value = True
@@ -44,7 +44,7 @@ class TestManageBotAutoJoin(TestManageBot):
             autojoin.manageAutoJoin(self.args._replace(message=message)), True)
         self.send.assert_called_once_with(ANY)
 
-    @patch('source.public.manage.autojoin.reload_server')
+    @patch('source.public.manage.autojoin.reload_server', autospec=True)
     def test_banned_channel_blank(self, mock_reload):
         self.database.isChannelBannedReason.return_value = ''
         mock_reload.return_value = True
@@ -53,7 +53,7 @@ class TestManageBotAutoJoin(TestManageBot):
             autojoin.manageAutoJoin(self.args._replace(message=message)), True)
         self.send.assert_called_once_with(ANY)
 
-    @patch('source.public.manage.autojoin.reload_server')
+    @patch('source.public.manage.autojoin.reload_server', autospec=True)
     def test_reloadserver(self, mock_reload):
         mock_reload.return_value = True
         message = Message('!managebot autojoin reloadserver')
@@ -61,7 +61,7 @@ class TestManageBotAutoJoin(TestManageBot):
             autojoin.manageAutoJoin(self.args._replace(message=message)), True)
         mock_reload.assert_called_once_with(self.database, self.send)
 
-    @patch('source.public.manage.autojoin.broadcaster.auto_join_add')
+    @patch('source.public.library.broadcaster.auto_join_add', autospec=True)
     def test_add(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot autojoin add botgotsthis')
@@ -70,7 +70,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_add.assert_called_once_with(self.database, 'botgotsthis',
                                          self.send)
 
-    @patch('source.public.manage.autojoin.broadcaster.auto_join_add')
+    @patch('source.public.library.broadcaster.auto_join_add', autospec=True)
     def test_insert(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot autojoin insert botgotsthis')
@@ -79,7 +79,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_add.assert_called_once_with(self.database, 'botgotsthis',
                                          self.send)
 
-    @patch('source.public.manage.autojoin.broadcaster.auto_join_add')
+    @patch('source.public.library.broadcaster.auto_join_add', autospec=True)
     def test_join(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot autojoin join botgotsthis')
@@ -88,7 +88,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_add.assert_called_once_with(self.database, 'botgotsthis',
                                          self.send)
 
-    @patch('source.public.manage.autojoin.broadcaster.auto_join_delete')
+    @patch('source.public.library.broadcaster.auto_join_delete', autospec=True)
     def test_delete(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin delete botgotsthis')
@@ -97,7 +97,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('source.public.manage.autojoin.broadcaster.auto_join_delete')
+    @patch('source.public.library.broadcaster.auto_join_delete', autospec=True)
     def test_del(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin del botgotsthis')
@@ -106,7 +106,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('source.public.manage.autojoin.broadcaster.auto_join_delete')
+    @patch('source.public.library.broadcaster.auto_join_delete', autospec=True)
     def test_remove(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin remove botgotsthis')
@@ -115,7 +115,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('source.public.manage.autojoin.broadcaster.auto_join_delete')
+    @patch('source.public.library.broadcaster.auto_join_delete', autospec=True)
     def test_rem(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin rem botgotsthis')
@@ -124,7 +124,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('source.public.manage.autojoin.broadcaster.auto_join_delete')
+    @patch('source.public.library.broadcaster.auto_join_delete', autospec=True)
     def test_part(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin part botgotsthis')
@@ -133,7 +133,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('source.public.manage.autojoin.auto_join_priority')
+    @patch('source.public.manage.autojoin.auto_join_priority', autospec=True)
     def test_priority(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis')
@@ -142,7 +142,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('source.public.manage.autojoin.auto_join_priority')
+    @patch('source.public.manage.autojoin.auto_join_priority', autospec=True)
     def test_pri(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin pri botgotsthis')
@@ -151,7 +151,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('source.public.manage.autojoin.auto_join_priority')
+    @patch('source.public.manage.autojoin.auto_join_priority', autospec=True)
     def test_priority_gibberish(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis abc')
@@ -160,7 +160,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('source.public.manage.autojoin.auto_join_priority')
+    @patch('source.public.manage.autojoin.auto_join_priority', autospec=True)
     def test_priority_integer(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis 1')
@@ -205,18 +205,15 @@ class TestManageBotAutoJoinReloadServer(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_stdout = patcher.start()
 
-        patcher = patch('source.public.manage.autojoin.twitch.chat_server',
-                        autospec=True)
+        patcher = patch('source.api.twitch.chat_server', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_server = patcher.start()
 
-        patcher = patch('source.public.manage.autojoin.utils.ensureServer',
-                        autospec=True)
+        patcher = patch('bot.utils.ensureServer', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_ensure = patcher.start()
 
-        patcher = patch('source.public.manage.autojoin.utils.now',
-                        autospec=True)
+        patcher = patch('bot.utils.now', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_now = patcher.start()
 

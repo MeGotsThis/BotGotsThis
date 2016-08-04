@@ -1,9 +1,10 @@
-﻿import select
+﻿import bot.globals
+import select
 import threading
 from contextlib import suppress
 from itertools import filterfalse
-from typing import Callable, List, Tuple
-from .. import data, globals, utils
+from typing import Callable, List
+from .. import data, utils
 
 
 class SocketsThread(threading.Thread):
@@ -11,7 +12,7 @@ class SocketsThread(threading.Thread):
         print('{time} Starting {name}'.format(
             time=utils.now(), name=self.__class__.__name__))
         
-        while globals.running:
+        while bot.globals.running:
             try:
                 self.process()
             except:
@@ -22,7 +23,7 @@ class SocketsThread(threading.Thread):
             time=utils.now(), name=self.__class__.__name__))
 
     def process(self):
-        sockets = list(globals.clusters.values()) # type: List[data.Socket]
+        sockets = list(bot.globals.clusters.values()) # type: List[data.Socket]
         isActive = lambda s: s.isConnected  # type: Callable[[data.Socket], bool]
         try:
             for socket in filterfalse(isActive, sockets):  # --type: Socket
@@ -44,6 +45,6 @@ class SocketsThread(threading.Thread):
             socket.sendPing()
     
     def terminate(self):
-        for socket in globals.clusters.values():  # --type: data.Socket
+        for socket in bot.globals.clusters.values():  # --type: data.Socket
             with suppress(ConnectionError):
                 socket.disconnect()

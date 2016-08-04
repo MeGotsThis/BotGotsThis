@@ -1,5 +1,7 @@
-﻿import time
-from bot import config, globals, utils
+﻿import bot.config
+import bot.globals
+import time
+from bot import utils
 from typing import Dict, List, Optional, Union
 from ...api import twitch
 from ...data import Send
@@ -35,7 +37,7 @@ def come(database: DatabaseBase,
 
 def leave(channel: str,
           send: Send) -> bool:
-    if channel == config.botnick:
+    if channel == bot.config.botnick:
         return False
     send('Bye {channel}'.format(channel=channel))
     time.sleep(1)
@@ -45,8 +47,8 @@ def leave(channel: str,
 
 def empty(channel: str,
           send: Send) -> bool:
-    if channel in globals.channels:
-        chan = globals.channels[channel]
+    if channel in bot.globals.channels:
+        chan = bot.globals.channels[channel]
         chan.clear()
         send('Cleared all queued messages '
              'for {channel}'.format(channel=channel))
@@ -78,7 +80,7 @@ def auto_join_add(database: DatabaseBase,
         send('Auto join for {channel} failed due to Twitch '
              'error'.format(channel=channel))
         return True
-    if cluster not in globals.clusters:
+    if cluster not in bot.globals.clusters:
         send('Auto join for {channel} failed due to unsupported chat '
              'server'.format(channel=channel))
         return True
@@ -148,7 +150,7 @@ def set_timeout_level(database: DatabaseBase,
         value = int(message[1])  # type: Optional[int]
     except (ValueError, IndexError):
         value = None
-    timeout = config.moderatorDefaultTimeout[int(k) - 1]  # type: int
+    timeout = bot.config.moderatorDefaultTimeout[int(k) - 1]  # type: int
     default = '{} seconds'.format(timeout) if timeout else 'Banned'  # type: str
     saveValue = str(value) if value is not None else None  # type: Optional[str]
     database.setChatProperty(channel, propertyDict[k], saveValue)

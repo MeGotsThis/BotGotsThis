@@ -1,6 +1,7 @@
 import unittest
 from source.public.library import textformat
-from unittest.mock import Mock, patch
+from unittest.mock import patch
+
 
 def translate(text):
     return text

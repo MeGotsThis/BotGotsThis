@@ -1,11 +1,12 @@
-﻿import itertools
+﻿import bot.config
+import bot.globals
+import itertools
 import random
 from contextlib import suppress
 from datetime import timedelta
-from bot import config, globals
 from typing import Dict, List
-from ..library import timeout
-from ..library.chat import inCooldown, min_args, permission_feature
+from ..library import chat, timeout
+from ..library.chat import min_args, permission_feature
 from ...data import ChatCommandArgs
 
 
@@ -32,12 +33,12 @@ def commandPyramidLong(args: ChatCommandArgs) -> bool:
 def process_pyramid(args: ChatCommandArgs,
                     repetition: str,
                     count: int) -> bool:
-    count = min(count, (config.messageLimit + 1) // (len(repetition) + 1))
+    count = min(count, (bot.config.messageLimit + 1) // (len(repetition) + 1))
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
-        cooldown = timedelta(seconds=config.spamModeratorCooldown)  # type: timedelta
-        if inCooldown(args, cooldown, 'modPyramid'):
+        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)  # type: timedelta
+        if chat.inCooldown(args, cooldown, 'modPyramid'):
             return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
@@ -55,9 +56,9 @@ def process_pyramid(args: ChatCommandArgs,
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 def commandRandomPyramid(args: ChatCommandArgs) -> bool:
-    if not globals.globalEmotes:
+    if not bot.globals.globalEmotes:
         return False
-    emotes = globals.globalEmotes.copy()  # type: Dict[int, str]
+    emotes = bot.globals.globalEmotes.copy()  # type: Dict[int, str]
     count = 5 if args.permissions.broadcaster else 3  # type: int
     # If below generate a ValueError or IndexError,
     # only the above line gets used
@@ -67,15 +68,15 @@ def commandRandomPyramid(args: ChatCommandArgs) -> bool:
     if not args.permissions.broadcaster:
         count = min(count, 5)
         
-        cooldown = timedelta(seconds=config.spamModeratorCooldown)  # type: timedelta
-        if inCooldown(args, cooldown, 'modPyramid'):
+        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)  # type: timedelta
+        if chat.inCooldown(args, cooldown, 'modPyramid'):
             return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     emoteIds = list(emotes.keys())  # type: List[int]
     for i in range(count):  # --type: int
         rep.append(emotes[random.choice(emoteIds)])
-        if len(' '.join(rep)) > config.messageLimit:
+        if len(' '.join(rep)) > bot.config.messageLimit:
             del rep[-1]
             count = len(rep)
             break

@@ -9,7 +9,7 @@ from unittest.mock import Mock, patch
 
 class TestUserState(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.irccommand.userstate.bot.globals',
+        patcher = patch('bot.globals',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
@@ -120,7 +120,7 @@ class TestUserState(unittest.TestCase):
 
 class TestClearChat(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.irccommand.clearchat.config', autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.botnick = 'botgotsthis'

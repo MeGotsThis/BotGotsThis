@@ -1,5 +1,7 @@
-﻿from bot import config, globals, utils
-from typing import Dict, List, Optional, Union
+﻿import bot.config
+import bot.globals
+from bot import utils
+from typing import Optional, Union
 from . import timeout
 from ...api import twitch
 from ...data import Send
@@ -15,7 +17,7 @@ def join(database: DatabaseBase,
     priority = database.getAutoJoinsPriority(channel)  # type: Union[int, float]
 
     cluster = twitch.chat_server(channel)  # type: Optional[str]
-    if cluster not in globals.clusters:
+    if cluster not in bot.globals.clusters:
         send('Unknown chat server for ' + channel)
     elif utils.joinChannel(channel, priority, cluster):
         send('Joining ' + channel)
@@ -32,7 +34,7 @@ def join(database: DatabaseBase,
 
 def part(channel: str,
          send: Send) -> bool:
-    if channel == config.botnick:
+    if channel == bot.config.botnick:
         return False
     utils.partChannel(channel)
     send('Leaving ' + channel)
@@ -43,10 +45,10 @@ def say(database: DatabaseBase,
         nick: str,
         channel: str,
         message: str) -> bool:
-    if channel in globals.channels:
+    if channel in bot.globals.channels:
         timeout.record_timeout(
-            database, globals.channels[channel], nick, message, None, 'say')
-        globals.channels[channel].send(message)
+            database, bot.globals.channels[channel], nick, message, None, 'say')
+        bot.globals.channels[channel].send(message)
         return True
     return False
 
@@ -59,8 +61,8 @@ def empty_all(send: Send) -> bool:
 
 def empty(channel: str,
           send: Send) -> bool:
-    if channel in globals.channels:
-        chan = globals.channels[channel]
+    if channel in bot.globals.channels:
+        chan = bot.globals.channels[channel]
         chan.clear()
         send('Cleared all queued messages for ' + channel)
         return True

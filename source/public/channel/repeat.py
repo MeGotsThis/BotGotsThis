@@ -1,13 +1,14 @@
-﻿import threading
+﻿import bot.globals
+import threading
 import time
-from bot import data, globals, utils
+from bot import data, utils
 from contextlib import suppress
 from datetime import datetime, timedelta
 from typing import Optional
 from ..library import timeout
 from ..library.chat import min_args, permission
 from ...data import ChatCommandArgs
-from ...database.factory import DatabaseBase, getDatabase
+from ...database import DatabaseBase, factory
 
 
 @permission('broadcaster')
@@ -90,7 +91,8 @@ class MessageRepeater(threading.Thread):
     @property
     def running(self) -> bool:
         with self._countLock:
-            return (self._count is None or self._count > 0) and globals.running
+            return ((self._count is None or self._count > 0)
+                    and bot.globals.running)
     
     def run(self) -> None:
         while self.running:
@@ -104,7 +106,7 @@ class MessageRepeater(threading.Thread):
             self._lastTime = now
             self._chat.send(self._message)
             if self._chat.isMod:
-                with getDatabase() as database:  # --type: DatabaseBase
+                with factory.getDatabase() as database:  # --type: DatabaseBase
                     timeout.record_timeout(database, self._chat, None,
                                            self._message, None, 'autorepeat')
             with self._countLock:

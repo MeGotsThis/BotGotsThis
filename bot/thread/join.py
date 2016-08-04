@@ -1,8 +1,10 @@
-﻿import threading
+﻿import bot.config
+import bot.globals
+import threading
 import time
 from datetime import datetime, timedelta
 from typing import Dict, List, Set
-from .. import config, data, globals, utils
+from .. import data, utils
 from ..twitchmessage import IrcMessage, IrcMessageParams
 
 joinDuration = timedelta(seconds=10.05)
@@ -22,12 +24,12 @@ class JoinThread(threading.Thread):
         with self._joinTimesLock:
             self._joinTimes = [t for t in self._joinTimes
                                if timestamp - t <= joinDuration]
-            return len(self._joinTimes) < config.joinLimit
+            return len(self._joinTimes) < bot.config.joinLimit
 
     @property
     def connectedChannels(self) -> 'Dict[str, data.Channel]':
         channels = {}  # type: Dict[str, data.Channel]
-        for socketThread in globals.clusters.values():  # --type: SocketsThread
+        for socketThread in bot.globals.clusters.values():  # --type: SocketsThread
             if socketThread.isConnected:
                 chans = socketThread.channels
                 for chan in chans:  # --type: Channel
@@ -37,10 +39,10 @@ class JoinThread(threading.Thread):
     def run(self) -> None:
         print('{time} Starting {name}'.format(
             time=utils.now(), name=self.__class__.__name__))
-        while globals.running:
+        while bot.globals.running:
             try:
                 self.process()
-                time.sleep(1 / config.joinPerSecond)
+                time.sleep(1 / bot.config.joinPerSecond)
             except:
                 utils.logException()
         print('{time} Ending {name}'.format(

@@ -2,8 +2,7 @@
 from bot import globals
 from contextlib import closing, suppress
 from datetime import datetime, timedelta
-from http.client import HTTPConnection, HTTPException, HTTPResponse
-from http.client import HTTPSConnection
+from http import client
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
 import configparser
@@ -35,10 +34,11 @@ def api_call(channel: Optional[str],
              method: str,
              uri: str,
              headers: MutableMapping[str, str]=None,
-             data: Union[str, Mapping[str, str]]=None) -> Tuple[HTTPResponse, bytes]:
+             data: Union[str, Mapping[str, str]]=None) -> Tuple[client.HTTPResponse, bytes]:
     if headers is None:
         headers = {}
-    with closing(HTTPSConnection('api.twitch.tv')) as connection:  # --type: HTTPConnection
+    connection = client.HTTPSConnection('api.twitch.tv')  # type: client.HTTPConnection
+    with closing(connection):
         if 'Accept' not in headers:
             headers['Accept'] = 'application/vnd.twitchtv.v3+json'
         if 'Client-ID' not in headers:
@@ -53,13 +53,13 @@ def api_call(channel: Optional[str],
             if isinstance(data, Mapping):
                 data = urllib.parse.urlencode(data)
         connection.request(method, uri, data, headers)
-        with connection.getresponse() as response:  # --type: HTTPResponse
+        with connection.getresponse() as response:  # --type: client.HTTPResponse
             return response, response.read()
 
 
 def server_time() -> Optional[datetime]:
-    with suppress(HTTPException):
-        response, data = api_call(None, 'GET', '/kraken/')  # type: HTTPResponse, bytes
+    with suppress(client.HTTPException):
+        response, data = api_call(None, 'GET', '/kraken/')  # type: client.HTTPResponse, bytes
         if response.status == 200:
             date = response.getheader('Date')
             if data is not None:
@@ -72,8 +72,8 @@ def server_time() -> Optional[datetime]:
 def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
     uri = ('/kraken/chat/emoticon_images?emotesets='
            + ','.join(str(i) for i in globals.emoteset))  # type: str
-    with suppress(ConnectionError, HTTPException):
-        response, data = api_call(None, 'GET', uri)  # type: HTTPResponse, bytes
+    with suppress(ConnectionError, client.HTTPException):
+        response, data = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']  # type: TwitchEmotes
         emotes = {}  # type: Dict[int, str]
         emoteSet = {}  # type: Dict[int, int]
@@ -106,9 +106,10 @@ def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
 
 
 def chat_server(chat:Optional[str]) -> Optional[str]:
-    with closing(HTTPSConnection('tmi.twitch.tv')) as connection:  # --type: HTTPConnection
+    connection = client.HTTPSConnection('tmi.twitch.tv')  # type: client.HTTPConnection
+    with closing(connection):
         connection.request('GET', '/servers?channel=' + chat)
-        with connection.getresponse() as response:  # --type: HTTPResponse
+        with connection.getresponse() as response:  # --type: client.HTTPResponse
             responseData = response.read()  # type: bytes
             with suppress(ValueError):
                 jData = json.loads(responseData.decode('utf-8'))  # type: dict
@@ -119,14 +120,15 @@ def chat_server(chat:Optional[str]) -> Optional[str]:
 @cache('validTwitchUser', timedelta(minutes=1))
 def is_valid_user(user: str) -> bool:
     user = user.lower()
-    response, _ = api_call(None, 'GET', '/kraken/channels/' + user)  # type: HTTPResponse, bytes
+    response, _ = api_call(
+        None, 'GET', '/kraken/channels/' + user)  # type: client.HTTPResponse, bytes
     return response.code == 200
 
 
 def num_followers(user: str) -> Optional[int]:
-    with suppress(ConnectionError, HTTPException):
+    with suppress(ConnectionError, client.HTTPException):
         uri = '/kraken/users/' + user + '/follows/channels?limit=1'  # type: str
-        response, data = api_call(None, 'GET', uri)  # type: HTTPResponse, bytes
+        response, data = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         followerData = json.loads(data.decode('utf-8'))  # type: dict
         return int(followerData['_total'])
     return None
@@ -142,21 +144,21 @@ def update(channel: str, *,
         postData['channel[game]'] = game
     if not postData:
         return None
-    with suppress(ConnectionError, HTTPException):
+    with suppress(ConnectionError, client.HTTPException):
         response, data = api_call(
             channel, 'PUT', '/kraken/channels/' + channel,
             headers={
                 'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            data=postData)  # type: HTTPResponse, bytes
+            data=postData)  # type: client.HTTPResponse, bytes
         return response.status == 200
     return None
 
 
 def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
-    with suppress(ConnectionError, HTTPException):
+    with suppress(ConnectionError, client.HTTPException):
         uri = '/kraken/streams?limit=100&channel=' + ','.join(channels)  # type: str
-        response, responseData = api_call(None, 'GET', uri)  # type: HTTPResponse, bytes
+        response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         if response.status != 200:
             return None
         online = {}  # type: Dict[str, TwitchStatus]
@@ -192,8 +194,8 @@ def _handle_streams(streams: List[Dict[str, Any]],
 
 def channel_properties(channel: str) -> Optional[TwitchStatus]:
     uri = '/kraken/channels/' + channel  # type: str
-    with suppress(ConnectionError, HTTPException):
-        response, responseData = api_call(None, 'GET', uri)  # type: HTTPResponse, bytes
+    with suppress(ConnectionError, client.HTTPException):
+        response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         if response.status != 200:
             return None
         channel_ = json.loads(responseData.decode('utf-8'))  # type: Dict[str, str]

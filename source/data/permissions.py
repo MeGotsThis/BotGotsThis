@@ -1,4 +1,4 @@
-from bot import config
+import bot.config
 # from bot import data  -- https://github.com/python/mypy/issues/1701
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from typing import Any
@@ -37,14 +37,14 @@ class ChatPermissionSet:
     @property
     def owner(self) -> bool:
         if self._isOwner is None:
-            self._isOwner = self._user == config.owner
+            self._isOwner = self._user == bot.config.owner
         return self._isOwner
     
     @property
     def inOwnerChannel(self) -> bool:
         if self._inOwnerChannel is None:
-            inOwner = self._channel.channel == config.owner  # type: bool
-            inBot = self._channel.channel == config.botnick  # type: bool
+            inOwner = self._channel.channel == bot.config.owner  # type: bool
+            inBot = self._channel.channel == bot.config.botnick  # type: bool
             self._inOwnerChannel = inOwner or inBot
         return self._inOwnerChannel
     
@@ -156,7 +156,7 @@ class WhisperPermissionSet:
     @property
     def owner(self) -> bool:
         if self._isOwner is None:
-            self._isOwner = self._user == config.owner
+            self._isOwner = self._user == bot.config.owner
         return self._isOwner
     
     @property

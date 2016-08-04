@@ -3,6 +3,7 @@ from source.api import oauth
 from source.database import DatabaseBase
 from unittest.mock import MagicMock, Mock, patch
 
+
 class TestApiOAuth(unittest.TestCase):
     def test_token(self):
         mock_database = Mock(spec=DatabaseBase)
@@ -15,7 +16,7 @@ class TestApiOAuth(unittest.TestCase):
         mock_database.getOAuthToken.return_value = '0123456789abcedf'
         self.assertRaises(TypeError, oauth.token, None, database=mock_database)
 
-    @patch('source.api.oauth.getDatabase')
+    @patch('source.database.factory.getDatabase')
     def test_token_database_none(self, mock_getDatabase):
         mock_getDatabase.return_value = MagicMock()
         mock_database = Mock(spec=DatabaseBase)

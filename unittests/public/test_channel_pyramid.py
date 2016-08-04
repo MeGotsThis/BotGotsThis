@@ -91,10 +91,9 @@ class TestChannelPyramid(TestChannel):
             True)
         mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 3)
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid(self, mock_timeout, mock_cooldown, mock_config):
         mock_config.messageLimit = 100
         mock_config.spamModeratorCooldown = 30
@@ -106,10 +105,9 @@ class TestChannelPyramid(TestChannel):
         self.assertFalse(mock_timeout.called)
         self.assertEqual(list(self.channel.send.call_args[0][0]), [])
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_1(self, mock_timeout, mock_cooldown, mock_config):
         mock_config.messageLimit = 100
         mock_config.spamModeratorCooldown = 30
@@ -121,10 +119,9 @@ class TestChannelPyramid(TestChannel):
         self.assertFalse(mock_timeout.called)
         self.assertEqual(list(self.channel.send.call_args[0][0]), ['Kappa'])
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_2(self, mock_timeout, mock_cooldown, mock_config):
         mock_config.messageLimit = 100
         mock_config.spamModeratorCooldown = 30
@@ -137,10 +134,9 @@ class TestChannelPyramid(TestChannel):
         self.assertEqual(list(self.channel.send.call_args[0][0]),
                          ['Kappa', 'Kappa Kappa', 'Kappa'])
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_5(self, mock_timeout, mock_cooldown, mock_config):
         mock_config.messageLimit = 300
         mock_config.spamModeratorCooldown = 30
@@ -162,10 +158,9 @@ class TestChannelPyramid(TestChannel):
              'Kappa Kappa',
              'Kappa'])
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_channel_mod(self, mock_timeout, mock_cooldown,
                                          mock_config):
         mock_config.messageLimit = 300
@@ -182,10 +177,9 @@ class TestChannelPyramid(TestChannel):
         self.assertEqual(list(self.channel.send.call_args[0][0]),
                          ['Kappa', 'Kappa Kappa', 'Kappa'])
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_broadcaster_limit(
             self, mock_timeout, mock_cooldown, mock_config):
         mock_config.messageLimit = 10000
@@ -198,10 +192,9 @@ class TestChannelPyramid(TestChannel):
         self.assertEqual(
             len(list(self.channel.send.call_args[0][0])), 20 + 20 - 1)
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_moderator_limit(
             self, mock_timeout, mock_cooldown, mock_config):
         mock_config.messageLimit = 100
@@ -215,10 +208,9 @@ class TestChannelPyramid(TestChannel):
         self.assertEqual(list(self.channel.send.call_args[0][0]),
                          ['Kappa', 'Kappa Kappa', 'Kappa'])
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_moderator_cooldown(
             self, mock_timeout, mock_cooldown, mock_config):
         mock_config.messageLimit = 100
@@ -230,10 +222,9 @@ class TestChannelPyramid(TestChannel):
         mock_cooldown.assert_called_once_with(
             self.args, timedelta(seconds=30), ANY)
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_limit(self, mock_timeout, mock_cooldown,
                                    mock_config):
         mock_config.messageLimit = 10
@@ -246,10 +237,9 @@ class TestChannelPyramid(TestChannel):
         self.assertFalse(mock_timeout.called)
         self.assertEqual(list(self.channel.send.call_args[0][0]), ['Kappa'])
 
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_pyramid_limit_exact(self, mock_timeout, mock_cooldown,
                                          mock_config):
         mock_config.messageLimit = 11
@@ -263,9 +253,9 @@ class TestChannelPyramid(TestChannel):
         self.assertEqual(list(self.channel.send.call_args[0][0]),
                          ['Kappa', 'Kappa Kappa', 'Kappa'])
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
     def test_random_pyramid_false(self, mock_cooldown, mock_config,
                                   mock_globals):
         self.assertIs(pyramid.commandRandomPyramid(self.args), False)
@@ -277,10 +267,10 @@ class TestChannelPyramid(TestChannel):
         self.assertFalse(mock_cooldown.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid(self, mock_choice, mock_cooldown, mock_config,
                             mock_globals):
         mock_globals.globalEmotes = {
@@ -319,10 +309,10 @@ class TestChannelPyramid(TestChannel):
              ':)',
              ])
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_0(self, mock_choice, mock_cooldown, mock_config,
                               mock_globals):
         mock_globals.globalEmotes = {
@@ -350,10 +340,10 @@ class TestChannelPyramid(TestChannel):
         self.assertFalse(mock_cooldown.called)
         self.assertEqual( list(self.channel.send.call_args[0][0]), [])
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_1(self, mock_choice, mock_cooldown, mock_config,
                               mock_globals):
         mock_globals.globalEmotes = {
@@ -382,10 +372,10 @@ class TestChannelPyramid(TestChannel):
         self.assertEqual(
             list(self.channel.send.call_args[0][0]), [':)'])
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_2(self, mock_choice, mock_cooldown, mock_config,
                               mock_globals):
         mock_globals.globalEmotes = {
@@ -415,10 +405,10 @@ class TestChannelPyramid(TestChannel):
             list(self.channel.send.call_args[0][0]),
             [':)', ':) FrankerZ', ':)'])
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_broadcaster_limit(
             self, mock_choice, mock_cooldown, mock_config, mock_globals):
         mock_globals.globalEmotes = {
@@ -446,10 +436,10 @@ class TestChannelPyramid(TestChannel):
         self.assertEqual(
             len(list(self.channel.send.call_args[0][0])), 20 + 20 - 1)
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_moderator(self, mock_choice, mock_cooldown,
                                       mock_config, mock_globals):
         mock_globals.globalEmotes = {
@@ -484,10 +474,10 @@ class TestChannelPyramid(TestChannel):
              ':)',
              ])
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_moderator_limit(
             self, mock_choice, mock_cooldown, mock_config, mock_globals):
         mock_globals.globalEmotes = {
@@ -526,10 +516,10 @@ class TestChannelPyramid(TestChannel):
              ':)',
              ])
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_moderator_cooldown(
             self, mock_choice, mock_cooldown, mock_config, mock_globals):
         mock_globals.globalEmotes = {
@@ -556,10 +546,10 @@ class TestChannelPyramid(TestChannel):
         self.assertFalse(self.channel.send.called)
         mock_cooldown.assert_called_once_with(args, timedelta(seconds=30), ANY)
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_limit(self, mock_choice, mock_cooldown,
                                   mock_config, mock_globals):
         mock_globals.globalEmotes = {
@@ -596,10 +586,10 @@ class TestChannelPyramid(TestChannel):
              ':)',
              ])
 
-    @patch('source.public.channel.pyramid.globals', autospec=True)
-    @patch('source.public.channel.pyramid.config', autospec=True)
-    @patch('source.public.channel.pyramid.inCooldown', autospec=True)
-    @patch('source.public.channel.pyramid.random.choice', autospec=True)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('source.public.library.chat.inCooldown', autospec=True)
+    @patch('random.choice', autospec=True)
     def test_random_pyramid_limit_exact(self, mock_choice, mock_cooldown,
                                         mock_config, mock_globals):
         mock_globals.globalEmotes = {

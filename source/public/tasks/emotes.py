@@ -1,6 +1,7 @@
-﻿import copy
+﻿import bot.globals
+import copy
 import random
-from bot import data, globals
+from bot import data
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from ...api import bttv
@@ -9,13 +10,13 @@ from ...api import twitch
 
 
 def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
-    if timestamp - globals.globalEmotesCache >= timedelta(hours=1):
+    if timestamp - bot.globals.globalEmotesCache >= timedelta(hours=1):
         data = twitch.twitch_emotes()  # type: Optional[Tuple[Dict[int, str], Dict[int, int]]]
-        globals.globalEmotesCache = timestamp
+        bot.globals.globalEmotesCache = timestamp
         if data:
             emotes, emoteSets = data
-            globals.globalEmotes = emotes
-            globals.globalEmoteSets = emoteSets
+            bot.globals.globalEmotes = emotes
+            bot.globals.globalEmoteSets = emoteSets
 
 
 def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
@@ -24,15 +25,15 @@ def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
 
 
 def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
-    if timestamp - globals.globalFfzEmotesCache >= timedelta(hours=1):
+    if timestamp - bot.globals.globalFfzEmotesCache >= timedelta(hours=1):
         emotes = ffz.getGlobalEmotes()  # type: Optional[Dict[int, str]]
-        globals.globalFfzEmotesCache = timestamp
+        bot.globals.globalFfzEmotesCache = timestamp
         if emotes is not None:
-            globals.globalFfzEmotes = emotes
+            bot.globals.globalFfzEmotes = emotes
 
 
 def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
-    channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
+    channels = copy.copy(bot.globals.channels)  # type: Dict[str, data.Channel]
     toUpdate = [chan for chan in channels.values()
                 if timestamp - chan.ffzCache >= timedelta(hours=1)
                 and chan.isStreaming]  # type: List[data.Channel]
@@ -50,15 +51,15 @@ def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:
 
 
 def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
-    if timestamp - globals.globalBttvEmotesCache >= timedelta(hours=1):
+    if timestamp - bot.globals.globalBttvEmotesCache >= timedelta(hours=1):
         emotes = bttv.getGlobalEmotes()
-        globals.globalBttvEmotesCache = timestamp
+        bot.globals.globalBttvEmotesCache = timestamp
         if emotes is not None:
-            globals.globalBttvEmotes = emotes
+            bot.globals.globalBttvEmotes = emotes
 
 
 def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
-    channels = copy.copy(globals.channels)  # type: Dict[str, data.Channel]
+    channels = copy.copy(bot.globals.channels)  # type: Dict[str, data.Channel]
     toUpdate = [chan for chan in channels.values()
                 if timestamp - chan.bttvCache >= timedelta(hours=1)
                 and chan.isStreaming]  # type: List[data.Channel]

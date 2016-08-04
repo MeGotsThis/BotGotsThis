@@ -13,20 +13,17 @@ class TestLibraryExitExit(unittest.TestCase):
         self.channel = Mock(spec=Channel)
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.exit.globals',
-                        autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}
         self.mock_globals.running = True
 
-        patcher = patch('source.public.library.exit.utils.partChannel',
-                        autospec=True)
+        patcher = patch('bot.utils.partChannel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_part = patcher.start()
 
-        patcher = patch('source.public.library.exit.time.sleep',
-                        autospec=True)
+        patcher = patch('time.sleep', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_sleep = patcher.start()
 

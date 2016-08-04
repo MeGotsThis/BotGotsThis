@@ -13,7 +13,7 @@ def method(args):
 
 class TestLibraryMessage(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.public.library.message.config')
+        patcher = patch('bot.config')
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.messageLimit = 30

@@ -1,4 +1,4 @@
-from bot import config
+import bot.config
 from collections import deque
 from typing import Generator, Iterable, Optional
 
@@ -6,7 +6,7 @@ from typing import Generator, Iterable, Optional
 def messagesFromItems(items:Iterable[str],
                       prepend:Optional[str]=None) -> Generator[str, None, None]:
     prepend = prepend or ''
-    limit = config.messageLimit - len(prepend)
+    limit = bot.config.messageLimit - len(prepend)
     queue = deque(items)  # type: deque
     itemsMsg = deque()  # type: deque
     length = 0  # type: int

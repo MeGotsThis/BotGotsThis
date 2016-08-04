@@ -1,3 +1,4 @@
+import lists.custom
 from typing import Dict, Iterable, List, Optional
 from ...data import ChatCommandArgs, CustomFieldArgs, CustomCommand
 from ...data import CommandActionTokens, CustomCommandProcess
@@ -6,7 +7,6 @@ from ...data.message import Message
 from ...data.permissions import ChatPermissionSet
 from ...database import DatabaseBase
 from ..library import textformat
-import lists.custom
 
 
 def get_command(database: DatabaseBase,

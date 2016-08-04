@@ -9,7 +9,7 @@ class TestUtils(unittest.TestCase):
     def test_now(self):
         self.assertIsInstance(utils.now(), datetime)
 
-    @patch('bot.utils.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_joinChannel_none(self, mock_globals):
         mock_globals.channels = {}
         mock_globals.clusters = {
@@ -17,7 +17,7 @@ class TestUtils(unittest.TestCase):
             }
         self.assertRaises(TypeError, utils.joinChannel, None)
 
-    @patch('bot.utils.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_joinChannel_nocluster(self, mock_globals):
         mock_globals.channels = {}
         mock_globals.clusters = {
@@ -27,7 +27,7 @@ class TestUtils(unittest.TestCase):
             utils.joinChannel('botgotsthis', cluster='botgotsthis'), None)
         self.assertNotIn('botgotsthis', mock_globals.channels)
 
-    @patch('bot.utils.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_joinChannel_existing_channel(self, mock_globals):
         mock_globals.clusters = {
             'twitch': Mock(spec=Socket)
@@ -41,7 +41,7 @@ class TestUtils(unittest.TestCase):
         self.assertIn('botgotsthis', mock_globals.channels)
         self.assertEqual(mock_globals.channels['botgotsthis'].joinPriority, 0)
 
-    @patch('bot.utils.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_joinChannel(self, mock_globals):
         mock_globals.channels = {}
         mock_globals.clusters = {
@@ -53,19 +53,19 @@ class TestUtils(unittest.TestCase):
         mock_globals.clusters['twitch'].joinChannel.assert_called_once_with(
             mock_globals.channels['botgotsthis'])
 
-    @patch('bot.utils.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_partChannel_none(self, mock_globals):
         mock_globals.channels = {}
         self.assertRaises(TypeError, utils.partChannel, None)
 
-    @patch('bot.utils.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     @patch.object(Channel, 'part', autospec=True)
     def test_partChannel_not_existing(self, mock_part, mock_globals):
         mock_globals.channels = {}
         utils.partChannel('botgotsthis')
         self.assertFalse(mock_part.called)
 
-    @patch('bot.utils.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_partChannel(self, mock_globals):
         channel = Mock(spec=Channel)
         mock_globals.channels = {
@@ -74,7 +74,7 @@ class TestUtils(unittest.TestCase):
         utils.partChannel('botgotsthis')
         channel.part.assert_called_once_with()
 
-    @patch('bot.utils.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_whisper(self, mock_globals):
         socket = Mock(spec=Socket)
         socket.messaging = Mock(spec=MessagingQueue)
@@ -86,8 +86,8 @@ class TestUtils(unittest.TestCase):
         socket.messaging.sendWhisper.assert_called_once_with(
             'botgotsthis', 'Kappa')
 
-    @patch('bot.utils.open', new_callable=mock_open)
-    @patch('bot.utils.config', autospec=True)
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logIrcMessage_config(self, mock_now, mock_config, mockopen):
         mock_now.return_value = datetime(2000, 1, 1)
@@ -96,8 +96,8 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(mockopen.called)
         self.assertTrue(mockopen().write.called)
 
-    @patch('bot.utils.open', new_callable=mock_open)
-    @patch('bot.utils.config', autospec=True)
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logIrcMessage_config_None(self, mock_now, mock_config, mockopen):
         mock_now.return_value = datetime(2000, 1, 1)
@@ -105,8 +105,8 @@ class TestUtils(unittest.TestCase):
         utils.logIrcMessage('botgotsthis', 'Kappa')
         self.assertFalse(mockopen.called)
 
-    @patch('bot.utils.open', new_callable=mock_open)
-    @patch('bot.utils.config', autospec=True)
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logException(self, mock_now, mock_config, mockopen):
         mock_now.return_value = datetime(2000, 1, 1)
@@ -118,8 +118,8 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(mockopen.called)
         self.assertTrue(mockopen().write.called)
 
-    @patch('bot.utils.open', new_callable=mock_open)
-    @patch('bot.utils.config', autospec=True)
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logException_config_None(self, mock_now, mock_config, mockopen):
         mock_now.return_value = datetime(2000, 1, 1)
@@ -133,7 +133,7 @@ class TestUtils(unittest.TestCase):
 
 class TesEnsureServer(unittest.TestCase):
     def setUp(self):
-        patcher = patch('bot.utils.globals', autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.clusters = {

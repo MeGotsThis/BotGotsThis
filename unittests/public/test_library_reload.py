@@ -1,3 +1,4 @@
+import sys
 import unittest
 from source.public.library import reload
 from unittest.mock import ANY, Mock, patch
@@ -134,20 +135,20 @@ class TestLibraryReload(unittest.TestCase):
         mock_reload_config.assert_called_once_with(self.send)
         mock_reload_command.assert_called_once_with(self.send)
 
-    @patch('source.public.library.reload.sys', autospec=True)
-    @patch('source.public.library.reload.importlib.reload', autospec=True)
-    def test_reload_commands(self, mock_reload, mock_sys):
+    @patch.dict('sys.modules', autospec=True)
+    @patch('importlib.reload', autospec=True)
+    def test_reload_commands(self, mock_reload):
         module = Mock()
-        mock_sys.modules = {'source': module}
+        sys.modules = {'source': module}
         self.assertIs(reload.reload_commands(self.send), True)
         self.assertEqual(self.send.call_count, 2)
         mock_reload.assert_called_once_with(module)
 
-    @patch('source.public.library.reload.sys', autospec=True)
-    @patch('source.public.library.reload.importlib.reload', autospec=True)
-    def test_reload_config(self, mock_reload, mock_sys):
+    @patch.dict('sys.modules', autospec=True)
+    @patch('importlib.reload', autospec=True)
+    def test_reload_config(self, mock_reload):
         module = Mock()
-        mock_sys.modules = {'bot.config': module}
+        sys.modules = {'bot.config': module}
         self.assertIs(reload.reload_config(self.send), True)
         self.assertEqual(self.send.call_count, 2)
         mock_reload.assert_called_once_with(module)

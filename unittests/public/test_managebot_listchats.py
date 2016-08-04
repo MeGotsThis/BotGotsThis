@@ -4,16 +4,16 @@ from unittests.public.test_managebot import TestManageBot
 
 
 class TestManageBotListChats(TestManageBot):
-    @patch('source.public.manage.listchats.messagesFromItems', autospec=True)
-    @patch('source.public.manage.listchats.globals', autospec=True)
+    @patch('source.public.library.message.messagesFromItems', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_no_channels(self, mock_globals, mock_messages):
         mock_globals.channels = {}
         self.assertIs(listchats.manageListChats(self.args), True)
         self.assertFalse(mock_messages.called)
         self.send.assert_called_once_with(ANY)
 
-    @patch('source.public.manage.listchats.messagesFromItems', autospec=True)
-    @patch('source.public.manage.listchats.globals', autospec=True)
+    @patch('source.public.library.message.messagesFromItems', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_one_channel(self, mock_globals, mock_messages):
         mock_globals.channels = {'botgotsthis': None}
         mock_messages.return_value = []
@@ -21,8 +21,8 @@ class TestManageBotListChats(TestManageBot):
         mock_messages.assert_called_once_with(['botgotsthis'], ANY)
         self.send.assert_called_once_with(ANY)
 
-    @patch('source.public.manage.listchats.messagesFromItems', autospec=True)
-    @patch('source.public.manage.listchats.globals', autospec=True)
+    @patch('source.public.library.message.messagesFromItems', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_many_channel(self, mock_globals, mock_messages):
         mock_globals.channels = {'botgotsthis': None,
                                  'mebotsthis': None,

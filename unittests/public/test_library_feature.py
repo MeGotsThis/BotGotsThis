@@ -14,8 +14,7 @@ class TestLibraryFeatureFeature(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict(
-            'source.public.library.feature.lists.feature.features')
+        patcher = patch.dict('lists.feature.features')
         self.addCleanup(patcher.stop)
         patcher.start()
         feature.lists.feature.features['feature'] = 'Feature'
@@ -97,8 +96,7 @@ class TestLibraryFeatureAdd(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict(
-            'source.public.library.feature.lists.feature.features')
+        patcher = patch.dict('lists.feature.features')
         self.addCleanup(patcher.stop)
         patcher.start()
         feature.lists.feature.features['feature'] = 'Feature'
@@ -132,8 +130,7 @@ class TestLibraryFeatureRemove(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict(
-            'source.public.library.feature.lists.feature.features')
+        patcher = patch.dict('lists.feature.features')
         self.addCleanup(patcher.stop)
         patcher.start()
         feature.lists.feature.features['feature'] = 'Feature'

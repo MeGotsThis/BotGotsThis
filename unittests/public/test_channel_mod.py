@@ -5,8 +5,8 @@ from unittests.public.test_channel import TestChannel
 
 
 class TestChannelMod(TestChannel):
-    @patch('source.public.channel.mod.oauth.token', autospec=True)
-    @patch('source.public.channel.mod.twitch.update', autospec=True)
+    @patch('source.api.oauth.token', autospec=True)
+    @patch('source.api.twitch.update', autospec=True)
     def test_status_false(self, mock_update, mock_token):
         self.assertIs(mod.commandStatus(self.args), False)
         self.permissionSet['moderator'] = True
@@ -22,8 +22,8 @@ class TestChannelMod(TestChannel):
                                            database=self.database)
         self.assertFalse(mock_update.called)
 
-    @patch('source.public.channel.mod.oauth.token', autospec=True)
-    @patch('source.public.channel.mod.twitch.update', autospec=True)
+    @patch('source.api.oauth.token', autospec=True)
+    @patch('source.api.twitch.update', autospec=True)
     def test_status(self, mock_update, mock_token):
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'
@@ -36,8 +36,8 @@ class TestChannelMod(TestChannel):
                                             status='Kappa')
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.mod.oauth.token', autospec=True)
-    @patch('source.public.channel.mod.twitch.update', autospec=True)
+    @patch('source.api.oauth.token', autospec=True)
+    @patch('source.api.twitch.update', autospec=True)
     def test_game_false(self, mock_update, mock_token):
         self.assertIs(mod.commandGame(self.args), False)
         self.permissionSet['moderator'] = True
@@ -53,8 +53,8 @@ class TestChannelMod(TestChannel):
                                            database=self.database)
         self.assertFalse(mock_update.called)
 
-    @patch('source.public.channel.mod.oauth.token', autospec=True)
-    @patch('source.public.channel.mod.twitch.update', autospec=True)
+    @patch('source.api.oauth.token', autospec=True)
+    @patch('source.api.twitch.update', autospec=True)
     def test_game(self, mock_update, mock_token):
         self.permissionSet['broadcaster'] = True
         self.database.getFullGameTitle.return_value = None
@@ -68,8 +68,8 @@ class TestChannelMod(TestChannel):
                                             game='Kappa')
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.mod.oauth.token', autospec=True)
-    @patch('source.public.channel.mod.twitch.update', autospec=True)
+    @patch('source.api.oauth.token', autospec=True)
+    @patch('source.api.twitch.update', autospec=True)
     def test_game_abbreviation(self, mock_update, mock_token):
         self.permissionSet['moderator'] = True
         self.database.getFullGameTitle.return_value = 'Creative'
@@ -83,8 +83,8 @@ class TestChannelMod(TestChannel):
                                             game='Creative')
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.mod.oauth.token', autospec=True)
-    @patch('source.public.channel.mod.twitch.update', autospec=True)
+    @patch('source.api.oauth.token', autospec=True)
+    @patch('source.api.twitch.update', autospec=True)
     def test_game_pokemon(self, mock_update, mock_token):
         self.features.append('gamestatusbroadcaster')
         self.permissionSet['broadcaster'] = True
@@ -99,8 +99,8 @@ class TestChannelMod(TestChannel):
                                             game='Pokémon Poképark')
         self.channel.send.assert_called_once_with(ANY)
 
-    @patch('source.public.channel.mod.oauth.token', autospec=True)
-    @patch('source.public.channel.mod.twitch.update', autospec=True)
+    @patch('source.api.oauth.token', autospec=True)
+    @patch('source.api.twitch.update', autospec=True)
     def test_raw_game_false(self, mock_update, mock_token):
         self.assertIs(mod.commandRawGame(self.args), False)
         self.permissionSet['moderator'] = True
@@ -116,8 +116,8 @@ class TestChannelMod(TestChannel):
                                            database=self.database)
         self.assertFalse(mock_update.called)
 
-    @patch('source.public.channel.mod.oauth.token', autospec=True)
-    @patch('source.public.channel.mod.twitch.update', autospec=True)
+    @patch('source.api.oauth.token', autospec=True)
+    @patch('source.api.twitch.update', autospec=True)
     def test_raw_game(self, mock_update, mock_token):
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'

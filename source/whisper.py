@@ -8,7 +8,7 @@ from typing import Iterator
 from . import data
 from .data.message import Message
 from .data.permissions import WhisperPermissionSet
-from .database.factory import getDatabase
+from .database import factory
 
 
 # Set up our commands function
@@ -37,7 +37,7 @@ def whisperCommand(tags: IrcMessageTagsReadOnly,
         permissions = WhisperPermissionSet(tags, nick)  # type: WhisperPermissionSet
 
         complete = False
-        with getDatabase() as database:
+        with factory.getDatabase() as database:
             arguments = data.WhisperCommandArgs(
                 database, nick, message, permissions, timestamp)  # type: data.WhisperCommandArgs
             for command in commandsToProcess(message.command):  # --type: data.WhisperCommand

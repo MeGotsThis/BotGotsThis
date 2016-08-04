@@ -17,12 +17,12 @@ class TestSocketThread(unittest.TestCase):
         type(self.socket2).isConnected = self.socket2_isConnected
         self.socket2.disconnect.side_effect = ConnectionError
 
-        patcher = patch('bot.thread.socket.globals', autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.clusters = {'1': self.socket1, '2': self.socket2}
 
-    @patch('bot.thread.socket.select.select')
+    @patch('select.select')
     def test_process_connect(self, mock_select):
         mock_select.return_value = [], [], []
         self.socketThead.process()
@@ -32,21 +32,21 @@ class TestSocketThread(unittest.TestCase):
         self.assertFalse(self.socket1.read.called)
         self.assertFalse(self.socket1.flushWrite.called)
 
-    @patch('bot.thread.socket.select.select')
+    @patch('select.select')
     def test_process_read(self, mock_select):
         mock_select.return_value = [self.socket1], [], []
         self.socketThead.process()
         self.socket1.read.assert_called_once_with()
         self.assertFalse(self.socket1.flushWrite.called)
 
-    @patch('bot.thread.socket.select.select')
+    @patch('select.select')
     def test_process_write(self, mock_select):
         mock_select.return_value = [], [self.socket1], []
         self.socketThead.process()
         self.socket1.flushWrite.assert_called_once_with()
         self.assertFalse(self.socket1.read.called)
 
-    @patch('bot.thread.socket.select.select')
+    @patch('select.select')
     def test_process_read_write(self, mock_select):
         mock_select.return_value = [self.socket1], [self.socket1], []
         self.socketThead.process()
@@ -54,7 +54,7 @@ class TestSocketThread(unittest.TestCase):
         self.socket1.flushWrite.assert_called_once_with()
         self.socket1.sendPing.assert_called_once_with()
 
-    @patch('bot.thread.socket.select.select')
+    @patch('select.select')
     def test_process_read_reset_write(self, mock_select):
         mock_select.return_value = [self.socket1], [self.socket1], []
         def changeConnection():
@@ -64,7 +64,7 @@ class TestSocketThread(unittest.TestCase):
         self.assertFalse(self.socket1.flushWrite.called)
         self.assertFalse(self.socket1.sendPing.called)
 
-    @patch('bot.thread.socket.select.select')
+    @patch('select.select')
     def test_process_reset_read_write(self, mock_select):
         mock_select.return_value = [self.socket1], [self.socket1], []
         self.socket1_isConnected.side_effect = [True, True, True, False, False, False]

@@ -174,44 +174,43 @@ class TestChannelRepeatMessageRepeater(unittest.TestCase):
         self.repeater.count = None
         self.assertIsNone(self.repeater.count)
 
-    @patch('source.public.channel.repeat.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_running(self, mock_globals):
         mock_globals.running = True
         self.assertIs(self.repeater.running, True)
 
-    @patch('source.public.channel.repeat.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_running_zero_count(self, mock_globals):
         mock_globals.running = True
         self.repeater.count = 0
         self.assertIs(self.repeater.running, False)
 
-    @patch('source.public.channel.repeat.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_running_zero_count(self, mock_globals):
         mock_globals.running = True
         self.repeater.count = 1
         self.assertIs(self.repeater.running, True)
 
-    @patch('source.public.channel.repeat.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_running_not_running(self, mock_globals):
         mock_globals.running = False
         self.assertIs(self.repeater.running, False)
 
-    @patch('source.public.channel.repeat.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_running_zero_count_not_running(self, mock_globals):
         mock_globals.running = True
         self.repeater.count = 0
         self.assertIs(self.repeater.running, False)
 
-    @patch('source.public.channel.repeat.globals', autospec=True)
+    @patch('bot.globals', autospec=True)
     def test_running_zero_count_not_running(self, mock_globals):
         mock_globals.running = False
         self.repeater.count = 1
         self.assertIs(self.repeater.running, False)
 
-    @patch('source.public.channel.repeat.utils.now', autospec=True)
-    @patch('source.public.channel.repeat.getDatabase', autospec=True)
-    @patch('source.public.channel.repeat.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process(self, mock_record, mock_database, mock_now):
         now = datetime(2000, 1, 1)
         mock_now.return_value = now
@@ -222,10 +221,9 @@ class TestChannelRepeatMessageRepeater(unittest.TestCase):
         self.assertFalse(mock_database.called)
         self.assertFalse(mock_record.called)
 
-    @patch('source.public.channel.repeat.utils.now', autospec=True)
-    @patch('source.public.channel.repeat.getDatabase', autospec=True)
-    @patch('source.public.channel.repeat.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_recent(self, mock_record, mock_database, mock_now):
         now = datetime(2000, 1, 1)
         mock_now.return_value = now
@@ -236,10 +234,9 @@ class TestChannelRepeatMessageRepeater(unittest.TestCase):
         self.assertFalse(mock_database.called)
         self.assertFalse(mock_record.called)
 
-    @patch('source.public.channel.repeat.utils.now', autospec=True)
-    @patch('source.public.channel.repeat.getDatabase', autospec=True)
-    @patch('source.public.channel.repeat.timeout.record_timeout',
-           autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
+    @patch('source.public.library.timeout.record_timeout', autospec=True)
     def test_process_chat_mod(self, mock_record, mock_database, mock_now):
         now = datetime(2000, 1, 1)
         mock_now.return_value = now
