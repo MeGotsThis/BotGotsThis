@@ -194,6 +194,13 @@
     <Compile Include="unittests\public\test_channel_repeat.py" />
     <Compile Include="unittests\public\test_channel_textformat.py" />
     <Compile Include="unittests\public\test_channel_wall.py" />
+    <Compile Include="unittests\public\test_custom.py" />
+    <Compile Include="unittests\public\test_custom_broadcaster.py" />
+    <Compile Include="unittests\public\test_custom_countdown.py" />
+    <Compile Include="unittests\public\test_custom_params.py" />
+    <Compile Include="unittests\public\test_custom_query.py" />
+    <Compile Include="unittests\public\test_custom_url.py" />
+    <Compile Include="unittests\public\test_custom_user.py" />
     <Compile Include="unittests\public\test_data_message.py" />
     <Compile Include="unittests\public\test_data_permissions.py" />
     <Compile Include="unittests\public\test_data_timedelta.py" />
