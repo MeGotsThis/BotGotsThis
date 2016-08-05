@@ -5,12 +5,12 @@ from source.database.sqlite import SQLiteDatabase
 
 class TestSqlite(unittest.TestCase):
     def setUp(self):
-        ini = {
+        self.ini = {
             'file': ':memory:',
             'oauth': ':memory:',
-            'timeoutlog': ':memory:',
+            'timeoutlog': 'timeout',
             }
-        self.database = SQLiteDatabase(ini)
+        self.database = SQLiteDatabase(self.ini)
         self.database.connect()
         self.cursor = self.database.connection.cursor()
 

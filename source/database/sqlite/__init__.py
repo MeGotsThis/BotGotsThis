@@ -16,7 +16,7 @@ class SQLiteDatabase(DatabaseBase):
         self._dbfile = ini['file']  # type: str
         self._oauthfile = ini['oauth']  # type: str
         self._timeoutlogfile = ini['timeoutlog']  # type: str
-    
+
     def connect(self) -> None:
         self._connection = sqlite3.connect(
             database=self._dbfile,
@@ -77,12 +77,17 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''  # ty
             cursor.execute(query, (cluster, broadcaster))
             self.connection.commit()
             return cursor.rowcount != 0
-    
+
+    def _attachOauth(self, cursor) -> None:
+        try:
+            cursor.execute('ATTACH DATABASE ? AS oauth', (self._oauthfile,))
+        except sqlite3.OperationalError:
+            pass
+
     def getOAuthToken(self, broadcaster:str) -> Optional[str]:
-        attach = '''ATTACH DATABASE ? AS oauth'''
         query = '''SELECT token FROM oauth.oauth_tokens WHERE broadcaster=?'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
-            cursor.execute(attach, (self._oauthfile,))
+            self._attachOauth(cursor)
             cursor.execute(query, (broadcaster,))
             token = cursor.fetchone()  # type: Optional[Tuple[str]]
             return token and token[0]  # type: ignore
@@ -91,8 +96,9 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''  # ty
                              broadcaster: str,
                              token: str) -> None:
         query = '''
-REPLACE INTO oauth_tokens (broadcaster, token) VALUES (?, ?)'''  # type: str
+REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
+            self._attachOauth(cursor)
             cursor.execute(query, (broadcaster, token))
             self.connection.commit()
 
