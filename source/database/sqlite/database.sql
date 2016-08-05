@@ -4,6 +4,11 @@ CREATE TABLE auto_join (
     cluster VARCHAR NOT NULL DEFAULT 'main'
 );
 
+CREATE TABLE game_abbreviations (
+    abbreviation VARCHAR NOT NULL PRIMARY KEY,
+    twitchGame VARCHAR NOT NULL
+);
+
 CREATE TABLE custom_commands (
     broadcaster VARCHAR NOT NULL,
     permission VARCHAR NOT NULL,
