@@ -81,14 +81,14 @@ class DatabaseBase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
+        return None
+
+    @abstractmethod
     def getChatCommands(self,
                         broadcaster: str,
                         command: str) -> Dict[str, Dict[str, str]]:
         return {broadcaster: {}, '#global': {}}
-
-    @abstractmethod
-    def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
-        return None
 
     @abstractmethod
     def insertCustomCommand(self,

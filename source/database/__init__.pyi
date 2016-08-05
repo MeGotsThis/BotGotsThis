@@ -47,11 +47,11 @@ class DatabaseBase(metaclass=ABCMeta):
                              broadcaster:str,
                              token:str) -> None: ...
     @abstractmethod
+    def getFullGameTitle(self, abbreviation: str) -> Optional[str]: ...
+    @abstractmethod
     def getChatCommands(self,
                         broadcaster:str,
                         command:str) -> Dict[str, Dict[str, str]]: ...
-    @abstractmethod
-    def getFullGameTitle(self, abbreviation: str) -> Optional[str]: ...
     @abstractmethod
     def insertCustomCommand(self,
                             broadcaster: str,

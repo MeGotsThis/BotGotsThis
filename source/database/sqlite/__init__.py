@@ -101,6 +101,14 @@ REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)'''  # type: s
             self._attachOauth(cursor)
             cursor.execute(query, (broadcaster, token))
             self.connection.commit()
+    
+    def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
+        query = '''
+SELECT twitchGame FROM game_abbreviations WHERE abbreviation=?'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
+            cursor.execute(query, (abbreviation,))
+            game = cursor.fetchone()  # type: Optional[Tuple[str]]
+            return game and game[0]  # type: ignore
 
     def getChatCommands(self,
                         broadcaster: str,
@@ -115,14 +123,6 @@ SELECT broadcaster, permission, fullMessage
                 commands[row[0]][row[1]] = row[2]
             cursor.close()
             return commands
-    
-    def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
-        query = '''
-SELECT twitchGame FROM game_abbreviations WHERE abbreviation=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
-            cursor.execute(query, (abbreviation,))
-            game = cursor.fetchone()  # type: Optional[Tuple[str]]
-            return game and game[0]  # type: ignore
 
     def insertCustomCommand(self,
                             broadcaster: str,

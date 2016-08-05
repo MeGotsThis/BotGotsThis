@@ -40,13 +40,13 @@ class DatabaseNone(DatabaseBase):
                              token: str) -> None:
         pass
 
+    def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
+        return None
+
     def getChatCommands(self,
                         broadcaster: str,
                         command: str) -> Dict[str, Dict[str, str]]:
         return {broadcaster: {}, '#global': {}}
-
-    def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
-        return None
 
     def insertCustomCommand(self,
                             broadcaster: str,
