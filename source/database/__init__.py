@@ -154,7 +154,7 @@ class DatabaseBase(metaclass=ABCMeta):
                                      permission: str,
                                      command: str,
                                      property: str,
-                                     value=Optional[str]) -> bool:
+                                     value: Optional[str]) -> bool:
         return False
 
     @abstractmethod

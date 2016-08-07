@@ -22,6 +22,7 @@ class SQLiteDatabase(DatabaseBase):
             database=self._dbfile,
             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
             )  # type: sqlite3.Connection
+        self._connection.execute('PRAGMA foreign_keys = ON')
 
     def getAutoJoinsChats(self) -> Iterable[AutoJoinChannel]:
         query = '''
@@ -142,15 +143,15 @@ INSERT INTO custom_commands_history
     VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             try:
-                display = None if command.lower() == command else command  # type: Optional[str]
-                cursor.execute(query, (broadcaster, permission,
-                                       command.lower(), display, fullMessage,
-                                       user, user))
+                lower = command.lower()
+                display = None if lower == command else command  # type: Optional[str]
+                cursor.execute(query, (broadcaster, permission, lower, display,
+                                       fullMessage, user, user))
             except sqlite3.IntegrityError:
                 return False
             
-            cursor.execute(history, (broadcaster, permission, command.lower(),
-                                     history, fullMessage, user))
+            cursor.execute(history, (broadcaster, permission, lower, display,
+                                     fullMessage, user))
             self.connection.commit()
             return True
 
@@ -321,7 +322,7 @@ SELECT value FROM custom_command_properties
                                      permission: str,
                                      command: str,
                                      property: str,
-                                     value=Optional[str]) -> bool:
+                                     value: Optional[str]=None) -> bool:
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             try:
                 if value is None:
@@ -339,7 +340,7 @@ REPLACE INTO custom_command_properties
                                            command.lower(), property, value))
                 self.connection.commit()
                 return cursor.rowcount != 0
-            except:
+            except sqlite3.IntegrityError:
                 return False
 
     def hasFeature(self,

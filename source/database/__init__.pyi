@@ -99,7 +99,7 @@ class DatabaseBase(metaclass=ABCMeta):
                                      permission: str,
                                      command: str,
                                      property: str,
-                                     value=Optional[str]) -> bool: ...
+                                     value: Optional[str]=None) -> bool: ...
     @abstractmethod
     def hasFeature(self,
                    broadcaster: str,

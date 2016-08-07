@@ -1,5 +1,5 @@
 import unittest
-from collections.abc import Iterable
+from collections.abc import Sequence
 from source.database.sqlite import SQLiteDatabase
 
 
@@ -21,8 +21,8 @@ class TestSqlite(unittest.TestCase):
     def execute(self, query, params=(), *, commit=True):
         if isinstance(query, str):
             self.cursor.execute(query, params)
-        elif isinstance(query, Iterable):
-            for q, p in zip(query, params):
+        elif isinstance(query, Sequence):
+            for q, p in zip(query, params if params else ((),) * len(query)):
                 self.cursor.execute(q, p)
         else:
             raise TypeError()

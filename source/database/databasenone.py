@@ -105,7 +105,7 @@ class DatabaseNone(DatabaseBase):
                                      permission: str,
                                      command: str,
                                      property: str,
-                                     value=Optional[str]) -> bool:
+                                     value: Optional[str]=None) -> bool:
         return False
 
     def hasFeature(self,

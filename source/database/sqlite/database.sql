@@ -31,7 +31,9 @@ CREATE TABLE custom_command_properties (
     property VARCHAR NOT NULL,
     value VARCHAR NOT NULL,
     PRIMARY KEY (broadcaster, permission, command, property),
-    FOREIGN KEY (broadcaster, permission, command) REFERENCES custom_commands(broadcaster, permission, command)
+    FOREIGN KEY (broadcaster, permission, command)
+        REFERENCES custom_commands(broadcaster, permission, command)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE custom_commands_history (
@@ -48,19 +50,19 @@ CREATE TABLE custom_commands_history (
 CREATE INDEX custom_commands_history_broadcaster ON custom_commands_history (broadcaster, command);
 
 CREATE TABLE banned_channels (
-	broadcaster VARCHAR NOT NULL PRIMARY KEY,
-	currentTime TIMESTAMP NOT NULL,
-	reason VARCHAR NOT NULL,
-	who VARCHAR NOT NULL
+    broadcaster VARCHAR NOT NULL PRIMARY KEY,
+    currentTime TIMESTAMP NOT NULL,
+    reason VARCHAR NOT NULL,
+    who VARCHAR NOT NULL
 );
 
 CREATE TABLE banned_channels_log (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	broadcaster VARCHAR NOT NULL,
-	currentTime TIMESTAMP NOT NULL,
-	reason VARCHAR NOT NULL,
-	who VARCHAR NOT NULL,
-	actionLog VARCHAR NOT NULL
+    broadcaster VARCHAR NOT NULL,
+    currentTime TIMESTAMP NOT NULL,
+    reason VARCHAR NOT NULL,
+    who VARCHAR NOT NULL,
+    actionLog VARCHAR NOT NULL
 );
 
 CREATE TABLE chat_features (
