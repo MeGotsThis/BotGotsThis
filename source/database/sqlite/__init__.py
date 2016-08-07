@@ -432,6 +432,13 @@ INSERT INTO banned_channels_log
             self.connection.commit()
             return True
 
+    def _attachTimeout(self, cursor) -> None:
+        try:
+            cursor.execute('ATTACH DATABASE ? AS timeout',
+                           (self._timeoutlogfile,))
+        except sqlite3.OperationalError:
+            pass
+
     def recordTimeout(self,
                       broadcaster: str,
                       user: str,
@@ -441,14 +448,12 @@ INSERT INTO banned_channels_log
                       length: Optional[int],
                       message: Optional[str],
                       reason: Optional[str]) -> bool:
-        attach = '''
-ATTACH DATABASE ? AS timeout'''  # type: str
         query = '''
 INSERT INTO timeout.timeout_logs 
     (broadcaster, twitchUser, fromUser, module, level, length, message, reason)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
-            cursor.execute(attach, (self._timeoutlogfile,))
+            self._attachTimeout(cursor)
             try:
                 cursor.execute(query, (broadcaster, user, fromUser, module,
                                        level, length, message, reason))

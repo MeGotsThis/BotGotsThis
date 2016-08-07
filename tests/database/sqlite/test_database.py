@@ -8,7 +8,7 @@ class TestSqlite(unittest.TestCase):
         self.ini = {
             'file': ':memory:',
             'oauth': ':memory:',
-            'timeoutlog': 'timeout',
+            'timeoutlog': ':memory:',
             }
         self.database = SQLiteDatabase(self.ini)
         self.database.connect()
