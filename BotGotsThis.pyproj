@@ -175,14 +175,24 @@
     <Compile Include="source\public\__init__.py" />
     <Compile Include="source\whisper.py" />
     <Compile Include="source\__init__.py" />
-    <Compile Include="timezonedb.py" />
-    <Compile Include="twitchOauth.py" />
+    <Compile Include="tests\database\sqlite\test_auto_join.py" />
+    <Compile Include="tests\database\sqlite\test_banned_channels.py" />
+    <Compile Include="tests\database\sqlite\test_chat_properties.py" />
+    <Compile Include="tests\database\sqlite\test_custom_commands.py" />
+    <Compile Include="tests\database\sqlite\test_database.py" />
+    <Compile Include="tests\database\sqlite\test_features.py" />
+    <Compile Include="tests\database\sqlite\test_game_abbreviations.py" />
+    <Compile Include="tests\database\sqlite\test_oauth.py" />
+    <Compile Include="tests\database\sqlite\test_timeout.py" />
+    <Compile Include="tests\unittest\base_channel.py" />
+    <Compile Include="tests\unittest\base_custom.py" />
+    <Compile Include="tests\unittest\base_managebot.py" />
+    <Compile Include="tests\unittest\base_whisper.py" />
     <Compile Include="tests\unittest\public\test_api.py" />
     <Compile Include="tests\unittest\public\test_api_bttv.py" />
     <Compile Include="tests\unittest\public\test_api_ffz.py" />
     <Compile Include="tests\unittest\public\test_api_oauth.py" />
     <Compile Include="tests\unittest\public\test_api_twitch.py" />
-    <Compile Include="tests\unittest\public\test_channel.py" />
     <Compile Include="tests\unittest\public\test_channel_block_url.py" />
     <Compile Include="tests\unittest\public\test_channel_broadcaster.py" />
     <Compile Include="tests\unittest\public\test_channel_custom.py" />
@@ -194,7 +204,6 @@
     <Compile Include="tests\unittest\public\test_channel_repeat.py" />
     <Compile Include="tests\unittest\public\test_channel_textformat.py" />
     <Compile Include="tests\unittest\public\test_channel_wall.py" />
-    <Compile Include="tests\unittest\public\test_custom.py" />
     <Compile Include="tests\unittest\public\test_custom_broadcaster.py" />
     <Compile Include="tests\unittest\public\test_custom_countdown.py" />
     <Compile Include="tests\unittest\public\test_custom_params.py" />
@@ -221,13 +230,11 @@
     <Compile Include="tests\unittest\public\test_library_textformat.py" />
     <Compile Include="tests\unittest\public\test_library_timeout.py" />
     <Compile Include="tests\unittest\public\test_library_whisper.py" />
-    <Compile Include="tests\unittest\public\test_managebot.py" />
     <Compile Include="tests\unittest\public\test_managebot_autojoin.py" />
     <Compile Include="tests\unittest\public\test_managebot_banned.py" />
     <Compile Include="tests\unittest\public\test_managebot_listchats.py" />
     <Compile Include="tests\unittest\public\test_tasks_emotes.py" />
     <Compile Include="tests\unittest\public\test_tasks_twitch.py" />
-    <Compile Include="tests\unittest\public\test_whisper.py" />
     <Compile Include="tests\unittest\public\test_whisper_broadcaster.py" />
     <Compile Include="tests\unittest\public\test_whisper_feature.py" />
     <Compile Include="tests\unittest\public\test_whisper_owner.py" />
@@ -244,6 +251,8 @@
     <Compile Include="tests\unittest\twitchmessage\test_ircprefix.py" />
     <Compile Include="tests\unittest\twitchmessage\test_irctags.py" />
     <Compile Include="tests\unittest\twitchmessage\test_irctagskey.py" />
+    <Compile Include="timezonedb.py" />
+    <Compile Include="twitchOauth.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bot\" />
@@ -277,9 +286,13 @@
     <Folder Include="source\public\manage\" />
     <Folder Include="source\public\tasks\" />
     <Folder Include="source\public\whisper\" />
+    <Folder Include="tests\" />
+    <Folder Include="tests\database\" />
+    <Folder Include="tests\database\sqlite\" />
     <Folder Include="tests\unittest\" />
     <Folder Include="tests\unittest\private\" />
     <Folder Include="tests\unittest\public\" />
+    <Folder Include="tests\unittest\twitchmessage\" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
