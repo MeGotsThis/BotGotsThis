@@ -1,6 +1,6 @@
 from source.data.message import Message
 from source.public.custom import query
-from tests.unittest.public.test_custom import TestCustomField
+from tests.unittest.base_custom import TestCustomField
 
 
 class TestCustomQuery(TestCustomField):

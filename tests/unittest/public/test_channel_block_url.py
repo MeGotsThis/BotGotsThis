@@ -9,7 +9,7 @@ from bot.data import Channel
 from source.data.message import Message
 from source.database import DatabaseBase
 from source.public.channel import block_url
-from tests.unittest.public.test_channel import TestChannel
+from tests.unittest.base_channel import TestChannel
 
 
 @patch('source.public.channel.block_url.check_domain_redirect', autospec=True)

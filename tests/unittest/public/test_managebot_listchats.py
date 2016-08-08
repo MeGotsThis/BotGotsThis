@@ -1,6 +1,7 @@
-from source.public.manage import listchats
-from tests.unittest.public.test_managebot import TestManageBot
 from unittest.mock import ANY, patch
+
+from source.public.manage import listchats
+from tests.unittest.base_managebot import TestManageBot
 
 
 class TestManageBotListChats(TestManageBot):

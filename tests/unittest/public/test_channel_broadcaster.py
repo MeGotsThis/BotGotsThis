@@ -1,6 +1,7 @@
-from source.public.channel import broadcaster
-from tests.unittest.public.test_channel import TestChannel
 from unittest.mock import ANY, patch
+
+from source.public.channel import broadcaster
+from tests.unittest.base_channel import TestChannel
 
 
 class TestChannelBroadcaster(TestChannel):

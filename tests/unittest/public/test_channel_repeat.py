@@ -1,11 +1,12 @@
 import unittest
-from bot.data import Channel
 from datetime import datetime, timedelta
+from unittest.mock import Mock, patch
+
+from bot.data import Channel
 from source.data.message import Message
 from source.database import DatabaseBase
 from source.public.channel import repeat
-from tests.unittest.public.test_channel import TestChannel
-from unittest.mock import Mock, patch
+from tests.unittest.base_channel import TestChannel
 
 
 class TestChannelRepeat(TestChannel):

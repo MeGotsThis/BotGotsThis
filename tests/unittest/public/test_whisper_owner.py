@@ -1,7 +1,8 @@
+from unittest.mock import ANY, patch
+
 from source.data.message import Message
 from source.public.whisper import owner
-from tests.unittest.public.test_whisper import TestWhisper
-from unittest.mock import ANY, patch
+from tests.unittest.base_whisper import TestWhisper
 
 
 class TestWhisperOwner(TestWhisper):

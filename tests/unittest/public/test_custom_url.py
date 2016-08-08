@@ -1,9 +1,10 @@
 import urllib.error
 from http.client import HTTPResponse
+from unittest.mock import Mock, patch
+
 from source.data.message import Message
 from source.public.custom import url
-from tests.unittest.public.test_custom import TestCustomField
-from unittest.mock import Mock, patch
+from tests.unittest.base_custom import TestCustomField
 
 
 class TestCustomQuery(TestCustomField):

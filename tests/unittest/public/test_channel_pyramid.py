@@ -1,8 +1,9 @@
 from datetime import timedelta
+from unittest.mock import ANY, patch
+
 from source.data.message import Message
 from source.public.channel import pyramid
-from tests.unittest.public.test_channel import TestChannel
-from unittest.mock import ANY, patch
+from tests.unittest.base_channel import TestChannel
 
 
 class TestChannelPyramid(TestChannel):

@@ -1,11 +1,12 @@
 import unittest
 from datetime import datetime
 from io import StringIO
+from unittest.mock import ANY, Mock, patch
+
 from source.data import Message
 from source.database import AutoJoinChannel, DatabaseBase
 from source.public.manage import autojoin
-from tests.unittest.public.test_managebot import TestManageBot, send
-from unittest.mock import ANY, Mock, patch
+from tests.unittest.base_managebot import TestManageBot, send
 
 
 class TestManageBotAutoJoin(TestManageBot):

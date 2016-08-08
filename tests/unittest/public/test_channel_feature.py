@@ -1,7 +1,8 @@
+from unittest.mock import ANY, patch
+
 from source.data.message import Message
 from source.public.channel import feature
-from tests.unittest.public.test_channel import TestChannel
-from unittest.mock import ANY, patch
+from tests.unittest.base_channel import TestChannel
 
 
 class TestChannelFeature(TestChannel):
