@@ -1,5 +1,6 @@
 ﻿from . import data
 from .thread import background as backgroundThread
+from .thread import logging as loggingThread
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
 from datetime import datetime
@@ -14,6 +15,7 @@ sockets = None  # type: SocketsThread
 join = None  # type: JoinThread
 groupChannel = None  # type: data.Channel
 
+logging = None  # type: loggingThread.Logging
 background = None  # type: backgroundThread.BackgroundTasker
 
 clusters = {

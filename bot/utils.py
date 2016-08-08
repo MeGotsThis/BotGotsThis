@@ -88,11 +88,10 @@ def logIrcMessage(filename: str,
     if bot.config.ircLogFolder is None:
         return
     timestamp = timestamp or now()
-    with open(os.path.join(bot.config.ircLogFolder, filename), 'a',
-              encoding='utf-8') as file:  # --type: TextIO
-        file.write(
-            '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
-                time=timestamp, message=message))
+    bot.globals.logging.log(
+        os.path.join(bot.config.ircLogFolder, filename),
+        '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
+            time=timestamp, message=message))
 
 
 def logException(extraMessage: str=None,
@@ -102,11 +101,9 @@ def logException(extraMessage: str=None,
     timestamp = timestamp or now()
     exceptInfo = sys.exc_info()  # type: ExceptionInfo
     excep = traceback.format_exception(*exceptInfo)  # type: ignore
-    with open(bot.config.exceptionLog, 'a', encoding='utf-8') as file:  # --type: TextIO
-        if extraMessage and extraMessage[-1] != '\n':
-            extraMessage += '\n'
-        file.write(
-            '{time:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {thread}:\n'
+    bot.globals.logging.log(
+        bot.config.exceptionLog,
+        '{time:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {thread}:\n'
             '{extra}{exception}'.format(
                 time=timestamp, thread=threading.current_thread().name,  # type: ignore --
                 extra=extraMessage, exception=''.join(excep)))

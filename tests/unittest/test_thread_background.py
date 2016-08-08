@@ -1,4 +1,3 @@
-import threading
 import unittest
 from bot.thread.background import BackgroundTasker, Task, run_task
 from datetime import datetime, timedelta

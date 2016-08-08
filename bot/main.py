@@ -11,6 +11,7 @@ from typing import Generator, List, Iterable, Optional, Tuple
 from . import config, data, globals, utils
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
+from .thread.logging import Logging
 from .thread.socket import SocketsThread
 
 
@@ -26,9 +27,11 @@ def main(argv: Optional[List[str]]=None) -> int:
     globals.groupChannel = data.Channel('jtv', globals.clusters['aws'],
                                         float('-inf'))
 
+    globals.logging = Logging()
     globals.background = BackgroundTasker(name='Background Tasker')
 
     # Start the Threads
+    globals.logging.start()
     globals.sockets.start()
     globals.background.start()
     globals.join.start()
@@ -58,4 +61,6 @@ def main(argv: Optional[List[str]]=None) -> int:
         utils.logException()
         raise
     finally:
+        while globals.logging.queue.qsize():
+            pass
         print('{time} Ended'.format(time=utils.now()))

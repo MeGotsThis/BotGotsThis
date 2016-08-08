@@ -1,8 +1,9 @@
 import unittest
 from bot import utils
 from bot.data import Channel, Socket, MessagingQueue
+from bot.thread.logging import Logging
 from datetime import datetime
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import ANY, Mock, patch
 
 
 class TestUtils(unittest.TestCase):
@@ -86,49 +87,53 @@ class TestUtils(unittest.TestCase):
         socket.messaging.sendWhisper.assert_called_once_with(
             'botgotsthis', 'Kappa')
 
-    @patch('builtins.open', new_callable=mock_open)
+    @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
-    def test_logIrcMessage_config(self, mock_now, mock_config, mockopen):
+    def test_logIrcMessage_config(self, mock_now, mock_config, mock_globals):
+        mock_globals.logging = Mock(spec=Logging)
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.ircLogFolder = 'log'
         utils.logIrcMessage('botgotsthis', 'Kappa')
-        self.assertTrue(mockopen.called)
-        self.assertTrue(mockopen().write.called)
+        mock_globals.logging.log.assert_called_once_with(ANY, ANY)
 
-    @patch('builtins.open', new_callable=mock_open)
+    @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
-    def test_logIrcMessage_config_None(self, mock_now, mock_config, mockopen):
+    def test_logIrcMessage_config_None(self, mock_now, mock_config,
+                                       mock_globals):
+        mock_globals.logging = Mock(spec=Logging)
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.ircLogFolder = None
         utils.logIrcMessage('botgotsthis', 'Kappa')
-        self.assertFalse(mockopen.called)
+        self.assertFalse(mock_globals.logging.log.called)
 
-    @patch('builtins.open', new_callable=mock_open)
+    @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
-    def test_logException(self, mock_now, mock_config, mockopen):
+    def test_logException(self, mock_now, mock_config, mock_globals):
+        mock_globals.logging = Mock(spec=Logging)
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.exceptionLog = 'exception'
         try:
             raise Exception()
         except Exception:
             utils.logException()
-        self.assertTrue(mockopen.called)
-        self.assertTrue(mockopen().write.called)
+        mock_globals.logging.log.assert_called_once_with(ANY, ANY)
 
-    @patch('builtins.open', new_callable=mock_open)
+    @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
-    def test_logException_config_None(self, mock_now, mock_config, mockopen):
+    def test_logException_config_None(self, mock_now, mock_config,
+                                      mock_globals):
+        mock_globals.logging = Mock(spec=Logging)
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.exceptionLog = None
         try:
             raise Exception()
         except Exception:
             utils.logException()
-        self.assertFalse(mockopen.called)
+        self.assertFalse(mock_globals.logging.log.called)
 
 
 class TesEnsureServer(unittest.TestCase):
