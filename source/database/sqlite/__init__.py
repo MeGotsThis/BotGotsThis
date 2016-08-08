@@ -498,8 +498,11 @@ SELECT property, value FROM chat_properties
                 values[property] = value
             for property in properties:
                 if property not in values:
-                    if isinstance(default, dict) and property in default:
-                        value = default[property]
+                    if isinstance(default, dict):
+                        if property in default:
+                            value = default[property]
+                        else:
+                            continue
                     else:
                         value = default
                     values[property] = value
