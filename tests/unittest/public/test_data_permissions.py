@@ -246,6 +246,18 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm['chatModerator'], False)
         self.assertIs(perm['channelModerator'], False)
 
+    def test_tags_None(self):
+        perm = permissions.ChatPermissionSet(None, self.user,
+                                             self.channel)
+        self.assertIs(perm.owner, False)
+        self.assertIs(perm.twitchStaff, False)
+        self.assertIs(perm.twitchAdmin, False)
+        self.assertIs(perm.globalModerator, False)
+        self.assertIs(perm.broadcaster, False)
+        self.assertIs(perm.moderator, False)
+        self.assertIs(perm.subscriber, False)
+        self.assertIs(perm.turbo, False)
+
 
 class TestDataWhisperPermissions(unittest.TestCase):
     def setUp(self):

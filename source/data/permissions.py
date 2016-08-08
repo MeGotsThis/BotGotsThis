@@ -1,7 +1,7 @@
 import bot.config
 # from bot import data  -- https://github.com/python/mypy/issues/1701
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from typing import Any
+from typing import Any, Optional
 
 
 typeTwitchStaff = {'staff'}
@@ -12,15 +12,15 @@ typeModerator = {'staff', 'admin', 'global_mod', 'mod'}
 
 class ChatPermissionSet:
     def __init__(self,
-                 tags: IrcMessageTagsReadOnly,
+                 tags: Optional[IrcMessageTagsReadOnly],
                  user: str,
                  channel: Any) -> None:
         userType = None  # type: str
-        if 'user-type' in tags:
+        if tags is not None and 'user-type' in tags:
             userType = str(tags['user-type'])
         else:
             userType = ''
-        self._tags = tags  # type: IrcMessageTagsReadOnly
+        self._tags = tags  # type: Optional[IrcMessageTagsReadOnly]
         self._userType = userType  # type: str
         self._user = user  # type: str
         self._channel = channel
@@ -87,7 +87,7 @@ class ChatPermissionSet:
     def subscriber(self) -> bool:
         if self._isSubscriber is None:
             subscriber = None  # type: int
-            if 'subscriber' in self._tags:
+            if self._tags is not None and 'subscriber' in self._tags:
                 subscriber = int(self._tags['subscriber'])
             else:
                 subscriber = 0
@@ -98,7 +98,7 @@ class ChatPermissionSet:
     def turbo(self) -> bool:
         if self._isTurbo is None:
             turbo = None  # type: int
-            if 'turbo' in self._tags:
+            if self._tags is not None and 'turbo' in self._tags:
                 turbo = int(self._tags['turbo'])
             else:
                 turbo = 0
