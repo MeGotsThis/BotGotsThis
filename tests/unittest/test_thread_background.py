@@ -1,6 +1,6 @@
 import threading
 import unittest
-from bot.thread.background import BackgroundTasker, Task
+from bot.thread.background import BackgroundTasker, Task, run_task
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
@@ -53,17 +53,39 @@ class TestBackgroundTasker(unittest.TestCase):
                          datetime.min)
 
     @patch('bot.utils.now', autospec=True)
-    def test_runTasks(self, mock_now):
+    @patch('bot.thread.background.run_task', autospec=True)
+    def test_runTasks(self, mock_run, mock_now):
         now = datetime(2000, 1, 1, 0, 0, 0)
         self.backgroundTasker.addTask(self.taskMethod, timedelta(seconds=60))
-        mock_now.return_value = datetime(2000, 1, 1, 0, 0, 0)
+        mock_now.return_value = now
         self.backgroundTasker.runTasks()
-        threads = threading.enumerate()
-        self.taskMethod.assert_called_once_with(now)
-        self.taskMethod.reset_mock()
+        mock_run.assert_called_once_with(self.taskMethod, now)
+        mock_run.reset_mock()
         mock_now.return_value = now + timedelta(seconds=30)
         self.backgroundTasker.runTasks()
-        self.assertFalse(self.taskMethod.called)
+        self.assertFalse(mock_run.called)
         mock_now.return_value = now + timedelta(seconds=60)
         self.backgroundTasker.runTasks()
-        self.taskMethod.assert_called_once_with(now + timedelta(seconds=60))
+        mock_run.assert_called_once_with(self.taskMethod,
+                                         now + timedelta(seconds=60))
+
+
+class TestBackgroundRunTask(unittest.TestCase):
+    def setUp(self):
+        self.taskMethod = Mock(spec=some_task_to_run)
+        self.now = datetime(2000, 1, 1, 0, 0, 0)
+
+        patcher = patch('bot.utils.logException')
+        self.addCleanup(patcher.stop)
+        self.mock_logException = patcher.start()
+
+    def test(self):
+        run_task(self.taskMethod, self.now)
+        self.taskMethod.assert_called_once_with(self.now)
+        self.assertFalse(self.mock_logException.called)
+
+    def test_exception(self):
+        self.taskMethod.side_effect = Exception
+        run_task(self.taskMethod, self.now)
+        self.taskMethod.assert_called_once_with(self.now)
+        self.mock_logException.assert_called_once_with()

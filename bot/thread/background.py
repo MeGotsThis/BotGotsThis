@@ -34,8 +34,16 @@ class BackgroundTasker(threading.Thread):
         for task in self._tasks[:]:  # --type: Task
             if timestamp >= task.timestamp + task.interval:
                 threading.Thread(
-                    target=task.task, args=(timestamp,)).start()
+                    target=run_task, args=(task.task, timestamp,)).start()
                 task.timestamp = timestamp
+
+
+def run_task(task: Callable[[datetime], None],
+             timestamp: datetime) -> None:
+    try:
+        task(timestamp)
+    except:
+        utils.logException()
 
 
 class Task:
