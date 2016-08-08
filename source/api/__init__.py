@@ -18,12 +18,12 @@ def cache(key: str,
                                                   HTTPException),
           default: Any=None) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
-        if key not in bot.globals.globalSessionData:
-            _ = defaultdict(lambda: (datetime.min, default))  # type: defaultdict
-            bot.globals.globalSessionData[key] = _
-
         @wraps(func)
         def data(*args, **kwargs) -> Any:
+            if key not in bot.globals.globalSessionData:
+                _ = defaultdict(lambda: (datetime.min, default))  # type: defaultdict
+                bot.globals.globalSessionData[key] = _
+
             kargs = args, tuple(kwargs.items())  # type: _ArgsKey
             lastTime, value = bot.globals.globalSessionData[key][kargs]  # type: datetime, Any
             if utils.now() - lastTime >= duration:

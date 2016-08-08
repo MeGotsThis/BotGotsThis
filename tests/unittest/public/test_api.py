@@ -20,8 +20,8 @@ class TestApi(unittest.TestCase):
             i += 1
             return i
 
-        self.assertIn('Kappa', mock_globals.globalSessionData)
         self.assertEqual(d(), 1)
+        self.assertIn('Kappa', mock_globals.globalSessionData)
         self.assertIn(((), ()), mock_globals.globalSessionData['Kappa'])
         self.assertEqual(
             basenow, mock_globals.globalSessionData['Kappa'][(), ()][0])

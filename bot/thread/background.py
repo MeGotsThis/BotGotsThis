@@ -1,6 +1,7 @@
-﻿from .. import globals, utils
+﻿from .. import utils
 from datetime import datetime, timedelta
 from typing import Callable, List
+import bot.globals
 import threading
 import time
 
@@ -14,7 +15,7 @@ class BackgroundTasker(threading.Thread):
         print('{time} Starting {name}'.format(
             time=utils.now(), name=self.__class__.__name__))
         try:
-            while globals.running:
+            while bot.globals.running:
                 self.runTasks()
                 time.sleep(1 / 1000)
         except:

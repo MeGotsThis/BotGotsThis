@@ -23,7 +23,7 @@ class TestCustomQuery(TestCustomField):
         self.request.status = 200
         self.request.read.return_value = b'Kappa'
 
-        patcher = patch('source.public.custom.url.config', autospec=True)
+        patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.customMessageUrlTimeout = 1

@@ -1,10 +1,10 @@
 ﻿from . import cache, oauth
-from bot import globals
 from contextlib import closing, suppress
 from datetime import datetime, timedelta
 from http import client
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
+import bot.globals
 import configparser
 import email.utils
 import json
@@ -71,7 +71,7 @@ def server_time() -> Optional[datetime]:
 
 def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
     uri = ('/kraken/chat/emoticon_images?emotesets='
-           + ','.join(str(i) for i in globals.emoteset))  # type: str
+           + ','.join(str(i) for i in bot.globals.emoteset))  # type: str
     with suppress(ConnectionError, client.HTTPException):
         response, data = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']  # type: TwitchEmotes

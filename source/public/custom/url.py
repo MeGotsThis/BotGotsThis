@@ -1,8 +1,8 @@
-﻿from bot import config
-from contextlib import suppress
+﻿from contextlib import suppress
 from http.client import HTTPResponse
 from typing import Optional
 from ...data import CustomFieldArgs
+import bot.config
 import urllib.error
 import urllib.request
 
@@ -16,7 +16,7 @@ def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
         url = url.replace('{streamer}', args.channel)
         with suppress(urllib.error.URLError):
             with urllib.request.urlopen(
-                    url, timeout=config.customMessageUrlTimeout) as res:  # --type: HTTPResponse
+                    url, timeout=bot.config.customMessageUrlTimeout) as res:  # --type: HTTPResponse
                 if isinstance(res, HTTPResponse) and int(res.status) == 200:
                     data = res.read().decode('utf-8')  # type: str
                     data = data.replace('\r\n', ' ')

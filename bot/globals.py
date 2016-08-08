@@ -1,11 +1,12 @@
-﻿from . import data
+﻿import bot.config
+from . import data
 from .thread import background as backgroundThread
 from .thread import logging as loggingThread
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
 from datetime import datetime
 from typing import Any, Dict, List
-from . import config
+
 
 running = True  # type: bool
 
@@ -24,7 +25,7 @@ clusters = {
 whisperCluster = 'aws'  # type: str
 
 channels = {}  # type: Dict[str, data.Channel]
-displayName = config.botnick  # type: str
+displayName = bot.config.botnick  # type: str
 isTwitchTurbo = False  # type: bool
 isTwitchAdmin = False  # type: bool
 isTwitchStaff = False  # type: bool

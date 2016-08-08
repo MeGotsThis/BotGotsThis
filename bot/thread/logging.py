@@ -1,5 +1,6 @@
-﻿from .. import globals, utils
+﻿from .. import utils
 from typing import Tuple
+import bot.globals
 import queue
 import threading
 
@@ -13,12 +14,12 @@ class Logging(threading.Thread):
         print('{time} Starting {name}'.format(
             time=utils.now(), name=self.__class__.__name__))
         try:
-            while globals.running:
+            while bot.globals.running:
                 self.process()
         finally:
             print('{time} Ending {name}'.format(
                 time=utils.now(), name=self.__class__.__name__))
-            globals.running = False
+            bot.globals.running = False
     
     def log(self,
             file: str,

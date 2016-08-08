@@ -1,5 +1,4 @@
-﻿from bot import globals
-from ..library import channel, exit, managebot
+﻿from ..library import channel, exit, managebot
 from ..library.chat import min_args, permission, ownerChannel, send
 from ..library.chat import sendPriority
 from ...data import ChatCommandArgs

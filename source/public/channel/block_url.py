@@ -4,11 +4,12 @@ from ...data.message import Message
 from ...database import factory
 from ..library import timeout
 from ..library.chat import feature, not_permission, permission
-from bot import config, data, utils
+from bot import data, utils
 from datetime import datetime
 from http.client import HTTPResponse
 from urllib.parse import ParseResult, urlparse
 from typing import Tuple
+import bot.config
 import re
 import socket
 import threading
@@ -52,7 +53,7 @@ def check_domain_redirect(chat: 'data.Channel',
         try:
             request = urllib.request.Request(
                 url, headers={
-                    'User-Agent': 'BotGotsThis/' + config.botnick,
+                    'User-Agent': 'BotGotsThis/' + bot.config.botnick,
                     })  # type: urllib.request.Request
             with urllib.request.urlopen(request) as response:  # HTTPResponse
                 if not isinstance(response, HTTPResponse):

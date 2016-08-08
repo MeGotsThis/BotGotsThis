@@ -1,4 +1,6 @@
 ﻿# Import some necessary libraries.
+import bot.config
+import bot.globals
 import importlib
 import pkgutil
 import source.private.autoload as privateAuto
@@ -8,7 +10,7 @@ from importlib.abc import PathEntryFinder
 from source.database import AutoJoinChannel
 from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
-from . import config, data, globals, utils
+from . import data, utils
 from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.logging import Logging
@@ -17,24 +19,24 @@ from .thread.socket import SocketsThread
 
 def main(argv: Optional[List[str]]=None) -> int:
     print('{time} Starting'.format(time=utils.now()))
-    globals.running = True
-    globals.sockets = SocketsThread(name='Sockets Thread')
+    bot.globals.running = True
+    bot.globals.sockets = SocketsThread(name='Sockets Thread')
 
-    globals.clusters['aws'] = data.Socket(
-        'AWS Chat', config.awsServer, config.awsPort)
+    bot.globals.clusters['aws'] = data.Socket(
+        'AWS Chat', bot.config.awsServer, bot.config.awsPort)
 
-    globals.join = JoinThread(name='Join Thread')
-    globals.groupChannel = data.Channel('jtv', globals.clusters['aws'],
-                                        float('-inf'))
+    bot.globals.join = JoinThread(name='Join Thread')
+    bot.globals.groupChannel = data.Channel('jtv', bot.globals.clusters['aws'],
+                                            float('-inf'))
 
-    globals.logging = Logging()
-    globals.background = BackgroundTasker(name='Background Tasker')
+    bot.globals.logging = Logging()
+    bot.globals.background = BackgroundTasker(name='Background Tasker')
 
     # Start the Threads
-    globals.logging.start()
-    globals.sockets.start()
-    globals.background.start()
-    globals.join.start()
+    bot.globals.logging.start()
+    bot.globals.sockets.start()
+    bot.globals.background.start()
+    bot.globals.join.start()
 
     _modulesList = [
         pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore --
@@ -46,21 +48,21 @@ def main(argv: Optional[List[str]]=None) -> int:
         importlib.import_module(modname)
 
     try:
-        utils.joinChannel(config.botnick, float('-inf'), 'aws')
-        if config.owner:
-            utils.joinChannel(config.owner, float('-inf'), 'aws')
+        utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
+        if bot.config.owner:
+            utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
         with getDatabase() as db:
             for autoJoin in db.getAutoJoinsChats():  # --type: AutoJoinChannel
                 utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
                                   autoJoin.cluster)
     
-        globals.sockets.join()
+        bot.globals.sockets.join()
         return 0
     except:
-        globals.running = False
+        bot.globals.running = False
         utils.logException()
         raise
     finally:
-        while globals.logging.queue.qsize():
+        while bot.globals.logging.queue.qsize():
             pass
         print('{time} Ended'.format(time=utils.now()))
