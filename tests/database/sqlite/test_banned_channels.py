@@ -1,6 +1,6 @@
 from datetime import datetime
 from tests.database.sqlite.test_database import TestSqlite
-from unittest.mock import ANY
+from tests.unittest.mock_class import TypeMatch
 
 
 class TestSqliteBannedChannels(TestSqlite):
@@ -45,11 +45,13 @@ CREATE TABLE banned_channels_log (
             self.database.addBannedChannel(
                 'botgotsthis', 'Kappa', 'megotsthis'),
             True)
-        self.assertEqual(self.row('SELECT * FROM banned_channels'),
-                         ('botgotsthis', ANY, 'Kappa', 'megotsthis'))
+        self.assertEqual(
+            self.row('SELECT * FROM banned_channels'),
+            ('botgotsthis', TypeMatch(datetime), 'Kappa', 'megotsthis'))
         self.assertEqual(
             self.row('SELECT * FROM banned_channels_log'),
-            (ANY, 'botgotsthis', ANY, 'Kappa', 'megotsthis', 'add'))
+            (1, 'botgotsthis', TypeMatch(datetime), 'Kappa', 'megotsthis',
+             'add'))
 
     def test_add_existing(self):
         now = datetime(2000, 1, 1)
@@ -78,4 +80,5 @@ CREATE TABLE banned_channels_log (
         self.assertIsNone(self.row('SELECT * FROM banned_channels'))
         self.assertEqual(
             self.row('SELECT * FROM banned_channels_log'),
-            (ANY, 'botgotsthis', ANY, 'Kappa', 'megotsthis', 'remove'))
+            (1, 'botgotsthis', TypeMatch(datetime), 'Kappa', 'megotsthis',
+             'remove'))

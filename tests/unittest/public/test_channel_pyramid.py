@@ -1,9 +1,10 @@
 from datetime import timedelta
-from unittest.mock import ANY, patch
+from unittest.mock import patch
 
 from source.data.message import Message
 from source.public.channel import pyramid
 from tests.unittest.base_channel import TestChannel
+from tests.unittest.mock_class import IterableMatch, StrContains
 
 
 class TestChannelPyramid(TestChannel):
@@ -30,27 +31,27 @@ class TestChannelPyramid(TestChannel):
         self.permissionSet['broadcaster'] = True
         self.mock_process.return_value = True
         message = Message('!pyramid Kappa')
-        self.assertIs(
-            pyramid.commandPyramid(self.args._replace(message=message)), True)
-        self.mock_process.assert_called_once_with(ANY, 'Kappa', 5)
+        args = self.args._replace(message=message)
+        self.assertIs(pyramid.commandPyramid(args), True)
+        self.mock_process.assert_called_once_with(args, 'Kappa', 5)
 
     def test_pyramid_count(self):
         self.permissions.broadcaster = True
         self.permissionSet['broadcaster'] = True
         self.mock_process.return_value = True
         message = Message('!pyramid Kappa 20')
-        self.assertIs(
-            pyramid.commandPyramid(self.args._replace(message=message)), True)
-        self.mock_process.assert_called_once_with(ANY, 'Kappa', 20)
+        args = self.args._replace(message=message)
+        self.assertIs(pyramid.commandPyramid(args), True)
+        self.mock_process.assert_called_once_with(args, 'Kappa', 20)
 
     def test_pyramid_moderator(self):
         self.permissionSet['moderator'] = True
         self.features.append('modpyramid')
         self.mock_process.return_value = True
         message = Message('!pyramid Kappa')
-        self.assertIs(
-            pyramid.commandPyramid(self.args._replace(message=message)), True)
-        self.mock_process.assert_called_once_with(ANY, 'Kappa', 3)
+        args = self.args._replace(message=message)
+        self.assertIs(pyramid.commandPyramid(args), True)
+        self.mock_process.assert_called_once_with(args, 'Kappa', 3)
 
     def test_long_pyramid_false(self):
         self.assertIs(pyramid.commandPyramidLong(self.args), False)
@@ -64,30 +65,27 @@ class TestChannelPyramid(TestChannel):
         self.permissionSet['broadcaster'] = True
         self.mock_process.return_value = True
         message = Message('!pyramid- Kappa Kappa')
-        self.assertIs(
-            pyramid.commandPyramidLong(self.args._replace(message=message)),
-            True)
-        self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 5)
+        args = self.args._replace(message=message)
+        self.assertIs(pyramid.commandPyramidLong(args), True)
+        self.mock_process.assert_called_once_with(args, 'Kappa Kappa', 5)
 
     def test_long_pyramid_count(self):
         self.permissions.broadcaster = True
         self.permissionSet['broadcaster'] = True
         self.mock_process.return_value = True
         message = Message('!pyramid-20 Kappa Kappa')
-        self.assertIs(
-            pyramid.commandPyramidLong(self.args._replace(message=message)),
-            True)
-        self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 20)
+        args = self.args._replace(message=message)
+        self.assertIs(pyramid.commandPyramidLong(args), True)
+        self.mock_process.assert_called_once_with(args, 'Kappa Kappa', 20)
 
     def test_long_pyramid_moderator(self):
         self.permissionSet['moderator'] = True
         self.features.append('modpyramid')
         self.mock_process.return_value = True
         message = Message('!pyramid- Kappa Kappa')
-        self.assertIs(
-            pyramid.commandPyramidLong(self.args._replace(message=message)),
-            True)
-        self.mock_process.assert_called_once_with(ANY, 'Kappa Kappa', 3)
+        args = self.args._replace(message=message)
+        self.assertIs(pyramid.commandPyramidLong(args), True)
+        self.mock_process.assert_called_once_with(args, 'Kappa Kappa', 3)
 
 
 class TestChannelProcessPyramid(TestChannel):
@@ -116,49 +114,44 @@ class TestChannelProcessPyramid(TestChannel):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa', 0), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(IterableMatch(), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
-        self.assertEqual(list(self.channel.send.call_args[0][0]), [])
 
     def test_1(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa', 1), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(IterableMatch('Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
-        self.assertEqual(list(self.channel.send.call_args[0][0]), ['Kappa'])
 
     def test_2(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa', 2), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch('Kappa', 'Kappa Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
-        self.assertEqual(list(self.channel.send.call_args[0][0]),
-                         ['Kappa', 'Kappa Kappa', 'Kappa'])
 
     def test_5(self):
         self.mock_config.messageLimit = 300
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa', 5), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch('Kappa',
+                          'Kappa Kappa',
+                          'Kappa Kappa Kappa',
+                          'Kappa Kappa Kappa Kappa',
+                          'Kappa Kappa Kappa Kappa Kappa',
+                          'Kappa Kappa Kappa Kappa',
+                          'Kappa Kappa Kappa',
+                          'Kappa Kappa',
+                          'Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
-        self.assertEqual(
-            list(self.channel.send.call_args[0][0]),
-            ['Kappa',
-             'Kappa Kappa',
-             'Kappa Kappa Kappa',
-             'Kappa Kappa Kappa Kappa',
-             'Kappa Kappa Kappa Kappa Kappa',
-             'Kappa Kappa Kappa Kappa',
-             'Kappa Kappa Kappa',
-             'Kappa Kappa',
-             'Kappa'])
 
     def test_channel_mod(self):
         self.mock_config.messageLimit = 300
@@ -166,34 +159,31 @@ class TestChannelProcessPyramid(TestChannel):
         self.permissions.globalModerator = True
         self.permissions.chatModerator = True
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa', 2), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch('Kappa', 'Kappa Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.mock_timeout.assert_called_once_with(
             self.database, self.channel, 'botgotsthis', 'Kappa Kappa',
             str(self.args.message), 'pyramid')
-        self.assertEqual(list(self.channel.send.call_args[0][0]),
-                         ['Kappa', 'Kappa Kappa', 'Kappa'])
 
     def test_broadcaster_limit(self):
         self.mock_config.messageLimit = 10000
         self.permissions.broadcaster = True
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa ', 100), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch(*([StrContains()] * (20 + 20 - 1))), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
-        self.assertEqual(
-            len(list(self.channel.send.call_args[0][0])), 20 + 20 - 1)
 
     def test_moderator_limit(self):
         self.mock_config.messageLimit = 100
         self.mock_cooldown.return_value = False
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa', 2), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch('Kappa', 'Kappa Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_timeout.called)
         self.mock_cooldown.assert_called_once_with(
-            self.args, timedelta(seconds=30), ANY)
-        self.assertEqual(list(self.channel.send.call_args[0][0]),
-                         ['Kappa', 'Kappa Kappa', 'Kappa'])
+            self.args, timedelta(seconds=30), 'modPyramid')
 
     def test_moderator_cooldown(self):
         self.mock_config.messageLimit = 100
@@ -202,28 +192,26 @@ class TestChannelProcessPyramid(TestChannel):
         self.assertFalse(self.channel.send.called)
         self.assertFalse(self.mock_timeout.called)
         self.mock_cooldown.assert_called_once_with(
-            self.args, timedelta(seconds=30), ANY)
+            self.args, timedelta(seconds=30), 'modPyramid')
 
     def test_limit(self):
         self.mock_config.messageLimit = 10
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa', 2), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(IterableMatch('Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
-        self.assertEqual(list(self.channel.send.call_args[0][0]), ['Kappa'])
 
     def test_limit_exact(self):
         self.mock_config.messageLimit = 11
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.assertIs(pyramid.process_pyramid(self.args, 'Kappa', 2), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch('Kappa', 'Kappa Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
-        self.assertEqual(list(self.channel.send.call_args[0][0]),
-                         ['Kappa', 'Kappa Kappa', 'Kappa'])
 
 
 class TestChannelRandomPyramid(TestChannel):
@@ -282,20 +270,17 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch(':)',
+                          ':) FrankerZ',
+                          ':) FrankerZ PogChamp',
+                          ':) FrankerZ PogChamp Kappa',
+                          ':) FrankerZ PogChamp Kappa PJSalt',
+                          ':) FrankerZ PogChamp Kappa',
+                          ':) FrankerZ PogChamp',
+                          ':) FrankerZ',
+                          ':)'), -1)
         self.assertFalse(self.mock_cooldown.called)
-        self.assertEqual(
-            list(self.channel.send.call_args[0][0]),
-            [':)',
-             ':) FrankerZ',
-             ':) FrankerZ PogChamp',
-             ':) FrankerZ PogChamp Kappa',
-             ':) FrankerZ PogChamp Kappa PJSalt',
-             ':) FrankerZ PogChamp Kappa',
-             ':) FrankerZ PogChamp',
-             ':) FrankerZ',
-             ':)',
-             ])
 
     def test_0(self):
         self.permissionSet['broadcaster'] = True
@@ -304,9 +289,8 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid 0')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(IterableMatch(), -1)
         self.assertFalse(self.mock_cooldown.called)
-        self.assertEqual(list(self.channel.send.call_args[0][0]), [])
 
     def test_1(self):
         self.permissionSet['broadcaster'] = True
@@ -315,10 +299,8 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid 1')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(IterableMatch(':)'), -1)
         self.assertFalse(self.mock_cooldown.called)
-        self.assertEqual(
-            list(self.channel.send.call_args[0][0]), [':)'])
 
     def test_2(self):
         self.permissionSet['broadcaster'] = True
@@ -327,11 +309,11 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid 2')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch(':)',
+                          ':) FrankerZ',
+                          ':)'), -1)
         self.assertFalse(self.mock_cooldown.called)
-        self.assertEqual(
-            list(self.channel.send.call_args[0][0]),
-            [':)', ':) FrankerZ', ':)'])
 
     def test_broadcaster_limit(self):
         self.mock_choice.side_effect = [0, 5, 3, 1, 7] * 10
@@ -341,10 +323,9 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid 50')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch(*([StrContains()] * (20 + 20 - 1))), -1)
         self.assertFalse(self.mock_cooldown.called)
-        self.assertEqual(
-            len(list(self.channel.send.call_args[0][0])), 20 + 20 - 1)
 
     def test_moderator(self):
         self.permissionSet['moderator'] = True
@@ -352,17 +333,14 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch(':)',
+                          ':) FrankerZ',
+                          ':) FrankerZ PogChamp',
+                          ':) FrankerZ',
+                          ':)'), -1)
         self.mock_cooldown.assert_called_once_with(
-            args, timedelta(seconds=30), ANY)
-        self.assertEqual(
-            list(self.channel.send.call_args[0][0]),
-            [':)',
-             ':) FrankerZ',
-             ':) FrankerZ PogChamp',
-             ':) FrankerZ',
-             ':)',
-             ])
+            args, timedelta(seconds=30), 'modPyramid')
 
     def test_moderator_limit(self):
         self.permissionSet['moderator'] = True
@@ -370,21 +348,18 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid 10')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch(':)',
+                          ':) FrankerZ',
+                          ':) FrankerZ PogChamp',
+                          ':) FrankerZ PogChamp Kappa',
+                          ':) FrankerZ PogChamp Kappa PJSalt',
+                          ':) FrankerZ PogChamp Kappa',
+                          ':) FrankerZ PogChamp',
+                          ':) FrankerZ',
+                          ':)'), -1)
         self.mock_cooldown.assert_called_once_with(
-            args, timedelta(seconds=30), ANY)
-        self.assertEqual(
-            list(self.channel.send.call_args[0][0]),
-            [':)',
-             ':) FrankerZ',
-             ':) FrankerZ PogChamp',
-             ':) FrankerZ PogChamp Kappa',
-             ':) FrankerZ PogChamp Kappa PJSalt',
-             ':) FrankerZ PogChamp Kappa',
-             ':) FrankerZ PogChamp',
-             ':) FrankerZ',
-             ':)',
-             ])
+            args, timedelta(seconds=30), 'modPyramid')
 
     def test_moderator_cooldown(self):
         self.mock_cooldown.return_value = True
@@ -395,7 +370,7 @@ class TestChannelRandomPyramid(TestChannel):
         self.assertIs(pyramid.commandRandomPyramid(args), False)
         self.assertFalse(self.channel.send.called)
         self.mock_cooldown.assert_called_once_with(
-            args, timedelta(seconds=30), ANY)
+            args, timedelta(seconds=30), 'modPyramid')
 
     def test_limit(self):
         self.mock_config.messageLimit = 30
@@ -405,18 +380,15 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch(':)',
+                          ':) FrankerZ',
+                          ':) FrankerZ PogChamp',
+                          ':) FrankerZ PogChamp Kappa',
+                          ':) FrankerZ PogChamp',
+                          ':) FrankerZ',
+                          ':)'), -1)
         self.assertFalse(self.mock_cooldown.called)
-        self.assertEqual(
-            list(self.channel.send.call_args[0][0]),
-            [':)',
-             ':) FrankerZ',
-             ':) FrankerZ PogChamp',
-             ':) FrankerZ PogChamp Kappa',
-             ':) FrankerZ PogChamp',
-             ':) FrankerZ',
-             ':)',
-             ])
 
     def test_limit_exact(self):
         self.mock_config.messageLimit = 20
@@ -426,13 +398,10 @@ class TestChannelRandomPyramid(TestChannel):
         message = Message('!rpyramid')
         args = self.args._replace(message=message)
         self.assertIs(pyramid.commandRandomPyramid(args), True)
-        self.channel.send.assert_called_once_with(ANY, -1)
+        self.channel.send.assert_called_once_with(
+            IterableMatch(':)',
+                          ':) FrankerZ',
+                          ':) FrankerZ PogChamp',
+                          ':) FrankerZ',
+                          ':)'), -1)
         self.assertFalse(self.mock_cooldown.called)
-        self.assertEqual(
-            list(self.channel.send.call_args[0][0]),
-            [':)',
-             ':) FrankerZ',
-             ':) FrankerZ PogChamp',
-             ':) FrankerZ',
-             ':)',
-             ])

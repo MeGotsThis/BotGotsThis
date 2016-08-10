@@ -1,5 +1,6 @@
+from datetime import datetime
 from tests.database.sqlite.test_database import TestSqlite
-from unittest.mock import ANY
+from tests.unittest.mock_class import TypeMatch
 
 
 class TestSqliteTimeout(TestSqlite):
@@ -26,7 +27,7 @@ CREATE TABLE timeout.timeout_logs (
             None)
         self.assertEqual(
             self.row('SELECT * FROM timeout.timeout_logs'),
-            (ANY, ANY, 'botgotsthis', 'botgotsthis', None, 'tests', None, None,
+            (1, TypeMatch(datetime), 'botgotsthis', 'botgotsthis', None, 'tests', None, None,
              None, None))
 
     def test_record2(self):
@@ -35,5 +36,5 @@ CREATE TABLE timeout.timeout_logs (
             'Kappa', 'KappaHD')
         self.assertEqual(
             self.row('SELECT * FROM timeout.timeout_logs'),
-            (ANY, ANY, 'botgotsthis', 'megotsthis', 'mebotsthis', 'tests', 0,
+            (1, TypeMatch(datetime), 'botgotsthis', 'megotsthis', 'mebotsthis', 'tests', 0,
              3600, 'Kappa', 'KappaHD'))

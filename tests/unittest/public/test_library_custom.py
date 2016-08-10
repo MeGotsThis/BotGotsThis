@@ -5,11 +5,13 @@ from collections import defaultdict
 from datetime import datetime
 from source.data import ChatCommandArgs, CommandActionTokens
 from source.data import CustomCommand, CustomFieldArgs, CustomFieldParts
+from source.data import CustomProcessArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
 from source.database import DatabaseBase
 from source.public.library import custom
-from unittest.mock import ANY, MagicMock, Mock, call, patch
+from tests.unittest.mock_class import TypeMatch
+from unittest.mock import MagicMock, Mock, call, patch
 
 
 class TestLibraryCustomGetCommand(unittest.TestCase):
@@ -296,7 +298,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_called_once_with(ANY)
+        self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
     def test_plain_plain(self):
@@ -329,7 +331,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_called_once_with(ANY)
+        self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
     def test_field_field(self):
@@ -345,7 +347,8 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_has_calls([call(ANY)] * 2)
+        self.mock_convert.assert_has_calls(
+            [call(TypeMatch(CustomFieldArgs))] * 2)
         self.assertEqual(self.mock_format.call_args_list,
                          [call('default1', 'format', False),
                           call('default2', 'format', False)])
@@ -362,7 +365,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_called_once_with(ANY)
+        self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
     def test_plain_field_plain(self):
@@ -378,7 +381,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_called_once_with(ANY)
+        self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
     def test_plain_field_field(self):
@@ -394,7 +397,8 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_has_calls([call(ANY)] * 2)
+        self.mock_convert.assert_has_calls(
+            [call(TypeMatch(CustomFieldArgs))] * 2)
         self.assertEqual(self.mock_format.call_args_list,
                          [call('default1', 'format', False),
                           call('default2', 'format', False)])
@@ -412,7 +416,8 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_has_calls([call(ANY)] * 2)
+        self.mock_convert.assert_has_calls(
+            [call(TypeMatch(CustomFieldArgs))] * 2)
         self.assertEqual(self.mock_format.call_args_list,
                          [call('default1', 'format', False),
                           call('default2', 'format', False)])
@@ -432,7 +437,8 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_has_calls([call(ANY)] * 2)
+        self.mock_convert.assert_has_calls(
+            [call(TypeMatch(CustomFieldArgs))] * 2)
         self.assertEqual(self.mock_format.call_args_list,
                          [call('default1', 'format', False),
                           call('default2', 'format', False)])
@@ -456,7 +462,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
             custom.create_messages(self.command, self.args),
             ['Kappa original'])
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_called_once_with(ANY)
+        self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.assertFalse(self.mock_format.called)
 
     def test_format_except(self):
@@ -469,7 +475,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
             custom.create_messages(self.command, self.args),
             ['Kappa original'])
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
-        self.mock_convert.assert_called_once_with(ANY)
+        self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
     def test_post_process(self):
@@ -481,7 +487,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.assertEqual(
             custom.create_messages(self.command, self.args),
             ['Kappa'])
-        mock_process.assert_called_once_with(ANY)
+        mock_process.assert_called_once_with(TypeMatch(CustomProcessArgs))
 
     def test_split_except_post_process(self):
         def process(args):

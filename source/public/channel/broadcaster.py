@@ -8,7 +8,7 @@ from ...data import ChatCommandArgs
 
 @permission('broadcaster')
 def commandHello(args: ChatCommandArgs) -> bool:
-    args.chat.send('Hello Kappa')
+    args.chat.send('Hello Kappa !')
     return True
 
 
@@ -52,5 +52,5 @@ def commandUptime(args: ChatCommandArgs) -> bool:
             uptime = currentTime - args.chat.streamingSince  # type: timedelta
             args.chat.send('Uptime: {uptime}'.format(uptime=uptime))
         else:
-            args.chat.send('Fail to get information from Twitch.tv')
+            args.chat.send('Failed to get information from twitch.tv')
     return True

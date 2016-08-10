@@ -1,12 +1,13 @@
 import unittest
 from datetime import datetime
 from io import StringIO
-from unittest.mock import ANY, Mock, patch
+from unittest.mock import Mock, patch
 
 from source.data import Message
 from source.database import AutoJoinChannel, DatabaseBase
 from source.public.manage import autojoin
 from tests.unittest.base_managebot import TestManageBot, send
+from tests.unittest.mock_class import StrContains
 
 
 class TestManageBotAutoJoin(TestManageBot):
@@ -40,19 +41,19 @@ class TestManageBotAutoJoin(TestManageBot):
     def test_banned_channel(self, mock_reload):
         self.database.isChannelBannedReason.return_value = 'Reason'
         mock_reload.return_value = True
-        message = Message('!managebot autojoin action banned')
+        message = Message('!managebot autojoin action banned_channel')
         self.assertIs(
             autojoin.manageAutoJoin(self.args._replace(message=message)), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('banned_channel', 'ban'))
 
     @patch('source.public.manage.autojoin.reload_server', autospec=True)
     def test_banned_channel_blank(self, mock_reload):
         self.database.isChannelBannedReason.return_value = ''
         mock_reload.return_value = True
-        message = Message('!managebot autojoin action banned')
+        message = Message('!managebot autojoin action banned_channel')
         self.assertIs(
             autojoin.manageAutoJoin(self.args._replace(message=message)), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('banned_channel', 'ban'))
 
     @patch('source.public.manage.autojoin.reload_server', autospec=True)
     def test_reloadserver(self, mock_reload):
@@ -184,7 +185,8 @@ class TestManageBotAutoJoinAutoJoinPriority(unittest.TestCase):
             True)
         self.database.setAutoJoinPriority.assert_called_once_with(
             'botgotsthis', 0)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'priority', '0'))
 
     def test_not_existing(self):
         self.database.setAutoJoinPriority.return_value = False
@@ -194,7 +196,7 @@ class TestManageBotAutoJoinAutoJoinPriority(unittest.TestCase):
             True)
         self.database.setAutoJoinPriority.assert_called_once_with(
             'botgotsthis', 0)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('botgotsthis', 'never'))
 
 
 class TestManageBotAutoJoinReloadServer(unittest.TestCase):
@@ -230,7 +232,7 @@ class TestManageBotAutoJoinReloadServer(unittest.TestCase):
         self.database.getAutoJoinsChats.assert_called_once_with()
         self.assertFalse(self.database.setAutoJoinServer.called)
         self.assertFalse(self.mock_ensure.called)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('reload', 'complete'))
         self.assertEqual(self.mock_stdout.getvalue(), '')
 
     def test_server_error(self):
@@ -245,7 +247,7 @@ class TestManageBotAutoJoinReloadServer(unittest.TestCase):
         self.database.getAutoJoinsChats.assert_called_once_with()
         self.assertFalse(self.database.setAutoJoinServer.called)
         self.assertFalse(self.mock_ensure.called)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('reload', 'complete'))
         self.assertEqual(self.mock_stdout.getvalue(), '')
 
     def test_server_different(self):
@@ -261,5 +263,5 @@ class TestManageBotAutoJoinReloadServer(unittest.TestCase):
         self.database.setAutoJoinServer.assert_called_once_with('botgotsthis',
                                                                 'twitch')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('reload', 'complete'))
         self.assertNotEqual(self.mock_stdout.getvalue(), '')

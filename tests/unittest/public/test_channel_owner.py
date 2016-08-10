@@ -1,8 +1,9 @@
-from unittest.mock import ANY, patch
+from unittest.mock import patch
 
 from source.data.message import Message
 from source.public.channel import owner
 from tests.unittest.base_channel import TestChannel
+from tests.unittest.mock_class import PartialMatch
 
 
 class TestChannelOwner(TestChannel):
@@ -14,7 +15,8 @@ class TestChannelOwner(TestChannel):
         self.permissions.inOwnerChannel = True
         self.permissionSet['owner'] = True
         self.assertIs(owner.commandExit(self.args), True)
-        mock_exit.assert_called_once_with(ANY)
+        mock_exit.assert_called_once_with(
+            PartialMatch(self.channel.send, priority=0))
 
     @patch('source.public.library.channel.say', autospec=True)
     def test_say(self, mock_say):
@@ -39,7 +41,8 @@ class TestChannelOwner(TestChannel):
         message = Message('!join MeGotsThis')
         self.assertIs(owner.commandJoin(self.args._replace(message=message)),
                       True)
-        mock_join.assert_called_once_with(self.database, 'megotsthis', ANY)
+        mock_join.assert_called_once_with(self.database, 'megotsthis',
+                                          self.channel.send)
 
     @patch('source.public.library.channel.part', autospec=True)
     def test_part(self, mock_part):
@@ -51,7 +54,7 @@ class TestChannelOwner(TestChannel):
         message = Message('!part MeGotsThis')
         self.assertIs(owner.commandPart(self.args._replace(message=message)),
                       True)
-        mock_part.assert_called_once_with('megotsthis', ANY)
+        mock_part.assert_called_once_with('megotsthis', self.channel.send)
 
     @patch('source.public.library.channel.empty_all', autospec=True)
     def test_empty_all(self, mock_empty_all):
@@ -61,7 +64,7 @@ class TestChannelOwner(TestChannel):
         self.permissions.inOwnerChannel = True
         self.permissionSet['admin'] = True
         self.assertIs(owner.commandEmptyAll(self.args), True)
-        mock_empty_all.assert_called_once_with(ANY)
+        mock_empty_all.assert_called_once_with(self.channel.send)
 
     @patch('source.public.library.channel.empty', autospec=True)
     def test_empty(self, mock_empty):
@@ -74,7 +77,7 @@ class TestChannelOwner(TestChannel):
             owner.commandEmpty(
                 self.args._replace(message=Message('!emptychat MeGotsThis'))),
             True)
-        mock_empty.assert_called_once_with('megotsthis', ANY)
+        mock_empty.assert_called_once_with('megotsthis', self.channel.send)
 
     @patch('source.public.library.managebot.manage_bot', autospec=True)
     def test_manage_bot(self, mock_manage_bot):
@@ -86,5 +89,5 @@ class TestChannelOwner(TestChannel):
         message = Message('!managebot listchats')
         self.assertIs(
             owner.commandManageBot(self.args._replace(message=message)), True)
-        mock_manage_bot.assert_called_once_with(self.database, ANY,
-                                                'botgotsthis', message)
+        mock_manage_bot.assert_called_once_with(
+            self.database, self.channel.send, 'botgotsthis', message)

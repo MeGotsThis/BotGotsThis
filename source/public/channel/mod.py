@@ -9,7 +9,10 @@ def commandStatus(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
     if twitch.update(args.chat.channel, status=args.message.query):
-        msg = 'Channel Status set as: ' + args.message.query
+        if args.message.query:
+            msg = 'Channel Status set as: ' + args.message.query
+        else:
+            msg = 'Channel Status has been unset'
     else:
         msg = 'Channel Status failed to set'
     args.chat.send(msg)

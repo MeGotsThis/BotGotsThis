@@ -3,7 +3,8 @@ from bot.data import Channel
 from datetime import datetime, timedelta
 from source.database import DatabaseBase
 from source.public.library import timeout
-from unittest.mock import ANY, Mock, call, patch
+from tests.unittest.mock_class import StrContains, TypeMatch
+from unittest.mock import Mock, call, patch
 
 
 class TestLibraryTimeoutUser(unittest.TestCase):
@@ -38,7 +39,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -56,7 +58,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest', reason='Kappa')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -68,14 +71,16 @@ class TestLibraryTimeoutUser(unittest.TestCase):
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 60, None,
             'Kappa')
-        self.mock_whisper.assert_called_once_with('megotsthis', ANY)
+        self.mock_whisper.assert_called_once_with('megotsthis',
+                                                  StrContains('Kappa', '60'))
 
     def test_message(self):
         timeout.timeout_user(self.database, self.channel, 'megotsthis',
                              'unittest', message='Kappa')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -94,7 +99,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest', base_level=1)
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -113,7 +119,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest', base_level=2)
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -133,7 +140,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest', base_level=3)
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -153,7 +161,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest', base_level=-1)
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -176,7 +185,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -199,7 +209,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -222,7 +233,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -246,7 +258,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',
@@ -271,7 +284,8 @@ class TestLibraryTimeoutUser(unittest.TestCase):
                              'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
-            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'], ANY, int)
+            ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
+            TypeMatch(dict), int)
         self.assertIn('timeouts', self.channel.sessionData)
         self.assertIn('unittest', self.channel.sessionData['timeouts'])
         self.assertIn('megotsthis',

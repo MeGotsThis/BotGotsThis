@@ -2,7 +2,8 @@ import unittest
 from source.data.message import Message
 from source.database import DatabaseBase
 from source.public.library import feature
-from unittest.mock import ANY, Mock, patch
+from tests.unittest.mock_class import StrContains
+from unittest.mock import Mock, patch
 
 
 def send(messages):
@@ -68,7 +69,8 @@ class TestLibraryFeatureFeature(unittest.TestCase):
             feature.feature(self.database, 'botgotsthis',
                             Message('!feature does_not_exist'), self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('feature', 'does_not_exist'))
         self.assertFalse(self.mock_add.called)
         self.assertFalse(self.mock_remove.called)
 
@@ -77,7 +79,7 @@ class TestLibraryFeatureFeature(unittest.TestCase):
             feature.feature(self.database, 'botgotsthis',
                             Message('!feature none'), self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('feature', 'none'))
         self.assertFalse(self.mock_add.called)
         self.assertFalse(self.mock_remove.called)
 
@@ -86,7 +88,7 @@ class TestLibraryFeatureFeature(unittest.TestCase):
             feature.feature(self.database, 'botgotsthis',
                             Message('!feature feature Kappa'), self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('parameter', 'kappa'))
         self.assertFalse(self.mock_add.called)
         self.assertFalse(self.mock_remove.called)
 
@@ -107,7 +109,7 @@ class TestLibraryFeatureAdd(unittest.TestCase):
             feature.feature_add(self.database, 'botgotsthis', 'feature',
                                 self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('Feature', 'enable'))
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'feature')
         self.database.addFeature.assert_called_once_with(
@@ -119,7 +121,8 @@ class TestLibraryFeatureAdd(unittest.TestCase):
             feature.feature_add(self.database, 'botgotsthis', 'feature',
                                 self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('Feature', 'already', 'enable'))
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'feature')
         self.assertFalse(self.database.addFeature.called)
@@ -141,7 +144,7 @@ class TestLibraryFeatureRemove(unittest.TestCase):
             feature.feature_remove(self.database, 'botgotsthis', 'feature',
                                    self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('Feature', 'disable'))
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'feature')
         self.database.removeFeature.assert_called_once_with(
@@ -153,7 +156,8 @@ class TestLibraryFeatureRemove(unittest.TestCase):
             feature.feature_remove(self.database, 'botgotsthis', 'feature',
                                    self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('Feature', 'not', 'enable'))
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'feature')
         self.assertFalse(self.database.removeFeature.called)

@@ -6,7 +6,7 @@ from ...data import WhisperCommandArgs
 
 @permission('owner')
 def commandHello(args: WhisperCommandArgs) -> bool:
-    utils.whisper(args.nick, 'Hello Kappa')
+    utils.whisper(args.nick, 'Hello Kappa !')
     return True
 
 

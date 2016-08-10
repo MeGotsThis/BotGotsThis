@@ -4,7 +4,8 @@ from bot import utils
 from bot.data import Channel, Socket
 from source.database import DatabaseBase
 from source.public.library import channel
-from unittest.mock import ANY, Mock, patch
+from tests.unittest.mock_class import StrContains
+from unittest.mock import Mock, patch
 
 
 def send(messages):
@@ -40,7 +41,7 @@ class TestLibraryChannelJoin(unittest.TestCase):
         self.mock_join.return_value = True
         self.assertIs(
             channel.join(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('Join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -55,7 +56,8 @@ class TestLibraryChannelJoin(unittest.TestCase):
         self.mock_chat_server.return_value = ''
         self.assertIs(
             channel.join(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('Unknown', 'server', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -71,7 +73,7 @@ class TestLibraryChannelJoin(unittest.TestCase):
         self.mock_join.return_value = True
         self.assertIs(
             channel.join(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('Join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -88,7 +90,8 @@ class TestLibraryChannelJoin(unittest.TestCase):
         self.mock_ensure.return_value = utils.ENSURE_CORRECT
         self.assertIs(
             channel.join(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('Already', 'join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -105,7 +108,7 @@ class TestLibraryChannelJoin(unittest.TestCase):
         self.mock_ensure.return_value = utils.ENSURE_REJOIN
         self.assertIs(
             channel.join(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('botgotsthis', 'server'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -122,7 +125,7 @@ class TestLibraryChannelJoin(unittest.TestCase):
         self.mock_ensure.return_value = utils.ENSURE_CLUSTER_UNKNOWN
         self.assertIs(
             channel.join(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('error', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -139,7 +142,7 @@ class TestLibraryChannelJoin(unittest.TestCase):
         self.mock_ensure.return_value = utils.ENSURE_NOT_JOINED
         self.assertIs(
             channel.join(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('error', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -163,9 +166,9 @@ class TestLibraryChannelPart(unittest.TestCase):
         self.mock_part = patcher.start()
 
     def test(self):
-        self.assertIs(channel.part('', self.send), True)
-        self.send.assert_called_with(ANY)
-        self.mock_part.assert_called_with('')
+        self.assertIs(channel.part('megotsthis', self.send), True)
+        self.send.assert_called_with(StrContains('Leav', 'megotsthis'))
+        self.mock_part.assert_called_with('megotsthis')
 
     def test_bot_channel(self):
         self.assertIs(channel.part('botgotsthis', self.send), False)
@@ -193,7 +196,7 @@ class TestLibraryChannelSay(unittest.TestCase):
             channel.say(self.database, 'megotsthis', 'botgotsthis', 'Kappa'),
             True)
         self.mock_record.assert_called_once_with(
-            self.database, self.channel, 'megotsthis', 'Kappa', None, ANY)
+            self.database, self.channel, 'megotsthis', 'Kappa', None, 'say')
         self.channel.send.assert_called_once_with('Kappa')
 
     def test_not_existing(self):
@@ -210,7 +213,7 @@ class TestLibraryChannelEmptyAll(unittest.TestCase):
         mock_send = Mock(spec=send)
         self.assertIs(channel.empty_all(mock_send), True)
         mock_clear.assert_called_once_with()
-        mock_send.assert_called_once_with(ANY)
+        mock_send.assert_called_once_with(StrContains('all', 'messages'))
 
 
 class TestLibraryChannelEmpty(unittest.TestCase):
@@ -225,7 +228,8 @@ class TestLibraryChannelEmpty(unittest.TestCase):
 
     def test(self):
         self.assertIs(channel.empty('botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('all', 'messages', 'botgotsthis'))
         self.channel.clear.assert_called_once_with()
 
     def test_non_existing(self):

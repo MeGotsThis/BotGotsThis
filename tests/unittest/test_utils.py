@@ -3,7 +3,8 @@ from bot import utils
 from bot.data import Channel, Socket, MessagingQueue
 from bot.thread.logging import Logging
 from datetime import datetime
-from unittest.mock import ANY, Mock, patch
+from tests.unittest.mock_class import StrContains
+from unittest.mock import Mock, patch
 
 
 class TestUtils(unittest.TestCase):
@@ -95,7 +96,8 @@ class TestUtils(unittest.TestCase):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.ircLogFolder = 'log'
         utils.logIrcMessage('botgotsthis', 'Kappa')
-        mock_globals.logging.log.assert_called_once_with(ANY, ANY)
+        mock_globals.logging.log.assert_called_once_with(
+            StrContains('botgotsthis'), StrContains('Kappa'))
 
     @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
@@ -119,7 +121,10 @@ class TestUtils(unittest.TestCase):
             raise Exception()
         except Exception:
             utils.logException()
-        mock_globals.logging.log.assert_called_once_with(ANY, ANY)
+        mock_globals.logging.log.assert_called_once_with(
+            StrContains('exception'),
+            StrContains('Exception', 'test_utils.py', 'test_logException',
+                        'raise Exception'))
 
     @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
