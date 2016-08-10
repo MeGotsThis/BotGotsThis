@@ -5,7 +5,8 @@ from collections import defaultdict
 from datetime import datetime
 from http.client import HTTPException, HTTPResponse
 from source.api import twitch
-from unittest.mock import ANY, MagicMock, Mock, patch
+from tests.unittest.mock_class import StrContains, TypeMatch
+from unittest.mock import MagicMock, Mock, patch
 
 chatServers = b'''{
     "cluster": "aws",
@@ -354,14 +355,14 @@ class TestApiTwitch(unittest.TestCase):
         self.mock_response.status = 200
         self.assertIs(twitch.update('botgotsthis', status=''), True)
         self.mock_api_call.assert_called_once_with(
-            'botgotsthis', 'PUT', ANY, headers=ANY,
+            'botgotsthis', 'PUT', StrContains(), headers=TypeMatch(dict),
             data={'channel[status]': ' '})
 
     def test_update_game(self):
         self.mock_response.status = 200
         self.assertIs(twitch.update('botgotsthis', game=''), True)
         self.mock_api_call.assert_called_once_with(
-            'botgotsthis', 'PUT', ANY, headers=ANY,
+            'botgotsthis', 'PUT', StrContains(), headers=TypeMatch(dict),
             data={'channel[game]': ''})
 
     def test_update_except(self):
@@ -377,6 +378,8 @@ class TestApiTwitch(unittest.TestCase):
     def test_active_streams_one(self, mock_handle):
         self.mock_response.status = 200
         self.mock_api_call.return_value[1] = noStreams
+        self.assertEqual(twitch.active_streams(['botgotsthis']), {})
+        self.assertEqual(mock_handle.call_count, 1)
 
     @patch('source.api.twitch._handle_streams')
     def test_active_streams_too_many(self, mock_handle):

@@ -1,7 +1,8 @@
 import unittest
 from bot.data import Channel
 from source.public.library import exit
-from unittest.mock import ANY, Mock, patch
+from tests.unittest.mock_class import StrContains, TypeMatch
+from unittest.mock import Mock, patch
 
 
 def send(messages):
@@ -30,6 +31,6 @@ class TestLibraryExitExit(unittest.TestCase):
     def test(self):
         self.assertIs(exit.exit(self.send), True)
         self.assertIs(self.mock_globals.running, False)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('Goodbye'))
         self.mock_part.assert_called_once_with('botgotsthis')
-        self.mock_sleep.assert_called_once_with(ANY)
+        self.mock_sleep.assert_called_once_with(TypeMatch(float))

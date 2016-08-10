@@ -40,7 +40,7 @@ def leave(channel: str,
     if channel == bot.config.botnick:
         return False
     send('Bye {channel}'.format(channel=channel))
-    time.sleep(1)
+    time.sleep(1.0)
     utils.partChannel(channel)
     return True
 

@@ -1,8 +1,10 @@
-from unittest.mock import ANY, patch
+from unittest.mock import patch
 
+import bot.utils
 from source.data.message import Message
 from source.public.whisper import feature
 from tests.unittest.base_whisper import TestWhisper
+from tests.unittest.mock_class import PartialMatch
 
 
 class TestWhisperFeature(TestWhisper):
@@ -14,5 +16,6 @@ class TestWhisperFeature(TestWhisper):
         message = Message('!feature feature')
         self.assertIs(
             feature.commandFeature(self.args._replace(message=message)), True)
-        mock_feature.assert_called_once_with(self.database, 'botgotsthis',
-                                             message, ANY)
+        mock_feature.assert_called_once_with(
+            self.database, 'botgotsthis', message,
+            PartialMatch(bot.utils.whisper, 'botgotsthis'))

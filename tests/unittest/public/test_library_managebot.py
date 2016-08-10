@@ -1,8 +1,10 @@
 import unittest
+from source.data import ManageBotArgs
 from source.data.message import Message
 from source.database import DatabaseBase
 from source.public.library import managebot
-from unittest.mock import ANY, Mock, patch
+from tests.unittest.mock_class import TypeMatch
+from unittest.mock import Mock, patch
 
 
 def send(messages):
@@ -32,7 +34,7 @@ class TestLibraryManageBot(unittest.TestCase):
                                  message),
             True)
         self.assertFalse(self.send.called)
-        self.method.assert_called_once_with(ANY)
+        self.method.assert_called_once_with(TypeMatch(ManageBotArgs))
 
     def test_not_existing(self):
         message = Message('!managebot not_existing')

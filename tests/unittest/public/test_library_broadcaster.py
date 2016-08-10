@@ -5,7 +5,8 @@ from bot.twitchmessage import IrcMessageTags
 from source.data.message import Message
 from source.database import DatabaseBase
 from source.public.library import broadcaster
-from unittest.mock import ANY, Mock, patch
+from tests.unittest.mock_class import StrContains, TypeMatch
+from unittest.mock import Mock, patch
 
 
 def send(messages):
@@ -43,7 +44,8 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.mock_globals.channels = {}
         self.assertIs(
             broadcaster.come(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('Joining', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -60,7 +62,7 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.mock_join.return_value = False
         self.assertIs(
             broadcaster.come(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('in', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -77,7 +79,8 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.mock_join.return_value = False
         self.assertIs(
             broadcaster.come(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('Move', 'botgotsthis', 'server'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -94,7 +97,7 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.mock_join.return_value = False
         self.assertIs(
             broadcaster.come(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('Error'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -111,7 +114,7 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.mock_join.return_value = False
         self.assertIs(
             broadcaster.come(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('Error'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -127,7 +130,8 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.mock_join.return_value = None
         self.assertIs(
             broadcaster.come(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'join', 'server'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.database.getAutoJoinsPriority.assert_called_once_with(
@@ -140,7 +144,8 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.database.isChannelBannedReason.return_value = ''
         self.assertIs(
             broadcaster.come(self.database, 'botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'banned'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
         self.assertFalse(self.database.getAutoJoinsPriority.called)
@@ -169,8 +174,8 @@ class TestLibraryBroadcasterLeave(unittest.TestCase):
 
     def test(self):
         self.assertIs(broadcaster.leave('megotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
-        self.mock_sleep.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('megotsthis', 'Bye'))
+        self.mock_sleep.assert_called_once_with(TypeMatch(float))
         self.mock_part.assert_called_once_with('megotsthis')
 
     def test_bot(self):
@@ -193,7 +198,8 @@ class TestLibraryBroadcasterEmpty(unittest.TestCase):
 
     def test(self):
         self.assertIs(broadcaster.empty('botgotsthis', self.send), True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('Clear', 'messages', 'botgotsthis'))
         self.channel.clear.assert_called_once_with()
 
     def test_not_existing(self):
@@ -266,7 +272,7 @@ class TestLibraryBroadcasterAutoJoin(unittest.TestCase):
             'botgotsthis')
         self.assertFalse(self.mock_add.called)
         self.assertFalse(self.mock_delete.called)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('banned', 'botgotsthis'))
 
     def test_banned_delete(self):
         self.database.isChannelBannedReason.return_value = ''
@@ -278,7 +284,7 @@ class TestLibraryBroadcasterAutoJoin(unittest.TestCase):
             'botgotsthis')
         self.assertFalse(self.mock_add.called)
         self.assertFalse(self.mock_delete.called)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('banned', 'botgotsthis'))
 
 
 class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
@@ -311,7 +317,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'enable', 'join'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -330,7 +337,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'already'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -351,7 +359,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'enabled'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -371,7 +380,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'already', 'enable', 'in chat'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -392,7 +402,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'enable'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -412,7 +423,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'already', 'enable', 'move', 'server'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -433,7 +445,7 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(StrContains('botgotsthis', 'enable'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -453,7 +465,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'already', 'enabled', 'in chat'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -474,7 +487,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'enabled', 'move', 'server'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -494,7 +508,8 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.assertIs(
             broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
             True)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'enabled', 'move', 'server'))
         self.database.discardAutoJoin.assert_not_called()
         self.database.saveAutoJoin.assert_called_once_with(
             'botgotsthis', 0, 'twitch')
@@ -519,7 +534,8 @@ class TestLibraryBroadcasterAutoJoinDelete(unittest.TestCase):
                                          self.send),
             True)
         self.database.discardAutoJoin.assert_called_once_with('botgotsthis')
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'disable'))
 
     def test_not_existing(self):
         self.database.discardAutoJoin.return_value = False
@@ -528,7 +544,8 @@ class TestLibraryBroadcasterAutoJoinDelete(unittest.TestCase):
                                          self.send),
             True)
         self.database.discardAutoJoin.assert_called_once_with('botgotsthis')
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('botgotsthis', 'never'))
 
 
 class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
@@ -545,11 +562,12 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.assertIs(
             broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
-                Message('!settimeoutlevel-1 0')),
+                Message('!settimeoutlevel-1 1')),
             True)
         self.database.setChatProperty.assert_called_once_with(
-            'botgotsthis', 'timeoutLength0', '0')
-        self.send.assert_called_once_with(ANY)
+            'botgotsthis', 'timeoutLength0', '1')
+        self.send.assert_called_once_with(
+            StrContains('timeout', '1st', '1 second'))
 
     def test_1_default(self):
         self.assertIs(
@@ -559,17 +577,19 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
             True)
         self.database.setChatProperty.assert_called_once_with(
             'botgotsthis', 'timeoutLength0', None)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('timeout', '1st', 'default'))
 
     def test_2(self):
         self.assertIs(
             broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
-                Message('!settimeoutlevel-2 0')),
+                Message('!settimeoutlevel-2 3600')),
             True)
         self.database.setChatProperty.assert_called_once_with(
-            'botgotsthis', 'timeoutLength1', '0')
-        self.send.assert_called_once_with(ANY)
+            'botgotsthis', 'timeoutLength1', '3600')
+        self.send.assert_called_once_with(
+            StrContains('timeout', '2nd', '3600 seconds'))
 
     def test_2_default(self):
         self.assertIs(
@@ -579,7 +599,8 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
             True)
         self.database.setChatProperty.assert_called_once_with(
             'botgotsthis', 'timeoutLength1', None)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('timeout', '2nd', 'default'))
 
     def test_3(self):
         self.assertIs(
@@ -589,7 +610,8 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
             True)
         self.database.setChatProperty.assert_called_once_with(
             'botgotsthis', 'timeoutLength2', '0')
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('timeout', '3rd', 'ban'))
 
     def test_3_default(self):
         self.assertIs(
@@ -599,7 +621,8 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
             True)
         self.database.setChatProperty.assert_called_once_with(
             'botgotsthis', 'timeoutLength2', None)
-        self.send.assert_called_once_with(ANY)
+        self.send.assert_called_once_with(
+            StrContains('timeout', '3rd', 'default'))
 
     def test_0(self):
         self.assertIs(
