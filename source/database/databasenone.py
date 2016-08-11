@@ -48,6 +48,12 @@ class DatabaseNone(DatabaseBase):
                         command: str) -> Dict[str, Dict[str, str]]:
         return {broadcaster: {}, '#global': {}}
 
+    def getCustomCommand(self,
+                         broadcaster: str,
+                         permission: str,
+                         command: str) -> Optional[str]:
+        return None
+
     def insertCustomCommand(self,
                             broadcaster: str,
                             permission: str,

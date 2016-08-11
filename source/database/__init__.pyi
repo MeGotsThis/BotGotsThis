@@ -53,6 +53,11 @@ class DatabaseBase(metaclass=ABCMeta):
                         broadcaster:str,
                         command:str) -> Dict[str, Dict[str, str]]: ...
     @abstractmethod
+    def getCustomCommand(self,
+                         broadcaster: str,
+                         permission: str,
+                         command: str) -> Optional[str]: ...
+    @abstractmethod
     def insertCustomCommand(self,
                             broadcaster: str,
                             permission: str,

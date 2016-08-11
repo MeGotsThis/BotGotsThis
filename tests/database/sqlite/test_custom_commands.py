@@ -45,7 +45,7 @@ CREATE TABLE custom_commands_history (
 CREATE INDEX custom_commands_history_broadcaster ON
     custom_commands_history (broadcaster, command)'''])
 
-    def test_get(self):
+    def test_get_commands(self):
         self.assertEqual(self.database.getChatCommands('botgotsthis', 'kappa'),
                          {'#global': {}, 'botgotsthis': {}})
 
@@ -138,6 +138,20 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                           'botgotsthis': {'': ':O',
                                           'moderator': ':P',
                                           'broadcaster': ';)'}})
+
+    def test_get_None(self):
+        self.assertIsNone(
+            self.database.getCustomCommand('botgotsthis', '', 'kappa'))
+
+    def test_get(self):
+        now = datetime(2000, 1, 1)
+        self.execute('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
+                      now, 'botgotsthis', now))
+        self.assertEqual(
+            self.database.getCustomCommand('botgotsthis', '', 'kappa'),
+            'Kappa')
 
     def test_insert(self):
         self.assertIs(

@@ -1,5 +1,7 @@
 ﻿import bot.config
 import lists.custom
+import textwrap
+from bot import utils
 from ..library import chat, custom, timeout
 from ..library.chat import min_args, not_feature, permission, ownerChannel
 from ...data import ChatCommandArgs, CustomCommand, CommandActionTokens
@@ -175,4 +177,17 @@ def command_property(args: ChatCommandArgs,
         message = '{user} -> {command} with {property} could not be processed'
     args.chat.send(message.format(user=args.nick, command=input.command,
                                   property=property, value=value))
+    return True
+
+
+def raw_command(args: ChatCommandArgs,
+                input: CommandActionTokens) -> bool:
+    command = args.database.getCustomCommand(input.broadcaster, input.level,
+                                             input.command)  # type: Optional[str]
+    if command is None:
+        message = '{user} -> {command} does not exist'
+        args.chat.send(message.format(user=args.nick, command=input.command))
+    else:
+        utils.whisper(args.nick,
+                      textwrap.wrap(command, width=bot.config.messageLimit))
     return True

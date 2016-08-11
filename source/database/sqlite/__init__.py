@@ -125,6 +125,18 @@ SELECT broadcaster, permission, fullMessage
             cursor.close()
             return commands
 
+    def getCustomCommand(self,
+                         broadcaster: str,
+                         permission: str,
+                         command: str) -> Optional[str]:
+        find = '''
+SELECT fullMessage FROM custom_commands
+    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
+            cursor.execute(find, (broadcaster, permission, command.lower()))
+            row = cursor.fetchone()  # type: Optional[Tuple[str]]
+            return row and row[0]  # type: ignore
+
     def insertCustomCommand(self,
                             broadcaster: str,
                             permission: str,

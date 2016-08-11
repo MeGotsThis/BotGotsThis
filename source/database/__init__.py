@@ -91,6 +91,13 @@ class DatabaseBase(metaclass=ABCMeta):
         return {broadcaster: {}, '#global': {}}
 
     @abstractmethod
+    def getCustomCommand(self,
+                         broadcaster: str,
+                         permission: str,
+                         command: str) -> Optional[str]:
+        return None
+
+    @abstractmethod
     def insertCustomCommand(self,
                             broadcaster: str,
                             permission: str,

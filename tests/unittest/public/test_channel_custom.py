@@ -5,7 +5,7 @@ from source.data import CustomCommand, CommandActionTokens
 from source.data.message import Message
 from source.public.channel import custom
 from tests.unittest.base_channel import TestChannel
-from tests.unittest.mock_class import StrContains
+from tests.unittest.mock_class import IterableMatch, StrContains
 
 
 class TestChannelCustomCustomCommand(TestChannel):
@@ -518,3 +518,48 @@ class TestChannelCustomProcessCommand(TestChannel):
             self.broadcaster, '', 'Kappa', 'someproperty', 'PogChamp')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'someproperty', 'not'))
+
+    @patch('bot.config')
+    @patch('bot.utils.whisper')
+    def test_raw_command(self, mock_whisper, mock_config):
+        mock_config.messageLimit = 100
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'PogChamp')
+        self.database.getCustomCommand.return_value = 'KappaRoss KappaPride'
+        self.assertIs(custom.raw_command(self.args, input), True)
+        self.database.getCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa')
+        mock_whisper.assert_called_once_with(
+            'botgotsthis',
+            IterableMatch('KappaRoss KappaPride'))
+        self.assertFalse(self.channel.send.called)
+
+    @patch('bot.config')
+    @patch('bot.utils.whisper')
+    def test_raw_command_long(self, mock_whisper, mock_config):
+        mock_config.messageLimit = 20
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'PogChamp')
+        self.database.getCustomCommand.return_value = (
+            'Kappa   Keepo KappaRoss KappaPride')
+        self.assertIs(custom.raw_command(self.args, input), True)
+        self.database.getCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa')
+        mock_whisper.assert_called_once_with(
+            'botgotsthis',
+            IterableMatch('Kappa   Keepo', 'KappaRoss KappaPride'))
+        self.assertFalse(self.channel.send.called)
+
+    @patch('bot.config')
+    @patch('bot.utils.whisper')
+    def test_raw_command_not_exist(self, mock_whisper, mock_config):
+        mock_config.messageLimit = 100
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'PogChamp')
+        self.database.getCustomCommand.return_value = None
+        self.assertIs(custom.raw_command(self.args, input), True)
+        self.database.getCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa')
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'Kappa', 'not', 'exist'))
+        self.assertFalse(mock_whisper.called)
