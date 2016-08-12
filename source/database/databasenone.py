@@ -75,7 +75,7 @@ class DatabaseNone(DatabaseBase):
                              permission: str,
                              command: str,
                              fullMessage: str,
-                             user: str):
+                             user: str) -> bool:
         return False
 
     def appendCustomCommand(self,
@@ -83,15 +83,23 @@ class DatabaseNone(DatabaseBase):
                             permission: str,
                             command: str,
                             message: str,
-                            user: str):
+                            user: str) -> bool:
         return False
 
     def deleteCustomCommand(self,
                             broadcaster: str,
                             permission: str,
                             command: str,
-                            user: str):
+                            user: str) -> bool:
         return True
+
+    def levelCustomCommand(self,
+                           broadcaster: str,
+                           permission: str,
+                           command: str,
+                           user: str,
+                           new_permission: str) -> bool:
+        return False
 
     def getCustomCommandProperty(
             self,

@@ -290,6 +290,35 @@ INSERT INTO custom_commands_history
             self.connection.commit()
             return True
 
+    def levelCustomCommand(self,
+                           broadcaster: str,
+                           permission: str,
+                           command: str,
+                           user: str,
+                           new_permission: str) -> bool:
+        query = '''
+UPDATE custom_commands SET permission=?
+    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
+        history = '''
+INSERT INTO custom_commands_history
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
+            cursor.execute(query, (new_permission, broadcaster, permission,
+                                   command.lower()))
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+
+            display = None if command.lower() == command else command  # type: Optional[str]
+            cursor.execute(history, (broadcaster,
+                                     permission + ';' + new_permission,
+                                     command.lower(), display, None, user))
+            self.connection.commit()
+            return True
+
     def getCustomCommandProperty(
             self,
             broadcaster: str,

@@ -191,3 +191,19 @@ def raw_command(args: ChatCommandArgs,
         utils.whisper(args.nick,
                       textwrap.wrap(command, width=bot.config.messageLimit))
     return True
+
+
+def level_command(args: ChatCommandArgs,
+                  input: CommandActionTokens) -> bool:
+    if input.text not in custom.permissions:
+        message = '{user} -> {inputLevel} is an invalid permission'
+    elif args.database.levelCustomCommand(
+            input.broadcaster, input.level, input.command, args.nick,
+            custom.permissions[input.text]):
+        message = '{user} -> {command} changed permission successfully'
+    else:
+        message = ('{user} -> {command} was not changed successfully. The '
+                   'command might not exist')
+    args.chat.send(message.format(user=args.nick, command=input.command,
+                                  inputLevel=input.text))
+    return True

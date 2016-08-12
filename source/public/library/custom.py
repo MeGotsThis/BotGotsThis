@@ -9,6 +9,34 @@ from ...database import DatabaseBase
 from ..library import textformat
 
 
+permissions = {
+    None: '',
+    '': '',
+    'any': '',
+    'all': '',
+    'public': '',
+    'turbo': 'turbo',
+    'twitchturbo': 'turbo',
+    'subscriber': 'subscriber',
+    'sub': 'subscriber',
+    'moderator': 'moderator',
+    'mod': 'moderator',
+    'broadcaster': 'broadcaster',
+    'streamer': 'broadcaster',
+    'me': 'broadcaster',
+    'globalmod': 'globalMod',
+    'global_mod': 'globalMod',
+    'gmod': 'globalMod',
+    'admin': 'admin',
+    'twitchadmin': 'admin',
+    'staff': 'staff',
+    'twitchstaff': 'staff',
+    'owner': 'owner',
+    'self': 'owner',
+    'bot': 'owner',
+    }
+
+
 def get_command(database: DatabaseBase,
                 command: str,
                 channel: str,
@@ -59,33 +87,6 @@ def create_messages(command: CustomCommand,
 
 
 def parse_action_message(message: Message, broadcaster: str) -> Optional[CommandActionTokens]:
-    allowPermissions = {
-        None: '',
-        '': '',
-        'any': '',
-        'all': '',
-        'public': '',
-        'turbo': 'turbo',
-        'twitchturbo': 'turbo',
-        'subscriber': 'subscriber',
-        'sub': 'subscriber',
-        'moderator': 'moderator',
-        'mod': 'moderator',
-        'broadcaster': 'broadcaster',
-        'streamer': 'broadcaster',
-        'me': 'broadcaster',
-        'globalmod': 'globalMod',
-        'global_mod': 'globalMod',
-        'gmod': 'globalMod',
-        'admin': 'admin',
-        'twitchadmin': 'admin',
-        'staff': 'staff',
-        'twitchstaff': 'staff',
-        'owner': 'owner',
-        'self': 'owner',
-        'bot': 'owner',
-        }
-    
     try:
         action = message.lower[1]
         i = 2
@@ -93,8 +94,8 @@ def parse_action_message(message: Message, broadcaster: str) -> Optional[Command
         if message[2].startswith('level='):
             i = 3
             level = message.lower[2][len('level='):]
-        if level in allowPermissions:
-            level = allowPermissions[level]
+        if level in permissions:
+            level = permissions[level]
         else:
             level = None
         command = message[i]

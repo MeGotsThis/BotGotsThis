@@ -121,7 +121,7 @@ class DatabaseBase(metaclass=ABCMeta):
                              permission: str,
                              command: str,
                              fullMessage: str,
-                             user: str):
+                             user: str) -> bool:
         return False
 
     @abstractmethod
@@ -130,7 +130,7 @@ class DatabaseBase(metaclass=ABCMeta):
                             permission: str,
                             command: str,
                             message: str,
-                            user: str):
+                            user: str) -> bool:
         return False
 
     @abstractmethod
@@ -138,8 +138,17 @@ class DatabaseBase(metaclass=ABCMeta):
                             broadcaster: str,
                             permission: str,
                             command: str,
-                            user: str):
-        return True
+                            user: str) -> bool:
+        return False
+
+    @abstractmethod
+    def levelCustomCommand(self,
+                           broadcaster: str,
+                           permission: str,
+                           command: str,
+                           user: str,
+                           new_permission: str) -> bool:
+        return False
 
     @abstractmethod
     def getCustomCommandProperty(

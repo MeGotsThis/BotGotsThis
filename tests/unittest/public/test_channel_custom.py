@@ -563,3 +563,33 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'not', 'exist'))
         self.assertFalse(mock_whisper.called)
+
+    def test_level_command(self):
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'mod')
+        self.database.levelCustomCommand.return_value = True
+        self.assertIs(custom.level_command(self.args, input), True)
+        self.database.levelCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa', 'botgotsthis', 'moderator')
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'Kappa', 'change', 'success'))
+
+    def test_level_command_unknown_level(self):
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'PogChamp DansGame')
+        self.database.levelCustomCommand.return_value = True
+        self.assertIs(custom.level_command(self.args, input), True)
+        self.assertFalse(self.database.levelCustomCommand.called)
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'PogChamp DansGame', 'invalid',
+                        'permission'))
+
+    def test_level_command_dberror(self):
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'moderator')
+        self.database.levelCustomCommand.return_value = False
+        self.assertIs(custom.level_command(self.args, input), True)
+        self.database.levelCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa', 'botgotsthis', 'moderator')
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'Kappa', 'change', 'not', 'success'))

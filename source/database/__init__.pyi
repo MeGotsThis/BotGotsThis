@@ -77,20 +77,27 @@ class DatabaseBase(metaclass=ABCMeta):
                              permission: str,
                              command: str,
                              fullMessage: str,
-                             user: str): ...
+                             user: str) -> bool: ...
     @abstractmethod
     def appendCustomCommand(self,
                             broadcaster: str,
                             permission: str,
                             command: str,
                             message: str,
-                            user: str): ...
+                            user: str) -> bool: ...
     @abstractmethod
     def deleteCustomCommand(self,
                             broadcaster: str,
                             permission: str,
                             command: str,
-                            user: str): ...
+                            user: str) -> bool: ...
+    @abstractmethod
+    def levelCustomCommand(self,
+                           broadcaster: str,
+                           permission: str,
+                           command: str,
+                           user: str,
+                           new_permission: str) -> bool: ...
     @abstractmethod
     def getCustomCommandProperty(
             self,

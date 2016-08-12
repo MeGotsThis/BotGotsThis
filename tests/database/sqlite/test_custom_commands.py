@@ -389,6 +389,58 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
             (1, 'botgotsthis', '', 'kappa', 'Kappa', None,
              'botgotsthis', TypeMatch(datetime)))
 
+    def test_level(self):
+        self.assertIs(
+            self.database.levelCustomCommand(
+                'botgotsthis', '', 'kappa', 'botgotsthis', 'moderator'),
+            False)
+        self.assertIsNone(self.row('SELECT * FROM custom_commands'))
+        self.assertIsNone(self.row('SELECT * FROM custom_commands_history'))
+
+    def test_level_existing(self):
+        now = datetime(2000, 1, 1)
+        self.execute('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
+                      now, 'botgotsthis', now))
+        self.execute('''
+INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
+        self.assertIs(
+            self.database.levelCustomCommand(
+                'botgotsthis', '', 'kappa', 'botgotsthis', 'moderator'),
+            True)
+        self.assertEqual(
+            self.row('SELECT * FROM custom_commands'),
+            ('botgotsthis', 'moderator', 'kappa', None, 'Kappa', 'botgotsthis',
+             now, 'botgotsthis', TypeMatch(datetime)))
+        self.assertEqual(
+            self.row('SELECT * FROM custom_command_properties'),
+            ('botgotsthis', 'moderator', 'kappa', 'kappa', 'Kappa'))
+        self.assertEqual(
+            self.row('SELECT * FROM custom_commands_history'),
+            (1, 'botgotsthis', ';moderator', 'kappa', None, None,
+             'botgotsthis', TypeMatch(datetime)))
+
+    def test_level_commanddisplay(self):
+        now = datetime(2000, 1, 1)
+        self.execute('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
+                      now, 'botgotsthis', now))
+        self.assertIs(
+            self.database.levelCustomCommand(
+                'botgotsthis', '', 'Kappa', 'botgotsthis', 'moderator'),
+            True)
+        self.assertEqual(
+            self.row('SELECT * FROM custom_commands'),
+            ('botgotsthis', 'moderator', 'kappa', None, 'Kappa', 'botgotsthis',
+             now, 'botgotsthis', TypeMatch(datetime)))
+        self.assertEqual(
+            self.row('SELECT * FROM custom_commands_history'),
+            (1, 'botgotsthis', ';moderator', 'kappa', 'Kappa', None,
+             'botgotsthis', TypeMatch(datetime)))
+
     def test_get_property_no_command(self):
         self.assertIsNone(
             self.database.getCustomCommandProperty(
