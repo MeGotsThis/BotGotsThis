@@ -203,7 +203,8 @@ def level_command(args: ChatCommandArgs,
         message = '{user} -> {command} changed permission successfully'
     else:
         message = ('{user} -> {command} was not changed successfully. The '
-                   'command might not exist')
+                   'command might not exist or there is a command with that '
+                   'level existing')
     args.chat.send(message.format(user=args.nick, command=input.command,
                                   inputLevel=input.text))
     return True

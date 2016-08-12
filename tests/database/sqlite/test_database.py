@@ -41,3 +41,7 @@ class TestSqlite(unittest.TestCase):
     def row(self, query, params=()):
         self.cursor.execute(query, params)
         return self.cursor.fetchone()
+
+    def rows(self, query, params=()):
+        self.cursor.execute(query, params)
+        return self.cursor.fetchall()

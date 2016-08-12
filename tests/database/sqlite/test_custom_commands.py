@@ -422,6 +422,31 @@ INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
             (1, 'botgotsthis', ';moderator', 'kappa', None, None,
              'botgotsthis', TypeMatch(datetime)))
 
+    def test_level_overlap(self):
+        now = datetime(2000, 1, 1)
+        self.executemany('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                         [('botgotsthis', '', 'kappa', None, 'Kappa',
+                           'botgotsthis', now, 'botgotsthis', now),
+                          ('botgotsthis', 'moderator', 'kappa', None, 'Kappa',
+                           'botgotsthis', now, 'botgotsthis', now)])
+        self.execute('''
+INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
+        self.assertIs(
+            self.database.levelCustomCommand(
+                'botgotsthis', '', 'kappa', 'botgotsthis', 'moderator'),
+            False)
+        self.assertEqual(
+            self.rows('SELECT * FROM custom_commands'),
+            [('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
+              now, 'botgotsthis', now),
+             ('botgotsthis', 'moderator', 'kappa', None, 'Kappa', 'botgotsthis',
+              now, 'botgotsthis', now)])
+        self.assertEqual(
+            self.row('SELECT * FROM custom_command_properties'),
+            ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
+
     def test_level_commanddisplay(self):
         now = datetime(2000, 1, 1)
         self.execute('''

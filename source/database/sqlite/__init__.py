@@ -305,8 +305,11 @@ INSERT INTO custom_commands_history
     created)
     VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
-            cursor.execute(query, (new_permission, broadcaster, permission,
-                                   command.lower()))
+            try:
+                cursor.execute(query, (new_permission, broadcaster, permission,
+                                       command.lower()))
+            except sqlite3.IntegrityError:
+                return False
 
             self.connection.commit()
             if cursor.rowcount == 0:
