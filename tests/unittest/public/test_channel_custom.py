@@ -359,6 +359,50 @@ class TestChannelCustomProcessCommand(TestChannel):
         mock_property.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
+    @patch('source.public.channel.custom.raw_command', autospec=True)
+    def test_raw(self, mock_raw):
+        mock_raw.return_value = True
+        input = CommandActionTokens('raw', self.broadcaster, '', '', '')
+        self.mock_input.return_value = input
+        self.assertIs(
+            custom.process_command(self.args, self.broadcaster), True)
+        self.mock_input.assert_called_once_with(self.message, self.broadcaster)
+        mock_raw.assert_called_once_with(self.args, input)
+        self.assertFalse(self.channel.send.called)
+
+    @patch('source.public.channel.custom.raw_command', autospec=True)
+    def test_original(self, mock_raw):
+        mock_raw.return_value = True
+        input = CommandActionTokens('original', self.broadcaster, '', '', '')
+        self.mock_input.return_value = input
+        self.assertIs(
+            custom.process_command(self.args, self.broadcaster), True)
+        self.mock_input.assert_called_once_with(self.message, self.broadcaster)
+        mock_raw.assert_called_once_with(self.args, input)
+        self.assertFalse(self.channel.send.called)
+
+    @patch('source.public.channel.custom.level_command', autospec=True)
+    def test_level(self, mock_level):
+        mock_level.return_value = True
+        input = CommandActionTokens('level', self.broadcaster, '', '', '')
+        self.mock_input.return_value = input
+        self.assertIs(
+            custom.process_command(self.args, self.broadcaster), True)
+        self.mock_input.assert_called_once_with(self.message, self.broadcaster)
+        mock_level.assert_called_once_with(self.args, input)
+        self.assertFalse(self.channel.send.called)
+
+    @patch('source.public.channel.custom.rename_command', autospec=True)
+    def test_rename(self, mock_rename):
+        mock_rename.return_value = True
+        input = CommandActionTokens('rename', self.broadcaster, '', '', '')
+        self.mock_input.return_value = input
+        self.assertIs(
+            custom.process_command(self.args, self.broadcaster), True)
+        self.mock_input.assert_called_once_with(self.message, self.broadcaster)
+        mock_rename.assert_called_once_with(self.args, input)
+        self.assertFalse(self.channel.send.called)
+
     def test_insert_command(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')

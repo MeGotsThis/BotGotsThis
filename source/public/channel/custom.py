@@ -82,6 +82,10 @@ def process_command(args: ChatCommandArgs,
         'rem': delete_command,
         'remove': delete_command,
         'property': command_property,
+        'raw': raw_command,
+        'original': raw_command,
+        'level': level_command,
+        'rename': rename_command,
         }  # type: Dict[str, Callable[[ChatCommandArgs, CommandActionTokens], bool]]
     if input.action in actions:
         return actions[input.action](args, input)
