@@ -42,6 +42,7 @@ CREATE TABLE custom_commands_history (
     permission VARCHAR NOT NULL,
     command VARCHAR NOT NULL,
     commandDisplay VARCHAR,
+    process VARCHAR,
     fullMessage VARCHAR,
     creator VARCHAR,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP

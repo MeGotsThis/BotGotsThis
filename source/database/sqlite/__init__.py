@@ -150,9 +150,9 @@ INSERT INTO custom_commands
     VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''  # type: str
         history = '''
 INSERT INTO custom_commands_history
-    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
-    created)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
+    (broadcaster, permission, command, commandDisplay, process, fullMessage,
+    creator, created)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             try:
                 lower = command.lower()
@@ -163,7 +163,7 @@ INSERT INTO custom_commands_history
                 return False
             
             cursor.execute(history, (broadcaster, permission, lower, display,
-                                     fullMessage, user))
+                                     'add', fullMessage, user))
             self.connection.commit()
             return True
 
@@ -180,9 +180,9 @@ UPDATE custom_commands
     WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
         history = '''
 INSERT INTO custom_commands_history
-    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
-    created)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
+    (broadcaster, permission, command, commandDisplay, process, fullMessage,
+    creator, created)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             display = None if command.lower() == command else command  # type: Optional[str]
             cursor.execute(query, (display, fullMessage, user, broadcaster,
@@ -192,7 +192,7 @@ INSERT INTO custom_commands_history
                 return False
             
             cursor.execute(history, (broadcaster, permission, command.lower(),
-                                     display, fullMessage, user))
+                                     display, 'edit', fullMessage, user))
             self.connection.commit()
             return True
 
@@ -208,10 +208,10 @@ REPLACE INTO custom_commands
     created, lastEditor, lastUpdated)
     VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''  # type: str
         history = '''
-INSERT INTO custom_commands_history 
-    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
-    created)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
+INSERT INTO custom_commands_history
+    (broadcaster, permission, command, commandDisplay, process, fullMessage,
+    creator, created)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             display = None if command.lower() == command else command  # type: Optional[str]
             cursor.execute(query, (broadcaster, permission, command.lower(),
@@ -221,9 +221,7 @@ INSERT INTO custom_commands_history
                 return False
             
             cursor.execute(history, (broadcaster, permission, command.lower(),
-                                     display, None, user))
-            cursor.execute(history, (broadcaster, permission, command.lower(),
-                                     display, fullMessage, user))
+                                     display, 'replace', fullMessage, user))
             self.connection.commit()
             return True
 
@@ -242,9 +240,9 @@ UPDATE custom_commands
     WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
         history = '''
 INSERT INTO custom_commands_history
-    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
-    created)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
+    (broadcaster, permission, command, commandDisplay, process, fullMessage,
+    creator, created)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             cursor.execute(find, (broadcaster, permission, command.lower()))
             original = cursor.fetchone()  # type: Optional[Tuple[str]]
@@ -260,7 +258,7 @@ INSERT INTO custom_commands_history
                 return False
             
             cursor.execute(history, (broadcaster, permission, command.lower(),
-                                     display, fullMessage, user))
+                                     display, 'append', fullMessage, user))
             self.connection.commit()
             return True
 
@@ -274,9 +272,9 @@ DELETE FROM custom_commands
     WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
         history = '''
 INSERT INTO custom_commands_history
-    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
-    created)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
+    (broadcaster, permission, command, commandDisplay, process, fullMessage,
+    creator, created)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             cursor.execute(query, (broadcaster, permission, command.lower()))
             
@@ -286,7 +284,7 @@ INSERT INTO custom_commands_history
             
             display = None if command.lower() == command else command  # type: Optional[str]
             cursor.execute(history, (broadcaster, permission, command.lower(),
-                                     display, None, user))
+                                     display, 'delete', None, user))
             self.connection.commit()
             return True
 
@@ -301,9 +299,9 @@ UPDATE custom_commands SET permission=?
     WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
         history = '''
 INSERT INTO custom_commands_history
-    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
-    created)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
+    (broadcaster, permission, command, commandDisplay, process, fullMessage,
+    creator, created)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
             try:
                 cursor.execute(query, (new_permission, broadcaster, permission,
@@ -316,9 +314,9 @@ INSERT INTO custom_commands_history
                 return False
 
             display = None if command.lower() == command else command  # type: Optional[str]
-            cursor.execute(history, (broadcaster,
-                                     permission + ';' + new_permission,
-                                     command.lower(), display, None, user))
+            cursor.execute(history, (broadcaster, new_permission,
+                                     command.lower(), display, 'level',
+                                     permission, user))
             self.connection.commit()
             return True
 

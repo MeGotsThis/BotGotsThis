@@ -38,6 +38,7 @@ CREATE TABLE custom_commands_history (
     permission VARCHAR NOT NULL,
     command VARCHAR NOT NULL,
     commandDisplay VARCHAR,
+    process VARCHAR,
     fullMessage VARCHAR,
     creator VARCHAR,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -164,8 +165,8 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
              TypeMatch(datetime), 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', '', 'kappa', None, 'KappaHD', 'botgotsthis',
-             TypeMatch(datetime)))
+            (1, 'botgotsthis', '', 'kappa', None, 'add', 'KappaHD',
+             'botgotsthis', TypeMatch(datetime)))
 
     def test_insert_commanddisplay(self):
         self.assertIs(
@@ -178,7 +179,7 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
              TypeMatch(datetime), 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', '', 'kappa', 'Kappa', 'KappaHD',
+            (1, 'botgotsthis', '', 'kappa', 'Kappa', 'add', 'KappaHD',
              'botgotsthis', TypeMatch(datetime)))
 
     def test_insert_existing(self):
@@ -217,8 +218,8 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
              now, 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', '', 'kappa', None, 'KappaHD', 'botgotsthis',
-             TypeMatch(datetime)))
+            (1, 'botgotsthis', '', 'kappa', None, 'edit', 'KappaHD',
+             'botgotsthis', TypeMatch(datetime)))
 
     def test_update_commanddisplay(self):
         now = datetime(2000, 1, 1)
@@ -236,7 +237,7 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
              now, 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', '', 'kappa', 'Kappa', 'KappaHD',
+            (1, 'botgotsthis', '', 'kappa', 'Kappa', 'edit', 'KappaHD',
              'botgotsthis', TypeMatch(datetime)))
 
     def test_replace(self):
@@ -249,12 +250,8 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
             ('botgotsthis', '', 'kappa', None, 'KappaHD', 'botgotsthis',
              TypeMatch(datetime), 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
-            self.row('SELECT * FROM custom_commands_history WHERE id=1'),
-            (1, 'botgotsthis', '', 'kappa', None, None,
-             'botgotsthis', TypeMatch(datetime)))
-        self.assertEqual(
-            self.row('SELECT * FROM custom_commands_history WHERE id=2'),
-            (2, 'botgotsthis', '', 'kappa', None, 'KappaHD',
+            self.row('SELECT * FROM custom_commands_history'),
+            (1, 'botgotsthis', '', 'kappa', None, 'replace', 'KappaHD',
              'botgotsthis', TypeMatch(datetime)))
 
     def test_replace_existing(self):
@@ -268,13 +265,9 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                 'botgotsthis', '', 'kappa', 'KappaHD', 'botgotsthis'),
             True)
         self.assertEqual(
-            self.row('SELECT * FROM custom_commands_history WHERE id=1'),
-            (1, 'botgotsthis', '', 'kappa', None, None,
+            self.row('SELECT * FROM custom_commands_history'),
+            (1, 'botgotsthis', '', 'kappa', None, 'replace', 'KappaHD',
              'botgotsthis', TypeMatch(datetime)))
-        self.assertEqual(
-            self.row('SELECT * FROM custom_commands_history WHERE id=2'),
-            (2, 'botgotsthis', '', 'kappa', None, 'KappaHD', 'botgotsthis',
-             TypeMatch(datetime)))
 
     def test_replace_commanddisplay(self):
         now = datetime(2000, 1, 1)
@@ -291,12 +284,8 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
             ('botgotsthis', '', 'kappa', 'Kappa', 'KappaHD', 'botgotsthis',
              TypeMatch(datetime), 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
-            self.row('SELECT * FROM custom_commands_history WHERE id=1'),
-            (1, 'botgotsthis', '', 'kappa', 'Kappa', None,
-             'botgotsthis', TypeMatch(datetime)))
-        self.assertEqual(
-            self.row('SELECT * FROM custom_commands_history WHERE id=2'),
-            (2, 'botgotsthis', '', 'kappa', 'Kappa', 'KappaHD',
+            self.row('SELECT * FROM custom_commands_history'),
+            (1, 'botgotsthis', '', 'kappa', 'Kappa', 'replace', 'KappaHD',
              'botgotsthis', TypeMatch(datetime)))
 
     def test_append(self):
@@ -323,8 +312,8 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
              now, 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', '', 'kappa', None, 'Kappa Kappa', 'botgotsthis',
-             TypeMatch(datetime)))
+            (1, 'botgotsthis', '', 'kappa', None, 'append', 'Kappa Kappa',
+             'botgotsthis', TypeMatch(datetime)))
 
     def test_append_commanddisplay(self):
         now = datetime(2000, 1, 1)
@@ -342,7 +331,7 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
              now, 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', '', 'kappa', 'Kappa', 'Kappa Kappa',
+            (1, 'botgotsthis', '', 'kappa', 'Kappa', 'append', 'Kappa Kappa',
              'botgotsthis', TypeMatch(datetime)))
 
     def test_delete(self):
@@ -370,7 +359,7 @@ INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
         self.assertIsNone(self.row('SELECT * FROM custom_command_properties'))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', '', 'kappa', None, None,
+            (1, 'botgotsthis', '', 'kappa', None, 'delete', None,
              'botgotsthis', TypeMatch(datetime)))
 
     def test_delete_commanddisplay(self):
@@ -386,7 +375,7 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         self.assertIsNone(self.row('SELECT * FROM custom_commands'))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', '', 'kappa', 'Kappa', None,
+            (1, 'botgotsthis', '', 'kappa', 'Kappa', 'delete', None,
              'botgotsthis', TypeMatch(datetime)))
 
     def test_level(self):
@@ -419,7 +408,7 @@ INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
             ('botgotsthis', 'moderator', 'kappa', 'kappa', 'Kappa'))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', ';moderator', 'kappa', None, None,
+            (1, 'botgotsthis', 'moderator', 'kappa', None, 'level', '',
              'botgotsthis', TypeMatch(datetime)))
 
     def test_level_overlap(self):
@@ -463,7 +452,7 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
              now, 'botgotsthis', TypeMatch(datetime)))
         self.assertEqual(
             self.row('SELECT * FROM custom_commands_history'),
-            (1, 'botgotsthis', ';moderator', 'kappa', 'Kappa', None,
+            (1, 'botgotsthis', 'moderator', 'kappa', 'Kappa', 'level', '',
              'botgotsthis', TypeMatch(datetime)))
 
     def test_get_property_no_command(self):
