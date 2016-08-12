@@ -151,6 +151,15 @@ class DatabaseBase(metaclass=ABCMeta):
         return False
 
     @abstractmethod
+    def renameCustomCommand(self,
+                           broadcaster: str,
+                           permission: str,
+                           command: str,
+                           user: str,
+                           new_command: str) -> bool:
+        return False
+
+    @abstractmethod
     def getCustomCommandProperty(
             self,
             broadcaster: str,

@@ -99,6 +99,13 @@ class DatabaseBase(metaclass=ABCMeta):
                            user: str,
                            new_permission: str) -> bool: ...
     @abstractmethod
+    def renameCustomCommand(self,
+                           broadcaster: str,
+                           permission: str,
+                           command: str,
+                           user: str,
+                           new_command: str) -> bool: ...
+    @abstractmethod
     def getCustomCommandProperty(
             self,
             broadcaster: str,

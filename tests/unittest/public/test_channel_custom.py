@@ -593,3 +593,43 @@ class TestChannelCustomProcessCommand(TestChannel):
             self.broadcaster, '', 'Kappa', 'botgotsthis', 'moderator')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'change', 'not', 'success'))
+
+    def test_rename_command(self):
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'PogChamp')
+        self.database.renameCustomCommand.return_value = True
+        self.assertIs(custom.rename_command(self.args, input), True)
+        self.database.renameCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa', 'botgotsthis', 'PogChamp')
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'Kappa', 'rename', 'success',
+                        'PogChamp'))
+
+    def test_rename_command_multiple(self):
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'PogChamp DansGame')
+        self.database.renameCustomCommand.return_value = True
+        self.assertIs(custom.rename_command(self.args, input), True)
+        self.database.renameCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa', 'botgotsthis', 'PogChamp')
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'Kappa', 'rename', 'success',
+                        'PogChamp'))
+
+    def test_rename_command_blank(self):
+        input = CommandActionTokens('', self.broadcaster, '', 'Kappa', '')
+        self.assertIs(custom.rename_command(self.args, input), True)
+        self.assertFalse(self.database.renameCustomCommand.called)
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'specify', 'command', 'rename'))
+
+    def test_rename_command_dberror(self):
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'PogChamp')
+        self.database.renameCustomCommand.return_value = False
+        self.assertIs(custom.rename_command(self.args, input), True)
+        self.database.renameCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa', 'botgotsthis', 'PogChamp')
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'Kappa', 'rename', 'not', 'success',
+                        'PogChamp'))

@@ -101,6 +101,14 @@ class DatabaseNone(DatabaseBase):
                            new_permission: str) -> bool:
         return False
 
+    def renameCustomCommand(self,
+                           broadcaster: str,
+                           permission: str,
+                           command: str,
+                           user: str,
+                           new_command: str) -> bool:
+        return False
+
     def getCustomCommandProperty(
             self,
             broadcaster: str,

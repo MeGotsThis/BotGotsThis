@@ -320,6 +320,40 @@ INSERT INTO custom_commands_history
             self.connection.commit()
             return True
 
+    def renameCustomCommand(self,
+                           broadcaster: str,
+                           permission: str,
+                           command: str,
+                           user: str,
+                           new_command: str) -> bool:
+        query = '''
+UPDATE custom_commands SET command=?, commandDisplay=?
+    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
+        history = '''
+INSERT INTO custom_commands_history
+    (broadcaster, permission, command, commandDisplay, process, fullMessage,
+    creator, created)
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # --type: sqlite3.Cursor
+            display = (None if new_command.lower() == new_command else
+                       new_command)  # type: Optional[str]
+            try:
+                cursor.execute(query, (new_command.lower(), display,
+                                       broadcaster, permission,
+                                       command.lower()))
+            except sqlite3.IntegrityError:
+                return False
+
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+
+            cursor.execute(history, (broadcaster, permission,
+                                     new_command.lower(), display, 'rename',
+                                     command.lower(), user))
+            self.connection.commit()
+            return True
+
     def getCustomCommandProperty(
             self,
             broadcaster: str,

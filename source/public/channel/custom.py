@@ -208,3 +208,22 @@ def level_command(args: ChatCommandArgs,
     args.chat.send(message.format(user=args.nick, command=input.command,
                                   inputLevel=input.text))
     return True
+
+
+def rename_command(args: ChatCommandArgs,
+                  input: CommandActionTokens) -> bool:
+    newCommand = input.text and input.text.split(None, 1)[0]
+    if not newCommand:
+        message = '{user} -> Please specify a command to rename to'
+    elif args.database.renameCustomCommand(
+            input.broadcaster, input.level, input.command, args.nick,
+            newCommand):
+        message = ('{user} -> {command} was renamed to successfully to '
+                   '{newcommand}')
+    else:
+        message = ('{user} -> {command} was not renamed successfully to '
+                   '{newcommand}. The command might not exist or there is a '
+                   'command already existing')
+    args.chat.send(message.format(user=args.nick, command=input.command,
+                                  newcommand=newCommand))
+    return True

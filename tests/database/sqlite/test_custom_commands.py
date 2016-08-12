@@ -455,6 +455,83 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
             (1, 'botgotsthis', 'moderator', 'kappa', 'Kappa', 'level', '',
              'botgotsthis', TypeMatch(datetime)))
 
+    def test_rename(self):
+        self.assertIs(
+            self.database.renameCustomCommand(
+                'botgotsthis', '', 'kappa', 'botgotsthis', 'pogchamp'),
+            False)
+        self.assertIsNone(self.row('SELECT * FROM custom_commands'))
+        self.assertIsNone(self.row('SELECT * FROM custom_commands_history'))
+
+    def test_rename_existing(self):
+        now = datetime(2000, 1, 1)
+        self.execute('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
+                      now, 'botgotsthis', now))
+        self.execute('''
+INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
+        self.assertIs(
+            self.database.renameCustomCommand(
+                'botgotsthis', '', 'kappa', 'botgotsthis', 'pogchamp'),
+            True)
+        self.assertEqual(
+            self.row('SELECT * FROM custom_commands'),
+            ('botgotsthis', '', 'pogchamp', None, 'Kappa', 'botgotsthis',
+             now, 'botgotsthis', TypeMatch(datetime)))
+        self.assertEqual(
+            self.row('SELECT * FROM custom_command_properties'),
+            ('botgotsthis', '', 'pogchamp', 'kappa', 'Kappa'))
+        self.assertEqual(
+            self.row('SELECT * FROM custom_commands_history'),
+            (1, 'botgotsthis', '', 'pogchamp', None, 'rename', 'kappa',
+             'botgotsthis', TypeMatch(datetime)))
+
+    def test_rename_overlap(self):
+        now = datetime(2000, 1, 1)
+        self.executemany('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                         [('botgotsthis', '', 'kappa', None, 'Kappa',
+                           'botgotsthis', now, 'botgotsthis', now),
+                          ('botgotsthis', '', 'pogchamp', None, 'PogChamp',
+                           'botgotsthis', now, 'botgotsthis', now)])
+        self.execute('''
+INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'pogchamp', 'kappa', 'Kappa'))
+        self.assertIs(
+            self.database.renameCustomCommand(
+                'botgotsthis', '', 'kappa', 'botgotsthis', 'pogchamp'),
+            False)
+        self.assertEqual(
+            self.rows('SELECT * FROM custom_commands'),
+            [('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
+              now, 'botgotsthis', now),
+             ('botgotsthis', '', 'pogchamp', None, 'PogChamp', 'botgotsthis',
+              now, 'botgotsthis', now)])
+        self.assertEqual(
+            self.row('SELECT * FROM custom_command_properties'),
+            ('botgotsthis', '', 'pogchamp', 'kappa', 'Kappa'))
+
+    def test_rename_commanddisplay(self):
+        now = datetime(2000, 1, 1)
+        self.execute('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
+                      now, 'botgotsthis', now))
+        self.assertIs(
+            self.database.renameCustomCommand(
+                'botgotsthis', '', 'Kappa', 'botgotsthis', 'PogChamp'),
+            True)
+        self.assertEqual(
+            self.row('SELECT * FROM custom_commands'),
+            ('botgotsthis', '', 'pogchamp', 'PogChamp', 'Kappa', 'botgotsthis',
+             now, 'botgotsthis', TypeMatch(datetime)))
+        self.assertEqual(
+            self.row('SELECT * FROM custom_commands_history'),
+            (1, 'botgotsthis', '', 'pogchamp', 'PogChamp', 'rename', 'kappa',
+             'botgotsthis', TypeMatch(datetime)))
+
     def test_get_property_no_command(self):
         self.assertIsNone(
             self.database.getCustomCommandProperty(
