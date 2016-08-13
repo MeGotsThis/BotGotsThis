@@ -49,10 +49,13 @@ def api_call(channel: Optional[str],
             token = oauth.token(channel)  # type: Optional[str]
             if token is not None:
                 headers['Authorization'] = 'OAuth ' + token
+        dataStr = None  # type: Optional[str]
         if data is not None:
             if isinstance(data, Mapping):
-                data = urllib.parse.urlencode(data)
-        connection.request(method, uri, data, headers)
+                dataStr = urllib.parse.urlencode(data)
+            else:
+                dataStr = data
+        connection.request(method, uri, dataStr, headers)
         with connection.getresponse() as response:  # --type: client.HTTPResponse
             return response, response.read()
 
@@ -122,7 +125,7 @@ def is_valid_user(user: str) -> bool:
     user = user.lower()
     response, _ = api_call(
         None, 'GET', '/kraken/channels/' + user)  # type: client.HTTPResponse, bytes
-    return response.code == 200
+    return response.status == 200
 
 
 def num_followers(user: str) -> Optional[int]:

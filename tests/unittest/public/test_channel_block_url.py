@@ -89,7 +89,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.mock_followers.return_value = 1
         self.mock_compare.return_value = True
         message = Message('twitch.tv')
-        self.response.geturl.return_value = 'http://megotsthis.com'
+        self.response.url = 'http://megotsthis.com'
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
                                         self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
@@ -97,7 +97,6 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
         self.mock_request.assert_called_once_with(TypeMatch(Request))
-        self.response.geturl.assert_called_once_with()
         self.mock_compare.assert_called_once_with(
             'http://twitch.tv', 'http://megotsthis.com',
             chat=self.channel, nick='megotsthis', timestamp=self.now)
@@ -108,7 +107,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
     def test_same_domain(self):
         self.mock_followers.return_value = 1
         message = Message('twitch.tv')
-        self.response.geturl.return_value = 'http://twitch.tv'
+        self.response.url = 'http://twitch.tv'
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
                                         self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
@@ -116,7 +115,6 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
         self.mock_request.assert_called_once_with(TypeMatch(Request))
-        self.response.geturl.assert_called_once_with()
         self.mock_compare.assert_called_once_with(
             'http://twitch.tv', 'http://twitch.tv',
             chat=self.channel, nick='megotsthis', timestamp=self.now)
@@ -128,7 +126,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         message = Message('twitch.tv')
         self.mock_request.side_effect = urllib.error.HTTPError(
             'http://twitch.tv', 404, None, {}, 0)
-        self.response.geturl.return_value = 'http://twitch.tv'
+        self.response.url = 'http://twitch.tv'
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
                                         self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
@@ -147,7 +145,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         message = Message('twitch.tv')
         self.mock_request.side_effect = urllib.error.HTTPError(
             'http://twitch.tv', 502, None, {}, 0)
-        self.response.geturl.return_value = 'http://twitch.tv'
+        self.response.url = 'http://twitch.tv'
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
                                         self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
@@ -211,8 +209,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
     def test_multiple(self):
         self.mock_followers.return_value = 1
         message = Message('https://twitch.tv megotsthis.com')
-        self.response.geturl.side_effect = ['http://twitch.tv',
-                                            'https://twitch.tv']
+        self.response.url = 'http://twitch.tv'
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
                                         self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
@@ -220,11 +217,10 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
         self.assertEqual(self.mock_request.call_count, 2)
-        self.assertEqual(self.response.geturl.call_count, 2)
         self.mock_compare.assert_has_calls([
             call('https://twitch.tv', 'http://twitch.tv',
                  chat=self.channel, nick='megotsthis', timestamp=self.now),
-            call('http://megotsthis.com', 'https://twitch.tv',
+            call('http://megotsthis.com', 'http://twitch.tv',
                  chat=self.channel, nick='megotsthis', timestamp=self.now),
             ])
         self.assertFalse(self.mock_handle.called)
@@ -234,8 +230,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.mock_followers.return_value = 1
         self.mock_compare.side_effect = [True, False]
         message = Message('https://twitch.tv megotsthis.com')
-        self.response.geturl.side_effect = ['http://twitch.tv',
-                                            'https://twitch.tv']
+        self.response.url = 'http://twitch.tv'
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
                                         self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
@@ -253,9 +248,9 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
     def test_multiple_exception(self):
         self.mock_followers.return_value = 1
         message = Message('twitch.tv megotsthis.com twitch.tv')
-        self.response.geturl.side_effect = [Exception,
-                                            'https://twitch.tv',
-                                            Exception]
+        self.response.url = 'http://twitch.tv'
+        self.mock_request.return_value.__enter__.side_effect = [
+            Exception, self.response, Exception]
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
                                         self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
@@ -263,9 +258,8 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
         self.assertEqual(self.mock_request.call_count, 3)
-        self.assertEqual(self.response.geturl.call_count, 3)
         self.mock_compare.assert_called_once_with(
-            'http://megotsthis.com', 'https://twitch.tv',
+            'http://megotsthis.com', 'http://twitch.tv',
             chat=self.channel, nick='megotsthis', timestamp=self.now)
         self.mock_except.assert_has_calls(
             [call(StrContains(str(message)), TypeMatch(datetime)),

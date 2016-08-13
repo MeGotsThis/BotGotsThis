@@ -329,7 +329,7 @@ class TestApiTwitch(unittest.TestCase):
     def test_is_valid_user(self):
         bot.globals.globalSessionData['validTwitchUser'] = defaultdict(
             lambda: (datetime.min, None))
-        self.mock_response.code = 200
+        self.mock_response.status = 200
         self.assertIs(twitch.is_valid_user('botgotsthis'), True)
 
     @patch.dict('bot.globals.globalSessionData')

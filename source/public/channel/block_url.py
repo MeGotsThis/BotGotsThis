@@ -58,12 +58,12 @@ def check_domain_redirect(chat: 'data.Channel',
             with urllib.request.urlopen(request) as response:  # HTTPResponse
                 if not isinstance(response, HTTPResponse):
                     raise TypeError()
-                if compare_domains(url, response.geturl(),
+                if compare_domains(url, response.url,
                                    chat=chat, nick=nick, timestamp=timestamp):
                     handle_different_domains(chat, nick, message)
                     return
         except urllib.error.HTTPError as e:
-            if compare_domains(url, e.geturl(),  # type: ignore --
+            if compare_domains(url, e.filename,
                                chat=chat, nick=nick, timestamp=timestamp):
                 handle_different_domains(chat, nick, message)
                 return
