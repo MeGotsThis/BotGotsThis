@@ -383,8 +383,8 @@ def convert_field(args: CustomFieldArgs) -> Optional[str]:
 
 
 def format(string: str,
-           format: str,
+           format: Optional[str],
            hasTextConvert: bool) -> str:
-    if hasTextConvert:
+    if hasTextConvert and format is not None:
         return textformat.format(string=string, format_=format)
     return string

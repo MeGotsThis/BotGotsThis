@@ -1021,6 +1021,10 @@ class TestLibraryCustomFormat(unittest.TestCase):
         self.assertEqual(custom.format('Kappa', 'test', False), 'Kappa')
         self.assertFalse(self.mock_format.called)
 
+    def test_none_format(self):
+        self.assertEqual(custom.format('Kappa', None, False), 'Kappa')
+        self.assertFalse(self.mock_format.called)
+
     def test_with_format(self):
         self.mock_format.return_value = 'Keepo'
         self.assertEqual(custom.format('Kappa', 'test', True), 'Keepo')
