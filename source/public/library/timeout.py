@@ -42,16 +42,13 @@ def timeout_user(database: DatabaseBase,
     length = timeouts[level]  # type: int
     if length:
         chat.send(
-            '.timeout {user} {length}'.format(user=user, length=length), 0)
+            '.timeout {user} {length} {reason}'.format(
+                user=user, length=length, reason=reason or ''), 0)
     else:
-        chat.send('.ban {user}'.format(user=user), 0)
+        chat.send(
+            '.ban {user} {reason}'.format(user=user, reason=reason or ''), 0)
     database.recordTimeout(chat.channel, user, None, module, level, length,
                            message, reason)
-    if reason is not None:
-        lengthText = '{} seconds'.format(length) if length else 'Banned'
-        utils.whisper(
-            user,
-            '{reason} ({length})'.format(reason=reason, length=lengthText))
 
 
 def record_timeout(database: DatabaseBase,
@@ -64,16 +61,23 @@ def record_timeout(database: DatabaseBase,
         messages = messages,
     for message in messages:  # --type: str
         who, length = None, None  # type: Optional[str], Optional[Union[int, bool]]
+        reason = None  # type: Optional[str]
         if message.startswith(('.ban', '/ban')):
-            with suppress(ValueError, IndexError):
-                who, length = message.split()[1], 0
+            parts = message.split(None, 2)  # type: List[str]
+            if len(parts) >= 2:
+                who, length = parts[1], 0
+            if len(parts) >= 3:
+                reason = parts[2]
         if message.startswith(('.timeout', '/timeout')):
-            with suppress(ValueError, IndexError):
-                parts = message.split()
+            parts = message.split(None, 3)
+            if len(parts) >= 2:
                 if len(parts) < 3:
                     who = parts[1]
                 else:
-                    who, length = parts[1], int(parts[2])
+                    with suppress(ValueError):
+                        who, length = parts[1], int(parts[2])
+                    if len(parts) >= 4:
+                        reason = parts[3]
         if who is not None:
             database.recordTimeout(chat.channel, who, user, module, None,
-                                   length, source_message, None)
+                                   length, source_message, reason)
