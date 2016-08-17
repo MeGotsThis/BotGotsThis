@@ -367,4 +367,5 @@ class TestChannelBlockUrlHandleDifferentDomain(unittest.TestCase):
                                            self.message)
         self.mock_database.assert_called_once_with()
         self.mock_timeout.assert_called_once_with(
-            self.database, self.channel, 'megotsthis', 'redirectUrl', 1, '')
+            self.database, self.channel, 'megotsthis', 'redirectUrl', 1, '',
+            'Blocked Redirected URL')
