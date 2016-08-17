@@ -94,16 +94,18 @@ def logIrcMessage(filename: str,
             time=timestamp, message=message))
 
 
-def logException(extraMessage: str=None,
+def logException(extraMessage: str='',
                  timestamp: Optional[datetime]=None) -> None:
     if bot.config.exceptionLog is None:
         return
     timestamp = timestamp or now()
     exceptInfo = sys.exc_info()  # type: ExceptionInfo
     excep = traceback.format_exception(*exceptInfo)  # type: ignore
+    if extraMessage:
+        extraMessage += '\n'
     bot.globals.logging.log(
         bot.config.exceptionLog,
         '{time:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {thread}:\n'
-            '{extra}{exception}'.format(
-                time=timestamp, thread=threading.current_thread().name,  # type: ignore --
-                extra=extraMessage, exception=''.join(excep)))
+        '{extra}{exception}'.format(
+            time=timestamp, thread=threading.current_thread().name,  # type: ignore --
+            extra=extraMessage, exception=''.join(excep)))
