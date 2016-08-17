@@ -58,8 +58,11 @@ def commandRawGame(args: ChatCommandArgs) -> bool:
 @permission('chatModerator')
 @min_args(1)
 def commandPurge(args: ChatCommandArgs) -> bool:
-    args.chat.send('.timeout {user} 1'.format(user=args.message[1]))
+    reason = args.message[2:]  # type: str
+    args.chat.send(
+        '.timeout {user} 1 {reason}'.format(
+            user=args.message[1], reason=reason))
     args.database.recordTimeout(
         args.chat.channel, args.message.lower[1], args.nick, 'purge', None, 1,
-        str(args.message), None)
+        str(args.message), reason if reason else None)
     return True

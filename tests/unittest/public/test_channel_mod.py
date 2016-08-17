@@ -216,7 +216,22 @@ class TestChannelMod(TestChannel):
         message = Message('!purge MeGotsThis')
         self.assertIs(mod.commandPurge(self.args._replace(message=message)),
                       True)
-        self.channel.send.assert_called_once_with('.timeout MeGotsThis 1')
+        self.channel.send.assert_called_once_with('.timeout MeGotsThis 1 ')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', 'botgotsthis', 'purge', None, 1,
             '!purge MeGotsThis', None)
+
+    def test_purge_reason(self):
+        self.assertIs(mod.commandPurge(self.args), False)
+        self.assertFalse(self.channel.send.called)
+        self.assertFalse(self.database.recordTimeout.called)
+        self.permissionSet['moderator'] = True
+        self.permissionSet['chatModerator'] = True
+        message = Message('!purge MeGotsThis Kappa')
+        self.assertIs(mod.commandPurge(self.args._replace(message=message)),
+                      True)
+        self.channel.send.assert_called_once_with(
+            '.timeout MeGotsThis 1 Kappa')
+        self.database.recordTimeout.assert_called_once_with(
+            'botgotsthis', 'megotsthis', 'botgotsthis', 'purge', None, 1,
+            '!purge MeGotsThis Kappa', 'Kappa')
