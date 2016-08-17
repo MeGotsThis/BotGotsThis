@@ -103,4 +103,4 @@ def handle_different_domains(chat: 'data.Channel',
                              message: Message) -> None:
     with factory.getDatabase() as database:
         timeout.timeout_user(database, chat, nick, 'redirectUrl', 1,
-                             str(message))
+                             str(message), 'Blocked Redirected URL')
