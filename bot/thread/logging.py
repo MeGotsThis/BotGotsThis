@@ -14,7 +14,7 @@ class Logging(threading.Thread):
         print('{time} Starting {name}'.format(
             time=utils.now(), name=self.__class__.__name__))
         try:
-            while bot.globals.running:
+            while bot.globals.running or not self.queue.empty():
                 self.process()
         finally:
             print('{time} Ending {name}'.format(
