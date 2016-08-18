@@ -199,11 +199,12 @@ def raw_command(args: ChatCommandArgs,
 
 def level_command(args: ChatCommandArgs,
                   input: CommandActionTokens) -> bool:
-    if input.text not in custom.permissions:
+    permission = input.text.lower()  # type: str
+    if permission not in custom.permissions:
         message = '{user} -> {inputLevel} is an invalid permission'
     elif args.database.levelCustomCommand(
             input.broadcaster, input.level, input.command, args.nick,
-            custom.permissions[input.text]):
+            custom.permissions[permission]):
         message = '{user} -> {command} changed permission successfully'
     else:
         message = ('{user} -> {command} was not changed successfully. The '

@@ -618,6 +618,16 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'change', 'success'))
 
+    def test_level_command_capitals(self):
+        input = CommandActionTokens('', self.broadcaster, '',
+                                    'Kappa', 'BrOaDcAsTeR')
+        self.database.levelCustomCommand.return_value = True
+        self.assertIs(custom.level_command(self.args, input), True)
+        self.database.levelCustomCommand.assert_called_once_with(
+            self.broadcaster, '', 'Kappa', 'botgotsthis', 'broadcaster')
+        self.channel.send.assert_called_once_with(
+            StrContains(self.args.nick, 'Kappa', 'change', 'success'))
+
     def test_level_command_unknown_level(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp DansGame')
