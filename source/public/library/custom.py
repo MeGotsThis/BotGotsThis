@@ -65,7 +65,8 @@ def create_messages(command: CustomCommand,
                     fieldArgument = CustomFieldArgs(
                         parts.field, parts.param, parts.prefix,
                         parts.suffix, parts.default, args.message,
-                        args.chat.channel, args.nick, args.timestamp)  # type: CustomFieldArgs
+                        args.chat.channel, args.nick, args.permissions,
+                        args.timestamp)  # type: CustomFieldArgs
                     string = convert_field(fieldArgument)  # type: Optional[str]
                     if string is not None:
                         string = format(string, parts.format, textFormat)

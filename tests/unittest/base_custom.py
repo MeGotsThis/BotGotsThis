@@ -12,9 +12,10 @@ from unittest.mock import MagicMock, Mock
 class TestCustomField(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
+        self.permissions = MagicMock(spec=ChatPermissionSet)
         self.args = CustomFieldArgs(
             'field', None, None, None, None, Message(''),
-            'botgotsthis', 'botgotsthis', self.now)
+            'botgotsthis', 'botgotsthis', self.permissions, self.now)
 
 
 class TestCustomProcess(unittest.TestCase):

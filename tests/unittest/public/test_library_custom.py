@@ -983,6 +983,7 @@ class TestLibraryCustomConvertField(unittest.TestCase):
     def setUp(self):
         self.args = CustomFieldArgs('', None, None, None, None, Message(''),
                                     Mock(spec=Channel), 'botgotsthis',
+                                    Mock(spec=ChatPermissionSet),
                                     datetime(2000, 1, 1))
 
         patcher = patch('lists.custom', autospec=True)

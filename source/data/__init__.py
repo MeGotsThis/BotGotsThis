@@ -30,6 +30,7 @@ CustomFieldArgs = NamedTuple('CustomFieldArgs',
                               ('message', Message),
                               ('channel', str),
                               ('nick', str),
+                              ('permissions', ChatPermissionSet),
                               ('timestamp', datetime)])
 
 CustomProcessArgs = NamedTuple('CustomProcessArgs',
