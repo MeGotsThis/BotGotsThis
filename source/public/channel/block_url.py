@@ -37,7 +37,7 @@ def check_domain_redirect(chat: 'data.Channel',
                           nick: str,
                           message: Message,
                           timestamp: datetime) -> None:
-    if not twitch.num_followers(nick):
+    if twitch.num_followers(nick):
         return
     
     # Record all urls with users of no follows

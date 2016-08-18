@@ -73,8 +73,8 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_handle = patcher.start()
 
-    def test_no_followers(self):
-        self.mock_followers.return_value = 0
+    def test_followers(self):
+        self.mock_followers.return_value = 1
         message = Message('twitch.tv')
         block_url.check_domain_redirect(self.channel, 'botgotsthis', message,
                                         self.now)
@@ -86,7 +86,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_handle.called)
 
     def test(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         self.mock_compare.return_value = True
         message = Message('twitch.tv')
         self.response.url = 'http://megotsthis.com'
@@ -105,7 +105,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     def test_same_domain(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         message = Message('twitch.tv')
         self.response.url = 'http://twitch.tv'
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
@@ -122,7 +122,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     def test_404_error(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         message = Message('twitch.tv')
         self.mock_request.side_effect = urllib.error.HTTPError(
             'http://twitch.tv', 404, None, {}, 0)
@@ -141,7 +141,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     def test_502_error(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         message = Message('twitch.tv')
         self.mock_request.side_effect = urllib.error.HTTPError(
             'http://twitch.tv', 502, None, {}, 0)
@@ -160,7 +160,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     def test_urlerror_no_dns(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         message = Message('twitch.tv')
         self.mock_request.side_effect = urllib.error.URLError(
             OSError(socket.EAI_NONAME, 'no name'))
@@ -175,7 +175,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     def test_urlerror_other(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         message = Message('twitch.tv')
         self.mock_request.side_effect = urllib.error.URLError('error')
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
@@ -191,7 +191,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_compare.called)
 
     def test_exception(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         message = Message('twitch.tv')
         self.mock_request.side_effect = Exception
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
@@ -207,7 +207,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_compare.called)
 
     def test_multiple(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         message = Message('https://twitch.tv megotsthis.com')
         self.response.url = 'http://twitch.tv'
         block_url.check_domain_redirect(self.channel, 'megotsthis', message,
@@ -227,7 +227,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     def test_multiple_first_match(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         self.mock_compare.side_effect = [True, False]
         message = Message('https://twitch.tv megotsthis.com')
         self.response.url = 'http://twitch.tv'
@@ -246,7 +246,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     def test_multiple_exception(self):
-        self.mock_followers.return_value = 1
+        self.mock_followers.return_value = 0
         message = Message('twitch.tv megotsthis.com twitch.tv')
         self.response.url = 'http://twitch.tv'
         self.mock_request.return_value.__enter__.side_effect = [
