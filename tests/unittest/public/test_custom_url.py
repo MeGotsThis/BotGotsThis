@@ -1,13 +1,14 @@
 import urllib.error
+import re
 from http.client import HTTPResponse
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 from source.data.message import Message
 from source.public.custom import url
 from tests.unittest.base_custom import TestCustomField
 
 
-class TestCustomQuery(TestCustomField):
+class TestCustomUrl(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='url',
@@ -82,34 +83,40 @@ class TestCustomQuery(TestCustomField):
         self.mock_urlopen.assert_called_once_with(
             'http://localhost/', timeout=1)
 
-    def test_query(self):
+    @patch('source.public.custom.url.field_replace')
+    def test_field(self, mock_replace):
+        mock_replace.return_value = 'PogChamp'
         self.args = self.args._replace(param='http://localhost/{query}')
         self.assertEqual(url.fieldUrl(self.args), 'Kappa')
         self.mock_urlopen.assert_called_once_with(
-            'http://localhost/query', timeout=1)
+            'http://localhost/PogChamp', timeout=1)
 
-    def test_user(self):
-        self.args = self.args._replace(param='http://localhost/{user}',
-                                       nick='megotsthis')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
-            'http://localhost/megotsthis', timeout=1)
 
-    def test_nick(self):
-        self.args = self.args._replace(param='http://localhost/{nick}',
-                                       nick='megotsthis')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
-            'http://localhost/megotsthis', timeout=1)
+class TestFieldReplace(TestCustomField):
+    def setUp(self):
+        super().setUp()
 
-    def test_broadcaster(self):
-        self.args = self.args._replace(param='http://localhost/{broadcaster}')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
-            'http://localhost/botgotsthis', timeout=1)
+        patcher = patch('source.public.custom.url.fieldUrl')
+        self.addCleanup(patcher.stop)
+        self.mock_fieldUrl = patcher.start()
 
-    def test_streamer(self):
-        self.args = self.args._replace(param='http://localhost/{streamer}')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
-            'http://localhost/botgotsthis', timeout=1)
+        patcher = patch('lists.custom')
+        self.addCleanup(patcher.stop)
+        self.mock_list = patcher.start()
+        self.mock_list.fields = [self.mock_fieldUrl]
+
+        self.match = re.match(r'(.*)', 'Kappa')
+
+    def test(self):
+        self.assertEqual(url.field_replace(self.args, self.match), '')
+        self.assertFalse(self.mock_fieldUrl.called)
+
+    def test_something(self):
+        self.mock_list.fields.append(Mock(return_value='Kappa'))
+        self.assertEqual(url.field_replace(self.args, self.match), 'Kappa')
+        self.assertFalse(self.mock_fieldUrl.called)
+
+    def test_none(self):
+        self.mock_list.fields.append(Mock(return_value=None))
+        self.assertEqual(url.field_replace(self.args, self.match), '')
+        self.assertFalse(self.mock_fieldUrl.called)

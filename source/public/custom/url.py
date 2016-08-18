@@ -1,19 +1,20 @@
 ﻿from contextlib import suppress
+from functools import partial
 from http.client import HTTPResponse
-from typing import Optional
-from ...data import CustomFieldArgs
+from typing import Callable, Iterator, Match, Optional
+from ...data import CustomCommandField, CustomFieldArgs
+import re
 import bot.config
+import lists.custom
 import urllib.error
 import urllib.request
 
 
 def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'url':
-        url = args.param.replace('{query}', args.message.query)  # type: str
-        url = url.replace('{user}', args.nick)
-        url = url.replace('{nick}', args.nick)
-        url = url.replace('{broadcaster}', args.channel)
-        url = url.replace('{streamer}', args.channel)
+        replace_func = partial(field_replace, args  # type: ignore --
+                               )  # type: Callable[[Match[str]], str]
+        url = re.sub(r'{([^\r\n\t\f {}]+)}', replace_func, args.param)  # type: str
         with suppress(urllib.error.URLError):
             with urllib.request.urlopen(
                     url, timeout=bot.config.customMessageUrlTimeout) as res:  # --type: HTTPResponse
@@ -25,3 +26,18 @@ def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
                     return (args.prefix or '') + data + (args.suffix or '')
         return args.default or ''
     return None
+
+
+def field_replace(args: CustomFieldArgs, match: Match[str]) -> str:
+    newargs = args._replace(field=match.group(1),  # type: ignore
+                            param=None,
+                            prefix=None,
+                            suffix=None,
+                            default=None,
+                            )  # type: CustomFieldArgs
+    fields = (f for f in lists.custom.fields if f is not fieldUrl)  # type: Iterator[CustomCommandField]
+    for field in fields:  # --type: CustomCommandField
+        replacement = field(newargs)  # type: Optional[str]
+        if replacement is not None:
+            return replacement
+    return ''
