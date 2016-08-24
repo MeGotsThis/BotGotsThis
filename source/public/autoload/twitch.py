@@ -17,8 +17,8 @@ def call_server(timestamp: datetime.datetime) -> None:
 
 
 threading.Timer(1, background.addTask, 
-                (call_streams, datetime.timedelta(seconds=30))).start()
+                [call_streams, datetime.timedelta(seconds=30)]).start()
 threading.Timer(10, background.addTask,
-                (call_offline, datetime.timedelta(seconds=0.05))).start()
+                [call_offline, datetime.timedelta(seconds=0.05)]).start()
 threading.Timer(10, background.addTask,
-                (call_server, datetime.timedelta(seconds=0.05))).start()
+                [call_server, datetime.timedelta(seconds=0.05)]).start()
