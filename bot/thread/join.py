@@ -12,7 +12,7 @@ joinDuration = timedelta(seconds=10.05)
 
 class JoinThread(threading.Thread):
     def __init__(self, **kwargs):
-        threading.Thread.__init__(self, **kwargs)
+        threading.Thread.__init__(self, **kwargs)  # type: ignore
         self._joinTimes = []  # type: List[datetime]
         self._joinTimesLock = threading.Lock()  # type: threading.Lock
         self._channelJoined = set()  # type: Set[str]

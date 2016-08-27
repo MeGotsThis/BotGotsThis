@@ -8,7 +8,7 @@ import time
 
 class BackgroundTasker(threading.Thread):
     def __init__(self, **kwargs) -> None:
-        threading.Thread.__init__(self, **kwargs)
+        threading.Thread.__init__(self, **kwargs)  # type: ignore
         self._tasks = []  # type: List[Task]
     
     def run(self) -> None:

@@ -70,7 +70,7 @@ class MessageRepeater(threading.Thread):
                  duration: timedelta=timedelta(),
                  count: Optional[int]=None,
                  **kwargs) -> None:
-        threading.Thread.__init__(self, *args, **kwargs)
+        threading.Thread.__init__(self, *args, **kwargs)  # type: ignore
         self._chat = chat  # type: data.Channel
         self._message = message  # type: str
         self._count = count  # type: Optional[int]

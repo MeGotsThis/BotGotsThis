@@ -7,7 +7,7 @@ import threading
 
 class Logging(threading.Thread):
     def __init__(self, **kwargs) -> None:
-        threading.Thread.__init__(self, **kwargs)
+        threading.Thread.__init__(self, **kwargs)  # type: ignore
         self.queue = queue.Queue()  # type: queue.Queue[Tuple[str, str]]
 
     def run(self) -> None:
