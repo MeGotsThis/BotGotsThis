@@ -56,7 +56,7 @@ def commandRawGame(args: ChatCommandArgs) -> bool:
 
 @permission('moderator')
 @permission('chatModerator')
-@min_args(1)
+@min_args(2)
 def commandPurge(args: ChatCommandArgs) -> bool:
     reason = args.message[2:]  # type: str
     args.chat.send(
