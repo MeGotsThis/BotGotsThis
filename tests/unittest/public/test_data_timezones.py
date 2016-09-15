@@ -23,6 +23,20 @@ class TestDataBasicTimeZone(unittest.TestCase):
         self.assertEqual(self.timezone.dst(None), timedelta())
 
 
+class TestDataBasicTimeZoneNegative(unittest.TestCase):
+    def setUp(self):
+        self.timezone = timezones.BasicTimeZone(-60, 'BASE')
+
+    def test_tzname(self):
+        self.assertEqual(self.timezone.tzname(None), 'BASE')
+
+    def test_utcoffset(self):
+        self.assertEqual(self.timezone.utcoffset(None), timedelta(minutes=-60))
+
+    def test_dst(self):
+        self.assertEqual(self.timezone.dst(None), timedelta())
+
+
 class TestDataTimeZone(unittest.TestCase):
     def setUp(self):
         transitions = [

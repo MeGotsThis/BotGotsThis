@@ -41,7 +41,7 @@ class BasicTimeZone(BaseTimeZone):
         return self.__name
     
     def utcoffset(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
-        return timedelta(minutes=self.__offset.seconds // 60)
+        return timedelta(minutes=self.__offset.total_seconds() // 60)
     
     def dst(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
         return ZERO
