@@ -38,17 +38,6 @@ class TestLibraryCustomGetCommand(unittest.TestCase):
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_turbo(self):
-        self.permissions['turbo'] = True
-        self.database.getChatCommands.return_value = {
-            'botgotsthis': {'turbo': 'Kappa'}, '#global': {}}
-        self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
-            CustomCommand('Kappa', 'botgotsthis', 'turbo'))
-        self.database.getChatCommands.assert_called_once_with(
-            'botgotsthis', '!kappa')
-
     def test_subscriber(self):
         self.permissions['subscriber'] = True
         self.database.getChatCommands.return_value = {
@@ -582,15 +571,6 @@ class TestLibraryCustomGetActionCommand(unittest.TestCase):
             self.assertEqual(
                 custom.parse_action_message(message, 'botgotsthis'),
                 CommandActionTokens('add', 'botgotsthis', '', 'Kappa', ''),
-                level)
-
-    def test_level_turbo(self):
-        for level in ['turbo', 'TURBO', 'twitchturbo']:
-            message = Message('!command add level=%s Kappa' % level)
-            self.assertEqual(
-                custom.parse_action_message(message, 'botgotsthis'),
-                CommandActionTokens('add', 'botgotsthis', 'turbo', 'Kappa',
-                                    ''),
                 level)
 
     def test_level_subcriber(self):

@@ -14,7 +14,6 @@ def parse(channel: 'data.Channel',
     bot.globals.isTwitchAdmin = tags['user-type'] in ['staff', 'admin']
     bot.globals.isGlobalMod = tags['user-type'] in ['staff', 'admin',
                                                     'global_mod']
-    bot.globals.isTwitchTurbo = bool(int(tags['turbo']))
     if isinstance(channel, data.Channel):
         channel.isMod = bool(int(tags['mod'])) or bot.globals.isGlobalMod
         channel.isSubscriber = bool(int(tags['subscriber']))

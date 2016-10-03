@@ -26,7 +26,6 @@ whisperCluster = 'aws'  # type: str
 
 channels = {}  # type: Dict[str, data.Channel]
 displayName = bot.config.botnick  # type: str
-isTwitchTurbo = False  # type: bool
 isTwitchAdmin = False  # type: bool
 isTwitchStaff = False  # type: bool
 isGlobalMod = False  # type: bool

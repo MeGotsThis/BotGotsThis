@@ -95,17 +95,6 @@ class ChatPermissionSet:
         return self._isSubscriber
     
     @property
-    def turbo(self) -> bool:
-        if self._isTurbo is None:
-            turbo = None  # type: int
-            if self._tags is not None and 'turbo' in self._tags:
-                turbo = int(self._tags['turbo'])
-            else:
-                turbo = 0
-            self._isTurbo = self.broadcaster or bool(turbo)
-        return self._isTurbo
-    
-    @property
     def chatModerator(self) -> bool:
         return self._channel.isMod
     
@@ -127,8 +116,6 @@ class ChatPermissionSet:
                 return self.moderator
             if key == 'subscriber':
                 return self.subscriber
-            if key == 'turbo':
-                return self.turbo
             if key in ['channelModerator', 'chatModerator']:
                 return self.chatModerator
             raise KeyError('unknown permission')
@@ -180,17 +167,6 @@ class WhisperPermissionSet:
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod
     
-    @property
-    def turbo(self) -> bool:
-        if self._isTurbo is None:
-            turbo = None  # type: int
-            if 'turbo' in self._tags:
-                turbo = int(self._tags['turbo'])
-            else:
-                turbo = 0
-            self._isTurbo = self.globalModerator or bool(turbo)
-        return self._isTurbo
-    
     def __getitem__(self, key: str) -> bool:
         if isinstance(key, str):
             if key == 'owner':
@@ -201,7 +177,5 @@ class WhisperPermissionSet:
                 return self.twitchAdmin
             if key in ['globalMod', 'globalModerator']:
                 return self.globalModerator
-            if key == 'turbo':
-                return self.turbo
             raise KeyError('unknown permission')
         raise TypeError('key is not of type str')

@@ -29,7 +29,6 @@ class TestUserState(unittest.TestCase):
         self.assertIs(self.mock_globals.isTwitchStaff, False)
         self.assertIs(self.mock_globals.isTwitchAdmin, False)
         self.assertIs(self.mock_globals.isGlobalMod, False)
-        self.assertIs(self.mock_globals.isTwitchTurbo, False)
         self.assertIs(self.channel.isMod, False)
         self.assertIs(self.channel.isSubscriber, False)
 
@@ -39,7 +38,6 @@ class TestUserState(unittest.TestCase):
         self.assertIs(self.mock_globals.isTwitchStaff, True)
         self.assertIs(self.mock_globals.isTwitchAdmin, True)
         self.assertIs(self.mock_globals.isGlobalMod, True)
-        self.assertIs(self.mock_globals.isTwitchTurbo, False)
         self.assertIs(self.channel.isMod, True)
         self.assertIs(self.channel.isSubscriber, False)
 
@@ -49,7 +47,6 @@ class TestUserState(unittest.TestCase):
         self.assertIs(self.mock_globals.isTwitchStaff, False)
         self.assertIs(self.mock_globals.isTwitchAdmin, True)
         self.assertIs(self.mock_globals.isGlobalMod, True)
-        self.assertIs(self.mock_globals.isTwitchTurbo, False)
         self.assertIs(self.channel.isMod, True)
         self.assertIs(self.channel.isSubscriber, False)
 
@@ -59,7 +56,6 @@ class TestUserState(unittest.TestCase):
         self.assertIs(self.mock_globals.isTwitchStaff, False)
         self.assertIs(self.mock_globals.isTwitchAdmin, False)
         self.assertIs(self.mock_globals.isGlobalMod, True)
-        self.assertIs(self.mock_globals.isTwitchTurbo, False)
         self.assertIs(self.channel.isMod, True)
         self.assertIs(self.channel.isSubscriber, False)
 
@@ -70,21 +66,13 @@ class TestUserState(unittest.TestCase):
         self.assertIs(self.mock_globals.isTwitchStaff, False)
         self.assertIs(self.mock_globals.isTwitchAdmin, False)
         self.assertIs(self.mock_globals.isGlobalMod, False)
-        self.assertIs(self.mock_globals.isTwitchTurbo, False)
         self.assertIs(self.channel.isMod, True)
         self.assertIs(self.channel.isSubscriber, False)
 
     def test_parse_subscriber(self):
         self.tags['subscriber'] = '1'
         userstate.parse(self.channel, self.tags)
-        self.assertIs(self.mock_globals.isTwitchTurbo, False)
         self.assertIs(self.channel.isSubscriber, True)
-
-    def test_parse_turbo(self):
-        self.tags['turbo'] = '1'
-        userstate.parse(self.channel, self.tags)
-        self.assertIs(self.mock_globals.isTwitchTurbo, True)
-        self.assertIs(self.channel.isSubscriber, False)
 
     def test_parse_emote_sets(self):
         self.tags['emote-sets'] = '0'
@@ -110,7 +98,6 @@ class TestUserState(unittest.TestCase):
         self.assertIs(self.mock_globals.isTwitchStaff, True)
         self.assertIs(self.mock_globals.isTwitchAdmin, True)
         self.assertIs(self.mock_globals.isGlobalMod, True)
-        self.assertIs(self.mock_globals.isTwitchTurbo, False)
         self.assertIs(self.channel.isMod, False)
         self.assertIs(self.channel.isSubscriber, False)
 

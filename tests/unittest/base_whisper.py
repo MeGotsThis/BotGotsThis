@@ -21,7 +21,6 @@ class TestWhisper(unittest.TestCase):
             'staff': False,
             'admin': False,
             'globalMod': False,
-            'turbo': False,
             }
         self.permissions = MagicMock(spec=WhisperPermissionSet)
         _ = lambda k: self.permissionSet[k]

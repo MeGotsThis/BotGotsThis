@@ -34,7 +34,6 @@ class TestCustomProcess(unittest.TestCase):
             'broadcaster': False,
             'moderator': False,
             'subscriber': False,
-            'turbo': False,
             'chatModerator': False,
             }
         self.permissions = MagicMock(spec=ChatPermissionSet)
