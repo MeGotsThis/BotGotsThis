@@ -11,7 +11,7 @@ class SQLiteDatabase(DatabaseBase):
     def __init__(self,
                  ini: Mapping[str, str],
                  **kwargs) -> None:
-        super().__init__(**kwargs)
+        super().__init__(ini, **kwargs)
         self._engine = 'SQLite'  # type: str
         self._dbfile = ini['file']  # type: str
         self._oauthfile = ini['oauth']  # type: str
