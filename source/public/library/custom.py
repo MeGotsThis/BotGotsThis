@@ -42,9 +42,9 @@ def get_command(database: DatabaseBase,
     commands = database.getChatCommands(channel, command)  # type: Dict[str, Dict[str, str]]
     permissionsSet = ['', 'subscriber', 'moderator', 'broadcaster',
                       'globalMod', 'admin', 'staff', 'owner']  # type: List[str]
-    for permission in reversed(permissionsSet):  # --type: str
+    for permission in reversed(permissionsSet):  # type: str
         if not permission or permissions[permission]:
-            for broadcaster in [channel, '#global']:  # --type: str
+            for broadcaster in [channel, '#global']:  # type: str
                 if permission in commands[broadcaster]:
                     message = commands[broadcaster][permission]  # type: str
                     return CustomCommand(message, broadcaster, permission)
@@ -56,7 +56,7 @@ def create_messages(command: CustomCommand,
     textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
     messageParts = []  # type: List[str]
     try:
-        for parts in split_message(command.message):  # --type: CustomFieldParts
+        for parts in split_message(command.message):  # type: CustomFieldParts
             messageParts.append(parts.plainText)
             try:
                 if parts.field is not None:
@@ -80,7 +80,7 @@ def create_messages(command: CustomCommand,
         args.database, args.chat, args.tags, args.nick, args.permissions,
         command.broadcaster, command.level, args.message.command,
         messages)  # type: CustomProcessArgs
-    for process in lists.custom.postProcess:  # --type: CustomCommandProcess
+    for process in lists.custom.postProcess:  # type: CustomCommandProcess
         process(processArgument)
     return messages
 
@@ -374,7 +374,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
 
 
 def convert_field(args: CustomFieldArgs) -> Optional[str]:
-    for convert in lists.custom.fields:  # --type: CustomCommandField
+    for convert in lists.custom.fields:  # type: CustomCommandField
         result = convert(args)  # type: Optional[str]
         if result is not None:
             return result

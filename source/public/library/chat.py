@@ -15,7 +15,8 @@ def send(chat: Any) -> data.Send:
 
 def sendPriority(chat: Any,
                  priority: int) -> data.Send:
-    return partial(chat.send, priority=priority)  # type: ignore --
+    # TODO: mypy/typeshed fix
+    return partial(chat.send, priority=priority)  # type: ignore
 
 
 def permission(level: str) -> _AnyDecorator:
@@ -81,7 +82,7 @@ def permission_feature(*levelFeatures: Tuple[str, str]):
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            for level, featureKey in levelFeatures:  # --type: str, str
+            for level, featureKey in levelFeatures:  # type: str, str
                 hasPermission = level is None or args.permissions[level]
                 hasFeature = (featureKey is None
                               or args.database.hasFeature(args.chat.channel,
@@ -100,7 +101,7 @@ def permission_not_feature(*levelFeatures: Tuple[str, str]):
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            for level, featureKey in levelFeatures:  # --type: str, str
+            for level, featureKey in levelFeatures:  # type: str, str
                 hasPermission = level is None or args.permissions[level]
                 hasFeature = (featureKey is None
                               or not args.database.hasFeature(

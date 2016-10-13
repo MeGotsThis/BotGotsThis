@@ -20,8 +20,9 @@ def parse(tags: Optional[IrcMessageTagsReadOnly],
         raise LoginUnsuccessful()
     if (isinstance(tags, IrcMessageTagsReadOnly)
             and isinstance(chat, data.Channel)
-            and 'msg-id' in tags):
-        msgId = tags['msg-id']
+            and 'msg-id' in tags
+            and isinstance(tags['msg-id'], str)):
+        msgId = tags['msg-id']  # type: str
         if msgId in ['msg_duplicate', 'msg_ratelimit']:
             chat.isMod = False
         if msgId in ['msg_banned', 'msg_timedout']:

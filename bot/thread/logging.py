@@ -28,5 +28,5 @@ class Logging(threading.Thread):
     
     def process(self) -> None:
         filename, log = self.queue.get()  # type: str, str
-        with open(filename, 'a', encoding='utf-8') as file:  # --type: TextIO
+        with open(filename, 'a', encoding='utf-8') as file:  # type: TextIO
             file.write(log)

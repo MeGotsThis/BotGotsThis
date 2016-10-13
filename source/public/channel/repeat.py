@@ -106,7 +106,7 @@ class MessageRepeater(threading.Thread):
             self._lastTime = now
             self._chat.send(self._message)
             if self._chat.isMod:
-                with factory.getDatabase() as database:  # --type: DatabaseBase
+                with factory.getDatabase() as database:  # type: DatabaseBase
                     timeout.record_timeout(database, self._chat, None,
                                            self._message, None, 'autorepeat')
             with self._countLock:

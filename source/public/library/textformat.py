@@ -212,7 +212,7 @@ def format(string: str,
         }
     if format_ in strTable:
         return strTable[format_](string)
-    for pattern in reTable:  # --type: str
+    for pattern in reTable:  # type: str
         if re.fullmatch(pattern, format_):
             return reTable[pattern](string)
     return string

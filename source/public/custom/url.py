@@ -12,12 +12,12 @@ import urllib.request
 
 def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'url':
-        replace_func = partial(field_replace, args  # type: ignore --
-                               )  # type: Callable[[Match[str]], str]
+        replace_func = None  # type: Callable[[Match[str]], str]
+        replace_func = partial(field_replace, args)  # type: ignore
         url = re.sub(r'{([^\r\n\t\f {}]+)}', replace_func, args.param)  # type: str
         with suppress(urllib.error.URLError):
             with urllib.request.urlopen(
-                    url, timeout=bot.config.customMessageUrlTimeout) as res:  # --type: HTTPResponse
+                    url, timeout=bot.config.customMessageUrlTimeout) as res:  # type: HTTPResponse
                 if isinstance(res, HTTPResponse) and int(res.status) == 200:
                     data = res.read().decode('utf-8')  # type: str
                     data = data.replace('\r\n', ' ')
@@ -36,7 +36,7 @@ def field_replace(args: CustomFieldArgs, match: Match[str]) -> str:
                             default=None,
                             )  # type: CustomFieldArgs
     fields = (f for f in lists.custom.fields if f is not fieldUrl)  # type: Iterator[CustomCommandField]
-    for field in fields:  # --type: CustomCommandField
+    for field in fields:  # type: CustomCommandField
         replacement = field(newargs)  # type: Optional[str]
         if replacement is not None:
             return replacement

@@ -40,8 +40,9 @@ class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
                  default_factory: Optional[Callable[[], _VT]]=None,
                  *args,
                  **kwargs) -> None:
+        # TODO: mypy fix
         if (default_factory is not None
-                and not isinstance(default_factory, Callable)):  # type: ignore --
+                and not isinstance(default_factory, Callable)):  # type: ignore
             raise TypeError('first argument must be callable')
         OrderedDict.__init__(self, *args, **kwargs)
         self.default_factory = default_factory
@@ -337,7 +338,7 @@ class Socket:
         return self._writeQueue
 
     def fileno(self) -> Optional[int]:
-        return self._socket and self._socket.fileno()  # type: ignore --
+        return self._socket.fileno() if self._socket else None
 
     def connect(self) -> None:
         if self._socket is not None:
@@ -379,7 +380,7 @@ class Socket:
             IrcMessage(None, None, 'CAP',
                        IrcMessageParams('REQ', 'twitch.tv/tags')),
         ]  # type: List[IrcMessage]
-        for command in commands:  # --type: IrcMessage
+        for command in commands:  # type: IrcMessage
             message = (str(command) + '\r\n').encode('utf-8')  # type: bytes
             connection.send(message)
             self._logWrite(command)
@@ -448,7 +449,7 @@ class Socket:
             return
 
         try:
-            for ircmsg in ircmsgs.split(b'\r\n'):  # --type: bytes
+            for ircmsg in ircmsgs.split(b'\r\n'):  # type: bytes
                 if not ircmsg:
                     continue
                 message = ircmsg.decode('utf-8')  # type: str
@@ -497,7 +498,7 @@ class Socket:
                                                  socket=self.name))
         logs.append('> ' + str(command))
         if whisper and channel:
-            for file, log in zip(files, logs):  # --type: str, str
+            for file, log in zip(files, logs):  # type: str, str
                 utils.logIrcMessage(file, log, timestamp)
             raise ValueError()
         if whisper:
@@ -523,7 +524,7 @@ class Socket:
                 logs.append(
                     '{bot}: {message}'.format(bot=bot.config.botnick,
                                               message=command.params.trailing))
-        for file, log in zip(files, logs):  # --type: str, str
+        for file, log in zip(files, logs):  # type: str, str
             utils.logIrcMessage(file, log, timestamp)
 
     def queueWrite(self,
@@ -567,7 +568,7 @@ class Socket:
 
     def queueMessages(self) -> None:
         self.messaging.cleanOldTimestamps()
-        for whisperMessage in iter(self.messaging.popWhisper, None):  # --type: WhisperMessage
+        for whisperMessage in iter(self.messaging.popWhisper, None):  # type: WhisperMessage
             ircMsg = '.w {nick} {message}'.format(
                 nick=whisperMessage.nick,
                 message=whisperMessage.message)[:bot.config.messageLimit]
@@ -576,7 +577,7 @@ class Socket:
                            IrcMessageParams(
                                bot.globals.groupChannel.ircChannel, ircMsg)),
                 whisper=whisperMessage)
-        for message in iter(self.messaging.popChat, None):  # --type: ChatMessage
+        for message in iter(self.messaging.popChat, None):  # type: ChatMessage
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
                            IrcMessageParams(
@@ -626,7 +627,7 @@ class MessagingQueue:
             raise ValueError()
         whispers = DefaultOrderedDict(list)  # type: DefaultOrderedDict[str, List[str]]
         with self._queueLock:
-            for message in listMessages:  # --type: str
+            for message in listMessages:  # type: str
                 if not message:
                     continue
                 if (not bypass
@@ -641,7 +642,7 @@ class MessagingQueue:
                     self._chatQueues[priority].append(
                         ChatMessage(channel, message))
         if whispers:
-            for nick in whispers:  # --type; str
+            for nick in whispers:  # type; str
                 self.sendWhisper(nick, whispers[nick])
 
     def sendWhisper(self,
@@ -654,7 +655,7 @@ class MessagingQueue:
         elif not isinstance(messages, Iterable):
             raise TypeError()
         with self._queueLock:
-            for message in messages:  # --type: str
+            for message in messages:  # type: str
                 self._whisperQueue.append(WhisperMessage(nick, message))
 
     def popChat(self) -> Optional[ChatMessage]:
@@ -671,9 +672,9 @@ class MessagingQueue:
         isPublicGood = len(self._chatSent) < bot.config.publicLimit  # type: bool
         with self._queueLock:
             if isPublicGood:
-                for queue in self._chatQueues:  # --type: List[ChatMessage]
+                for queue in self._chatQueues:  # type: List[ChatMessage]
                     for i, message in enumerate(
-                            queue):  # --type: i, ChatMessage
+                            queue):  # type: i, ChatMessage
                         last = self._publicTime[message.channel.channel]  # type: datetime
                         if (self._isMod(message.channel)
                             or timestamp - last < publicDelay):
@@ -682,14 +683,14 @@ class MessagingQueue:
                         del queue[i]
                         return message
             if isModGood:
-                for queue in self._chatQueues[:-1]:  # --type: List[ChatMessage]
-                    for i, message in enumerate(queue):  # --type: i, ChatMessage
+                for queue in self._chatQueues[:-1]:  # type: List[ChatMessage]
+                    for i, message in enumerate(queue):  # type: i, ChatMessage
                         if not self._isMod(message.channel):
                             continue
                         del queue[i]
                         return message
                 else:
-                    for i, message in enumerate(self._chatQueues[-1]):  # --type: i, ChatMessage
+                    for i, message in enumerate(self._chatQueues[-1]):  # type: i, ChatMessage
                         if message.channel.channel in self._lowQueueRecent:
                             continue
                         if not self._isMod(message.channel):
@@ -699,7 +700,7 @@ class MessagingQueue:
                         return message
             if isModSpamGood and self._chatQueues[-1]:
                 for channel in self._lowQueueRecent:
-                    for i, message in enumerate(self._chatQueues[-1]):  # --type: i, ChatMessage
+                    for i, message in enumerate(self._chatQueues[-1]):  # type: i, ChatMessage
                         if message.channel.channel != channel:
                             continue
                         if not self._isMod(message.channel):
@@ -722,12 +723,12 @@ class MessagingQueue:
 
     def clearChat(self, channel: Channel) -> None:
         with self._queueLock:
-            for queue in self._chatQueues:  # --type: List[ChatMessage]
-                for message in queue[:]:  # --type: ChatMessage
+            for queue in self._chatQueues:  # type: List[ChatMessage]
+                for message in queue[:]:  # type: ChatMessage
                     if message.channel.channel == channel.channel:
                         queue.remove(message)
 
     def clearAllChat(self) -> None:
         with self._queueLock:
-            for queue in self._chatQueues:  # --type: List[ChatMessage]
+            for queue in self._chatQueues:  # type: List[ChatMessage]
                 queue.clear()

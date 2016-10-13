@@ -59,7 +59,7 @@ def record_timeout(database: DatabaseBase,
                    module: str):
     if isinstance(messages, str):
         messages = messages,
-    for message in messages:  # --type: str
+    for message in messages:  # type: str
         who, length = None, None  # type: Optional[str], Optional[Union[int, bool]]
         reason = None  # type: Optional[str]
         if message.startswith(('.ban', '/ban')):

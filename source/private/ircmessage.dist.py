@@ -4,4 +4,4 @@ from datetime import datetime
 def parseMessage(socket: 'data.Socket',
                  ircmsg: str,
                  now: datetime) -> None:
-    return 1
+    return

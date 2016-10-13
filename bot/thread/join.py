@@ -29,10 +29,10 @@ class JoinThread(threading.Thread):
     @property
     def connectedChannels(self) -> 'Dict[str, data.Channel]':
         channels = {}  # type: Dict[str, data.Channel]
-        for socketThread in bot.globals.clusters.values():  # --type: SocketsThread
+        for socketThread in bot.globals.clusters.values():  # type: SocketsThread
             if socketThread.isConnected:
                 chans = socketThread.channels
-                for chan in chans:  # --type: Channel
+                for chan in chans:  # type: Channel
                     channels[chan] = chans[chan]
         return channels
 

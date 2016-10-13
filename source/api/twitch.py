@@ -56,7 +56,7 @@ def api_call(channel: Optional[str],
             else:
                 dataStr = data
         connection.request(method, uri, dataStr, headers)
-        with connection.getresponse() as response:  # --type: client.HTTPResponse
+        with connection.getresponse() as response:  # type: client.HTTPResponse
             return response, response.read()
 
 
@@ -68,7 +68,7 @@ def server_time() -> Optional[datetime]:
             if data is not None:
                 dateStruct = email.utils.parsedate(date)  # type: DateTuple
                 unixTimestamp = time.mktime(dateStruct)  # type: float
-                return datetime.fromtimestamp(unixTimestamp)  # type: datetime
+                return datetime.fromtimestamp(unixTimestamp)
     return None
 
 
@@ -96,8 +96,8 @@ def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
             13: ';P',
             14: 'R)',
             }  # type: Dict[int, str]
-        for emoteSetId in globalEmotes:  # --type: int
-            for emote in globalEmotes[emoteSetId]:  # --type: Dict[str, Union[str, int]
+        for emoteSetId in globalEmotes:  # type: int
+            for emote in globalEmotes[emoteSetId]:  # type: Dict[str, Union[str, int]
                 id = int(emote['id'])  # type: int
                 if id in replaceGlobal:
                     emotes[id] = replaceGlobal[id]
@@ -112,7 +112,7 @@ def chat_server(chat:Optional[str]) -> Optional[str]:
     connection = client.HTTPSConnection('tmi.twitch.tv')  # type: client.HTTPConnection
     with closing(connection):
         connection.request('GET', '/servers?channel=' + chat)
-        with connection.getresponse() as response:  # --type: client.HTTPResponse
+        with connection.getresponse() as response:  # type: client.HTTPResponse
             responseData = response.read()  # type: bytes
             with suppress(ValueError):
                 jData = json.loads(responseData.decode('utf-8'))  # type: dict
@@ -185,7 +185,7 @@ def _handle_streams(streams: List[Dict[str, Any]],
                     online: Dict[str, TwitchStatus]=None):
     if online is None:
         online = {}
-    for stream in streams:  # --type: Dict[str, Any]
+    for stream in streams:  # type: Dict[str, Any]
         channel = stream['channel']['name'].lower()
         streamingSince = datetime.strptime(stream['created_at'],
                                            '%Y-%m-%dT%H:%M:%SZ')  # type: datetime

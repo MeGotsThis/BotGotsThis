@@ -107,5 +107,5 @@ def logException(extraMessage: str='',
         bot.config.exceptionLog,
         '{time:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {thread}:\n'
         '{extra}{exception}'.format(
-            time=timestamp, thread=threading.current_thread().name,  # type: ignore --
+            time=timestamp, thread=threading.current_thread().name,
             extra=extraMessage, exception=''.join(excep)))

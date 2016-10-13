@@ -11,7 +11,9 @@ CommandReturn = Union[str, Dict[str, str]]
 
 
 class DatabaseBase(metaclass=ABCMeta):
-    def __init__(self, **kwargs) -> None:
+    def __init__(self,
+                 ini: Mapping[str, str],
+                 **kwargs) -> None:
         self._engine = 'None'  # type: str
         self._connection = None  # type: Any
 

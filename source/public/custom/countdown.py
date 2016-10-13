@@ -358,7 +358,7 @@ def parse_next_past_cooldown(times: str,
                              now: datetime) -> NextPastCooldown:
     cd = None  # type: Optional[Union[float, timedelta]]
     instances = []  # type: List[DateTimeInstance]
-    for i, timeStr in enumerate(times.split(',')):  # --type: int, str
+    for i, timeStr in enumerate(times.split(',')):  # type: int, str
         if i == 0:
             cd = parse_cooldown(timeStr)
             if cd is not None:

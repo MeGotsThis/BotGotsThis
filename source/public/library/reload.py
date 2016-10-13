@@ -110,7 +110,7 @@ def reload_commands(send: Send) -> bool:
     send('Reloading Commands')
     
     modules = (m for m in sys.modules.keys() if reloadable(m))  # type: Iterator[str]
-    for moduleString in sorted(modules, key=key):  # --type: str
+    for moduleString in sorted(modules, key=key):  # type: str
         importlib.reload(sys.modules[moduleString])
     
     send('Complete Reloading')

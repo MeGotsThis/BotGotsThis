@@ -17,7 +17,7 @@ def checkStreamsAndChannel(timestamp: datetime) -> None:
         channels.keys())  # type: Optional[twitch.OnlineStreams]
     if onlineStreams is None:
         return
-    for channel in onlineStreams:  # --type: str
+    for channel in onlineStreams:  # type: str
         chat = channels[channel]
         chat.twitchCache = timestamp
         (chat.streamingSince, chat.twitchStatus,

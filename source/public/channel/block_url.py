@@ -45,7 +45,7 @@ def check_domain_redirect(chat: 'data.Channel',
                         '{nick}: {message}'.format(nick=nick, message=message),
                         timestamp)
 
-    for match in re.finditer(twitchUrlRegex, str(message)):  # --typing: Match[str]
+    for match in re.finditer(twitchUrlRegex, str(message)):  # typing: Match[str]
         originalUrl = match.group(0)  # type: str
         url = originalUrl  # type: str
         if not url.startswith('http://') and not url.startswith('https://'):
@@ -58,7 +58,8 @@ def check_domain_redirect(chat: 'data.Channel',
             with urllib.request.urlopen(request) as response:  # HTTPResponse
                 if not isinstance(response, HTTPResponse):
                     raise TypeError()
-                if compare_domains(url, response.url,  # type: ignore --
+                # TODO: typeshed fix
+                if compare_domains(url, response.url,  # type: ignore
                                    chat=chat, nick=nick, timestamp=timestamp):
                     handle_different_domains(chat, nick, message)
                     return
@@ -68,8 +69,8 @@ def check_domain_redirect(chat: 'data.Channel',
                 handle_different_domains(chat, nick, message)
                 return
         except urllib.error.URLError as e:
-            if (not isinstance(e.reason, OSError)  # type: ignore --
-                    or e.reason.errno != socket.EAI_NONAME):  # type: ignore --
+            if (not isinstance(e.reason, OSError)
+                    or e.reason.errno != socket.EAI_NONAME):
                 utils.logException(str(message), timestamp)
         except:
             utils.logException(str(message), timestamp)

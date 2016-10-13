@@ -15,7 +15,7 @@ def getGlobalEmotes() -> Optional[Dict[str, str]]:
                 responseData = response.read()  # type: bytes
                 bttvData = json.loads(responseData.decode())  # type: dict
                 emotes = {}  # type: Dict[str, str]
-                for emote in bttvData['emotes']:  # --type: Dict[str, str]
+                for emote in bttvData['emotes']:  # type: Dict[str, str]
                     emotes[emote['id']] = emote['code']
                 return emotes
     except HTTPError as e:
@@ -36,7 +36,7 @@ def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[str, str]]:
                 responseData = response.read()  # type: bytes
                 bttvData = json.loads(responseData.decode())  # type: dict
                 emotes = {}  # type: Dict[str, str]
-                for emote in bttvData['emotes']:  # --type: Dict[str, str]
+                for emote in bttvData['emotes']:  # type: Dict[str, str]
                     emotes[emote['id']] = emote['code']
                 return emotes
     except HTTPError as e:

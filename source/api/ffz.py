@@ -17,8 +17,8 @@ def getGlobalEmotes() -> Optional[Dict[int, str]]:
                 responseData = response.read()  # type: bytes
                 ffzData = json.loads(responseData.decode())  # type: dict
                 emotes = {}  # type: Dict[int, str]
-                for s in ffzData['default_sets']:  # --type: str
-                    for emote in ffzData['sets'][str(s)]['emoticons']:  # --type: FfzEmoteDict
+                for s in ffzData['default_sets']:  # type: str
+                    for emote in ffzData['sets'][str(s)]['emoticons']:  # type: FfzEmoteDict
                         emotes[emote['id']] = emote['name']
                 return emotes
     except HTTPError as e:
@@ -40,7 +40,7 @@ def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[int, str]]:
                 ffzData = json.loads(responseData.decode())  # type: dict
                 emotes = {}
                 ffzSet = ffzData['room']['set']  # type: str
-                for emote in ffzData['sets'][str(ffzSet)]['emoticons']:  # --type: FfzEmoteDict
+                for emote in ffzData['sets'][str(ffzSet)]['emoticons']:  # type: FfzEmoteDict
                     emotes[emote['id']] = emote['name']
                 return emotes
     except HTTPError as e:

@@ -32,7 +32,7 @@ class BackgroundTasker(threading.Thread):
     
     def runTasks(self) -> None:
         timestamp = utils.now()  # type: datetime
-        for task in self._tasks[:]:  # --type: Task
+        for task in self._tasks[:]:  # type: Task
             if timestamp >= task.timestamp + task.interval:
                 threading.Thread(
                     target=run_task, args=(task.task, timestamp,)).start()
@@ -51,7 +51,8 @@ class Task:
     def __init__(self,
                  task: Callable[[datetime], None],
                  interval: timedelta) -> None:
-        if not isinstance(task, Callable):  # type: ignore --
+        # TODO: mypy fix
+        if not isinstance(task, Callable):  # type: ignore
             raise TypeError()
         if not isinstance(interval, timedelta):
             raise TypeError()

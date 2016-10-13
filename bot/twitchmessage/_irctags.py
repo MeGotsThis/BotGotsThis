@@ -154,7 +154,7 @@ class IrcMessageTagsReadOnly(MappingAbc):
                     self._items[self.fromKey(key)] = items[key]
             elif isinstance(items, Iterable[Union[IrcMessageTagsKey, str,
                                                   Tuple[KeyParam, str]]]):
-                for key in items: # --type: Union[IrcMessageTagsKey, str, Tuple[KeyParam, str]]
+                for key in items: # type: Union[IrcMessageTagsKey, str, Tuple[KeyParam, str]]
                     if isinstance(key, (IrcMessageTagsKey, str)):
                         self._items[self.fromKey(key)] = True
                     elif (isinstance(key, Sequence)
@@ -181,7 +181,7 @@ class IrcMessageTagsReadOnly(MappingAbc):
         return self._items[key]
     
     def __iter__(self) -> Iterator[IrcMessageTagsKey]:
-        for i in self._items:  # --type: IrcMessageTagsKey
+        for i in self._items:  # type: IrcMessageTagsKey
             yield i
     
     def __len__(self) -> int:

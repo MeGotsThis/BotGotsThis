@@ -40,7 +40,7 @@ def whisperCommand(tags: IrcMessageTagsReadOnly,
         with factory.getDatabase() as database:
             arguments = data.WhisperCommandArgs(
                 database, nick, message, permissions, timestamp)  # type: data.WhisperCommandArgs
-            for command in commandsToProcess(message.command):  # --type: data.WhisperCommand
+            for command in commandsToProcess(message.command):  # type: data.WhisperCommand
                 if command(arguments):
                     return
     except:

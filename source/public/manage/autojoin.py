@@ -52,7 +52,7 @@ def auto_join_priority(database: DatabaseBase,
 
 def reload_server(database: DatabaseBase,
                   send: Send) -> bool:
-    for autojoin in database.getAutoJoinsChats():  # --type: AutoJoinChannel
+    for autojoin in database.getAutoJoinsChats():  # type: AutoJoinChannel
         cluster = twitch.chat_server(autojoin.broadcaster)  # type: Optional[str]
         if cluster is not None and autojoin.cluster != cluster:
             database.setAutoJoinServer(autojoin.broadcaster, cluster)

@@ -42,7 +42,7 @@ def chatCommand(chat: 'botData.Channel',
             arguments = data.ChatCommandArgs(
                 database, chat, tags, nick, message, permissions,
                 timestamp)  # type: data.ChatCommandArgs
-            for command in commandsToProcess(message.command):  # --type: argument.ChatCommand
+            for command in commandsToProcess(message.command):  # type: argument.ChatCommand
                 if command(arguments):
                     return
     except:

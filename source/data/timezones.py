@@ -40,10 +40,10 @@ class BasicTimeZone(BaseTimeZone):
     def tzname(self, dt: Optional[datetime]) -> str:
         return self.__name
     
-    def utcoffset(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
+    def utcoffset(self, dt: Optional[datetime]) -> timedelta:
         return timedelta(minutes=self.__offset.total_seconds() // 60)
     
-    def dst(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
+    def dst(self, dt: Optional[datetime]) -> timedelta:
         return ZERO
 
 
@@ -73,33 +73,33 @@ class TimeZone(BaseTimeZone):
             raise TypeError()
         unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
         transistion = self._transitions[0]  # type: Transition
-        for t in self._transitions[::-1]:  # --type: Transition
+        for t in self._transitions[::-1]:  # type: Transition
             if unixTime >= t.start:
                 transistion = t
                 break
         return transistion.abbreviation
     
-    def utcoffset(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
+    def utcoffset(self, dt: Optional[datetime]) -> timedelta:
         if dt is None:
             return timedelta(minutes=self._transitions[0].offset // 60)
         if not isinstance(dt, datetime):
             raise TypeError()
         unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
         transistion = self._transitions[0]  # type: Transition
-        for t in self._transitions[::-1]:  # --type: Transition
+        for t in self._transitions[::-1]:  # type: Transition
             if unixTime >= t.start:
                 transistion = t
                 break
         return timedelta(minutes=transistion.offset // 60)
      
-    def dst(self, dt: Optional[datetime]) -> timedelta:  # type: ignore --
+    def dst(self, dt: Optional[datetime]) -> timedelta:
         if dt is None:
             return ZERO
         if not isinstance(dt, datetime):
             raise TypeError()
         unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
         transistion = self._transitions[0]  # type: Transition
-        for t in self._transitions[::-1]:  # --type: Transition
+        for t in self._transitions[::-1]:  # type: Transition
             if unixTime >= t.start:
                 transistion = t
                 break
