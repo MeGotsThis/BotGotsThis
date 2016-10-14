@@ -32,7 +32,7 @@ class ChatPermissionSet:
         self._isBroadcaster = None  # type: bool
         self._isModerator = None  # type: bool
         self._isSubscriber = None  # type: bool
-        self._isTurbo = None  # type: bool
+        self._bannable = None  # type: bool
     
     @property
     def owner(self) -> bool:
@@ -82,7 +82,7 @@ class ChatPermissionSet:
             self._isModerator = self._userType in typeModerator
             self._isModerator = self.broadcaster or self._isModerator
         return self._isModerator
-    
+
     @property
     def subscriber(self) -> bool:
         if self._isSubscriber is None:
@@ -93,6 +93,13 @@ class ChatPermissionSet:
                 subscriber = 0
             self._isSubscriber = self.broadcaster or bool(subscriber)
         return self._isSubscriber
+
+    @property
+    def bannable(self) -> bool:
+        if self._bannable is None:
+            self._bannable = (self._userType not in typeModerator
+                              and self._channel.channel != self._user)
+        return self._bannable
     
     @property
     def chatModerator(self) -> bool:
@@ -116,6 +123,8 @@ class ChatPermissionSet:
                 return self.moderator
             if key == 'subscriber':
                 return self.subscriber
+            if key == 'bannable':
+                return self.bannable
             if key in ['channelModerator', 'chatModerator']:
                 return self.chatModerator
             raise KeyError('unknown permission')

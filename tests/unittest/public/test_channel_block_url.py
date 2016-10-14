@@ -17,6 +17,7 @@ from tests.unittest.mock_class import StrContains, TypeMatch
 @patch('source.public.channel.block_url.check_domain_redirect', autospec=True)
 class TestChannelBlockUrlFilterNoUrl(TestChannel):
     def test_nomod(self, mock_check):
+        self.features.append('nourlredirect')
         self.assertIs(block_url.filterNoUrlForBots(self.args), False)
         self.assertFalse(mock_check.called)
 
@@ -34,6 +35,15 @@ class TestChannelBlockUrlFilterNoUrl(TestChannel):
         self.assertIs(block_url.filterNoUrlForBots(self.args), False)
         mock_check.assert_called_once_with(self.channel, 'botgotsthis',
                                            message, self.now)
+
+    def test_not_bannable(self, mock_check):
+        message = Message('megotsthis.com')
+        self.args = self.args._replace(message=message)
+        self.permissionSet['chatModerator'] = True
+        self.permissionSet['bannable'] = False
+        self.features.append('nourlredirect')
+        self.assertIs(block_url.filterNoUrlForBots(self.args), False)
+        self.assertFalse(mock_check.called)
 
 
 class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):

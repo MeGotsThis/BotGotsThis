@@ -24,7 +24,7 @@ ThreadParam = Tuple['data.Channel', str, Message, datetime]
 
 # This is for banning the users who post a URL with no follows
 @feature('nourlredirect')
-@not_permission('moderator')
+@permission('bannable')
 @permission('chatModerator')
 def filterNoUrlForBots(args: ChatCommandArgs) -> bool:
     if re.search(twitchUrlRegex, str(args.message)):

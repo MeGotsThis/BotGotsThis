@@ -29,6 +29,7 @@ class TestChannel(unittest.TestCase):
             'moderator': False,
             'subscriber': False,
             'chatModerator': False,
+            'bannable': True,
             }
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.permissions.inOwnerChannel = False
