@@ -1,7 +1,8 @@
 ﻿from typing import List
 import configparser
 import os
-import sys
+
+development = False  # type: bool
 
 botnick = ''  # type: str
 password = ''  # type: str
@@ -49,6 +50,8 @@ if os.path.isfile('config.ini'):
 
     awsServer = str(ini['TWITCH']['awsServer'])
     awsPort = int(ini['TWITCH']['awsPort'])
+
+    development = bool(int(ini['BOT']['development']))
 
     messageLimit = int(ini['BOT']['messageLimit'])
     modLimit = min(int(ini['BOT']['modLimit']), 100)

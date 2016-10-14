@@ -3,6 +3,7 @@ from bot import utils
 from bot.data import Channel, Socket, MessagingQueue
 from bot.thread.logging import Logging
 from datetime import datetime
+from io import StringIO
 from tests.unittest.mock_class import StrContains
 from unittest.mock import Mock, patch
 
@@ -88,6 +89,56 @@ class TestUtils(unittest.TestCase):
         socket.messaging.sendWhisper.assert_called_once_with(
             'botgotsthis', 'Kappa')
 
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('bot.config', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    def test_print(self, mock_now, mock_config, mock_stdout):
+        mock_now.return_value = datetime(2000, 1, 1)
+        mock_config.development = False
+        utils.print('Kappa')
+        self.assertEqual(mock_stdout.getvalue(), '')
+
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('bot.config', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    def test_print_development(self, mock_now, mock_config, mock_stdout):
+        mock_now.return_value = datetime(2000, 1, 1)
+        mock_config.development = True
+        utils.print('Kappa')
+        self.assertEqual(mock_stdout.getvalue(), '2000-01-01 00:00:00 Kappa\n')
+
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('bot.config', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    def test_print_override(self, mock_now, mock_config, mock_stdout):
+        mock_now.return_value = datetime(2000, 1, 1)
+        mock_config.development = False
+        utils.print('Kappa', override=True)
+        self.assertEqual(mock_stdout.getvalue(), '2000-01-01 00:00:00 Kappa\n')
+
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('bot.config', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    def test_print_override(self, mock_now, mock_config, mock_stdout):
+        mock_now.return_value = datetime(2000, 1, 1)
+        mock_config.development = True
+        utils.print('Kappa', override=True)
+        self.assertEqual(mock_stdout.getvalue(), '2000-01-01 00:00:00 Kappa\n')
+
+    @patch('bot.globals', autospec=True)
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('bot.config', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    def test_print_file(self, mock_now, mock_config, mock_stdout,
+                        mock_globals):
+        mock_globals.logging = Mock(spec=Logging)
+        mock_now.return_value = datetime(2000, 1, 1)
+        mock_config.development = False
+        utils.print('Kappa', file=True)
+        self.assertEqual(mock_stdout.getvalue(), '')
+        mock_globals.logging.log.assert_called_once_with(
+            'output.log', '2000-01-01T00:00:00.000000 Kappa\n')
+
     @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
@@ -110,12 +161,15 @@ class TestUtils(unittest.TestCase):
         utils.logIrcMessage('botgotsthis', 'Kappa')
         self.assertFalse(mock_globals.logging.log.called)
 
+    @patch('sys.stderr', new_callable=StringIO)
     @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
-    def test_logException(self, mock_now, mock_config, mock_globals):
+    def test_logException(self, mock_now, mock_config, mock_globals,
+                          mock_stderr):
         mock_globals.logging = Mock(spec=Logging)
         mock_now.return_value = datetime(2000, 1, 1)
+        mock_config.development = True
         mock_config.exceptionLog = 'exception'
         try:
             raise Exception()
@@ -123,8 +177,31 @@ class TestUtils(unittest.TestCase):
             utils.logException()
         mock_globals.logging.log.assert_called_once_with(
             StrContains('exception'),
-            StrContains('Exception', 'test_utils.py', 'test_logException',
-                        'raise Exception'))
+            StrContains('2000', '01', 'Exception', __file__,
+                        'test_logException', 'raise Exception'))
+        self.assertEquals(mock_stderr.getvalue(),
+                          StrContains('2000', '1', 'Exception', __file__,
+                                      'test_logException', 'raise Exception'))
+
+    @patch('sys.stderr', new_callable=StringIO)
+    @patch('bot.globals', autospec=True)
+    @patch('bot.config', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    def test_logException_no_development(
+            self, mock_now, mock_config, mock_globals, mock_stderr):
+        mock_globals.logging = Mock(spec=Logging)
+        mock_now.return_value = datetime(2000, 1, 1)
+        mock_config.development = False
+        mock_config.exceptionLog = 'exception'
+        try:
+            raise Exception()
+        except Exception:
+            utils.logException()
+        mock_globals.logging.log.assert_called_once_with(
+            StrContains('exception'),
+            StrContains('2000', '1', 'Exception', __file__,
+                        'test_logException', 'raise Exception'))
+        self.assertEquals(mock_stderr.getvalue(), '')
 
     @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)

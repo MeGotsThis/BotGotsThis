@@ -1,7 +1,8 @@
 ﻿from . import data
 from datetime import datetime
 from types import TracebackType
-from typing import Iterable, List, Optional, TextIO, Tuple, Union
+from typing import Any, Iterable, Optional, Tuple, Union
+import builtins
 import bot.config
 import bot.globals
 import os.path
@@ -82,6 +83,25 @@ def ensureServer(channel: str,
     return ENSURE_REJOIN
 
 
+def print(*args: Any,
+          timestamp: Optional[datetime]=None,
+          override: bool=True,
+          file: Union[bool, str]=False) -> None:
+    _timestamp = timestamp or now()  # type: datetime
+    if not override or bot.config.development:
+        builtins.print(_timestamp, *args)
+
+    if file:
+        if isinstance(file, str):
+            filename = file  # type: str
+        else:
+            filename = 'output.log'
+        bot.globals.logging.log(
+            filename,
+            '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
+                time=_timestamp, message=''.join(str(a) for a in args)))
+
+
 def logIrcMessage(filename: str,
                   message: str,
                   timestamp: Optional[datetime]=None) -> None:
@@ -109,3 +129,10 @@ def logException(extraMessage: str='',
         '{extra}{exception}'.format(
             time=timestamp, thread=threading.current_thread().name,
             extra=extraMessage, exception=''.join(excep)))
+    if bot.config.development:
+        builtins.print(
+            timestamp,
+            'Exception in thread {thread}:\n{extra}{exception}'.format(
+                thread=threading.current_thread().name,
+                extra=extraMessage, exception=''.join(excep)),
+            file=sys.stderr)
