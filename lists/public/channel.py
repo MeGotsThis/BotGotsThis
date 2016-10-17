@@ -41,7 +41,7 @@ commands = {
     '!game': mod.commandGame,
     '!setgame': mod.commandRawGame,
     '!purge': mod.commandPurge,
-    '!rekt': mod.commandPurge,
+    '!permit': mod.commandPermit,
     '!command': custom.commandCommand,
     '!full': textformat.commandFull,
     '!parenthesized': textformat.commandParenthesized,

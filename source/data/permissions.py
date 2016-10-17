@@ -14,7 +14,8 @@ class ChatPermissionSet:
     def __init__(self,
                  tags: Optional[IrcMessageTagsReadOnly],
                  user: str,
-                 channel: Any) -> None:
+                 channel: Any,
+                 permitted: bool) -> None:
         userType = None  # type: str
         if tags is not None and 'user-type' in tags:
             userType = str(tags['user-type'])
@@ -32,8 +33,9 @@ class ChatPermissionSet:
         self._isBroadcaster = None  # type: bool
         self._isModerator = None  # type: bool
         self._isSubscriber = None  # type: bool
+        self._permitted = permitted  # type: bool
         self._bannable = None  # type: bool
-    
+
     @property
     def owner(self) -> bool:
         if self._isOwner is None:
@@ -95,6 +97,10 @@ class ChatPermissionSet:
         return self._isSubscriber
 
     @property
+    def permitted(self) -> bool:
+        return not self.bannable or self._permitted
+
+    @property
     def bannable(self) -> bool:
         if self._bannable is None:
             self._bannable = (self._userType not in typeModerator
@@ -123,6 +129,8 @@ class ChatPermissionSet:
                 return self.moderator
             if key == 'subscriber':
                 return self.subscriber
+            if key == 'permitted':
+                return self.permitted
             if key == 'bannable':
                 return self.bannable
             if key in ['channelModerator', 'chatModerator']:

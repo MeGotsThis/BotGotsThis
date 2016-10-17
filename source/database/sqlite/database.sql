@@ -78,3 +78,18 @@ CREATE TABLE chat_properties (
     value VARCHAR NOT NULL,
     PRIMARY KEY (broadcaster, property)
 );
+
+CREATE TABLE permitted_users (
+    broadcaster VARCHAR NOT NULL,
+    twitchUser VARCHAR NOT NULL,
+    PRIMARY KEY (broadcaster, twitchUser)
+);
+
+CREATE TABLE permitted_users_log (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    broadcaster VARCHAR NOT NULL,
+    twitchUser VARCHAR NOT NULL,
+    moderator VARCHAR NOT NULL,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actionLog VARCHAR NOT NULL
+);

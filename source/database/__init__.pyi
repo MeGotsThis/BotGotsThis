@@ -148,3 +148,17 @@ class DatabaseBase(metaclass=ABCMeta):
                         broadcaster: str,
                         property: str,
                         value: str=None) -> bool: ...
+    def isPermittedUser(self,
+                        broadcaster: str,
+                        user: str) -> bool:
+        return None
+    def addPermittedUser(self,
+                         broadcaster: str,
+                         user: str,
+                         moderator: str) -> bool:
+        return False
+    def removePermittedUser(self,
+                            broadcaster: str,
+                            user: str,
+                            moderator: str) -> bool:
+        return False

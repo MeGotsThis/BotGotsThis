@@ -29,7 +29,7 @@ class TestDataChatPermissions(unittest.TestCase):
 
     def test_readonly(self):
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         with self.assertRaises(AttributeError):
             perm.owner = True
         with self.assertRaises(AttributeError):
@@ -47,6 +47,8 @@ class TestDataChatPermissions(unittest.TestCase):
         with self.assertRaises(AttributeError):
             perm.bannable = True
         with self.assertRaises(AttributeError):
+            perm.permitted = True
+        with self.assertRaises(AttributeError):
             perm.inOwnerChannel = True
         with self.assertRaises(AttributeError):
             perm.chatModerator = True
@@ -54,7 +56,7 @@ class TestDataChatPermissions(unittest.TestCase):
     def test_owner(self):
         self.user = 'megotsthis'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, True)
         self.assertIs(perm.twitchStaff, True)
         self.assertIs(perm.twitchAdmin, True)
@@ -62,12 +64,13 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, True)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, False)
         self.assertIs(perm.bannable, True)
 
     def test_staff(self):
         self.tags['user-type'] = 'staff'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, True)
         self.assertIs(perm.twitchAdmin, True)
@@ -75,12 +78,13 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, True)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, True)
         self.assertIs(perm.bannable, False)
 
     def test_admin(self):
         self.tags['user-type'] = 'admin'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, True)
@@ -88,12 +92,13 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, True)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, True)
         self.assertIs(perm.bannable, False)
 
     def test_global_mod(self):
         self.tags['user-type'] = 'global_mod'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -101,12 +106,13 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, True)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, True)
         self.assertIs(perm.bannable, False)
 
     def test_broadcaster(self):
         self.user = 'mebotsthis'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -114,13 +120,14 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, True)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, True)
         self.assertIs(perm.bannable, False)
 
     def test_moderator(self):
         self.tags['user-type'] = 'mod'
         self.tags['mod'] = '1'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -128,12 +135,13 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, False)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, False)
+        self.assertIs(perm.permitted, True)
         self.assertIs(perm.bannable, False)
 
     def test_subscriber(self):
         self.tags['subscriber'] = '1'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -141,11 +149,12 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, False)
         self.assertIs(perm.moderator, False)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, False)
         self.assertIs(perm.bannable, True)
 
-    def test_bannable_true(self):
+    def test_permittable(self):
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, True)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -153,12 +162,26 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, False)
         self.assertIs(perm.moderator, False)
         self.assertIs(perm.subscriber, False)
+        self.assertIs(perm.permitted, True)
+        self.assertIs(perm.bannable, True)
+
+    def test_bannable_true(self):
+        perm = permissions.ChatPermissionSet(self.tags, self.user,
+                                             self.channel, False)
+        self.assertIs(perm.owner, False)
+        self.assertIs(perm.twitchStaff, False)
+        self.assertIs(perm.twitchAdmin, False)
+        self.assertIs(perm.globalModerator, False)
+        self.assertIs(perm.broadcaster, False)
+        self.assertIs(perm.moderator, False)
+        self.assertIs(perm.subscriber, False)
+        self.assertIs(perm.permitted, False)
         self.assertIs(perm.bannable, True)
 
     def test_bannable_true_owner(self):
         self.user = 'megotsthis'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, True)
         self.assertIs(perm.twitchStaff, True)
         self.assertIs(perm.twitchAdmin, True)
@@ -166,12 +189,13 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, True)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, False)
         self.assertIs(perm.bannable, True)
 
     def test_bannable_false_broadcaster(self):
         self.user = 'mebotsthis'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -179,13 +203,14 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, True)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, True)
         self.assertIs(perm.bannable, False)
 
     def test_bannable_false_owner_broadcaster(self):
         self.user = 'megotsthis'
         self.channel.channel = 'megotsthis'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, True)
         self.assertIs(perm.twitchStaff, True)
         self.assertIs(perm.twitchAdmin, True)
@@ -193,13 +218,14 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, True)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, True)
+        self.assertIs(perm.permitted, True)
         self.assertIs(perm.bannable, False)
 
     def test_bannable_false_moderator(self):
         self.tags['user-type'] = 'mod'
         self.tags['mod'] = '1'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -207,11 +233,12 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, False)
         self.assertIs(perm.moderator, True)
         self.assertIs(perm.subscriber, False)
+        self.assertIs(perm.permitted, True)
         self.assertIs(perm.bannable, False)
 
     def test_no_permission(self):
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -223,35 +250,35 @@ class TestDataChatPermissions(unittest.TestCase):
 
     def test_not_in_owner_channel(self):
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.inOwnerChannel, False)
 
     def test_in_owner_channel_owner(self):
         self.channel.channel = 'megotsthis'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.inOwnerChannel, True)
 
     def test_in_owner_channel_bot(self):
         self.channel.channel = 'botgotsthis'
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.inOwnerChannel, True)
 
     def test_chatModerator(self):
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.chatModerator, False)
 
     def test_not_chatModerator(self):
         self.channel.isMod = True
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm.chatModerator, True)
 
     def test_getitem_except(self):
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         with self.assertRaises(KeyError):
             perm['Kappa']
         with self.assertRaises(TypeError):
@@ -262,7 +289,7 @@ class TestDataChatPermissions(unittest.TestCase):
         self.channel.channel = 'megotsthis'
         self.channel.isMod = True
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, True)
         self.assertIs(perm['owner'], True)
         self.assertIs(perm['twitchStaff'], True)
         self.assertIs(perm['staff'], True)
@@ -273,6 +300,7 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm['broadcaster'], True)
         self.assertIs(perm['moderator'], True)
         self.assertIs(perm['subscriber'], True)
+        self.assertIs(perm['permitted'], True)
         self.assertIs(perm['inOwnerChannel'], True)
         self.assertIs(perm['ownerChan'], True)
         self.assertIs(perm['chatModerator'], True)
@@ -281,7 +309,7 @@ class TestDataChatPermissions(unittest.TestCase):
 
     def test_getitem_false(self):
         perm = permissions.ChatPermissionSet(self.tags, self.user,
-                                             self.channel)
+                                             self.channel, False)
         self.assertIs(perm['owner'], False)
         self.assertIs(perm['twitchStaff'], False)
         self.assertIs(perm['staff'], False)
@@ -292,6 +320,7 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm['broadcaster'], False)
         self.assertIs(perm['moderator'], False)
         self.assertIs(perm['subscriber'], False)
+        self.assertIs(perm['permitted'], False)
         self.assertIs(perm['inOwnerChannel'], False)
         self.assertIs(perm['ownerChan'], False)
         self.assertIs(perm['chatModerator'], False)
@@ -299,8 +328,8 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm['bannable'], True)
 
     def test_tags_None(self):
-        perm = permissions.ChatPermissionSet(None, self.user,
-                                             self.channel)
+        perm = permissions.ChatPermissionSet(None, self.user, self.channel,
+                                             False)
         self.assertIs(perm.owner, False)
         self.assertIs(perm.twitchStaff, False)
         self.assertIs(perm.twitchAdmin, False)
@@ -308,6 +337,7 @@ class TestDataChatPermissions(unittest.TestCase):
         self.assertIs(perm.broadcaster, False)
         self.assertIs(perm.moderator, False)
         self.assertIs(perm.subscriber, False)
+        self.assertIs(perm.permitted, False)
         self.assertIs(perm.bannable, True)
 
 

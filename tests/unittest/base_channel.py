@@ -28,6 +28,7 @@ class TestChannel(unittest.TestCase):
             'broadcaster': False,
             'moderator': False,
             'subscriber': False,
+            'permitted': False,
             'chatModerator': False,
             'bannable': True,
             }

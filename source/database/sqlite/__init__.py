@@ -600,3 +600,53 @@ REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)'''
             cursor.execute(query, params)
             self.connection.commit()
             return cursor.rowcount != 0
+
+    def isPermittedUser(self,
+                        broadcaster: str,
+                        user: str) -> bool:
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            query = '''
+SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''
+            cursor.execute(query, (broadcaster, user,))
+            return bool(cursor.fetchone())
+
+    def addPermittedUser(self,
+                         broadcaster: str,
+                         user: str,
+                         moderator: str) -> bool:
+        query = '''
+INSERT INTO permitted_users (broadcaster, twitchUser) VALUES (?, ?)'''  # type: str
+        history = '''
+INSERT INTO permitted_users_log
+    (broadcaster, twitchUser, moderator, created, actionLog)
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            try:
+                cursor.execute(query, (broadcaster, user))
+                self.connection.commit()
+            except sqlite3.IntegrityError:
+                return False
+
+            cursor.execute(history, (broadcaster, user, moderator, 'add'))
+            self.connection.commit()
+            return True
+
+    def removePermittedUser(self,
+                            broadcaster: str,
+                            user: str,
+                            moderator: str) -> bool:
+        query = '''
+DELETE FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''  # type: str
+        history = '''
+INSERT INTO permitted_users_log
+    (broadcaster, twitchUser, moderator, created, actionLog)
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            cursor.execute(query, (broadcaster, user))
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+
+            cursor.execute(history, (broadcaster, user, moderator, 'remove'))
+            self.connection.commit()
+            return True

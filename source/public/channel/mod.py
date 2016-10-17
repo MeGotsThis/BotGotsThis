@@ -66,3 +66,24 @@ def commandPurge(args: ChatCommandArgs) -> bool:
         args.chat.channel, args.message.lower[1], args.nick, 'purge', None, 1,
         str(args.message), reason if reason else None)
     return True
+
+
+@permission('moderator')
+@min_args(2)
+def commandPermit(args: ChatCommandArgs) -> bool:
+    user = args.message.lower[1]  # type: str
+    if args.database.isPermittedUser(args.chat.channel, user):
+        if args.database.removePermittedUser(args.chat.channel, user):
+            args.chat.send(
+                '{mod} -> {user} is now unpermitted in {channel}'.format(
+                    mod=args.nick, user=user, channel=args.chat.channel))
+        else:
+            args.chat.send('{mod} -> Error'.format(mod=args.nick))
+    else:
+        if args.database.addPermittedUser(args.chat.channel, user, args.nick):
+            args.chat.send(
+                '{mod} -> {user} is now permitted in {channel}'.format(
+                    mod=args.nick, user=user, channel=args.chat.channel))
+        else:
+            args.chat.send('{mod} -> Error'.format(mod=args.nick))
+    return True

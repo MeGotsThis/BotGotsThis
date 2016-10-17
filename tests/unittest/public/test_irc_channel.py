@@ -41,6 +41,7 @@ class TestChannel(unittest.TestCase):
         command3 = Mock(spec=lambda args: False, return_value = False)
         mock_commands.return_value = [command1, command2, command3]
         database = MagicMock(spec=DatabaseBase)
+        database.isPermittedUser.return_value = False
         database.__exit__.return_value = True
         mock_database.return_value = database
         message = Mock(spec=Message)
@@ -59,6 +60,7 @@ class TestChannel(unittest.TestCase):
         command = Mock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
         database = MagicMock(spec=DatabaseBase)
+        database.isPermittedUser.return_value = False
         database.__exit__.return_value = False
         mock_database.return_value = database
         message = Mock(spec=Message)

@@ -193,3 +193,20 @@ class DatabaseNone(DatabaseBase):
                         property: str,
                         value: Optional[str]=None) -> bool:
         return False
+
+    def isPermittedUser(self,
+                        broadcaster: str,
+                        user: str) -> bool:
+        return False
+
+    def addPermittedUser(self,
+                         broadcaster: str,
+                         user: str,
+                         moderator: str) -> bool:
+        return False
+
+    def removePermittedUser(self,
+                            broadcaster: str,
+                            user: str,
+                            moderator: str) -> bool:
+        return False

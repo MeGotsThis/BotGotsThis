@@ -259,4 +259,22 @@ class DatabaseBase(metaclass=ABCMeta):
                         value: Optional[str] = None) -> bool:
         return False
 
+    @abstractmethod
+    def isPermittedUser(self,
+                        broadcaster: str,
+                        user: str) -> bool:
+        return False
 
+    @abstractmethod
+    def addPermittedUser(self,
+                         broadcaster: str,
+                         user: str,
+                         moderator: str) -> bool:
+        return False
+
+    @abstractmethod
+    def removePermittedUser(self,
+                            broadcaster: str,
+                            user: str,
+                            moderator: str) -> bool:
+        return False
