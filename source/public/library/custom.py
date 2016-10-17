@@ -15,6 +15,8 @@ permissions = {
     'any': '',
     'all': '',
     'public': '',
+    'permitted': 'permitted',
+    'permit': 'permitted',
     'subscriber': 'subscriber',
     'sub': 'subscriber',
     'moderator': 'moderator',
