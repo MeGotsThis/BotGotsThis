@@ -210,3 +210,12 @@ class DatabaseNone(DatabaseBase):
                             user: str,
                             moderator: str) -> bool:
         return False
+
+    def isBotManager(self, user: str) -> bool:
+        return False
+
+    def addBotManager(self, user: str) -> bool:
+        return False
+
+    def removeBotManager(self, user: str) -> bool:
+        return False

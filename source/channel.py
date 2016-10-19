@@ -37,8 +37,9 @@ def chatCommand(chat: 'botData.Channel',
                 timestamp: datetime) -> None:
     try:
         with factory.getDatabase() as database:
-            permitted = database.isPermittedUser(chat.channel, nick)
-            permissions = ChatPermissionSet(tags, nick, chat, permitted)  # type: ChatPermissionSet
+            permitted = database.isPermittedUser(chat.channel, nick)  # type: bool
+            manager = database.isBotManager(nick)  # type: bool
+            permissions = ChatPermissionSet(tags, nick, chat, permitted, manager)  # type: ChatPermissionSet
 
             arguments = data.ChatCommandArgs(
                 database, chat, tags, nick, message, permissions,

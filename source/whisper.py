@@ -34,10 +34,10 @@ def whisperCommand(tags: IrcMessageTagsReadOnly,
                    message: Message,
                    timestamp: datetime) -> None:
     try:
-        permissions = WhisperPermissionSet(tags, nick)  # type: WhisperPermissionSet
-
-        complete = False
         with factory.getDatabase() as database:
+            manager = database.isBotManager(nick)  # type: bool
+            permissions = WhisperPermissionSet(tags, nick, manager)  # type: WhisperPermissionSet
+
             arguments = data.WhisperCommandArgs(
                 database, nick, message, permissions, timestamp)  # type: data.WhisperCommandArgs
             for command in commandsToProcess(message.command):  # type: data.WhisperCommand

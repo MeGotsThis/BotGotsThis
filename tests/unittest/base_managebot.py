@@ -2,8 +2,9 @@ import unittest
 from datetime import datetime
 from source.data import ManageBotArgs
 from source.data.message import Message
+from source.data.permissions import ChatPermissionSet
 from source.database import DatabaseBase
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 
 
 def send(messages):
@@ -15,5 +16,22 @@ class TestManageBot(unittest.TestCase):
         self.now = datetime(2000, 1, 1)
         self.send = Mock(spec=send)
         self.database = Mock(spec=DatabaseBase)
-        self.args = ManageBotArgs(self.database, self.send, 'botgotsthis',
-                                  Message(''))
+        self.permissionSet = {
+            'owner': False,
+            'manager': False,
+            'inOwnerChannel': False,
+            'staff': False,
+            'admin': False,
+            'globalMod': False,
+            'broadcaster': False,
+            'moderator': False,
+            'subscriber': False,
+            'permitted': False,
+            'chatModerator': False,
+            'bannable': True,
+            }
+        self.permissions = MagicMock(spec=ChatPermissionSet)
+        _ = lambda k: self.permissionSet[k]
+        self.permissions.__getitem__.side_effect = _
+        self.args = ManageBotArgs(self.database, self.permissions, self.send,
+                                  'botgotsthis', Message(''))

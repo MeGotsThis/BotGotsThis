@@ -93,3 +93,14 @@ CREATE TABLE permitted_users_log (
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     actionLog VARCHAR NOT NULL
 );
+
+CREATE TABLE bot_managers (
+    twitchUser VARCHAR NOT NULL PRIMARY KEY
+);
+
+CREATE TABLE bot_managers_log (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    twitchUser VARCHAR NOT NULL,
+    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actionLog VARCHAR NOT NULL
+);

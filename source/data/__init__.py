@@ -46,6 +46,8 @@ CustomProcessArgs = NamedTuple('CustomProcessArgs',
 
 ManageBotArgs = NamedTuple('ManageBotArgs',
                            [('database', DatabaseBase),
+                            ('permissions', Union[WhisperPermissionSet,
+                                                  ChatPermissionSet]),
                             ('send', Callable[[Union[str,Iterable[str]]], None]),
                             ('nick', str),
                             ('message', Message)])

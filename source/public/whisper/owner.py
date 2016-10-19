@@ -46,5 +46,5 @@ def commandEmpty(args: WhisperCommandArgs) -> bool:
 @min_args(2)
 @permission('owner')
 def commandManageBot(args: WhisperCommandArgs) -> bool:
-    return managebot.manage_bot(args.database, send(args.nick), args.nick,
-                                args.message)
+    return managebot.manage_bot(args.database, args.permissions,
+                                send(args.nick), args.nick, args.message)

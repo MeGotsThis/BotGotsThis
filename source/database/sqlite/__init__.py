@@ -606,7 +606,7 @@ REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)'''
                         user: str) -> bool:
         with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
             query = '''
-SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''
+SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''  # type: str
             cursor.execute(query, (broadcaster, user,))
             return bool(cursor.fetchone())
 
@@ -648,5 +648,46 @@ INSERT INTO permitted_users_log
                 return False
 
             cursor.execute(history, (broadcaster, user, moderator, 'remove'))
+            self.connection.commit()
+            return True
+
+    def isBotManager(self, user: str) -> bool:
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            query = '''SELECT 1 FROM bot_managers WHERE twitchUser=?'''  # type: str
+            cursor.execute(query, (user,))
+            return bool(cursor.fetchone())
+
+    def addBotManager(self, user: str) -> bool:
+        query = '''
+INSERT INTO bot_managers (twitchUser) VALUES (?)'''  # type: str
+        history = '''
+INSERT INTO bot_managers_log
+    (twitchUser, created, actionLog)
+    VALUES (?, CURRENT_TIMESTAMP, ?)'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            try:
+                cursor.execute(query, (user,))
+                self.connection.commit()
+            except sqlite3.IntegrityError:
+                return False
+
+            cursor.execute(history, (user, 'add'))
+            self.connection.commit()
+            return True
+
+    def removeBotManager(self, user: str) -> bool:
+        query = '''
+DELETE FROM bot_managers WHERE twitchUser=?'''  # type: str
+        history = '''
+INSERT INTO bot_managers_log
+    (twitchUser, created, actionLog)
+    VALUES (?, CURRENT_TIMESTAMP, ?)'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            cursor.execute(query, (user,))
+            self.connection.commit()
+            if cursor.rowcount == 0:
+                return False
+
+            cursor.execute(history, (user, 'remove'))
             self.connection.commit()
             return True

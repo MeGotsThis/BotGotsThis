@@ -49,5 +49,5 @@ def commandEmpty(args: ChatCommandArgs) -> bool:
 @ownerChannel
 @permission('owner')
 def commandManageBot(args: ChatCommandArgs) -> bool:
-    return managebot.manage_bot(args.database, send(args.chat), args.nick,
-                                args.message)
+    return managebot.manage_bot(args.database, args.permissions,
+                                send(args.chat), args.nick, args.message)

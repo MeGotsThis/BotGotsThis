@@ -15,7 +15,8 @@ class ChatPermissionSet:
                  tags: Optional[IrcMessageTagsReadOnly],
                  user: str,
                  channel: Any,
-                 permitted: bool) -> None:
+                 permitted: bool,
+                 manager: bool) -> None:
         userType = None  # type: str
         if tags is not None and 'user-type' in tags:
             userType = str(tags['user-type'])
@@ -26,6 +27,7 @@ class ChatPermissionSet:
         self._user = user  # type: str
         self._channel = channel
         self._isOwner = None  # type: bool
+        self._isManager = manager  # type: bool
         self._inOwnerChannel = None  # type: bool
         self._isTwitchStaff = None  # type: bool
         self._isTwitchAdmin = None  # type: bool
@@ -49,12 +51,16 @@ class ChatPermissionSet:
             inBot = self._channel.channel == bot.config.botnick  # type: bool
             self._inOwnerChannel = inOwner or inBot
         return self._inOwnerChannel
-    
+
+    @property
+    def manager(self) -> bool:
+        return self._isManager or self.owner
+
     @property
     def twitchStaff(self) -> bool:
         if self._isTwitchStaff is None:
             self._isTwitchStaff = self._userType in typeTwitchStaff
-            self._isTwitchStaff = self.owner or self._isTwitchStaff
+            self._isTwitchStaff = self.manager or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
@@ -115,6 +121,8 @@ class ChatPermissionSet:
         if isinstance(key, str):
             if key == 'owner':
                 return self.owner
+            if key == 'manager':
+                return self.manager
             if key in ['ownerChan', 'inOwnerChannel']:
                 return self.inOwnerChannel
             if key in ['staff', 'twitchStaff']:
@@ -142,7 +150,8 @@ class ChatPermissionSet:
 class WhisperPermissionSet:
     def __init__(self,
                  tags: IrcMessageTagsReadOnly,
-                 user: str) -> None:
+                 user: str,
+                 manager: bool) -> None:
         userType = None  # type: str
         if 'user-type' in tags:
             userType = str(tags['user-type'])
@@ -152,6 +161,7 @@ class WhisperPermissionSet:
         self._userType = userType  # type: str
         self._user = user  # type: str
         self._isOwner = None  # type: bool
+        self._isManager = manager  # type: bool
         self._isTwitchStaff = None  # type: bool
         self._isTwitchAdmin = None  # type: bool
         self._isGlobalMod = None  # type: bool
@@ -162,12 +172,16 @@ class WhisperPermissionSet:
         if self._isOwner is None:
             self._isOwner = self._user == bot.config.owner
         return self._isOwner
-    
+
+    @property
+    def manager(self) -> bool:
+        return self._isManager or self.owner
+
     @property
     def twitchStaff(self) -> bool:
         if self._isTwitchStaff is None:
             self._isTwitchStaff = self._userType in typeTwitchStaff
-            self._isTwitchStaff = self.owner or self._isTwitchStaff
+            self._isTwitchStaff = self.manager or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
@@ -188,6 +202,8 @@ class WhisperPermissionSet:
         if isinstance(key, str):
             if key == 'owner':
                 return self.owner
+            if key == 'manager':
+                return self.manager
             if key in ['staff', 'twitchStaff']:
                 return self.twitchStaff
             if key in ['admin', 'twitchAdmin']:

@@ -18,6 +18,7 @@ class TestWhisper(unittest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.permissionSet = {
             'owner': False,
+            'manager': False,
             'staff': False,
             'admin': False,
             'globalMod': False,

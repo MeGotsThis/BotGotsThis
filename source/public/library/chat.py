@@ -4,7 +4,8 @@ from functools import partial, wraps
 from typing import Any, Callable, Iterable, Optional, Tuple, Union
 from ... import data
 
-_AnyArgs = Union[data.ChatCommandArgs, data.WhisperCommandArgs]
+_AnyArgs = Union[data.ChatCommandArgs, data.WhisperCommandArgs,
+                 data.ManageBotArgs]
 _AnyCallable = Callable[..., Any]
 _AnyDecorator = Callable[..., _AnyCallable]
 

@@ -21,6 +21,7 @@ class TestChannel(unittest.TestCase):
         self.database.hasFeature.side_effect = lambda c, f: f in self.features
         self.permissionSet = {
             'owner': False,
+            'manager': False,
             'inOwnerChannel': False,
             'staff': False,
             'admin': False,

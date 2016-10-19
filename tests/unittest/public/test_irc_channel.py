@@ -41,13 +41,17 @@ class TestChannel(unittest.TestCase):
         command3 = Mock(spec=lambda args: False, return_value = False)
         mock_commands.return_value = [command1, command2, command3]
         database = MagicMock(spec=DatabaseBase)
+        database.__enter__.return_value = database
         database.isPermittedUser.return_value = False
+        database.isBotManager.return_value = False
         database.__exit__.return_value = True
         mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
         channel.chatCommand(self.channel, self.tags, 'botgotsthis', message,
                             self.now)
+        self.assertEqual(database.isPermittedUser.call_count, 1)
+        self.assertEqual(database.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command1.call_count, 1)
         self.assertEqual(command2.call_count, 1)
@@ -60,13 +64,17 @@ class TestChannel(unittest.TestCase):
         command = Mock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
         database = MagicMock(spec=DatabaseBase)
+        database.__enter__.return_value = database
         database.isPermittedUser.return_value = False
+        database.isBotManager.return_value = False
         database.__exit__.return_value = False
         mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
         channel.chatCommand(self.channel, self.tags, 'botgotsthis', message,
                             self.now)
+        self.assertEqual(database.isPermittedUser.call_count, 1)
+        self.assertEqual(database.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command.call_count, 1)
         self.assertTrue(mock_log.called)
@@ -74,7 +82,8 @@ class TestChannel(unittest.TestCase):
     @patch('bot.utils.logException', autospec=True)
     @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.channel.commandsToProcess', autospec=True)
-    def test_chatCommand_database_except(self, mock_commands, mock_database, mock_log):
+    def test_chatCommand_database_except(self, mock_commands, mock_database,
+                                         mock_log):
         mock_database.side_effect = Exception
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')

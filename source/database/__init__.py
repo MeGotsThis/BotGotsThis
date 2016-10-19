@@ -278,3 +278,15 @@ class DatabaseBase(metaclass=ABCMeta):
                             user: str,
                             moderator: str) -> bool:
         return False
+
+    @abstractmethod
+    def isBotManager(self, user: str) -> bool:
+        return False
+
+    @abstractmethod
+    def addBotManager(self, user: str) -> bool:
+        return False
+
+    @abstractmethod
+    def removeBotManager(self, user: str) -> bool:
+        return False
