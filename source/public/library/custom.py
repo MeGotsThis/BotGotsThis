@@ -31,10 +31,15 @@ permissions = {
     'twitchadmin': 'admin',
     'staff': 'staff',
     'twitchstaff': 'staff',
+    'manager': 'manager',
+    'botmanager': 'manager',
     'owner': 'owner',
     'self': 'owner',
     'bot': 'owner',
     }
+
+permissionsOrder = ['', 'permitted', 'subscriber', 'moderator', 'broadcaster',
+                    'globalMod', 'admin', 'staff', 'manager', 'owner']  # type: List[str]
 
 
 def get_command(database: DatabaseBase,
@@ -42,9 +47,7 @@ def get_command(database: DatabaseBase,
                 channel: str,
                 permissions: ChatPermissionSet) -> Optional[CustomCommand]:
     commands = database.getChatCommands(channel, command)  # type: Dict[str, Dict[str, str]]
-    permissionsSet = ['', 'subscriber', 'moderator', 'broadcaster',
-                      'globalMod', 'admin', 'staff', 'owner']  # type: List[str]
-    for permission in reversed(permissionsSet):  # type: str
+    for permission in reversed(permissionsOrder):  # type: str
         if not permission or permissions[permission]:
             for broadcaster in [channel, '#global']:  # type: str
                 if permission in commands[broadcaster]:
