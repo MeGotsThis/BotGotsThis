@@ -4,7 +4,7 @@ from bot import utils
 from ...data import WhisperCommandArgs
 
 
-@permission('owner')
+@permission('manager')
 def commandHello(args: WhisperCommandArgs) -> bool:
     utils.whisper(args.nick, 'Hello Kappa !')
     return True
@@ -15,7 +15,7 @@ def commandExit(args: WhisperCommandArgs) -> bool:
     return exit.exit(send(args.nick))
 
 
-@permission('owner')
+@permission('manager')
 def commandSay(args: WhisperCommandArgs) -> bool:
     return channel.say(args.database, args.nick, args.message.lower[1],
                        args.message[2:])
@@ -44,7 +44,7 @@ def commandEmpty(args: WhisperCommandArgs) -> bool:
 
 
 @min_args(2)
-@permission('owner')
+@permission('manager')
 def commandManageBot(args: WhisperCommandArgs) -> bool:
     return managebot.manage_bot(args.database, args.permissions,
                                 send(args.nick), args.nick, args.message)

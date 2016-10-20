@@ -10,7 +10,7 @@ def commandReload(args: ChatCommandArgs) -> bool:
 
 
 @ownerChannel
-@permission('owner')
+@permission('manager')
 def commandReloadCommands(args: ChatCommandArgs) -> bool:
     return reload.reload_commands(sendPriority(args.chat, 0))
 

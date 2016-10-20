@@ -8,7 +8,7 @@ def commandReload(args: WhisperCommandArgs) -> bool:
     return reload.full_reload(send(args.nick))
 
 
-@permission('owner')
+@permission('manager')
 def commandReloadCommands(args: WhisperCommandArgs) -> bool:
     return reload.reload_commands(send(args.nick))
 
