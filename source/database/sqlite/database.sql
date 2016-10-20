@@ -5,9 +5,12 @@ CREATE TABLE auto_join (
 );
 
 CREATE TABLE game_abbreviations (
-    abbreviation VARCHAR NOT NULL PRIMARY KEY,
-    twitchGame VARCHAR NOT NULL
+    abbreviation VARCHAR NOT NULL COLLATE NOCASE PRIMARY KEY,
+    twitchGame VARCHAR NOT NULL COLLATE NOCASE
 );
+
+CREATE INDEX game_abbreviations_game ON game_abbreviations (twitchGame);
+
 
 CREATE TABLE custom_commands (
     broadcaster VARCHAR NOT NULL,

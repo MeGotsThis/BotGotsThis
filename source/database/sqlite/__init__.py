@@ -105,9 +105,13 @@ REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)'''  # type: s
     
     def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
         query = '''
-SELECT twitchGame FROM game_abbreviations WHERE abbreviation=?'''  # type: str
+SELECT DISTINCT twitchGame
+    FROM game_abbreviations
+    WHERE abbreviation=?
+        OR twitchGame=?
+    ORDER BY twitchGame=? DESC'''  # type: str
         with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            cursor.execute(query, (abbreviation,))
+            cursor.execute(query, (abbreviation, abbreviation, abbreviation,))
             game = cursor.fetchone()  # type: Optional[Tuple[str]]
             return game and game[0]  # type: ignore
 
