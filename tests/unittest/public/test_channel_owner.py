@@ -85,7 +85,7 @@ class TestChannelOwner(TestChannel):
         self.assertFalse(mock_manage_bot.called)
         mock_manage_bot.return_value = True
         self.permissions.inOwnerChannel = True
-        self.permissionSet['owner'] = True
+        self.permissionSet['manager'] = True
         message = Message('!managebot listchats')
         self.assertIs(
             owner.commandManageBot(self.args._replace(message=message)), True)

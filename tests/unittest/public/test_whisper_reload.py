@@ -22,7 +22,7 @@ class TestWhisperReload(TestWhisper):
         self.assertIs(reload.commandReloadCommands(self.args), False)
         self.assertFalse(mock_reload.called)
         mock_reload.return_value = True
-        self.permissionSet['owner'] = True
+        self.permissionSet['manager'] = True
         self.assertIs(reload.commandReloadCommands(self.args), True)
         mock_reload.assert_called_once_with(
             PartialMatch(bot.utils.whisper, 'botgotsthis'))

@@ -11,7 +11,7 @@ class TestWhisperOwner(TestWhisper):
     @patch('bot.utils.whisper', autospec=True)
     def test_hello(self, mock_whisper):
         self.assertIs(owner.commandHello(self.args), False)
-        self.permissionSet['owner'] = True
+        self.permissionSet['manager'] = True
         self.assertIs(owner.commandHello(self.args), True)
         mock_whisper.assert_called_once_with(
             'botgotsthis', StrContains('Hello', '!'))
@@ -33,7 +33,7 @@ class TestWhisperOwner(TestWhisper):
         self.assertFalse(mock_say.called)
         mock_say.return_value = True
         self.permissions.inOwnerChannel = True
-        self.permissionSet['owner'] = True
+        self.permissionSet['manager'] = True
         message = Message('!say MeGotsThis Kappa')
         self.assertIs(owner.commandSay(self.args._replace(message=message)),
                       True)
@@ -98,7 +98,7 @@ class TestWhisperOwner(TestWhisper):
         self.assertFalse(mock_manage_bot.called)
         mock_manage_bot.return_value = True
         self.permissions.inOwnerChannel = True
-        self.permissionSet['owner'] = True
+        self.permissionSet['manager'] = True
         message = Message('!managebot listchats')
         self.assertIs(
             owner.commandManageBot(self.args._replace(message=message)), True)
