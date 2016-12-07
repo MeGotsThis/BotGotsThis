@@ -21,6 +21,14 @@ class TestLibraryTextToFormat(unittest.TestCase):
         self.assertEqual(trans('abcABC1²'), 'ABCabc!²')
         self.assertEqual(trans('Kappa'), 'kAPPA')
 
+    def test_upper(self):
+        self.assertEqual(textformat.to_upper('abcABC1²'), 'ABCABC1²')
+        self.assertEqual(textformat.to_upper('Kappa'), 'KAPPA')
+
+    def test_lower(self):
+        self.assertEqual(textformat.to_lower('abcABC1²'), 'abcabc1²')
+        self.assertEqual(textformat.to_lower('Kappa'), 'kappa')
+
     def test_full(self):
         self.assertEqual(
             textformat.to_full_width('abcABC1²'), 'ａｂｃＡＢＣ１²')
@@ -121,6 +129,18 @@ class TestLibraryTextFormat(unittest.TestCase):
         mock_to.assert_called_once_with('Kappa')
         mock_to.reset_mock()
         self.assertEqual(textformat.format('Kappa', 'ASCII'), 'Kappa')
+        mock_to.assert_called_once_with('Kappa')
+
+    @patch('source.public.library.textformat.to_upper',
+           autospec=True, side_effect=translate)
+    def test_upper(self, mock_to):
+        self.assertEqual(textformat.format('Kappa', 'upper'), 'Kappa')
+        mock_to.assert_called_once_with('Kappa')
+
+    @patch('source.public.library.textformat.to_lower',
+           autospec=True, side_effect=translate)
+    def test_lower(self, mock_to):
+        self.assertEqual(textformat.format('Kappa', 'lower'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
     @patch('source.public.library.textformat.to_full_width',

@@ -1,5 +1,5 @@
 ﻿import re
-from typing import Callable
+from typing import Callable, Dict, List
 
 FormatText = Callable[[str], str]
 
@@ -7,6 +7,20 @@ ascii = (''' !"#$%&'()*+,-./'''
          '0123456789'
          ':;<=>?@'
          'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+         r'[\]^_`'
+         'abcdefghijklmnopqrstuvwxyz'
+         '{|}~')  # type: str
+upper = (''' !"#$%&'()*+,-./'''
+         '0123456789'
+         ':;<=>?@'
+         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+         r'[\]^_`'
+         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+         '{|}~')  # type: str
+lower = (''' !"#$%&'()*+,-./'''
+         '0123456789'
+         ':;<=>?@'
+         'abcdefghijklmnopqrstuvwxyz'
          r'[\]^_`'
          'abcdefghijklmnopqrstuvwxyz'
          '{|}~')  # type: str
@@ -147,6 +161,8 @@ def _createAsciiTo(name: str,
     asciiTo.__name__ = name
     return asciiTo
 
+to_upper = _createAsciiTo('to_upper', upper)  # type: FormatText
+to_lower = _createAsciiTo('to_lower', lower)  # type: FormatText
 to_full_width = _createAsciiTo('to_full_width', full)  # type: FormatText
 to_parenthesized = _createAsciiTo('to_parenthesized', parenthesized)  # type: FormatText
 to_circled = _createAsciiTo('to_circled', circled)  # type: FormatText
@@ -188,6 +204,8 @@ def format(string: str,
     format_ = format_.lower()
     strTable = {
         'ascii': to_ascii,
+        'upper': to_upper,
+        'lower': to_lower,
         'full': to_full_width,
         'parenthesized': to_parenthesized,
         'circled': to_circled,
