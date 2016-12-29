@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from datetime import datetime
 from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
 from typing import Sequence, Union
 
@@ -6,6 +7,16 @@ AutoJoinChannel = NamedTuple('AutoJoinChannel',
                              [('broadcaster', str),
                               ('priority', Union[int, float]),
                               ('cluster', str)])
+AutoRepeatMessage = NamedTuple('AutoRepeatMessage',
+                               [('broadcaster', str),
+                                ('name', str),
+                                ('message', str)])
+AutoRepeatList = NamedTuple('AutoRepeatList',
+                            [('name', str),
+                             ('message', str),
+                             ('count', Optional[int]),
+                             ('duration', float),
+                             ('last', datetime)])
 CommandProperty = Union[str, Sequence[str]]
 CommandReturn = Union[str, Dict[str, str]]
 
@@ -289,4 +300,37 @@ class DatabaseBase(metaclass=ABCMeta):
 
     @abstractmethod
     def removeBotManager(self, user: str) -> bool:
+        return False
+
+    @abstractmethod
+    def getAutoRepeatToSend(self) -> Iterable[AutoRepeatMessage]:
+        yield from []
+
+    @abstractmethod
+    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatMessage]:
+        yield from []
+
+    @abstractmethod
+    def clearAutoRepeat(self, broadcaster: str) -> bool:
+        return False
+
+    @abstractmethod
+    def sentAutoRepeat(self,
+                       broadcaster: str,
+                       name: str) -> bool:
+        return False
+
+    @abstractmethod
+    def setAutoRepeat(self,
+                      broadcaster: str,
+                      name: str,
+                      message: str,
+                      count: Optional[int],
+                      minutes: float) -> bool:
+        return False
+
+    @abstractmethod
+    def removeAutoRepeat(self,
+                         broadcaster: str,
+                         name: str) -> bool:
         return False

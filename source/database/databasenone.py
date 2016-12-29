@@ -1,4 +1,5 @@
-from . import AutoJoinChannel, CommandProperty, CommandReturn, DatabaseBase
+from . import AutoJoinChannel, AutoRepeatMessage, CommandProperty
+from . import CommandReturn, DatabaseBase
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
 from typing import Union
 
@@ -218,4 +219,31 @@ class DatabaseNone(DatabaseBase):
         return False
 
     def removeBotManager(self, user: str) -> bool:
+        return False
+
+    def getAutoRepeatToSend(self) -> Iterable[AutoRepeatMessage]:
+        yield from []
+
+    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatMessage]:
+        yield from []
+
+    def clearAutoRepeat(self, broadcaster: str) -> bool:
+        return False
+
+    def sentAutoRepeat(self,
+                       broadcaster: str,
+                       name: str) -> bool:
+        return False
+
+    def setAutoRepeat(self,
+                      broadcaster: str,
+                      name: str,
+                      message: str,
+                      count: Optional[int],
+                      minutes: float) -> bool:
+        return False
+
+    def removeAutoRepeat(self,
+                         broadcaster: str,
+                         name: str) -> bool:
         return False

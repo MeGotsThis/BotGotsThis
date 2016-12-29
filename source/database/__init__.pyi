@@ -1,4 +1,5 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
+from datetime import datetime
 from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
 from typing import Sequence, Union, overload
 
@@ -6,6 +7,15 @@ AutoJoinChannel = NamedTuple('AutoJoinChannel',
                              [('broadcaster', str),
                               ('priority', Union[int, float]),
                               ('cluster', str)])
+AutoRepeatMessage = NamedTuple('AutoRepeatMessage',
+                               [('broadcaster', str),
+                                ('name', str),
+                                ('message', str)])
+AutoRepeatList = NamedTuple('AutoRepeatList',
+                            [('name', str),
+                             ('message', str),
+                             ('duration', float),
+                             ('last', datetime)])
 CommandProperty = Union[str, Sequence[str]]
 CommandReturn = Union[str, Dict[str, str]]
 
@@ -162,3 +172,18 @@ class DatabaseBase(metaclass=ABCMeta):
     def isBotManager(self, user: str) -> bool: ...
     def addBotManager(self, user: str) -> bool: ...
     def removeBotManager(self, user: str) -> bool: ...
+    def getAutoRepeatToSend(self) -> Iterable[AutoRepeatMessage]: ...
+    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatMessage]: ...
+    def clearAutoRepeat(self, broadcaster: str) -> bool: ...
+    def sentAutoRepeat(self,
+                       broadcaster: str,
+                       name: str) -> bool: ...
+    def setAutoRepeat(self,
+                      broadcaster: str,
+                      name: str,
+                      message: str,
+                      count: Optional[int],
+                      minutes: float) -> bool: ...
+    def removeAutoRepeat(self,
+                         broadcaster: str,
+                         name: str) -> bool: ...

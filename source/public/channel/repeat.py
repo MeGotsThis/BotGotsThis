@@ -1,14 +1,8 @@
-﻿import bot.globals
-import threading
-import time
-from bot import data, utils
-from contextlib import suppress
-from datetime import datetime, timedelta
-from typing import Optional
-from ..library import timeout
+﻿from contextlib import suppress
+from typing import List, Optional
 from ..library.chat import min_args, permission
 from ...data import ChatCommandArgs
-from ...database import DatabaseBase, factory
+from ...database import AutoRepeatList
 
 
 @permission('broadcaster')
@@ -40,80 +34,50 @@ def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
 @min_args(2)
 def process_auto_repeat(args: ChatCommandArgs,
                         count: Optional[int]) -> bool:
-    if args.message.lower[1] == 'off':
-        minutesDuration = 0  # type: float
+    name = ''  # type: str
+    minutesDuration = 0  # type: float
+    message = None  # type: Optional[str]
+
+    secondArg = ''  # type: str
+    if args.message.lower[1].startswith('name='):
+        name = args.message.lower[1].split('name=', 1)[1]
+        if len(args.message) >= 3:
+            secondArg = args.message.lower[2]
+            message = args.message[3:] or None
+    else:
+        secondArg = args.message.lower[1]
+        message = args.message[2:] or None
+
+    if secondArg == 'list':
+        repeats = list(args.database.listAutoRepeat(args.chat.channel)
+                       )  # type: List[AutoRepeatList]
+        if not repeats:
+            args.chat.send('No Active Auto Repeats')
+        else:
+            args.chat.send('Active Auto Repeats:')
+        for repeat in repeats:  # type: AutoRepeatList
+            name = repeat.name if repeat.name else '<default>'  # type: str
+            args.chat.send(
+                'Name: {name}, Duration: {duration} minutes, '
+                'Message: {message}'.format(name=name,
+                                            duration=repeat.duration,
+                                            message=repeat.message))
+        return True
+    elif secondArg == 'clear':
+        args.database.clearAutoRepeat(args.chat.channel)
+        return True
+    elif secondArg == 'off':
+        pass
     else:
         try:
-            minutesDuration = float(args.message[1])
+            minutesDuration = float(secondArg)
         except ValueError:
             return False
-    
-    message = args.message[2:] or None  # type: Optional[str]
-    if 'repeatThread' in args.chat.sessionData:
-        args.chat.sessionData['repeatThread'].count = 0
-    
+
     if minutesDuration <= 0 or count == 0 or not message:
+        args.database.removeAutoRepeat(args.chat.channel, name)
         return True
-    
-    thread = MessageRepeater(
-        chat=args.chat, message=message,
-        duration=timedelta(minutes=minutesDuration), count=count)  # type: MessageRepeater
-    args.chat.sessionData['repeatThread'] = thread
-    thread.start()
+
+    args.database.setAutoRepeat(args.chat.channel, name, message, count,
+                                minutesDuration)
     return True
-
-
-class MessageRepeater(threading.Thread):
-    def __init__(self, *args,
-                 chat: 'data.Channel',
-                 message: str='',
-                 duration: timedelta=timedelta(),
-                 count: Optional[int]=None,
-                 **kwargs) -> None:
-        threading.Thread.__init__(self, *args, **kwargs)  # type: ignore
-        self._chat = chat  # type: data.Channel
-        self._message = message  # type: str
-        self._count = count  # type: Optional[int]
-        self._duration = max(duration, timedelta(seconds=1))  # type: timedelta
-        self._lastTime = datetime.min  # type: datetime
-        self._countLock = threading.Lock()  # type: threading.Lock
-    
-    @property
-    def count(self) -> Optional[int]:
-        with self._countLock:
-            return self._count
-    
-    @count.setter
-    def count(self, value: Optional[int]) -> None:
-        with self._countLock:
-            self._count = value
-            
-    @property
-    def running(self) -> bool:
-        with self._countLock:
-            return ((self._count is None or self._count > 0)
-                    and bot.globals.running)
-    
-    def run(self) -> None:
-        while self.running:
-            self.process()
-            time.sleep(1 / 20)
-        self.end()
-    
-    def process(self) -> None:
-        now = utils.now()
-        if now >= self._lastTime + self._duration:
-            self._lastTime = now
-            self._chat.send(self._message)
-            if self._chat.isMod:
-                with factory.getDatabase() as database:  # type: DatabaseBase
-                    timeout.record_timeout(database, self._chat, None,
-                                           self._message, None, 'autorepeat')
-            with self._countLock:
-                if self._count is not None:
-                    self._count -= 1
-                    
-    def end(self) -> None:
-        if ('repeatThread' in self._chat.sessionData
-                and self._chat.sessionData['repeatThread'] is self):
-            del self._chat.sessionData['repeatThread']

@@ -107,3 +107,14 @@ CREATE TABLE bot_managers_log (
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     actionLog VARCHAR NOT NULL
 );
+
+CREATE TABLE auto_repeat (
+    broadcaster VARCHAR NOT NULL,
+    name VARCHAR NOT NULL,
+    message VARCHAR NOT NULL,
+    numLeft INTEGER,
+    duration REAL NOT NULL,
+    lastSent TIMESTAMP NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (broadcaster, name)
+);

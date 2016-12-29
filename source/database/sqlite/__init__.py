@@ -1,5 +1,7 @@
-﻿from .. import AutoJoinChannel, CommandProperty, CommandReturn, DatabaseBase
+﻿from .. import AutoJoinChannel, AutoRepeatList, AutoRepeatMessage
+from .. import CommandProperty, CommandReturn, DatabaseBase
 from contextlib import closing
+from datetime import datetime
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
 from typing import Tuple, Union
 import sqlite3
@@ -695,3 +697,70 @@ INSERT INTO bot_managers_log
             cursor.execute(history, (user, 'remove'))
             self.connection.commit()
             return True
+
+    def getAutoRepeatToSend(self) -> Iterable[AutoRepeatMessage]:
+        query = '''
+SELECT broadcaster, name, message FROM auto_repeat
+    WHERE datetime(lastSent, '+' || duration || ' minutes')
+        <= CURRENT_TIMESTAMP'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            for broadcaster, name, message in cursor.execute(query):
+                yield AutoRepeatMessage(broadcaster, name, message)
+
+    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatMessage]:
+        query = '''
+SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
+    WHERE broadcaster=?'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            for row in cursor.execute(query, (broadcaster,)):  # type: tuple
+                name, message, count, duration, last = row  # type: str, str, Optional[int], float, datetime
+                yield AutoRepeatList(name, message, count, duration, last)
+
+    def clearAutoRepeat(self, broadcaster: str) -> bool:
+        query = '''DELETE FROM auto_repeat WHERE broadcaster=?'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            cursor.execute(query, (broadcaster,))
+            self.connection.commit()
+            return cursor.rowcount != 0
+
+    def sentAutoRepeat(self,
+                       broadcaster: str,
+                       name: str) -> bool:
+        query = '''
+UPDATE auto_repeat SET numLeft=numLeft-1, lastSent=CURRENT_TIMESTAMP
+    WHERE broadcaster=? AND name=?'''  # type: str
+        delete = '''
+DELETE FROM auto_repeat
+    WHERE broadcaster=? AND name=? AND numLeft IS NOT NULL AND numLeft<=0'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            cursor.execute(query, (broadcaster, name))
+            self.connection.commit()
+            ret = cursor.rowcount != 0  # type: bool
+            cursor.execute(delete, (broadcaster, name))
+            self.connection.commit()
+            return ret
+
+    def setAutoRepeat(self,
+                      broadcaster: str,
+                      name: str,
+                      message: str,
+                      count: Optional[int],
+                      minutes: float) -> bool:
+        query = '''
+REPLACE INTO auto_repeat (broadcaster, name, message, duration, lastSent)
+VALUES (?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            cursor.execute(query, (broadcaster, name, message, minutes,
+                                   minutes))
+            self.connection.commit()
+            return cursor.rowcount != 0
+
+    def removeAutoRepeat(self,
+                         broadcaster: str,
+                         name: str) -> bool:
+        query = '''
+DELETE FROM auto_repeat WHERE broadcaster=? AND name=?'''  # type: str
+        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+            cursor.execute(query, (broadcaster, name))
+            self.connection.commit()
+            return cursor.rowcount != 0
