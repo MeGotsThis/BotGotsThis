@@ -307,7 +307,7 @@ class DatabaseBase(metaclass=ABCMeta):
         yield from []
 
     @abstractmethod
-    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatMessage]:
+    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatList]:
         yield from []
 
     @abstractmethod

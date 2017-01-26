@@ -707,7 +707,7 @@ SELECT broadcaster, name, message FROM auto_repeat
             for broadcaster, name, message in cursor.execute(query):
                 yield AutoRepeatMessage(broadcaster, name, message)
 
-    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatMessage]:
+    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatList]:
         query = '''
 SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
     WHERE broadcaster=?'''  # type: str

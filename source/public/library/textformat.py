@@ -217,7 +217,7 @@ def format(string: str,
         'fraktur': to_fraktur,
         'monospace': to_monospace,
         'doublestruck': to_double_struck,
-        }
+        }  # type: Dict[str, FormatText]
     reTable = {
         r'serif-?bold': to_serif_bold,
         r'serif-?italic': to_serif_italic,
@@ -227,7 +227,7 @@ def format(string: str,
         r'(sanserif-?)?(bold-?italic|italic-?bold)': to_sanserif_bold_italic,
         r'(script|cursive)-?bold': to_script_bold,
         r'fraktur-?bold': to_fraktur_bold,
-        }
+        }  # type: Dict[str, FormatText]
     if format_ in strTable:
         return strTable[format_](string)
     for pattern in reTable:  # type: str

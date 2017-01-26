@@ -1,7 +1,7 @@
 ﻿from abc import ABCMeta, abstractmethod
 from contextlib import closing
 from datetime import datetime, timedelta, tzinfo
-from typing import Dict, NamedTuple, Optional, Sequence
+from typing import Dict, List, NamedTuple, Optional, Sequence
 import configparser
 import os
 import sqlite3

@@ -1,5 +1,5 @@
-from . import AutoJoinChannel, AutoRepeatMessage, CommandProperty
-from . import CommandReturn, DatabaseBase
+from . import AutoJoinChannel, AutoRepeatMessage, AutoRepeatList
+from . import CommandProperty, CommandReturn, DatabaseBase
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence
 from typing import Union
 
@@ -224,7 +224,7 @@ class DatabaseNone(DatabaseBase):
     def getAutoRepeatToSend(self) -> Iterable[AutoRepeatMessage]:
         yield from []
 
-    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatMessage]:
+    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatList]:
         yield from []
 
     def clearAutoRepeat(self, broadcaster: str) -> bool:

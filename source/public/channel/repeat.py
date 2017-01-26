@@ -56,7 +56,7 @@ def process_auto_repeat(args: ChatCommandArgs,
         else:
             args.chat.send('Active Auto Repeats:')
         for repeat in repeats:  # type: AutoRepeatList
-            name = repeat.name if repeat.name else '<default>'  # type: str
+            name = repeat.name if repeat.name else '<default>'
             args.chat.send(
                 'Name: {name}, Duration: {duration} minutes, '
                 'Message: {message}'.format(name=name,
