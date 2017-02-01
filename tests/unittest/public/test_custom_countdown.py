@@ -208,6 +208,13 @@ class TestCustomCountdownParse(unittest.TestCase):
                                        countdown.SUNDAY, None, True))
         self.assertIsNone(countdown.parse_date_string('abc 0:00'))
 
+    def test_negative_timezone_time_of_day(self):
+        self.assertEqual(
+            countdown.parse_date_string('8:00PM UTC-08:00'),
+            countdown.DateTimeInstance(
+                time(20, 0, 0, 0, timezones.abbreviations['utc-08:00']),
+                None, None, False))
+
     def test_month_day_time_of_day(self):
         self.assertEqual(
             countdown.parse_date_string('1/1 0:00'),
@@ -325,6 +332,24 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
             countdown.DateTime(datetime(2000, 1, 8, 0, 0, 0, 0, timezones.utc),
                                True))
 
+    def test_time_of_day_day_of_week_timezone(self):
+        self.assertEqual(
+            countdown.next_datetime(
+                self.now,
+                time(20, 0, 0, 0, timezones.abbreviations['utc-08:00']),
+                countdown.FRIDAY, None, True),
+            countdown.DateTime(datetime(2000, 1, 1, 4, 0, 0, 0,
+                                        timezones.utc),
+                               True))
+        self.assertEqual(
+            countdown.next_datetime(
+                self.now,
+                time(4, 0, 0, 0, timezones.abbreviations['utc+08:00']),
+                countdown.SUNDAY, None, True),
+            countdown.DateTime(datetime(2000, 1, 1, 20, 0, 0, 0,
+                                        timezones.utc),
+                               True))
+
     def test_time_of_day_month_day(self):
         self.assertEqual(
             countdown.next_datetime(self.now, time(0, 0, 0, 0, timezones.utc),
@@ -415,6 +440,24 @@ class TestCustomCountdownPastDatetime(unittest.TestCase):
             countdown.past_datetime(self.now, time(0, 0, 0, 0, timezones.utc),
                                     countdown.SATURDAY, None, True),
             countdown.DateTime(datetime(2000, 1, 1, 0, 0, 0, 0,
+                                        timezones.utc),
+                               True))
+
+    def test_time_of_day_day_of_week_timezone(self):
+        self.assertEqual(
+            countdown.past_datetime(
+                self.now,
+                time(20, 0, 0, 0, timezones.abbreviations['utc-08:00']),
+                countdown.SATURDAY, None, True),
+            countdown.DateTime(datetime(1999, 12, 26, 4, 0, 0, 0,
+                                        timezones.utc),
+                               True))
+        self.assertEqual(
+            countdown.past_datetime(
+                self.now,
+                time(4, 0, 0, 0, timezones.abbreviations['utc+08:00']),
+                countdown.SATURDAY, None, True),
+            countdown.DateTime(datetime(1999, 12, 31, 20, 0, 0, 0,
                                         timezones.utc),
                                True))
 

@@ -206,7 +206,10 @@ def next_datetime(now: datetime,
                   dayofweek: Optional[int],
                   date_: Optional[Date],
                   is24Hour: bool) -> Optional[DateTime]:
-    today = now.date()  # time: date
+    if timeOfDay.tzinfo is not None:
+        today = now.astimezone(timeOfDay.tzinfo).date()  # time: date
+    else:
+        today = now.date()
     if date_ is not None:
         if date_.year is not None:
             dt = datetime.combine(date(*date_), timeOfDay)  # type: datetime
@@ -258,7 +261,10 @@ def past_datetime(now: datetime,
                   dayofweek: Optional[int],
                   date_: Optional[Date],
                   is24Hour: bool) -> Optional[DateTime]:
-    today = now.date()  # time: date
+    if timeOfDay.tzinfo is not None:
+        today = now.astimezone(timeOfDay.tzinfo).date()  # time: date
+    else:
+        today = now.date()
     if date_ is not None:
         if date_.year is not None:
             dt = datetime.combine(date(*date_), timeOfDay)  # type: datetime
