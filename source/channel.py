@@ -36,6 +36,10 @@ def chatCommand(chat: 'botData.Channel',
                 message: Message,
                 timestamp: datetime) -> None:
     try:
+        if 'room-id' in tags:
+            utils.saveTwitchId(chat.channel, tags['room-id'], timestamp)
+        if 'user-id' in tags:
+            utils.saveTwitchId(nick, tags['user-id'], timestamp)
         with factory.getDatabase() as database:
             permitted = database.isPermittedUser(chat.channel, nick)  # type: bool
             manager = database.isBotManager(nick)  # type: bool
