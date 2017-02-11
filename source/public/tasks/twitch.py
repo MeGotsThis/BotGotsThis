@@ -9,6 +9,23 @@ from ...database import factory
 from ...database.factory import getDatabase
 
 
+def checkTwitchIds(timestamp: datetime) -> None:
+    if not bot.globals.channels:
+        return
+    channels = [c for c in bot.globals.channels
+                if c not in bot.globals.twitchId]  # type: List[str]
+
+    ids = twitch.getTwitchIds(channels)  # type: Optional[Dict[str, str]]
+    if ids is None:
+        return
+    for channel, id in ids.items():  # type: str, str
+        utils.saveTwitchId(channel, id, timestamp)
+    for channel in bot.globals.channels:
+        if channel in bot.globals.twitchId:
+            continue
+        utils.saveTwitchId(channel, None, timestamp)
+
+
 def checkStreamsAndChannel(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
@@ -38,13 +55,24 @@ def checkOfflineChannels(timestamp: datetime) -> None:
                            and timestamp - ch.twitchCache >= cacheDuration)]  # type: List[data.Channel]
     if not offlineChannels:
         return
+    if 'offlineCheck' not in bot.globals.globalSessionData:
+        bot.globals.globalSessionData['offlineCheck'] = []
+    bot.globals.globalSessionData['offlineCheck'] = [
+        t for t in bot.globals.globalSessionData['offlineCheck']
+        if t >= timestamp - timedelta(minutes=1)]
+    if len(bot.globals.globalSessionData['offlineCheck']) >= 80:
+        return
     chat = random.choice(offlineChannels)  # type: data.Channel
+    oldTimestamp = chat.twitchCache  # type: datetime
+    chat.twitchCache = timestamp
     current = twitch.channel_properties(chat.channel)  # type: Optional[twitch.TwitchStatus]
     if current is None:
+        chat.twitchCache = oldTimestamp
         return
     (chat.streamingSince, chat.twitchStatus,
      chat.twitchGame) = current
     chat.twitchCache = timestamp
+    bot.globals.globalSessionData['offlineCheck'].append(timestamp)
 
 
 def checkChatServers(timestamp: datetime) -> None:

@@ -5,7 +5,7 @@ from .thread import logging as loggingThread
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, Optional, List
 
 
 running = True  # type: bool
@@ -25,6 +25,9 @@ clusters = {
 whisperCluster = 'aws'  # type: str
 
 channels = {}  # type: Dict[str, data.Channel]
+twitchId = {}  # type: Dict[str, Optional[str]]
+twitchIdName = {}  # type: Dict[str, str]
+twitchIdCache = {}  # type: Dict[str, datetime]
 displayName = bot.config.botnick  # type: str
 isTwitchAdmin = False  # type: bool
 isTwitchStaff = False  # type: bool

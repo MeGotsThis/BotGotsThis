@@ -5,6 +5,7 @@ from http import client
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
 import bot.globals
+import bot.utils
 import configparser
 import email.utils
 import json
@@ -40,7 +41,7 @@ def api_call(channel: Optional[str],
     connection = client.HTTPSConnection('api.twitch.tv')  # type: client.HTTPConnection
     with closing(connection):
         if 'Accept' not in headers:
-            headers['Accept'] = 'application/vnd.twitchtv.v3+json'
+            headers['Accept'] = 'application/vnd.twitchtv.v5+json'
         if 'Client-ID' not in headers:
             clientId = client_id()  # type: Optional[str]
             if clientId is not None:
@@ -120,6 +121,23 @@ def chat_server(chat:Optional[str]) -> Optional[str]:
     return None
 
 
+def getTwitchIds(channels: Iterable[str]) -> Optional[Dict[str, str]]:
+    with suppress(ConnectionError, client.HTTPException):
+        allChannels = list(channels)
+        ids = {}  # type: Dict[str, str]
+        for i in range((len(allChannels) + 99) // 100):
+            channelsToCheck = allChannels[i*100:(i+1)*100]
+            uri = '/kraken/users?limit=100&login=' + ','.join(channelsToCheck)  # type: str
+            response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
+            if response.status != 200:
+                return None
+            idData = json.loads(responseData.decode('utf-8'))  # type: dict
+            for userData in idData['users']:
+                ids[userData['name']] = userData['_id']
+        return ids
+    return None
+
+
 @cache('validTwitchUser', timedelta(minutes=1))
 def is_valid_user(user: str) -> bool:
     user = user.lower()
@@ -129,8 +147,11 @@ def is_valid_user(user: str) -> bool:
 
 
 def num_followers(user: str) -> Optional[int]:
+    if not bot.utils.loadTwitchId(user) or bot.globals.twitchId[user] is None:
+        return None
     with suppress(ConnectionError, client.HTTPException):
-        uri = '/kraken/users/' + user + '/follows/channels?limit=1'  # type: str
+        uri = '/kraken/users/{}/follows/channels?limit=1'.format(
+            bot.globals.twitchId[user])  # type: str
         response, data = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         followerData = json.loads(data.decode('utf-8'))  # type: dict
         return int(followerData['_total'])
@@ -140,6 +161,9 @@ def num_followers(user: str) -> Optional[int]:
 def update(channel: str, *,
            status:Optional[str]=None,
            game:Optional[str]=None) -> Optional[bool]:
+    if (not bot.utils.loadTwitchId(channel)
+            or bot.globals.twitchId[channel] is None):
+        return None
     postData = {}  # type: Dict[str, str]
     if isinstance(status, str):
         postData['channel[status]'] = status or ' '
@@ -149,7 +173,8 @@ def update(channel: str, *,
         return None
     with suppress(ConnectionError, client.HTTPException):
         response, data = api_call(
-            channel, 'PUT', '/kraken/channels/' + channel,
+            channel, 'PUT',
+            '/kraken/channels/' + bot.globals.twitchId[channel],
             headers={
                 'Content-Type': 'application/x-www-form-urlencoded',
                 },
@@ -160,23 +185,24 @@ def update(channel: str, *,
 
 def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
     with suppress(ConnectionError, client.HTTPException):
-        uri = '/kraken/streams?limit=100&channel=' + ','.join(channels)  # type: str
+        allChannels = [c for c in channels
+                       if bot.utils.loadTwitchId(c)
+                       and bot.globals.twitchId[c] is not None]
+        uri = '/kraken/streams?limit=100&channel=' + ','.join(allChannels)  # type: str
         response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         if response.status != 200:
             return None
         online = {}  # type: Dict[str, TwitchStatus]
         streamsData = json.loads(responseData.decode('utf-8'))  # type: dict
         _handle_streams(streamsData['streams'], online)
-        if streamsData['_total'] > 100:
-            while streamsData['streams']:
-                time.sleep(0.05)
-                fullUrl = streamsData['_links']['next']
-                uri = fullUrl[fullUrl.index('/kraken'):]
-                response, responseData = api_call(None, 'GET', uri)
-                if response.status != 200:
-                    break
-                streamsData = json.loads(responseData.decode('utf-8'))
-                _handle_streams(streamsData['streams'], online)
+        for offset in range(100, streamsData['_total'], 100):
+            time.sleep(0.05)
+            offsetUri = uri + '&offset=' + offset  # type: str
+            response, responseData = api_call(None, 'GET', offsetUri)
+            if response.status != 200:
+                break
+            streamsData = json.loads(responseData.decode('utf-8'))
+            _handle_streams(streamsData['streams'], online)
         return online
     return None
 
@@ -196,7 +222,10 @@ def _handle_streams(streams: List[Dict[str, Any]],
 
 
 def channel_properties(channel: str) -> Optional[TwitchStatus]:
-    uri = '/kraken/channels/' + channel  # type: str
+    if (not bot.utils.loadTwitchId(channel)
+            or bot.globals.twitchId[channel] is None):
+        return None
+    uri = '/kraken/channels/' + bot.globals.twitchId[channel]  # type: str
     with suppress(ConnectionError, client.HTTPException):
         response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         if response.status != 200:

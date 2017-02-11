@@ -11,12 +11,15 @@ from ...api import twitch
 
 def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalEmotesCache >= timedelta(hours=1):
-        data = twitch.twitch_emotes()  # type: Optional[Tuple[Dict[int, str], Dict[int, int]]]
+        oldTimestamp = bot.globals.globalEmotesCache  # type: datetime
         bot.globals.globalEmotesCache = timestamp
+        data = twitch.twitch_emotes()  # type: Optional[Tuple[Dict[int, str], Dict[int, int]]]
         if data:
             emotes, emoteSets = data
             bot.globals.globalEmotes = emotes
             bot.globals.globalEmoteSets = emoteSets
+        elif not bot.globals.globalEmotes:
+            bot.globals.globalEmotesCache = oldTimestamp + timedelta(minutes=1)
 
 
 def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:

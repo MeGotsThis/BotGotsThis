@@ -1,7 +1,8 @@
 ﻿from . import data
-from datetime import datetime
+from datetime import datetime, timedelta
 from types import TracebackType
 from typing import Any, Iterable, Optional, Tuple, Union
+from source.api import twitch
 import builtins
 import bot.config
 import bot.globals
@@ -52,6 +53,39 @@ def whisper(nick: str, messages: Union[str, Iterable[str]]) -> None:
 def clearAllChat() -> None:
     for c in bot.globals.clusters.values():
         c.messaging.clearAllChat()
+
+
+def loadTwitchId(channel: str,
+                 timestamp: Optional[datetime]=None) -> bool:
+    if timestamp is None:
+        timestamp = now()
+    if channel in bot.globals.twitchId:
+        cacheTime = bot.globals.twitchIdCache[channel]
+        if bot.globals.twitchId[channel] is None:
+            if timestamp <= cacheTime + timedelta(hours=1):
+                return True
+        else:
+            if timestamp <= cacheTime + timedelta(days=1):
+                return True
+    ids = twitch.getTwitchIds([channel])
+    if ids is None:
+        return False
+    if channel in ids:
+        saveTwitchId(channel, ids[channel], timestamp)
+    else:
+        saveTwitchId(channel, None, timestamp)
+    return True
+
+
+def saveTwitchId(channel: str,
+                 id: Optional[str],
+                 timestamp: Optional[datetime]=None) -> None:
+    if timestamp is None:
+        timestamp = now()
+    bot.globals.twitchId[channel] = id
+    if id is not None:
+        bot.globals.twitchIdName[id] = channel
+    bot.globals.twitchIdCache[channel] = timestamp
 
 ENSURE_CLUSTER_UNKNOWN = -2  # type: int
 ENSURE_REJOIN = -1  # type: int
