@@ -16,7 +16,7 @@ ircHandlers = {}  # type: Dict[Union[str, int], IrcHandler]
 
 _logCommandPerChannel = [
     'PRIVMSG', 'NOTICE', 'MODE', 'JOIN', 'PART', 'USERSTATE', 'HOSTTARGET',
-    'CLEARCHAT', 'ROOMSTATE',
+    'CLEARCHAT', 'ROOMSTATE', 'USERNOTICE',
     ]  # type: List[str]
 
 
