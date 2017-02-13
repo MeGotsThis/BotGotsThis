@@ -18,9 +18,81 @@ class TestTasksTwitchBase(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}
+        self.mock_globals.globalSessionData = {}
 
 
-class TestTasksTwitch(TestTasksTwitchBase):
+class TestTasksTwitchIds(TestTasksTwitchBase):
+    def setUp(self):
+        super().setUp()
+
+        self.mock_globals.twitchId = {}
+        self.mock_globals.twitchIdName = {}
+        self.mock_globals.twitchIdCache = {}
+
+        patcher = patch('bot.utils.saveTwitchId', autospec=True)
+        self.mock_save = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        patcher = patch('source.api.twitch.getTwitchIds')
+        self.addCleanup(patcher.stop)
+        self.mock_twitchid = patcher.start()
+        self.mock_twitchid.return_value = {}
+
+    def test_empty(self):
+        self.mock_globals.channels = {}
+        twitch.checkTwitchIds(self.now)
+        self.assertFalse(self.mock_twitchid.called)
+        self.assertFalse(self.mock_save.called)
+
+    def test_none(self):
+        self.mock_twitchid.return_value = None
+        twitch.checkTwitchIds(self.now)
+        self.assertTrue(self.mock_twitchid.called)
+        self.assertFalse(self.mock_save.called)
+
+    def test(self):
+        self.mock_twitchid.return_value = {'botgotsthis': '1'}
+        twitch.checkTwitchIds(self.now)
+        self.assertTrue(self.mock_twitchid.called)
+        self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
+
+    def test_recent(self):
+        self.mock_globals.twitchId = {'botgotsthis': '1'}
+        self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
+        self.mock_globals.twitchIdCache = {'botgotsthis': self.now}
+        self.mock_twitchid.return_value = {'botgotsthis': '1'}
+        twitch.checkTwitchIds(self.now)
+        self.assertFalse(self.mock_twitchid.called)
+        self.assertFalse(self.mock_save.called)
+
+    def test_no_id(self):
+        self.mock_twitchid.return_value = {}
+        twitch.checkTwitchIds(self.now)
+        self.assertTrue(self.mock_twitchid.called)
+        self.mock_save.assert_called_once_with('botgotsthis', None, self.now)
+
+    def test_cache_expired(self):
+        self.mock_globals.twitchId = {'botgotsthis': '1'}
+        self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
+        self.mock_globals.twitchIdCache = {
+            'botgotsthis': self.now - timedelta(days=1)}
+        self.mock_twitchid.return_value = {'botgotsthis': '1'}
+        twitch.checkTwitchIds(self.now)
+        self.assertTrue(self.mock_twitchid.called)
+        self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
+
+    def test_cache_expired_none(self):
+        self.mock_globals.twitchId = {'botgotsthis': None}
+        self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
+        self.mock_globals.twitchIdCache = {
+            'botgotsthis': self.now - timedelta(hours=1)}
+        self.mock_twitchid.return_value = {'botgotsthis': '1'}
+        twitch.checkTwitchIds(self.now)
+        self.assertTrue(self.mock_twitchid.called)
+        self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
+
+
+class TestTasksTwitchStreams(TestTasksTwitchBase):
     def setUp(self):
         super().setUp()
 
@@ -115,7 +187,9 @@ class TestTasksTwitch(TestTasksTwitchBase):
         self.cache_property.return_value = self.now - timedelta(hours=1)
         twitch.checkOfflineChannels(self.now)
         mock_channel.assert_called_once_with('botgotsthis')
-        self.cache_property.assert_called_once_with()
+        self.cache_property.assert_has_calls(
+            [call(), call(self.now),
+             call(self.now - timedelta(seconds=240))])
         self.assertFalse(self.streaming_property.called)
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)

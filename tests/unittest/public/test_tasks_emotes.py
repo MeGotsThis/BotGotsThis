@@ -50,7 +50,7 @@ class TestTasksEmotes(unittest.TestCase):
         mock_emotes.return_value = None
         emotes.refreshTwitchGlobalEmotes(self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalEmotesCache,
-                         self.now + timedelta(hours=1))
+                         self.now + timedelta(minutes=1))
         self.assertEqual(self.mock_globals.globalEmotes, {})
         self.assertEqual(self.mock_globals.globalEmoteSets, {})
         mock_emotes.assert_called_once_with()

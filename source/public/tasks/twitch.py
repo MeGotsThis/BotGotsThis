@@ -14,6 +14,12 @@ def checkTwitchIds(timestamp: datetime) -> None:
         return
     channels = [c for c in bot.globals.channels
                 if c not in bot.globals.twitchId]  # type: List[str]
+    cacheDuration = timedelta(hours=1)
+    channels += [c for c in bot.globals.twitchId
+                 if c not in channels
+                 if bot.globals.twitchIdCache[c] + cacheDuration <= timestamp]
+    if not channels:
+        return
 
     ids = twitch.getTwitchIds(channels)  # type: Optional[Dict[str, str]]
     if ids is None:
@@ -21,7 +27,7 @@ def checkTwitchIds(timestamp: datetime) -> None:
     for channel, id in ids.items():  # type: str, str
         utils.saveTwitchId(channel, id, timestamp)
     for channel in bot.globals.channels:
-        if channel in bot.globals.twitchId:
+        if channel in ids:
             continue
         utils.saveTwitchId(channel, None, timestamp)
 
@@ -63,15 +69,13 @@ def checkOfflineChannels(timestamp: datetime) -> None:
     if len(bot.globals.globalSessionData['offlineCheck']) >= 80:
         return
     chat = random.choice(offlineChannels)  # type: data.Channel
-    oldTimestamp = chat.twitchCache  # type: datetime
     chat.twitchCache = timestamp
     current = twitch.channel_properties(chat.channel)  # type: Optional[twitch.TwitchStatus]
     if current is None:
-        chat.twitchCache = oldTimestamp
+        chat.twitchCache = timestamp - cacheDuration + timedelta(seconds=60)
         return
     (chat.streamingSince, chat.twitchStatus,
      chat.twitchGame) = current
-    chat.twitchCache = timestamp
     bot.globals.globalSessionData['offlineCheck'].append(timestamp)
 
 

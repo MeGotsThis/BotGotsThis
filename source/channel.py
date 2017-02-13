@@ -4,7 +4,7 @@ import time
 from bot import data as botData, utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
-from typing import Iterator
+from typing import Iterator, Optional
 from . import data
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
@@ -13,7 +13,7 @@ from .database import factory
 
 # Set up our commands function
 def parse(chat: 'botData.Channel',
-          tags: IrcMessageTagsReadOnly,
+          tags: [IrcMessageTagsReadOnly],
           nick: str,
           rawMessage: str,
           timestamp: datetime) -> None:
@@ -31,15 +31,16 @@ def parse(chat: 'botData.Channel',
     
 
 def chatCommand(chat: 'botData.Channel',
-                tags: IrcMessageTagsReadOnly,
+                tags: Optional[IrcMessageTagsReadOnly],
                 nick: str,
                 message: Message,
                 timestamp: datetime) -> None:
     try:
-        if 'room-id' in tags:
-            utils.saveTwitchId(chat.channel, tags['room-id'], timestamp)
-        if 'user-id' in tags:
-            utils.saveTwitchId(nick, tags['user-id'], timestamp)
+        if tags is not None:
+            if 'room-id' in tags:
+                utils.saveTwitchId(chat.channel, tags['room-id'], timestamp)
+            if 'user-id' in tags:
+                utils.saveTwitchId(nick, tags['user-id'], timestamp)
         with factory.getDatabase() as database:
             permitted = database.isPermittedUser(chat.channel, nick)  # type: bool
             manager = database.isBotManager(nick)  # type: bool

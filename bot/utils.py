@@ -62,10 +62,10 @@ def loadTwitchId(channel: str,
     if channel in bot.globals.twitchId:
         cacheTime = bot.globals.twitchIdCache[channel]
         if bot.globals.twitchId[channel] is None:
-            if timestamp <= cacheTime + timedelta(hours=1):
+            if timestamp < cacheTime + timedelta(hours=1):
                 return True
         else:
-            if timestamp <= cacheTime + timedelta(days=1):
+            if timestamp < cacheTime + timedelta(days=1):
                 return True
     ids = twitch.getTwitchIds([channel])
     if ids is None:
@@ -86,6 +86,7 @@ def saveTwitchId(channel: str,
     if id is not None:
         bot.globals.twitchIdName[id] = channel
     bot.globals.twitchIdCache[channel] = timestamp
+
 
 ENSURE_CLUSTER_UNKNOWN = -2  # type: int
 ENSURE_REJOIN = -1  # type: int

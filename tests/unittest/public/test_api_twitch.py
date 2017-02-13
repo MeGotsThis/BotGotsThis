@@ -225,6 +225,10 @@ channelProperties = b'''{
 }'''
 
 
+twitchIdReponse = b'''\
+{"_total":1,"users":[{"display_name":"BotGotsThis","_id":"1","name":"botgotsthis","type":"user","bio":null,"created_at":"2000-01-01T00:00:00.000000Z","updated_at":"2000-01-01T00:00:00.000000Z","logo":null}]}'''
+
+
 class TestApiTwitchApiCalls(unittest.TestCase):
     def setUp(self):
         patcher = patch('source.api.twitch.client_id')
@@ -263,7 +267,7 @@ class TestApiTwitchApiCalls(unittest.TestCase):
         self.assertTrue(self.mock_clientid.called)
         self.assertTrue(self.mock_token.called)
         self.assertEqual(headers,
-                         {'Accept': 'application/vnd.twitchtv.v3+json',
+                         {'Accept': 'application/vnd.twitchtv.v5+json',
                           'Client-ID': '0123456789abcdef',
                           'Authorization': 'OAuth abcdef0123456789'})
 
@@ -287,6 +291,19 @@ class TestApiTwitch(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_api_call = patcher.start()
         self.mock_api_call.return_value = [self.mock_response, b'']
+
+        patcher = patch('bot.globals', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_globals = patcher.start()
+        self.mock_globals.twitchId = {
+            'botgotsthis': '0',
+            'megotsthis': None,
+            }
+
+        patcher = patch('bot.utils.loadTwitchId', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_load = patcher.start()
+        self.mock_load.return_value = True
 
     def test_server_time(self):
         timestamp = 'Sat, 1 Jan 2000 00:00:00 GMT'
@@ -325,35 +342,52 @@ class TestApiTwitch(unittest.TestCase):
         self.mock_api_call.side_effect = ConnectionError
         self.assertIsNone(twitch.twitch_emotes())
 
-    @patch.dict('bot.globals.globalSessionData')
     def test_is_valid_user(self):
-        bot.globals.globalSessionData['validTwitchUser'] = defaultdict(
-            lambda: (datetime.min, None))
-        self.mock_response.status = 200
         self.assertIs(twitch.is_valid_user('botgotsthis'), True)
+        self.mock_load.assert_called_once_with('botgotsthis')
 
-    @patch.dict('bot.globals.globalSessionData')
-    def test_is_valid_user_except(self):
-        bot.globals.globalSessionData['validTwitchUser'] = defaultdict(
-            lambda: (datetime.min, None))
-        self.mock_api_call.side_effect = ConnectionError
+    def test_is_valid_user_false(self):
+        self.assertIs(twitch.is_valid_user('megotsthis'), False)
+        self.mock_load.assert_called_once_with('megotsthis')
+
+    def test_is_valid_user_no_load(self):
+        self.mock_load.return_value = False
         self.assertIsNone(twitch.is_valid_user('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
 
     def test_num_followers(self):
         self.mock_api_call.return_value[1] = numFollowers
         self.assertEqual(twitch.num_followers('botgotsthis'), 1)
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_num_followers_no_load(self):
+        self.mock_load.return_value = False
+        self.assertIsNone(twitch.num_followers('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_num_followers_no_user(self):
+        self.assertEqual(twitch.num_followers('megotsthis'), 0)
+        self.mock_load.assert_called_once_with('megotsthis')
 
     def test_num_followers_except(self):
-        self.mock_api_call.side_effect = ConnectionError
+        self.mock_load.return_value = False
         self.assertIsNone(twitch.num_followers('botgotsthis'))
 
     def test_update(self):
         self.assertIsNone(twitch.update('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertFalse(self.mock_api_call.called)
+
+    def test_update_no_load(self):
+        self.mock_load.return_value = False
+        self.assertIsNone(twitch.update('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
         self.assertFalse(self.mock_api_call.called)
 
     def test_update_status(self):
         self.mock_response.status = 200
         self.assertIs(twitch.update('botgotsthis', status=''), True)
+        self.mock_load.assert_called_once_with('botgotsthis')
         self.mock_api_call.assert_called_once_with(
             'botgotsthis', 'PUT', StrContains(), headers=TypeMatch(dict),
             data={'channel[status]': ' '})
@@ -361,24 +395,28 @@ class TestApiTwitch(unittest.TestCase):
     def test_update_game(self):
         self.mock_response.status = 200
         self.assertIs(twitch.update('botgotsthis', game=''), True)
+        self.mock_load.assert_called_once_with('botgotsthis')
         self.mock_api_call.assert_called_once_with(
             'botgotsthis', 'PUT', StrContains(), headers=TypeMatch(dict),
             data={'channel[game]': ''})
 
     def test_update_except(self):
         self.mock_api_call.side_effect = HTTPException
-        self.assertIsNone(twitch.update('botgotsthis', status='Kappa'))
+        self.assertIsNone(twitch.active_streams(['botgotsthis']))
+        self.mock_load.assert_called_once_with('botgotsthis')
 
     def test_active_streams(self):
         self.mock_response.status = 404
         self.assertIsNone(twitch.update('botgotsthis'))
         self.assertFalse(self.mock_api_call.called)
+        self.mock_load.assert_called_once_with('botgotsthis')
 
     @patch('source.api.twitch._handle_streams')
     def test_active_streams_one(self, mock_handle):
         self.mock_response.status = 200
         self.mock_api_call.return_value[1] = noStreams
         self.assertEqual(twitch.active_streams(['botgotsthis']), {})
+        self.mock_load.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 1)
 
     @patch('source.api.twitch._handle_streams')
@@ -389,6 +427,7 @@ class TestApiTwitch(unittest.TestCase):
             [self.mock_response, noStreams]
         ]
         self.assertEqual(twitch.active_streams(['botgotsthis']), {})
+        self.mock_load.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 2)
 
     def test_handle_streams(self):
@@ -398,16 +437,38 @@ class TestApiTwitch(unittest.TestCase):
                          {'botgotsthis': twitch.TwitchStatus(
                              datetime(2000, 1, 1), None, None)})
 
-    def test_active_streams_404(self):
+    def test_properties_no_load(self):
+        self.mock_load.return_value = False
+        self.assertIsNone(twitch.channel_properties('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_properties_404(self):
         self.mock_response.status = 404
         self.assertIsNone(twitch.channel_properties('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
 
-    def test_active_streams_exception(self):
+    def test_properties_exception(self):
         self.mock_api_call.side_effect = HTTPException
         self.assertIsNone(twitch.channel_properties('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
 
-    def test_active_streams_something(self):
+    def test_properties_something(self):
         self.mock_response.status = 200
         self.mock_api_call.return_value[1] = channelProperties
         self.assertEqual(twitch.channel_properties('botgotsthis'),
                          twitch.TwitchStatus(None, None, None))
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_twitch_ids(self):
+        self.mock_response.status = 200
+        self.mock_api_call.return_value[1] = twitchIdReponse
+        self.assertEqual(twitch.getTwitchIds(['botgotsthis', 'megotsthis']),
+                         {'botgotsthis': '1'})
+
+    def test_twitch_ids_404(self):
+        self.mock_response.status = 404
+        self.assertIsNone(twitch.getTwitchIds(['botgotsthis', 'megotsthis']))
+
+    def test_twitch_ids_exception(self):
+        self.mock_api_call.side_effect = HTTPException
+        self.assertIsNone(twitch.getTwitchIds(['botgotsthis', 'megotsthis']))

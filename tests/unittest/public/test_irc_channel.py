@@ -5,7 +5,7 @@ from datetime import datetime
 from source import channel
 from source.data import Message
 from source.database import DatabaseBase
-from unittest.mock import MagicMock, Mock, PropertyMock, patch
+from unittest.mock import MagicMock, Mock, PropertyMock, call, patch
 
 
 class TestChannel(unittest.TestCase):
@@ -13,8 +13,9 @@ class TestChannel(unittest.TestCase):
         self.tags = IrcMessageTags(IrcMessageTags.parseTags(
             'display-name=BotGotsThis;id=0;subscriber=0;turbo=0;mod=1;'
             'user-type=mod;badges=broadcaster/1;color=#FFFFFF;emotes=;'
-            'room-id=1;user-id=1'))
+            'room-id=2;user-id=1'))
         self.channel = Mock(spec=Channel)
+        self.channel.channel = 'megotsthis'
         self.now = datetime(2000, 1, 1)
 
     @patch('source.channel.chatCommand', autospec=True)
@@ -33,9 +34,12 @@ class TestChannel(unittest.TestCase):
         channel.parse(self.channel, self.tags, 'botgotsthis', '  ', self.now)
         self.assertFalse(mock_chatCommand.called)
 
+    @patch('bot.utils.logException', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
     @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.channel.commandsToProcess', autospec=True)
-    def test_chatCommand(self, mock_commands, mock_database):
+    def test_chatCommand(self, mock_commands, mock_database, mock_save,
+                         mock_log):
         command1 = Mock(spec=lambda args: False, return_value=False)
         command2 = Mock(spec=lambda args: False, return_value = True)
         command3 = Mock(spec=lambda args: False, return_value = False)
@@ -50,12 +54,15 @@ class TestChannel(unittest.TestCase):
         type(message).command = PropertyMock(return_value='Kappa')
         channel.chatCommand(self.channel, self.tags, 'botgotsthis', message,
                             self.now)
+        mock_save.assert_has_calls([call('megotsthis', '2', self.now),
+                                    call('botgotsthis', '1', self.now)])
         self.assertEqual(database.isPermittedUser.call_count, 1)
         self.assertEqual(database.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command1.call_count, 1)
         self.assertEqual(command2.call_count, 1)
         self.assertEqual(command3.call_count, 0)
+        self.assertEqual(mock_log.call_count, 0)
 
     @patch('bot.utils.logException', autospec=True)
     @patch('source.database.factory.getDatabase', autospec=True)
@@ -91,6 +98,35 @@ class TestChannel(unittest.TestCase):
                             self.now)
         self.assertFalse(mock_commands.called)
         self.assertTrue(mock_log.called)
+
+    @patch('bot.utils.logException', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    @patch('source.database.factory.getDatabase', autospec=True)
+    @patch('source.channel.commandsToProcess', autospec=True)
+    def test_chatCommand_no_tags(self, mock_commands, mock_database, mock_save,
+                                 mock_log):
+        command1 = Mock(spec=lambda args: False, return_value=False)
+        command2 = Mock(spec=lambda args: False, return_value = True)
+        command3 = Mock(spec=lambda args: False, return_value = False)
+        mock_commands.return_value = [command1, command2, command3]
+        database = MagicMock(spec=DatabaseBase)
+        database.__enter__.return_value = database
+        database.isPermittedUser.return_value = False
+        database.isBotManager.return_value = False
+        database.__exit__.return_value = True
+        mock_database.return_value = database
+        message = Mock(spec=Message)
+        type(message).command = PropertyMock(return_value='Kappa')
+        channel.chatCommand(self.channel, None, 'botgotsthis', message,
+                            self.now)
+        self.assertFalse(mock_save.called)
+        self.assertEqual(database.isPermittedUser.call_count, 1)
+        self.assertEqual(database.isBotManager.call_count, 1)
+        self.assertEqual(mock_commands.call_count, 1)
+        self.assertEqual(command1.call_count, 1)
+        self.assertEqual(command2.call_count, 1)
+        self.assertEqual(command3.call_count, 0)
+        self.assertEqual(mock_log.call_count, 0)
 
 
 class TestChannelCommandToProcess(unittest.TestCase):
