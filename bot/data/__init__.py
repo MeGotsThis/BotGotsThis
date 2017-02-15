@@ -88,7 +88,7 @@ class Channel:
                  '_joinPriority', '_ffzEmotes', '_ffzCache', '_ffzLock',
                  '_bttvEmotes', '_bttvCache', '_twitchCache', '_bttvLock',
                  '_streamingSince', '_twitchStatus', '_twitchGame',
-                 '_serverCheck',
+                 '_community', '_serverCheck',
                  ]
 
     def __init__(self,
@@ -118,8 +118,9 @@ class Channel:
         self._bttvLock = threading.Lock()  # type: threading.Lock
         self._twitchCache = datetime.min  # type: datetime
         self._streamingSince = None  # type: Optional[datetime]
-        self._twitchStatus = ''  # type: str
-        self._twitchGame = ''  # type: str
+        self._twitchStatus = ''  # type: Optional[str]
+        self._twitchGame = ''  # type: Optional[str]
+        self._community = None  # type: Optional[str]
         self._serverCheck = datetime.min  # type: datetime
 
     @property
@@ -217,7 +218,7 @@ class Channel:
         return self._twitchStatus
 
     @twitchStatus.setter
-    def twitchStatus(self, value: str):
+    def twitchStatus(self, value: Optional[str]):
         if value is not None and not isinstance(value, str):
             raise TypeError()
         self._twitchStatus = value
@@ -227,10 +228,20 @@ class Channel:
         return self._twitchGame
 
     @twitchGame.setter
-    def twitchGame(self, value: str):
+    def twitchGame(self, value: Optional[str]):
         if value is not None and not isinstance(value, str):
             raise TypeError()
         self._twitchGame = value
+
+    @property
+    def community(self) -> str:
+        return self._community
+
+    @community.setter
+    def community(self, value: Optional[str]):
+        if value is not None and not isinstance(value, str):
+            raise TypeError()
+        self._community = value
 
     @property
     def serverCheck(self) -> datetime:

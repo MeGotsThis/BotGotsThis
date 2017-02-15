@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Union
 from ...api import twitch
 from ...database import factory
-from ...database.factory import getDatabase
 
 
 def checkTwitchIds(timestamp: datetime) -> None:
@@ -44,7 +43,9 @@ def checkStreamsAndChannel(timestamp: datetime) -> None:
         chat = channels[channel]
         chat.twitchCache = timestamp
         (chat.streamingSince, chat.twitchStatus,
-         chat.twitchGame) = onlineStreams[channel]
+         chat.twitchGame, chat.community) = onlineStreams[channel]
+        if chat.community is not None:
+            bot.utils.loadTwitchCommunity(chat.community)
 
     for channel in channels:
         if channel in onlineStreams:
@@ -66,7 +67,7 @@ def checkOfflineChannels(timestamp: datetime) -> None:
     bot.globals.globalSessionData['offlineCheck'] = [
         t for t in bot.globals.globalSessionData['offlineCheck']
         if t >= timestamp - timedelta(minutes=1)]
-    if len(bot.globals.globalSessionData['offlineCheck']) >= 80:
+    if len(bot.globals.globalSessionData['offlineCheck']) >= 40:
         return
     chat = random.choice(offlineChannels)  # type: data.Channel
     chat.twitchCache = timestamp
@@ -75,7 +76,11 @@ def checkOfflineChannels(timestamp: datetime) -> None:
         chat.twitchCache = timestamp - cacheDuration + timedelta(seconds=60)
         return
     (chat.streamingSince, chat.twitchStatus,
-     chat.twitchGame) = current
+     chat.twitchGame, shouldBeNone) = current
+    community = twitch.channel_community(chat.channel)  # type: twitch.TwitchCommunity
+    if community is not None:
+        chat.community = community.id
+        bot.utils.saveTwitchCommunity(community.name, community.id, timestamp)
     bot.globals.globalSessionData['offlineCheck'].append(timestamp)
 
 

@@ -135,6 +135,7 @@ streams = '''[
     {
         "_id": 1,
         "game": null,
+        "community_id":"",
         "viewers": 9000,
         "created_at": "2000-01-01T00:00:00Z",
         "video_height": 2160,
@@ -227,6 +228,9 @@ channelProperties = b'''{
 
 twitchIdReponse = b'''\
 {"_total":1,"users":[{"display_name":"BotGotsThis","_id":"1","name":"botgotsthis","type":"user","bio":null,"created_at":"2000-01-01T00:00:00.000000Z","updated_at":"2000-01-01T00:00:00.000000Z","logo":null}]}'''
+
+
+speedrunCommunityResponse = r'''{"_id":"6e940c4a-c42f-47d2-af83-0a2c7e47c421","owner_id":"23406143","name":"Speedrunning","summary":"Welcome to the Speedrunning Community, we like to play games fast! Connect with fellow speedrun enthusiasts by watching and/or streaming speedruns here!","description":"Welcome to the Speedrunning Community, we like to play games fast! Speedrunners are an extremely diverse and welcoming group that enjoys games of all genres, consoles, and eras! Speedrunners enjoy collaborating to optimize games by finding time saving tricks and glitches, to drive speedrun times as low as possible. Whether you are going for a world record or just trying to learn or improve at a game you will find yourself at home here. Speedrunners often organize online and live speedrunning events that benefit charities or are just for fun. If you enjoy friendly competition you can find it in the form of races and tournaments that are typically open to join. \n\n**Resources:**\n[Speed Runs Live](http://www.speedrunslive.com) race games here.\n[speedrun.com](http://www.speedrun.com)  leaderboards and more.\n[SpeedGaming](http://speedgaming.org) hosts tournaments and events.\n[GamesDoneQuick](http://www.gamesdonequick.com) live marathons for charity.\n[TASVideos.org](http://tasvideos.org)  tool-assisted speedruns, and more.","description_html":"Welcome to the Speedrunning Community, we like to play games fast! Speedrunners are an extremely diverse and welcoming group that enjoys games of all genres, consoles, and eras! Speedrunners enjoy collaborating to optimize games by finding time saving tricks and glitches, to drive speedrun times as low as possible. Whether you are going for a world record or just trying to learn or improve at a game you will find yourself at home here. Speedrunners often organize online and live speedrunning events that benefit charities or are just for fun. If you enjoy friendly competition you can find it in the form of races and tournaments that are typically open to join.\u003cbr\u003e\u003cbr\u003e\u003cstrong\u003eResources:\u003c/strong\u003e\u003cbr\u003e\n\u003ca href=\"http://www.speedrunslive.com\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003eSpeed Runs Live\u003c/a\u003e race games here.\u003cbr\u003e\n\u003ca href=\"http://www.speedrun.com\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003espeedrun.com\u003c/a\u003e  leaderboards and more.\u003cbr\u003e\n\u003ca href=\"http://speedgaming.org\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003eSpeedGaming\u003c/a\u003e hosts tournaments and events.\u003cbr\u003e\n\u003ca href=\"http://www.gamesdonequick.com\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003eGamesDoneQuick\u003c/a\u003e live marathons for charity.\u003cbr\u003e\n\u003ca href=\"http://tasvideos.org\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003eTASVideos.org\u003c/a\u003e  tool-assisted speedruns, and more.\u003cbr\u003e","rules":"Broadcast speedrunning content, where “speedrunning” is defined as completing a video game, or predetermined goal/set of goals within a video game as fast as possible.\n\n- Racing and racing formats including bingo, randomizer, and blind are allowed\n- Individual Level (IL) formats are allowed\n- Learning, routing, and practicing speedruns is allowed.\n- Tool Assisted Speedrunning (TAS) is allowed\n- Non-speedrunning content is not allowed.\n\nHave questions about the rules? Contact moderators listed below:\n\n360chrism\nAuthorblues\nFeasel\nMrcab55\nRomscout\nSinister1 (leader)\nSpikevegeta\nThadarkman78","rules_html":"Broadcast speedrunning content, where “speedrunning” is defined as completing a video game, or predetermined goal/set of goals within a video game as fast as possible.\u003cbr\u003e\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eRacing and racing formats including bingo, randomizer, and blind are allowed\u003cbr\u003e\u003c/li\u003e\n\u003cli\u003eIndividual Level (IL) formats are allowed\u003cbr\u003e\u003c/li\u003e\n\u003cli\u003eLearning, routing, and practicing speedruns is allowed.\u003cbr\u003e\u003c/li\u003e\n\u003cli\u003eTool Assisted Speedrunning (TAS) is allowed\u003cbr\u003e\u003c/li\u003e\n\u003cli\u003eNon-speedrunning content is not allowed.\u003cbr\u003e\n\u003cbr\u003e\u003c/li\u003e\n\u003c/ul\u003e\nHave questions about the rules? Contact moderators listed below:\u003cbr\u003e\u003cbr\u003e360chrism\u003cbr\u003e\nAuthorblues\u003cbr\u003e\nFeasel\u003cbr\u003e\nMrcab55\u003cbr\u003e\nRomscout\u003cbr\u003e\nSinister1 (leader)\u003cbr\u003e\nSpikevegeta\u003cbr\u003e\nThadarkman78\u003cbr\u003e","language":"EN","avatar_image_url":"https://static-cdn.jtvnw.net/twitch-community-images-production/6e940c4a-c42f-47d2-af83-0a2c7e47c421/43b0ac6d-ee00-4292-b6e8-cfab0f81e53f.png","cover_image_url":""}'''.encode()
 
 
 class TestApiTwitchApiCalls(unittest.TestCase):
@@ -435,7 +439,16 @@ class TestApiTwitch(unittest.TestCase):
         twitch._handle_streams(json.loads(streams), online)
         self.assertEqual(online,
                          {'botgotsthis': twitch.TwitchStatus(
-                             datetime(2000, 1, 1), None, None)})
+                             datetime(2000, 1, 1), None, None, None)})
+
+    def test_handle_streams_community(self):
+        online = {}
+        data = json.loads(streams)
+        data[0]['community_id'] = '1'
+        twitch._handle_streams(data, online)
+        self.assertEqual(online,
+                         {'botgotsthis': twitch.TwitchStatus(
+                             datetime(2000, 1, 1), None, None, '1')})
 
     def test_properties_no_load(self):
         self.mock_load.return_value = False
@@ -456,7 +469,7 @@ class TestApiTwitch(unittest.TestCase):
         self.mock_response.status = 200
         self.mock_api_call.return_value[1] = channelProperties
         self.assertEqual(twitch.channel_properties('botgotsthis'),
-                         twitch.TwitchStatus(None, None, None))
+                         twitch.TwitchStatus(None, None, None, None))
         self.mock_load.assert_called_once_with('botgotsthis')
 
     def test_twitch_ids(self):
@@ -472,3 +485,72 @@ class TestApiTwitch(unittest.TestCase):
     def test_twitch_ids_exception(self):
         self.mock_api_call.side_effect = HTTPException
         self.assertIsNone(twitch.getTwitchIds(['botgotsthis', 'megotsthis']))
+
+    def test_channel_community_no_load(self):
+        self.mock_load.return_value = False
+        self.assertIsNone(twitch.channel_community('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_channel_community_204(self):
+        self.mock_response.status = 204
+        self.assertEqual(twitch.channel_community('botgotsthis'),
+                         twitch.TwitchCommunity(None, None))
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_channel_community_404(self):
+        self.mock_response.status = 404
+        self.assertIsNone(twitch.channel_community('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_channel_community_exception(self):
+        self.mock_api_call.side_effect = HTTPException
+        self.assertIsNone(twitch.channel_community('botgotsthis'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_channel_community(self):
+        self.mock_response.status = 200
+        self.mock_api_call.return_value[1] = speedrunCommunityResponse
+        self.assertEqual(twitch.channel_community('botgotsthis'),
+                         twitch.TwitchCommunity('6e940c4a-c42f-47d2-'
+                                                'af83-0a2c7e47c421',
+                                                'Speedrunning'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_get_community_404(self):
+        self.mock_response.status = 404
+        self.assertEqual(twitch.get_community('speedrunning'),
+                         twitch.TwitchCommunity(None, None))
+
+    def test_get_community_exception(self):
+        self.mock_api_call.side_effect = HTTPException
+        self.assertIsNone(twitch.get_community('speedrunning'))
+
+    def test_get_community(self):
+        self.mock_response.status = 200
+        self.mock_api_call.return_value[1] = speedrunCommunityResponse
+        self.assertEqual(twitch.get_community('speedrunning'),
+                         twitch.TwitchCommunity('6e940c4a-c42f-47d2-'
+                                                'af83-0a2c7e47c421',
+                                                'Speedrunning'))
+
+    def test_get_community_id_404(self):
+        self.mock_response.status = 404
+        self.assertEqual(twitch.get_community_by_id('6e940c4a-c42f-47d2-'
+                                                     'af83-0a2c7e47c421'),
+                         twitch.TwitchCommunity(None, None))
+
+    def test_get_community_id_exception(self):
+        self.mock_api_call.side_effect = HTTPException
+        self.assertIsNone(twitch.get_community_by_id('6e940c4a-c42f-47d2-'
+                                                     'af83-0a2c7e47c421'))
+
+    def test_get_community_id(self):
+        self.mock_response.status = 200
+        self.mock_api_call.return_value[1] = speedrunCommunityResponse
+        self.assertEqual(twitch.get_community_by_id('6e940c4a-c42f-47d2-'
+                                                     'af83-0a2c7e47c421'),
+                         twitch.TwitchCommunity('6e940c4a-c42f-47d2-'
+                                                'af83-0a2c7e47c421',
+                                                'Speedrunning'))
+
+

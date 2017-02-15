@@ -60,7 +60,7 @@ def loadTwitchId(channel: str,
     if timestamp is None:
         timestamp = now()
     if channel in bot.globals.twitchId:
-        cacheTime = bot.globals.twitchIdCache[channel]
+        cacheTime = bot.globals.twitchIdCache[channel]  # type: datetime
         if bot.globals.twitchId[channel] is None:
             if timestamp < cacheTime + timedelta(hours=1):
                 return True
@@ -86,6 +86,61 @@ def saveTwitchId(channel: str,
     if id is not None:
         bot.globals.twitchIdName[id] = channel
     bot.globals.twitchIdCache[channel] = timestamp
+
+
+def loadTwitchCommunityId(id: str,
+                          timestamp: Optional[datetime]=None) -> bool:
+    if timestamp is None:
+        timestamp = now()
+    if id in bot.globals.twitchCommunityId:
+        name = bot.globals.twitchCommunityId[id]  # type: str
+        cacheTime = bot.globals.twitchCommunityCache[name]  # type: datetime
+        if bot.globals.twitchCommunity[name] is None:
+            if timestamp < cacheTime + timedelta(hours=1):
+                return True
+        else:
+            if timestamp < cacheTime + timedelta(days=1):
+                return True
+    community = twitch.get_community_by_id(id)  # --type: Optional[twitch.TwitchCommunity]
+    if community is None:
+        return False
+    saveTwitchCommunity(community.name, community.id, timestamp)
+    return True
+
+
+def loadTwitchCommunity(name: str,
+                        timestamp: Optional[datetime]=None) -> bool:
+    if timestamp is None:
+        timestamp = now()
+    lname = name.lower()  # type: str
+    if lname in bot.globals.twitchCommunity:
+        cacheTime = bot.globals.twitchCommunityCache[lname]  # type: datetime
+        if bot.globals.twitchCommunity[lname] is None:
+            if timestamp < cacheTime + timedelta(hours=1):
+                return True
+        else:
+            if timestamp < cacheTime + timedelta(days=1):
+                return True
+    community = twitch.get_community(lname)  # --type: Optional[twitch.TwitchCommunity]
+    if community is None:
+        return False
+    saveTwitchCommunity(name, community.id, timestamp)
+    return True
+
+
+def saveTwitchCommunity(name: Optional[str],
+                        id: Optional[str],
+                        timestamp: Optional[datetime]=None) -> None:
+    if timestamp is None:
+        timestamp = now()
+    if name is None:
+        bot.globals.twitchCommunityId[id] = None
+        return
+    lname = name.lower()  # type: str
+    bot.globals.twitchCommunity[lname] = id
+    if id is not None:
+        bot.globals.twitchCommunityId[id] = lname
+    bot.globals.twitchCommunityCache[lname] = timestamp
 
 
 ENSURE_CLUSTER_UNKNOWN = -2  # type: int

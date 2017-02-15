@@ -17,9 +17,13 @@ DateTuple = Tuple[int, int, int, int, int, int, int, int, int]
 TwitchStatus = NamedTuple('TwitchStatus',
                           [('streaming', Optional[datetime]),
                            ('status', Optional[str]),
-                           ('game', Optional[str])])
+                           ('game', Optional[str]),
+                           ('communityId', Optional[str])])
 TwitchEmotes = Dict[str, List[Dict[str, Union[str, int]]]]
 OnlineStreams = Dict[str, TwitchStatus]
+TwitchCommunity = NamedTuple('TwitchCommunity',
+                             [('id', Optional[str]),
+                              ('name', Optional[str])])
 
 
 def client_id() -> Optional[str]:
@@ -217,7 +221,8 @@ def _handle_streams(streams: List[Dict[str, Any]],
                                            '%Y-%m-%dT%H:%M:%SZ')  # type: datetime
         online[channel] = TwitchStatus(
             streamingSince, stream['channel']['status'],
-            stream['channel']['game'])
+            stream['channel']['game'],
+            stream['community_id'] or None)
     return online
 
 
@@ -231,5 +236,68 @@ def channel_properties(channel: str) -> Optional[TwitchStatus]:
         if response.status != 200:
             return None
         channel_ = json.loads(responseData.decode('utf-8'))  # type: Dict[str, str]
-        return TwitchStatus(None, channel_['status'], channel_['game'])
+        return TwitchStatus(None, channel_['status'], channel_['game'], None)
+    return None
+
+
+def channel_community(channel: str) -> Optional[TwitchCommunity]:
+    if (not bot.utils.loadTwitchId(channel)
+            or bot.globals.twitchId[channel] is None):
+        return None
+    uri = '/kraken/channels/' + bot.globals.twitchId[channel] + '/community'  # type: str
+    with suppress(ConnectionError, client.HTTPException):
+        response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
+        if response.status == 204:
+            return TwitchCommunity(None, None)
+        if response.status != 200:
+            return None
+        community = json.loads(responseData.decode('utf-8'))  # type: Dict[str, str]
+        return TwitchCommunity(community['_id'], community['name'])
+    return None
+
+
+def get_community(communityName: str) -> Optional[TwitchCommunity]:
+    uri = '/kraken/communities?name=' + communityName  # type: str
+    with suppress(ConnectionError, client.HTTPException):
+        response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
+        if response.status != 200:
+            return TwitchCommunity(None, None)
+        community = json.loads(responseData.decode('utf-8'))  # type: Dict[str, str]
+        return TwitchCommunity(community['_id'], community['name'])
+    return None
+
+
+def get_community_by_id(communityId: str) -> Optional[TwitchCommunity]:
+    uri = '/kraken/communities/' + communityId  # type: str
+    with suppress(ConnectionError, client.HTTPException):
+        response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
+        if response.status != 200:
+            return TwitchCommunity(None, None)
+        community = json.loads(responseData.decode('utf-8'))  # type: Dict[str, str]
+        return TwitchCommunity(community['_id'], community['name'])
+    return None
+
+
+def set_channel_community(channel: str,
+                          communityName: Optional[str]) -> Optional[bool]:
+    if (not bot.utils.loadTwitchId(channel)
+            or bot.globals.twitchId[channel] is None):
+        return None
+    if communityName is not None:
+        name = communityName.lower()  # type: str
+        if not bot.utils.loadTwitchCommunity(communityName):
+            return None
+        if bot.globals.twitchCommunity[name] is None:
+            return False
+        uri = ('/kraken/channels/' + bot.globals.twitchId[channel]
+               + '/community/' + bot.globals.twitchCommunity[name])  # type: str
+        with suppress(ConnectionError, client.HTTPException):
+            response, responseData = api_call(None, 'PUT', uri)  # type: client.HTTPResponse, bytes
+            return response.status != 204
+    else:
+        uri = ('/kraken/channels/' + bot.globals.twitchId[channel]
+               + '/community')
+        with suppress(ConnectionError, client.HTTPException):
+            response, responseData = api_call(None, 'DELETE', uri)
+            return response.status != 204
     return None
