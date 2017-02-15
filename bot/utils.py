@@ -124,7 +124,7 @@ def loadTwitchCommunity(name: str,
     community = twitch.get_community(lname)  # --type: Optional[twitch.TwitchCommunity]
     if community is None:
         return False
-    saveTwitchCommunity(name, community.id, timestamp)
+    saveTwitchCommunity(community.name or name, community.id, timestamp)
     return True
 
 
@@ -139,7 +139,7 @@ def saveTwitchCommunity(name: Optional[str],
     lname = name.lower()  # type: str
     bot.globals.twitchCommunity[lname] = id
     if id is not None:
-        bot.globals.twitchCommunityId[id] = lname
+        bot.globals.twitchCommunityId[id] = name
     bot.globals.twitchCommunityCache[lname] = timestamp
 
 

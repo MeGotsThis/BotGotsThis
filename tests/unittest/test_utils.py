@@ -577,7 +577,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(
             mock_globals.twitchCommunityId[
                 '6e940c4a-c42f-47d2-af83-0a2c7e47c421'],
-            'speedrunning')
+            'Speedrunning')
         self.assertEqual(mock_globals.twitchCommunityCache['speedrunning'],
                          now)
 
@@ -637,7 +637,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(
             mock_globals.twitchCommunityId[
                 '6e940c4a-c42f-47d2-af83-0a2c7e47c421'],
-            'speedrunning')
+            'Speedrunning')
         self.assertEqual(mock_globals.twitchCommunityCache['speedrunning'],
                          now)
 
