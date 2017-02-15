@@ -563,6 +563,13 @@ class TestApiTwitch(unittest.TestCase):
                                                 'af83-0a2c7e47c421',
                                                 'Speedrunning'))
 
+    def test_get_community_urlencode(self):
+        self.mock_response.status = 404
+        self.assertEqual(twitch.get_community('???'),
+                         twitch.TwitchCommunity(None, None))
+        self.mock_api_call.assert_called_once_with(
+            None, 'GET', '/kraken/communities?name=%3F%3F%3F')
+
     def test_get_community_id_404(self):
         self.mock_response.status = 404
         self.assertEqual(twitch.get_community_by_id('6e940c4a-c42f-47d2-'

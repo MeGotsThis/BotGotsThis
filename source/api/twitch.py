@@ -259,7 +259,7 @@ def channel_community(channel: str) -> Optional[TwitchCommunity]:
 
 
 def get_community(communityName: str) -> Optional[TwitchCommunity]:
-    uri = '/kraken/communities?name=' + communityName  # type: str
+    uri = '/kraken/communities?name=' + urllib.parse.quote(communityName)  # type: str
     with suppress(ConnectionError, client.HTTPException):
         response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         if response.status != 200:
