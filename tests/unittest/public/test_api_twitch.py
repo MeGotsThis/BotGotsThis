@@ -634,6 +634,15 @@ class TestApiTwitch(unittest.TestCase):
         mock_community.assert_called_once_with('Speedrunning')
 
     @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community_none_404(self, mock_community):
+        mock_community.return_value = True
+        self.mock_response.status = 404
+        self.assertIsNone(
+            twitch.set_channel_community('botgotsthis', None))
+        self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertFalse(mock_community.called)
+
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
     def test_set_channel_community_exception(self, mock_community):
         mock_community.return_value = True
         self.mock_api_call.side_effect = HTTPException
@@ -651,3 +660,13 @@ class TestApiTwitch(unittest.TestCase):
             True)
         self.mock_load.assert_called_once_with('botgotsthis')
         mock_community.assert_called_once_with('Speedrunning')
+
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community_none(self, mock_community):
+        mock_community.return_value = True
+        self.mock_response.status = 204
+        self.assertIs(
+            twitch.set_channel_community('botgotsthis', None),
+            True)
+        self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertFalse(mock_community.called)
