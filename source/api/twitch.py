@@ -295,11 +295,11 @@ def set_channel_community(channel: str,
                + '/community/' + bot.globals.twitchCommunity[name])  # type: str
         with suppress(ConnectionError, client.HTTPException):
             response, responseData = api_call(None, 'PUT', uri)  # type: client.HTTPResponse, bytes
-            return response.status != 204
+            return True if response.status == 204 else None
     else:
         uri = ('/kraken/channels/' + bot.globals.twitchId[channel]
                + '/community')
         with suppress(ConnectionError, client.HTTPException):
             response, responseData = api_call(None, 'DELETE', uri)
-            return response.status != 204
+            return True if response.status == 204 else None
     return None

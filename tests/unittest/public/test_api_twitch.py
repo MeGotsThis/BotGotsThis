@@ -303,6 +303,10 @@ class TestApiTwitch(unittest.TestCase):
             'botgotsthis': '0',
             'megotsthis': None,
             }
+        self.mock_globals.twitchCommunity = {
+            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421',
+            'abc': None,
+            }
 
         patcher = patch('bot.utils.loadTwitchId', autospec=True)
         self.addCleanup(patcher.stop)
@@ -514,7 +518,6 @@ class TestApiTwitch(unittest.TestCase):
         self.mock_load.assert_called_once_with('botgotsthis')
 
     def test_channel_community_no_user(self):
-        self.mock_load.return_value = False
         self.assertIsNone(twitch.channel_community('megotsthis'))
         self.mock_load.assert_called_once_with('megotsthis')
 
@@ -580,4 +583,64 @@ class TestApiTwitch(unittest.TestCase):
                                                 'af83-0a2c7e47c421',
                                                 'Speedrunning'))
 
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community_no_load(self, mock_community):
+        self.mock_load.return_value = False
+        mock_community.return_value = True
+        self.assertIsNone(
+            twitch.set_channel_community('botgotsthis', 'Speedrunning'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertFalse(mock_community.called)
 
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community_no_user(self, mock_community):
+        mock_community.return_value = True
+        self.assertIsNone(
+            twitch.set_channel_community('megotsthis', 'Speedrunning'))
+        self.mock_load.assert_called_once_with('megotsthis')
+        self.assertFalse(mock_community.called)
+
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community_no_load_community(self, mock_community):
+        mock_community.return_value = False
+        self.assertIsNone(
+            twitch.set_channel_community('botgotsthis', 'Speedrunning'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+        mock_community.assert_called_once_with('Speedrunning')
+
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community_no_community(self, mock_community):
+        mock_community.return_value = True
+        self.assertIs(
+            twitch.set_channel_community('botgotsthis', 'ABC'),
+            False)
+        self.mock_load.assert_called_once_with('botgotsthis')
+        mock_community.assert_called_once_with('ABC')
+
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community_404(self, mock_community):
+        mock_community.return_value = True
+        self.mock_response.status = 404
+        self.assertIsNone(
+            twitch.set_channel_community('botgotsthis', 'Speedrunning'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+        mock_community.assert_called_once_with('Speedrunning')
+
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community_exception(self, mock_community):
+        mock_community.return_value = True
+        self.mock_api_call.side_effect = HTTPException
+        self.assertIsNone(
+            twitch.set_channel_community('botgotsthis', 'Speedrunning'))
+        self.mock_load.assert_called_once_with('botgotsthis')
+        mock_community.assert_called_once_with('Speedrunning')
+
+    @patch('bot.utils.loadTwitchCommunity', autospec=True)
+    def test_set_channel_community(self, mock_community):
+        mock_community.return_value = True
+        self.mock_response.status = 204
+        self.assertIs(
+            twitch.set_channel_community('botgotsthis', 'Speedrunning'),
+            True)
+        self.mock_load.assert_called_once_with('botgotsthis')
+        mock_community.assert_called_once_with('Speedrunning')
