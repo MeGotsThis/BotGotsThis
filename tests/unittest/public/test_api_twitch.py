@@ -388,6 +388,11 @@ class TestApiTwitch(unittest.TestCase):
         self.mock_load.assert_called_once_with('botgotsthis')
         self.assertFalse(self.mock_api_call.called)
 
+    def test_update_no_user(self):
+        self.assertIsNone(twitch.update('megotsthis'))
+        self.mock_load.assert_called_once_with('megotsthis')
+        self.assertFalse(self.mock_api_call.called)
+
     def test_update_status(self):
         self.mock_response.status = 200
         self.assertIs(twitch.update('botgotsthis', status=''), True)
@@ -406,14 +411,31 @@ class TestApiTwitch(unittest.TestCase):
 
     def test_update_except(self):
         self.mock_api_call.side_effect = HTTPException
-        self.assertIsNone(twitch.active_streams(['botgotsthis']))
-        self.mock_load.assert_called_once_with('botgotsthis')
-
-    def test_active_streams(self):
-        self.mock_response.status = 404
         self.assertIsNone(twitch.update('botgotsthis'))
         self.assertFalse(self.mock_api_call.called)
         self.mock_load.assert_called_once_with('botgotsthis')
+
+    @patch('source.api.twitch._handle_streams')
+    def test_active_streams_no_load(self, mock_handle):
+        self.mock_load.return_value = False
+        self.assertEqual(twitch.active_streams(['botgotsthis']), {})
+        self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertFalse(self.mock_api_call.called)
+        self.assertEqual(mock_handle.call_count, 0)
+
+    @patch('source.api.twitch._handle_streams')
+    def test_active_streams_no_user(self, mock_handle):
+        self.assertEqual(twitch.active_streams(['megotsthis']), {})
+        self.mock_load.assert_called_once_with('megotsthis')
+        self.assertFalse(self.mock_api_call.called)
+        self.assertEqual(mock_handle.call_count, 0)
+
+    @patch('source.api.twitch._handle_streams')
+    def test_active_streams_404(self, mock_handle):
+        self.mock_response.status = 404
+        self.assertIsNone(twitch.active_streams(['botgotsthis']))
+        self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertEqual(mock_handle.call_count, 0)
 
     @patch('source.api.twitch._handle_streams')
     def test_active_streams_one(self, mock_handle):
@@ -490,6 +512,11 @@ class TestApiTwitch(unittest.TestCase):
         self.mock_load.return_value = False
         self.assertIsNone(twitch.channel_community('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
+
+    def test_channel_community_no_user(self):
+        self.mock_load.return_value = False
+        self.assertIsNone(twitch.channel_community('megotsthis'))
+        self.mock_load.assert_called_once_with('megotsthis')
 
     def test_channel_community_204(self):
         self.mock_response.status = 204

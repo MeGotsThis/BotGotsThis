@@ -192,6 +192,8 @@ def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
         allChannels = [c for c in channels
                        if bot.utils.loadTwitchId(c)
                        and bot.globals.twitchId[c] is not None]
+        if not allChannels:
+            return {}
         uri = '/kraken/streams?limit=100&channel=' + ','.join(allChannels)  # type: str
         response, responseData = api_call(None, 'GET', uri)  # type: client.HTTPResponse, bytes
         if response.status != 200:
