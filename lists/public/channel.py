@@ -40,6 +40,7 @@ commands = {
     '!title': mod.commandStatus,
     '!game': mod.commandGame,
     '!setgame': mod.commandRawGame,
+    '!community': mod.commandCommunity,
     '!purge': mod.commandPurge,
     '!permit': mod.commandPermit,
     '!command': custom.commandCommand,

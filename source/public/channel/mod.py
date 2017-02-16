@@ -1,4 +1,8 @@
-﻿from ..library.chat import min_args, permission_not_feature, permission
+﻿from typing import Optional
+
+import bot.globals
+
+from ..library.chat import min_args, permission_not_feature, permission
 from ...api import oauth, twitch
 from ...data import ChatCommandArgs
 
@@ -50,6 +54,31 @@ def commandRawGame(args: ChatCommandArgs) -> bool:
             msg = 'Channel Game has been unset'
     else:
         msg = 'Channel Game failed to set'
+    args.chat.send(msg)
+    return True
+
+
+@permission_not_feature(('broadcaster', None),
+                        ('moderator', 'gamestatusbroadcaster'))
+def commandCommunity(args: ChatCommandArgs) -> bool:
+    if oauth.token(args.chat.channel, database=args.database) is None:
+        return False
+    community = None  # type: Optional[str]
+    if len(args.message) >= 2:
+        community = args.message[1]
+    result = twitch.set_channel_community(args.chat.channel, community)  # type: Optional[bool]
+    if result is True:
+        if community is not None:
+            community = community.lower()
+            communityId = bot.globals.twitchCommunity[community]
+            communityName = bot.globals.twitchCommunityId[communityId]
+            msg = 'Channel Community set as: ' + communityName
+        else:
+            msg = 'Channel Community has been unset'
+    elif result is False:
+        msg = 'Channel Community failed to set, {} not exist'.format(community)
+    else:
+        msg = 'Channel Community failed to set'
     args.chat.send(msg)
     return True
 
