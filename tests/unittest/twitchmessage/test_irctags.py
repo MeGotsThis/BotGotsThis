@@ -281,7 +281,7 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
 
     def test_parse_empty(self):
         items = IrcMessageTagsReadOnly.parseTags('')
-        self.assertIsInstance(items, Dict[IrcMessageTagsKey, TagValue])
+        self.assertIsInstance(items, Dict)
         self.assertEqual(items, IrcMessageTagsReadOnly())
 
     def test_parse_key(self):

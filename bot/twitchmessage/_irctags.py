@@ -152,8 +152,7 @@ class IrcMessageTagsReadOnly(MappingAbc):
                             and not isinstance(items[key], str)):
                         raise TypeError()
                     self._items[self.fromKey(key)] = items[key]
-            elif isinstance(items, Iterable[Union[IrcMessageTagsKey, str,
-                                                  Tuple[KeyParam, str]]]):
+            elif isinstance(items, Iterable):
                 for key in items: # type: Union[IrcMessageTagsKey, str, Tuple[KeyParam, str]]
                     if isinstance(key, (IrcMessageTagsKey, str)):
                         self._items[self.fromKey(key)] = True
