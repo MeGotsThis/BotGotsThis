@@ -6,40 +6,43 @@ from typing import MutableMapping, NamedTuple, Optional, Sequence, Tuple, Union
 KeyParam = Union['IrcMessageTagsKey', str]
 TagValue = Union[bool, str]
 
-ParsedKeyVendor = NamedTuple('ParsedKey',
-                             [('key', str), ('vendor', Optional[str])])
 
-escapedValue = {
+class ParsedKeyVendor(NamedTuple):
+    key: str
+    vendor: Optional[str]
+
+
+escapedValue: Dict[str, str] = {
     ';': '\:',
     ' ': '\\s',
     '\\': '\\\\',
     '\r': '\\r',
     '\n': '\\n'
-    }  # type: Dict[str, str]
-unescapedValue = {
+    }
+unescapedValue: Dict[str, str] = {
     ':': ';',
     's': ' ',
     '\\': '\\',
     'r': '\r',
     'n': '\n'
-    }  # type: Dict[str, str]
+    }
 
 
 class IrcMessageTagsKey(Hashable):
     __slots__ = ('_vendor', '_key')
     
     def __init__(self,
-                 key:str='',
-                 vendor:Optional[str]=None) -> None:
+                 key: str='',
+                 vendor: Optional[str]=None) -> None:
         if not isinstance(key, str):
             raise TypeError()
         if not isinstance(vendor, (type(None), str)):
             raise TypeError()
-        self._key = key  # type: str
-        self._vendor = vendor  # type: Optional[str]
+        self._key: str = key
+        self._vendor: Optional[str] = vendor
     
     @classmethod
-    def fromKeyVendor(cls, keyVendor:str) -> 'IrcMessageTagsKey':
+    def fromKeyVendor(cls, keyVendor: str) -> 'IrcMessageTagsKey':
         if not isinstance(keyVendor, str):
             raise TypeError()
         return cls(*cls.parse(keyVendor))
@@ -53,40 +56,43 @@ class IrcMessageTagsKey(Hashable):
         return self._vendor
     
     def __str__(self) -> str:
-        s = self._key
+        s: str = self._key
         if self._vendor is not None:
             s = self._vendor + '/' + s
         return s
     
-    def __eq__(self, other:object) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, IrcMessageTagsKey):
             return self._key == other._key and self._vendor == other._vendor
         if isinstance(other, str):
             return str(self) == other
         return False
     
-    def __ne__(self, other:object) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
     
     def __hash__(self) -> int:
         return str(self).__hash__()
     
     @staticmethod
-    def parse(keyToParse:str) -> ParsedKeyVendor:
+    def parse(keyToParse: str) -> ParsedKeyVendor:
         if not isinstance(keyToParse, str):
             raise ValueError()
         
-        length = len(keyToParse)  # type: int
-        i = 0  # type: int
+        length: int = len(keyToParse)
+        i: int = 0
         
         if i == length:
             return ParsedKeyVendor('', None)
-        
-        v = []  # type: List[str]
-        isVendor = False  # type: bool
-        s = []  # type: List[str]
+
+        char: str
+        key: str
+        vendor: Optional[str]
+        v: List[str] = []
+        isVendor: bool = False
+        s: List[str] = []
         while i < length:
-            char = keyToParse[i]  # type: str
+            char = keyToParse[i]
             i += 1
                     
             if char == '.':
@@ -122,8 +128,8 @@ class IrcMessageTagsKey(Hashable):
         if isVendor:
             raise ValueError()
         
-        key = ''.join(s)  # type: str
-        vendor = ''.join(v) if v else None  # type: Optional[str]
+        key = ''.join(s)
+        vendor = ''.join(v) if v else None
         return ParsedKeyVendor(key, vendor)
 
 
@@ -131,77 +137,79 @@ class IrcMessageTagsKey(Hashable):
 class IrcMessageTagsReadOnly(MappingAbc):
     __slots__ = '_items',
     
-    def __new__(cls, items:Any=None) -> Any:
+    def __new__(cls, items: Any=None) -> Any:
         # This returns itself, only for read only
         if cls is type(items) and cls is IrcMessageTagsReadOnly:
             return items
         return super().__new__(cls)
     
-    def __init__(self, items:Any=None) -> None:
+    def __init__(self, items: Any=None) -> None:
         # This returns itself, only for read only
         if self is items:
             return
-        
-        self._items = {}  # type: Dict[IrcMessageTagsKey, TagValue]
+
+        mkey: str
+        ikey: Union[IrcMessageTagsKey, str, Tuple[KeyParam, str]]
+        self._items: Dict[IrcMessageTagsKey, TagValue] = {}
         if items is not None:
             if isinstance(items, str):
                 self._items = self.parseTags(items)
             elif isinstance(items, Mapping):
-                for key in items:
-                    if (items[key] is not True
-                            and not isinstance(items[key], str)):
+                for mkey in items:
+                    if (items[mkey] is not True
+                            and not isinstance(items[mkey], str)):
                         raise TypeError()
-                    self._items[self.fromKey(key)] = items[key]
+                    self._items[self.fromKey(mkey)] = items[mkey]
             elif isinstance(items, Iterable):
-                for key in items: # type: Union[IrcMessageTagsKey, str, Tuple[KeyParam, str]]
-                    if isinstance(key, (IrcMessageTagsKey, str)):
-                        self._items[self.fromKey(key)] = True
-                    elif (isinstance(key, Sequence)
-                            and len(key) >= 2):
-                        if (key[1] is not True
-                                and not isinstance(key[1], str)):
+                for ikey in items:
+                    if isinstance(ikey, (IrcMessageTagsKey, str)):
+                        self._items[self.fromKey(ikey)] = True
+                    elif (isinstance(ikey, Sequence)
+                            and len(ikey) >= 2):
+                        if (ikey[1] is not True
+                                and not isinstance(ikey[1], str)):
                             raise TypeError()
-                        self._items[self.fromKey(key[0])] = key[1]
+                        self._items[self.fromKey(ikey[0])] = ikey[1]
                     else:
                         raise TypeError()
             else:
                 raise TypeError()
 
     @staticmethod
-    def fromKey(key:KeyParam) -> IrcMessageTagsKey:
+    def fromKey(key: KeyParam) -> IrcMessageTagsKey:
         if isinstance(key, IrcMessageTagsKey):
             return key
         else:
             return IrcMessageTagsKey.fromKeyVendor(key)
     
-    def __getitem__(self, key:KeyParam) -> TagValue:
+    def __getitem__(self, key: KeyParam) -> TagValue:
         if not isinstance(key, IrcMessageTagsKey):
             key = IrcMessageTagsKey.fromKeyVendor(key)
         return self._items[key]
     
     def __iter__(self) -> Iterator[IrcMessageTagsKey]:
-        for i in self._items:  # type: IrcMessageTagsKey
+        i: IrcMessageTagsKey
+        for i in self._items:
             yield i
     
     def __len__(self) -> int:
         return len(self._items)
     
     def __str__(self) -> str:
-        s = []  # type: List[str]
+        s: List[str] = []
         for k in self._items:
             if self._items[k] is True:
                 s.append(str(k))
             else:
-                s.append(str(k) + '='
-                         + self.formatValue(self._items[k]))
+                s.append(str(k) + '=' + self.formatValue(self._items[k]))
         return ';'.join(s)
 
     @staticmethod
-    def formatValue(value) -> str:
+    def formatValue(value: str) -> str:
         if not isinstance(value, str):
             raise ValueError
         
-        s = []  # type: List[str]
+        s: List[str] = []
         
         for char in value:
             if char in escapedValue:
@@ -210,14 +218,14 @@ class IrcMessageTagsReadOnly(MappingAbc):
         return ''.join(s)
     
     @staticmethod
-    def parseTags(tags:str) -> Dict[IrcMessageTagsKey, TagValue]:
+    def parseTags(tags: str) -> Dict[IrcMessageTagsKey, TagValue]:
         if not isinstance(tags, str):
             raise TypeError()
         
-        length = len(tags)  # type: int
-        i = 0  # type: int
+        length: int = len(tags)
+        i: int = 0
         
-        items = {}  # type: Dict[IrcMessageTagsKey, TagValue]
+        items: Dict[IrcMessageTagsKey, TagValue] = {}
 
         if i == length:
             return items
@@ -226,13 +234,17 @@ class IrcMessageTagsReadOnly(MappingAbc):
             if tags[i] == ';':
                 raise ValueError()
             
-            v = []  # type: List[str]
-            isVendor = False  # type: bool
-            isKey = False  # type: bool
-            value = True  # type: TagValue
-            s = []  # type: List[str]
+            char: str
+            key: str
+            vendor: Optional[str]
+            tagkey: IrcMessageTagsKey
+            v: List[str] = []
+            isVendor: bool = False
+            isKey: bool = False
+            value: TagValue = True
+            s: List[str] = []
             while i < length:
-                char = tags[i]  # type: str
+                char = tags[i]
                 i += 1
                 
                 if char == ';':
@@ -273,8 +285,8 @@ class IrcMessageTagsReadOnly(MappingAbc):
             if isVendor:
                 raise ValueError()
             
-            key = ''.join(s)  # type: str
-            vendor = ''.join(v) if v else None  # type: Optional[str]
+            key = ''.join(s)
+            vendor = ''.join(v) if v else None
             
             if char == '=':
                 v = []
@@ -297,7 +309,7 @@ class IrcMessageTagsReadOnly(MappingAbc):
                         v.append(char)
                 value = ''.join(v)
             
-            tagkey = IrcMessageTagsKey(key, vendor)  # type: IrcMessageTagsKey
+            tagkey = IrcMessageTagsKey(key, vendor)
             
             if tagkey in items:
                 raise ValueError()
@@ -317,8 +329,8 @@ class IrcMessageTags(IrcMessageTagsReadOnly, MutableMappingAbc):
     __slots__ = '_items',
         
     def __setitem__(self,
-                    key:KeyParam,
-                    value:TagValue) -> None:
+                    key: KeyParam,
+                    value: TagValue) -> None:
         if isinstance(key, str):
             key = IrcMessageTagsKey.fromKeyVendor(key)
         elif not isinstance(key, IrcMessageTagsKey):
@@ -332,7 +344,7 @@ class IrcMessageTags(IrcMessageTagsReadOnly, MutableMappingAbc):
                 raise ValueError
             raise TypeError()
     
-    def __delitem__(self, key:KeyParam):
+    def __delitem__(self, key: KeyParam):
         if isinstance(key, str):
             key = IrcMessageTagsKey.fromKeyVendor(key)
         elif not isinstance(key, IrcMessageTagsKey):
