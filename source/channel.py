@@ -13,7 +13,7 @@ from .database import factory
 
 # Set up our commands function
 def parse(chat: 'botData.Channel',
-          tags: [IrcMessageTagsReadOnly],
+          tags: Optional[IrcMessageTagsReadOnly],
           nick: str,
           rawMessage: str,
           timestamp: datetime) -> None:
