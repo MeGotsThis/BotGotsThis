@@ -16,6 +16,7 @@ from .thread.join import JoinThread
 from .thread.logging import Logging
 from .thread.socket import SocketsThread
 
+ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 
 def main(argv: Optional[List[str]]=None) -> int:
     print('{time} Starting'.format(time=utils.now()))
@@ -38,14 +39,16 @@ def main(argv: Optional[List[str]]=None) -> int:
     bot.globals.background.start()
     bot.globals.join.start()
 
-    # TODO: Fix mypy
-    _modulesList = [
+    _modulesList: ModuleList = [
         pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore
                               prefix=publicAuto.__name__ + '.'),
         pkgutil.walk_packages(path=privateAuto.__path__,  # type: ignore
                               prefix=privateAuto.__name__ + '.')
-        ]  # type: Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
-    for importer, modname, ispkg in chain(*_modulesList):  # type: PathEntryFinder, str, bool
+        ]
+    importer: PathEntryFinder
+    modname: str
+    ispkg: bool
+    for importer, modname, ispkg in chain(*_modulesList):
         importlib.import_module(modname)
 
     try:
@@ -53,7 +56,8 @@ def main(argv: Optional[List[str]]=None) -> int:
         if bot.config.owner:
             utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
         with getDatabase() as db:
-            for autoJoin in db.getAutoJoinsChats():  # type: AutoJoinChannel
+            autojoin: AutoJoinChannel
+            for autoJoin in db.getAutoJoinsChats():
                 utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
                                   autoJoin.cluster)
     

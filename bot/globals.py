@@ -8,35 +8,35 @@ from datetime import datetime
 from typing import Any, Dict, Optional, List
 
 
-running = True  # type: bool
+running: bool = True
 
 # Import some necessary libraries.
-sockets = None  # type: SocketsThread
+sockets: SocketsThread = None
 
-join = None  # type: JoinThread
-groupChannel = None  # type: data.Channel
+join: JoinThread = None
+groupChannel: 'data.Channel' = None
 
-logging = None  # type: loggingThread.Logging
-background = None  # type: backgroundThread.BackgroundTasker
+logging: loggingThread.Logging = None
+background: backgroundThread.BackgroundTasker = None
 
-clusters = {
+clusters: Dict[str, 'data.Socket'] = {
     'aws': None,
-    }  # type: Dict[str, data.Socket]
-whisperCluster = 'aws'  # type: str
+    }
+whisperCluster: str = 'aws'
 
-channels = {}  # type: Dict[str, data.Channel]
-twitchId = {}  # type: Dict[str, Optional[str]]
-twitchIdName = {}  # type: Dict[str, str]
-twitchIdCache = {}  # type: Dict[str, datetime]
-twitchCommunity = {}  # type: Dict[str, Optional[str]]
-twitchCommunityId = {}  # type: Dict[str, str]
-twitchCommunityCache = {}  # type: Dict[str, datetime]
-displayName = bot.config.botnick  # type: str
-isTwitchAdmin = False  # type: bool
-isTwitchStaff = False  # type: bool
-isGlobalMod = False  # type: bool
-emoteset = [0]  # type: List[int]
-globalEmotes = {
+channels: Dict[str, 'data.Channel'] = {}
+twitchId: Dict[str, Optional[str]] = {}
+twitchIdName: Dict[str, str] = {}
+twitchIdCache: Dict[str, datetime] = {}
+twitchCommunity: Dict[str, Optional[str]] = {}
+twitchCommunityId: Dict[str, str] = {}
+twitchCommunityCache: Dict[str, datetime] = {}
+displayName: str = bot.config.botnick
+isTwitchAdmin: bool = False
+isTwitchStaff: bool = False
+isGlobalMod: bool = False
+emoteset: List[int] = [0]
+globalEmotes: Dict[int, str] = {
     25: 'Kappa',
     88: 'PogChamp',
     1902: 'Keepo',
@@ -76,11 +76,11 @@ globalEmotes = {
     3: ':D',
     4: '>(',
     9: '<3',
-    }  # type: Dict[int, str]
-globalEmoteSets = {k: 0 for k, v in globalEmotes.items()}  # type: Dict[int, int]
-globalEmotesCache = datetime.min  # type: datetime
-globalSessionData = {}  # type: Dict[Any, Any]
-globalFfzEmotes = {
+    }
+globalEmoteSets: Dict[int, int] = {k: 0 for k, v in globalEmotes.items()}
+globalEmotesCache: datetime = datetime.min
+globalSessionData: Dict[Any, Any] = {}
+globalFfzEmotes: Dict[int, str] = {
     25927: 'CatBag',
     27081: 'ZreknarF',
     28136: 'LilZ',
@@ -90,8 +90,7 @@ globalFfzEmotes = {
     5: 'YellowFever',
     4: 'ManChicken',
     3: 'BeanieHipster',
-    }  # type: Dict[int, str]
-globalFfzEmotesCache = datetime.min  # type: datetime
-globalBttvEmotes = {
-    }  # type: Dict[str, str]
-globalBttvEmotesCache = datetime.min  # type: datetime
+    }
+globalFfzEmotesCache: datetime = datetime.min
+globalBttvEmotes: Dict[str, str] = {}
+globalBttvEmotesCache: datetime = datetime.min

@@ -1,7 +1,7 @@
 ﻿from . import data
 from datetime import datetime, timedelta
 from types import TracebackType
-from typing import Any, Iterable, Optional, Tuple, Union
+from typing import Any, Iterable, List, Optional, Type, Tuple, Union
 from source.api import twitch
 import builtins
 import bot.config
@@ -60,7 +60,7 @@ def loadTwitchId(channel: str,
     if timestamp is None:
         timestamp = now()
     if channel in bot.globals.twitchId:
-        cacheTime = bot.globals.twitchIdCache[channel]  # type: datetime
+        cacheTime: datetime = bot.globals.twitchIdCache[channel]
         if bot.globals.twitchId[channel] is None:
             if timestamp < cacheTime + timedelta(hours=1):
                 return True
@@ -93,15 +93,16 @@ def loadTwitchCommunityId(id: str,
     if timestamp is None:
         timestamp = now()
     if id in bot.globals.twitchCommunityId:
-        name = bot.globals.twitchCommunityId[id]  # type: str
-        cacheTime = bot.globals.twitchCommunityCache[name]  # type: datetime
+        name: str = bot.globals.twitchCommunityId[id]
+        cacheTime: datetime = bot.globals.twitchCommunityCache[name]
         if bot.globals.twitchCommunity[name] is None:
             if timestamp < cacheTime + timedelta(hours=1):
                 return True
         else:
             if timestamp < cacheTime + timedelta(days=1):
                 return True
-    community = twitch.get_community_by_id(id)  # --type: Optional[twitch.TwitchCommunity]
+    # community: Optional[twitch.TwitchCommunity]
+    community = twitch.get_community_by_id(id)
     if community is None:
         return False
     saveTwitchCommunity(community.name, community.id, timestamp)
@@ -112,16 +113,17 @@ def loadTwitchCommunity(name: str,
                         timestamp: Optional[datetime]=None) -> bool:
     if timestamp is None:
         timestamp = now()
-    lname = name.lower()  # type: str
+    lname: str = name.lower()
     if lname in bot.globals.twitchCommunity:
-        cacheTime = bot.globals.twitchCommunityCache[lname]  # type: datetime
+        cacheTime: datetime = bot.globals.twitchCommunityCache[lname]
         if bot.globals.twitchCommunity[lname] is None:
             if timestamp < cacheTime + timedelta(hours=1):
                 return True
         else:
             if timestamp < cacheTime + timedelta(days=1):
                 return True
-    community = twitch.get_community(lname)  # --type: Optional[twitch.TwitchCommunity]
+    # community: Optional[twitch.TwitchCommunity]
+    community = twitch.get_community(lname)
     if community is None:
         return False
     saveTwitchCommunity(community.name or name, community.id, timestamp)
@@ -136,17 +138,17 @@ def saveTwitchCommunity(name: Optional[str],
     if name is None:
         bot.globals.twitchCommunityId[id] = None
         return
-    lname = name.lower()  # type: str
+    lname: str = name.lower()
     bot.globals.twitchCommunity[lname] = id
     if id is not None:
         bot.globals.twitchCommunityId[id] = name
     bot.globals.twitchCommunityCache[lname] = timestamp
 
 
-ENSURE_CLUSTER_UNKNOWN = -2  # type: int
-ENSURE_REJOIN = -1  # type: int
-ENSURE_CORRECT = 0  # type: int
-ENSURE_NOT_JOINED = 1  # type: int
+ENSURE_CLUSTER_UNKNOWN: int = -2
+ENSURE_REJOIN: int = -1
+ENSURE_CORRECT: int = 0
+ENSURE_NOT_JOINED: int = 1
 
 
 def ensureServer(channel: str,
@@ -177,13 +179,14 @@ def print(*args: Any,
           timestamp: Optional[datetime]=None,
           override: bool=True,
           file: Union[bool, str]=False) -> None:
-    _timestamp = timestamp or now()  # type: datetime
+    _timestamp: datetime = timestamp or now()
     if not override or bot.config.development:
         builtins.print(_timestamp, *args)
 
     if file:
+        filename: str
         if isinstance(file, str):
-            filename = file  # type: str
+            filename = file
         else:
             filename = 'output.log'
         bot.globals.logging.log(
@@ -209,8 +212,13 @@ def logException(extraMessage: str='',
     if bot.config.exceptionLog is None:
         return
     timestamp = timestamp or now()
-    exceptInfo = sys.exc_info()  # type: ExceptionInfo
-    excep = traceback.format_exception(*exceptInfo)  # type: ignore
+    exceptType: Optional[Type[BaseException]]
+    excecption: Optional[BaseException]
+    trackback: Optional[TracebackType]
+    excep: List[str]
+
+    exceptType, excecption, trackback = sys.exc_info()
+    excep = traceback.format_exception(exceptType, excecption, trackback)
     if extraMessage:
         extraMessage += '\n'
     bot.globals.logging.log(

@@ -2,38 +2,38 @@
 import configparser
 import os
 
-development = False  # type: bool
+development: bool = False
 
-botnick = ''  # type: str
-password = ''  # type: str
-owner = ''  # type: str
+botnick: str = ''
+password: str = ''
+owner: str = ''
 
-awsServer = ''  # type: str
-awsPort = 0  # type: int
+awsServer: str = ''
+awsPort: int = 0
 
-messageLimit = 500  # type: int
-modLimit = 100  # type: int
-modSpamLimit = 100  # type: int
-publicLimit = 20  # type: int
-publicDelay = 1  # type: float
-messageSpan = 30  # type: float
-whiperLimit = 100  # type: float
-whiperSpan = 30  # type: float
+messageLimit: int = 500
+modLimit: int = 100
+modSpamLimit: int = 100
+publicLimit: float = 20
+publicDelay: float = 1
+messageSpan: float = 30
+whiperLimit: float = 100
+whiperSpan: float = 30
 
-customMessageCooldown = 5  # type: float
-customMessageUserCooldown = 20  # type: float
-customMessageUrlTimeout = 5  # type: float
+customMessageCooldown: float = 5
+customMessageUserCooldown: float = 20
+customMessageUrlTimeout: float = 5
 
-spamModeratorCooldown = 20  # type: float
+spamModeratorCooldown: float = 20
 
-warningDuration = 20  # type: float
-moderatorDefaultTimeout = [0, 0, 0]  # type: List[int]
+warningDuration: float = 20
+moderatorDefaultTimeout: List[int] = [0, 0, 0]
 
-joinLimit = 50  # type: int
-joinPerSecond = 15  # type: float
+joinLimit: int = 50
+joinPerSecond: float = 15
 
-ircLogFolder = ''  # type: str
-exceptionLog = ''  # type: str
+ircLogFolder: str = ''
+exceptionLog: str = ''
 
 
 if os.path.isfile('twitch.ini'):
