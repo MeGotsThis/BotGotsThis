@@ -23,28 +23,32 @@ class SocketsThread(threading.Thread):
             time=utils.now(), name=self.__class__.__name__))
 
     def process(self):
-        sockets = list(bot.globals.clusters.values()) # type: List[data.Socket]
-        isActive = lambda s: s.isConnected  # type: Callable[[data.Socket], bool]
+        sockets: List[data.Socket] = list(bot.globals.clusters.values())
+        isActive: Callable[[data.Socket], bool] = lambda s: s.isConnected
+        socket: data.Socket
         try:
-            for socket in filterfalse(isActive, sockets):  # type: Socket
+            for socket in filterfalse(isActive, sockets):
                 socket.connect()
         except:
             utils.logException()
-        for socket in filter(isActive, sockets):  # type: data.Socket
+        for socket in filter(isActive, sockets):
             socket.queueMessages()
-        connections = list(filter(isActive, sockets))  # type: List[data.Socket]
+        connections: List[data.Socket] = list(filter(isActive, sockets))
         if connections:
+            read: List[data.Socket]
+            write: List[data.Socket]
+            exceptional: List[data.Socket]
             read, write, exceptional = select.select(
-                connections, connections, connections,
-                0.01)  # type: List[data.Socket], List[data.Socket], List[data.Socket]
-            for socket in filter(isActive, read):  # type: Socket
+                connections, connections, connections, 0.01)
+            for socket in filter(isActive, read):
                 socket.read()
-            for socket in filter(isActive, write):  # type: Socket
+            for socket in filter(isActive, write):
                 socket.flushWrite()
-        for socket in filter(isActive, sockets):  # type: data.Socket
+        for socket in filter(isActive, sockets):
             socket.sendPing()
     
     def terminate(self):
-        for socket in bot.globals.clusters.values():  # type: data.Socket
+        socket: data.Socket
+        for socket in bot.globals.clusters.values():
             with suppress(ConnectionError):
                 socket.disconnect()

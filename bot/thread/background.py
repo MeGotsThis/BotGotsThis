@@ -8,8 +8,8 @@ import time
 
 class BackgroundTasker(threading.Thread):
     def __init__(self, **kwargs) -> None:
-        threading.Thread.__init__(self, **kwargs)  # type: ignore
-        self._tasks = []  # type: List[Task]
+        threading.Thread.__init__(self, **kwargs)
+        self._tasks: List[Task] = []
     
     def run(self) -> None:
         print('{time} Starting {name}'.format(
@@ -31,8 +31,9 @@ class BackgroundTasker(threading.Thread):
         self._tasks.append(Task(task, interval))
     
     def runTasks(self) -> None:
-        timestamp = utils.now()  # type: datetime
-        for task in self._tasks[:]:  # type: Task
+        timestamp: datetime = utils.now()
+        task: Task
+        for task in self._tasks[:]:
             if timestamp >= task.timestamp + task.interval:
                 threading.Thread(
                     target=run_task, args=(task.task, timestamp,)).start()
@@ -51,14 +52,13 @@ class Task:
     def __init__(self,
                  task: Callable[[datetime], None],
                  interval: timedelta) -> None:
-        # TODO: mypy fix
         if not isinstance(task, Callable):  # type: ignore
             raise TypeError()
         if not isinstance(interval, timedelta):
             raise TypeError()
-        self._task = task
-        self._interval = interval
-        self._timestamp = datetime.min  # type: datetime
+        self._task: Callable[[datetime], None] = task
+        self._interval: timedelta = interval
+        self._timestamp: datetime = datetime.min
 
     @property
     def task(self) -> Callable[[datetime], None]:
