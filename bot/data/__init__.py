@@ -12,23 +12,25 @@ from .error import ConnectionReset, LoginUnsuccessful
 from .. import utils
 from ..twitchmessage import IrcMessage, IrcMessageParams
 
-socketAlias = socket.socket
+pysocket = socket.socket
 
 
-ChatMessage = NamedTuple('ChatMessage',
-                         [('channel', 'Channel'),
-                          ('message', str)])
-WhisperMessage = NamedTuple('WhisperMessage',
-                            [('nick', str),
-                             ('message', str)])
+class ChatMessage(NamedTuple):
+    channel: 'Channel'
+    message: str
 
 
-disallowedCommands = {
+class WhisperMessage(NamedTuple):
+    nick: str
+    message: str
+
+
+disallowedCommands: Set[str] = {
     '.ignore',
     '/ignore',
     '.disconnect',
     '/disconnect',
-    }  # type: Set[str]
+    }
 
 _KT = TypeVar('_KT')
 _VT = TypeVar('_VT')
@@ -40,12 +42,11 @@ class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
                  default_factory: Optional[Callable[[], _VT]]=None,
                  *args,
                  **kwargs) -> None:
-        # TODO: mypy fix
-        if (default_factory is not None
-                and not isinstance(default_factory, Callable)):  # type: ignore
-            raise TypeError('first argument must be callable')
+        if default_factory is not None:
+            if not isinstance(default_factory, Callable):  # type: ignore
+                raise TypeError('first argument must be callable')
         OrderedDict.__init__(self, *args, **kwargs)
-        self.default_factory = default_factory
+        self.default_factory: Optional[Callable[[], _VT]] = default_factory
 
     def __getitem__(self, key: _KT) -> _VT:
         try:
@@ -56,6 +57,7 @@ class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
     def __missing__(self, key: _KT) -> _VT:
         if self.default_factory is None:
             raise KeyError(key)
+        value: _VT
         self[key] = value = self.default_factory()
         return value
 
@@ -101,27 +103,27 @@ class Channel:
             raise TypeError()
         if not channel:
             raise ValueError()
-        self._channel = channel  # type: str
-        self._ircChannel = '#' + channel  # type: str
-        self._socket = socket  # type: Socket
-        self._isMod = False  # type: bool
-        self._isSubscriber = False  # type: bool
-        self._ircUsers = set()  # type: Set[str]
-        self._ircOps = set()  # type: Set[str]
-        self._joinPriority = float(joinPriority)  # type: float
-        self._sessionData = {}  # type: Dict[Any, Any]
-        self._ffzEmotes = {}  # type: Dict[int, str]
-        self._ffzCache = datetime.min  # type: datetime
-        self._ffzLock = threading.Lock()  # type: threading.Lock
-        self._bttvEmotes = {}  # type: Dict[str, str]
-        self._bttvCache = datetime.min  # type: datetime
-        self._bttvLock = threading.Lock()  # type: threading.Lock
-        self._twitchCache = datetime.min  # type: datetime
-        self._streamingSince = None  # type: Optional[datetime]
-        self._twitchStatus = ''  # type: Optional[str]
-        self._twitchGame = ''  # type: Optional[str]
-        self._community = None  # type: Optional[str]
-        self._serverCheck = datetime.min  # type: datetime
+        self._channel: str = channel
+        self._ircChannel: str = '#' + channel
+        self._socket: Socket = socket
+        self._isMod: bool = False
+        self._isSubscriber: bool = False
+        self._ircUsers: Set[str] = set()
+        self._ircOps: Set[str] = set()
+        self._joinPriority: float = float(joinPriority)
+        self._sessionData: Dict[Any, Any] = {}
+        self._ffzEmotes: Dict[int, str] = {}
+        self._ffzCache: datetime = datetime.min
+        self._ffzLock: threading.Lock = threading.Lock()
+        self._bttvEmotes: Dict[str, str] = {}
+        self._bttvCache: datetime = datetime.min
+        self._bttvLock: threading.Lock = threading.Lock()
+        self._twitchCache: datetime = datetime.min
+        self._streamingSince: Optional[datetime] = None
+        self._twitchStatus: Optional[str] = ''
+        self._twitchGame: Optional[str] = ''
+        self._community: Optional[str] = None
+        self._serverCheck: datetime = datetime.min
 
     @property
     def channel(self) -> str:
@@ -270,8 +272,10 @@ class Channel:
         self.socket.messaging.clearChat(self)
 
     def updateFfzEmotes(self) -> None:
+        oldTimestamp: datetime
         with self._ffzLock:
             oldTimestamp, self._ffzCache = self._ffzCache, utils.now()
+        emotes: Optional[Dict[int, str]]
         emotes = ffz.getBroadcasterEmotes(self._channel)
         if emotes is not None:
             self._ffzEmotes = emotes
@@ -282,8 +286,10 @@ class Channel:
                 self._ffzCache = oldTimestamp
 
     def updateBttvEmotes(self) -> None:
+        oldTimestamp: datetime
         with self._bttvLock:
             oldTimestamp, self._bttvCache = self._bttvCache, utils.now()
+        emotes: Optional[Dict[str, str]]
         emotes = bttv.getBroadcasterEmotes(self._channel)
         if emotes is not None:
             self._bttvEmotes = emotes
@@ -299,17 +305,17 @@ class Socket:
                  name: str,
                  server: str,
                  port: int) -> None:
-        self._writeQueue = deque()  # type: deque[Tuple[Tuple[IrcMessage], dict]]
-        self._name = name  # type: str
-        self._server = server  # type: str
-        self._port = port  # type: int
-        self._channels = {}  # type: Dict[str, Channel]
-        self._channelsLock = threading.Lock()  # type: threading.Lock
-        self._socket = None  # type: Optional[socketAlias]
-        self._messaging = MessagingQueue()  # type: MessagingQueue
-        self.lastSentPing = datetime.max  # type: datetime
-        self.lastPing = datetime.max  # type: datetime
-        self.lastConnectAttempt = datetime.min  # type: datetime
+        self._writeQueue: deque[Tuple[Tuple[IrcMessage], dict]] = deque()
+        self._name: str = name
+        self._server: str = server
+        self._port: int = port
+        self._channels: Dict[str, Channel] = {}
+        self._channelsLock: threading.Lock = threading.Lock()
+        self._socket: Optional[pysocket] = None
+        self._messaging: MessagingQueue = MessagingQueue()
+        self.lastSentPing: datetime = datetime.max
+        self.lastPing: datetime = datetime.max
+        self.lastConnectAttempt: datetime = datetime.min
 
     @property
     def name(self) -> str:
@@ -328,7 +334,7 @@ class Socket:
         return self._server, self._port
 
     @property
-    def socket(self) -> Optional[socketAlias]:
+    def socket(self) -> Optional[pysocket]:
         return self._socket
 
     @property
@@ -355,13 +361,13 @@ class Socket:
         if self._socket is not None:
             raise ConnectionError('connection already exists')
 
-        now = utils.now()
+        now: datetime = utils.now()
         if now - self.lastConnectAttempt < timedelta(seconds=5):
             return
         self.lastConnectAttempt = now
 
-        connection = socket.socket(socket.AF_INET,
-                                   socket.SOCK_STREAM)  # type: socketAlias
+        connection: pysocket
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         connection.connect(self.address)
 
         print('{time} {name} Connected {server}'.format(
@@ -373,10 +379,10 @@ class Socket:
         self.lastPing = now
         bot.globals.join.connected(self)
 
-    def login(self, connection: socketAlias) -> None:
-        if not isinstance(connection, socketAlias):
+    def login(self, connection: pysocket) -> None:
+        if not isinstance(connection, pysocket):
             raise TypeError()
-        commands = [
+        commands: List[IrcMessage] = [
             IrcMessage(None, None, 'PASS',
                        IrcMessageParams(bot.config.password or None)),
             IrcMessage(None, None, 'NICK',
@@ -390,9 +396,10 @@ class Socket:
                        IrcMessageParams('REQ', 'twitch.tv/commands')),
             IrcMessage(None, None, 'CAP',
                        IrcMessageParams('REQ', 'twitch.tv/tags')),
-        ]  # type: List[IrcMessage]
-        for command in commands:  # type: IrcMessage
-            message = (str(command) + '\r\n').encode('utf-8')  # type: bytes
+            ]
+        command: IrcMessage
+        for command in commands:
+            message: bytes = (str(command) + '\r\n').encode('utf-8')
             connection.send(message)
             self._logWrite(command)
 
@@ -416,9 +423,9 @@ class Socket:
         if self._socket is None:
             raise ConnectionError()
         try:
-            message = str(command) + '\r\n'  # type: str
-            messageBytes = message.encode('utf-8')  # type: bytes
-            timestamp = utils.now()  # type: datetime
+            message: str = str(command) + '\r\n'
+            messageBytes: bytes = message.encode('utf-8')
+            timestamp: datetime = utils.now()
             self._socket.send(messageBytes)
             self._onWrite(command, timestamp, channel=channel)
             self._logWrite(command, channel=channel, whisper=whisper,
@@ -443,14 +450,16 @@ class Socket:
         if self._socket is None:
             raise ConnectionError()
         while self.writeQueue:
-            item = self.writeQueue.popleft()  # type: Tuple[Tuple[IrcMessage], dict]
-            self.write(*item[0], **item[1])  # type: ignore
+            item: Tuple[Tuple[IrcMessage], dict] = self.writeQueue.popleft()
+            self.write(*item[0], **item[1])
 
     def read(self) -> None:
         if self._socket is None:
             raise ConnectionError()
         try:
-            ircmsgs = lastRecv = bytes(self._socket.recv(2048))  # type: bytes
+            ircmsgs: bytes
+            lastRecv: bytes
+            ircmsgs = lastRecv = bytes(self._socket.recv(2048))
             while lastRecv != b'' and lastRecv[-2:] != b'\r\n':
                 lastRecv = bytes(self._socket.recv(2048))
                 ircmsgs += lastRecv
@@ -460,10 +469,11 @@ class Socket:
             return
 
         try:
-            for ircmsg in ircmsgs.split(b'\r\n'):  # type: bytes
+            ircmsg: bytes
+            for ircmsg in ircmsgs.split(b'\r\n'):
                 if not ircmsg:
                     continue
-                message = ircmsg.decode('utf-8')  # type: str
+                message: str = ircmsg.decode('utf-8')
                 self._logRead(message)
                 source.ircmessage.parseMessage(self, message, utils.now())
         except ConnectionReset:
@@ -472,7 +482,7 @@ class Socket:
             self.disconnect()
             bot.globals.running = False
 
-    def ping(self, message: str = 'ping') -> None:
+    def ping(self, message: str='ping') -> None:
         self.queueWrite(IrcMessage(None, None, 'PONG',
                                    IrcMessageParams(None, message)),
                         prepend=True)
@@ -480,8 +490,8 @@ class Socket:
 
     def sendPing(self) -> None:
         now = utils.now()
-        sinceLastSend = now - self.lastSentPing  # type: timedelta
-        sinceLast = now - self.lastPing  # type: timedelta
+        sinceLastSend: timedelta = now - self.lastSentPing
+        sinceLast: timedelta = now - self.lastPing
         if sinceLastSend >= timedelta(minutes=1):
             self.queueWrite(IrcMessage(None, None, 'PING',
                                        IrcMessageParams(bot.config.botnick)),
@@ -491,8 +501,8 @@ class Socket:
             self.disconnect()
 
     def _logRead(self, message: str) -> None:
-        file = '{nick}-{server}.log'.format(nick=bot.config.botnick,
-                                            server=self.name)  # type: str
+        file: str = '{nick}-{server}.log'.format(nick=bot.config.botnick,
+                                                 server=self.name)
         utils.logIrcMessage(file, '< ' + message)
 
     def _logWrite(self,
@@ -503,13 +513,15 @@ class Socket:
         timestamp = timestamp or utils.now()
         if command.command == 'PASS':
             command = IrcMessage(command='PASS')
-        files = []  # type: List[str]
-        logs = []  # type: List[str]
+        files: List[str] = []
+        logs: List[str] = []
         files.append('{bot}-{socket}.log'.format(bot=bot.config.botnick,
                                                  socket=self.name))
         logs.append('> ' + str(command))
+        file: str
+        log: str
         if whisper and channel:
-            for file, log in zip(files, logs):  # type: str, str
+            for file, log in zip(files, logs):
                 utils.logIrcMessage(file, log, timestamp)
             raise ValueError()
         if whisper:
@@ -535,7 +547,7 @@ class Socket:
                 logs.append(
                     '{bot}: {message}'.format(bot=bot.config.botnick,
                                               message=command.params.trailing))
-        for file, log in zip(files, logs):  # type: str, str
+        for file, log in zip(files, logs):
             utils.logIrcMessage(file, log, timestamp)
 
     def queueWrite(self,
@@ -545,7 +557,7 @@ class Socket:
                    prepend: bool=False) -> None:
         if not isinstance(message, IrcMessage):
             raise TypeError()
-        kwargs = {}  # type: dict
+        kwargs: dict = {}
         if channel:
             if not isinstance(channel, Channel):
                 raise TypeError()
@@ -556,7 +568,8 @@ class Socket:
             kwargs['whisper'] = whisper
         if channel and whisper:
             raise ValueError()
-        item = (message,), kwargs  # type: Tuple[Tuple[IrcMessage], dict]
+        item: Tuple[Tuple[IrcMessage], dict]
+        item = (message,), kwargs
         if prepend:
             self.writeQueue.appendleft(item)
         else:
@@ -579,8 +592,9 @@ class Socket:
 
     def queueMessages(self) -> None:
         self.messaging.cleanOldTimestamps()
-        for whisperMessage in iter(self.messaging.popWhisper, None):  # type: WhisperMessage
-            ircMsg = '.w {nick} {message}'.format(
+        whisperMessage: WhisperMessage
+        for whisperMessage in iter(self.messaging.popWhisper, None):
+            ircMsg: str = '.w {nick} {message}'.format(
                 nick=whisperMessage.nick,
                 message=whisperMessage.message)[:bot.config.messageLimit]
             self.queueWrite(
@@ -588,7 +602,8 @@ class Socket:
                            IrcMessageParams(
                                bot.globals.groupChannel.ircChannel, ircMsg)),
                 whisper=whisperMessage)
-        for message in iter(self.messaging.popChat, None):  # type: ChatMessage
+        nessage: ChatMessage
+        for message in iter(self.messaging.popChat, None):
             self.queueWrite(
                 IrcMessage(None, None, 'PRIVMSG',
                            IrcMessageParams(
@@ -599,14 +614,15 @@ class Socket:
 
 class MessagingQueue:
     def __init__(self):
-        self._chatQueues = [], [], []  # type: Tuple[List[ChatMessage], ...]
-        self._whisperQueue = deque()  # type: deque[WhisperMessage]
-        self._queueLock = threading.Lock()  # type: threading.Lock
-        self._chatSent = []  # type: List[datetime]
-        self._whisperSent = []  # type: List[datetime]
-        self._lowQueueRecent = OrderedDict()  # type: OrderedDict[str, Any]
-        self._publicTime = defaultdict(
-            lambda: datetime.min)  # type: Dict[str, datetime]
+        self._chatQueues: Tuple[List[ChatMessage], ...]
+        self._chatQueues = [], [], []
+        self._whisperQueue: deque[WhisperMessage] = deque()
+        self._queueLock: threading.Lock = threading.Lock()
+        self._chatSent: List[datetime] = []
+        self._whisperSent: List[datetime] = []
+        self._lowQueueRecent: OrderedDict[str, Any] = OrderedDict()
+        self._publicTime: Dict[str, datetime]
+        self._publicTime = defaultdict(lambda: datetime.min)
 
     def cleanOldTimestamps(self) -> None:
         timestamp = utils.now()
@@ -624,7 +640,7 @@ class MessagingQueue:
                  bypass: bool=False) -> None:
         if not isinstance(channel, Channel):
             raise TypeError()
-        listMessages = None  # type: List[str]
+        listMessages: List[str]
         if isinstance(messages, str):
             listMessages = [messages]
         elif isinstance(messages, Iterable):
@@ -636,9 +652,11 @@ class MessagingQueue:
         if (priority < -len(self._chatQueues)
             or priority >= len(self._chatQueues)):
             raise ValueError()
-        whispers = DefaultOrderedDict(list)  # type: DefaultOrderedDict[str, List[str]]
+        whispers: DefaultOrderedDict[str, List[str]]
+        whispers = DefaultOrderedDict(list)
         with self._queueLock:
-            for message in listMessages:  # type: str
+            message: str
+            for message in listMessages:
                 if not message:
                     continue
                 if (not bypass
@@ -666,27 +684,31 @@ class MessagingQueue:
         elif not isinstance(messages, Iterable):
             raise TypeError()
         with self._queueLock:
-            for message in messages:  # type: str
+            message: str
+            for message in messages:
                 self._whisperQueue.append(WhisperMessage(nick, message))
 
     def popChat(self) -> Optional[ChatMessage]:
-        timestamp = utils.now()  # type: datetime
-        nextMessage = self._getChatMessage(timestamp)  # type: Optional[ChatMessage]
+        timestamp: datetime = utils.now()
+        nextMessage:  Optional[ChatMessage] = self._getChatMessage(timestamp)
         if nextMessage:
             self._chatSent.append(timestamp)
         return nextMessage
 
     def _getChatMessage(self, timestamp: datetime) -> Optional[ChatMessage]:
-        publicDelay = timedelta(seconds=bot.config.publicDelay)  # type: timedelta
-        isModGood = len(self._chatSent) < bot.config.modLimit  # type: bool
-        isModSpamGood = len(self._chatSent) < bot.config.modSpamLimit  # type: bool
-        isPublicGood = len(self._chatSent) < bot.config.publicLimit  # type: bool
+        publicDelay: timedelta = timedelta(seconds=bot.config.publicDelay)
+        isModGood: bool = len(self._chatSent) < bot.config.modLimit
+        isModSpamGood: bool = len(self._chatSent) < bot.config.modSpamLimit
+        isPublicGood: bool = len(self._chatSent) < bot.config.publicLimit
         with self._queueLock:
             if isPublicGood:
-                for queue in self._chatQueues:  # type: List[ChatMessage]
-                    for i, message in enumerate(
-                            queue):  # type: i, ChatMessage
-                        last = self._publicTime[message.channel.channel]  # type: datetime
+                queue: List[ChatMessage]
+                i: int
+                message: ChatMessage
+                for queue in self._chatQueues:
+                    for i, message in enumerate(queue):
+                        last: datetime
+                        last = self._publicTime[message.channel.channel]
                         if (self._isMod(message.channel)
                             or timestamp - last < publicDelay):
                             continue
@@ -694,14 +716,14 @@ class MessagingQueue:
                         del queue[i]
                         return message
             if isModGood:
-                for queue in self._chatQueues[:-1]:  # type: List[ChatMessage]
-                    for i, message in enumerate(queue):  # type: i, ChatMessage
+                for queue in self._chatQueues[:-1]:
+                    for i, message in enumerate(queue):
                         if not self._isMod(message.channel):
                             continue
                         del queue[i]
                         return message
                 else:
-                    for i, message in enumerate(self._chatQueues[-1]):  # type: i, ChatMessage
+                    for i, message in enumerate(self._chatQueues[-1]):
                         if message.channel.channel in self._lowQueueRecent:
                             continue
                         if not self._isMod(message.channel):
@@ -711,7 +733,7 @@ class MessagingQueue:
                         return message
             if isModSpamGood and self._chatQueues[-1]:
                 for channel in self._lowQueueRecent:
-                    for i, message in enumerate(self._chatQueues[-1]):  # type: i, ChatMessage
+                    for i, message in enumerate(self._chatQueues[-1]):
                         if message.channel.channel != channel:
                             continue
                         if not self._isMod(message.channel):
@@ -734,12 +756,15 @@ class MessagingQueue:
 
     def clearChat(self, channel: Channel) -> None:
         with self._queueLock:
-            for queue in self._chatQueues:  # type: List[ChatMessage]
-                for message in queue[:]:  # type: ChatMessage
+            queue: List[ChatMessage]
+            message: ChatMessage
+            for queue in self._chatQueues:
+                for message in queue[:]:
                     if message.channel.channel == channel.channel:
                         queue.remove(message)
 
     def clearAllChat(self) -> None:
         with self._queueLock:
-            for queue in self._chatQueues:  # type: List[ChatMessage]
+            queue: List[ChatMessage]
+            for queue in self._chatQueues:
                 queue.clear()
