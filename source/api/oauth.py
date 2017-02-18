@@ -7,8 +7,9 @@ def token(broadcaster: str, *,
     if not isinstance(broadcaster, str):
         raise TypeError()
     if database is None:
-        with factory.getDatabase() as database:  # type: DatabaseBase
-            return token(broadcaster, database=database)
+        db: DatabaseBase
+        with factory.getDatabase() as db:
+            return token(broadcaster, database=db)
     if not isinstance(database, DatabaseBase):
         raise TypeError()
     return database.getOAuthToken(broadcaster)

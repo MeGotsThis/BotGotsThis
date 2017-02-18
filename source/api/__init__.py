@@ -21,15 +21,19 @@ def cache(key: str,
         @wraps(func)
         def data(*args, **kwargs) -> Any:
             if key not in bot.globals.globalSessionData:
-                _ = defaultdict(lambda: (datetime.min, default))  # type: defaultdict
-                bot.globals.globalSessionData[key] = _
+                d: defaultdict = defaultdict(lambda: (datetime.min, default))
+                bot.globals.globalSessionData[key] = d
 
-            kargs = args, tuple(kwargs.items())  # type: _ArgsKey
-            lastTime, value = bot.globals.globalSessionData[key][kargs]  # type: datetime, Any
+            lastTime: datetime
+            value: Any
+            kargs: _ArgsKey
+            kargs = args, tuple(kwargs.items())
+            lastTime, value = bot.globals.globalSessionData[key][kargs]
             if utils.now() - lastTime >= duration:
                 with suppress(*excepts):
                     value = func(*args, **kwargs)
-                    bot.globals.globalSessionData[key][kargs] = utils.now(), value
+                    data: dict = bot.globals.globalSessionData[key]
+                    data[kargs] = utils.now(), value
             return value
         return data
     return decorator

@@ -1,21 +1,23 @@
 ﻿import json
 from http.client import HTTPResponse
-from typing import Dict, Optional
+from typing import BinaryIO, Dict, Optional, Union
 from urllib import request
 from urllib.error import HTTPError, URLError
 
 
 def getGlobalEmotes() -> Optional[Dict[str, str]]:
-    url = 'https://api.betterttv.net/2/emotes'
+    url: str = 'https://api.betterttv.net/2/emotes'
+    response: Union[HTTPResponse, BinaryIO]
     try:
         with request.urlopen(url) as response:
             if not isinstance(response, HTTPResponse):
                 raise TypeError()
             if response.status == 200:
-                responseData = response.read()  # type: bytes
-                bttvData = json.loads(responseData.decode())  # type: dict
-                emotes = {}  # type: Dict[str, str]
-                for emote in bttvData['emotes']:  # type: Dict[str, str]
+                responseData: bytes = response.read()
+                bttvData: dict = json.loads(responseData.decode())
+                emotes: Dict[str, str] = {}
+                emote: Dict[str, str]
+                for emote in bttvData['emotes']:
                     emotes[emote['id']] = emote['code']
                 return emotes
     except HTTPError as e:
@@ -27,16 +29,18 @@ def getGlobalEmotes() -> Optional[Dict[str, str]]:
 
 
 def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[str, str]]:
-    url = 'https://api.betterttv.net/2/channels/' + broadcaster
+    url: str = 'https://api.betterttv.net/2/channels/' + broadcaster
+    response: Union[HTTPResponse, BinaryIO]
     try:
         with request.urlopen(url) as response:
             if not isinstance(response, HTTPResponse):
                 raise TypeError()
             if response.status == 200:
-                responseData = response.read()  # type: bytes
-                bttvData = json.loads(responseData.decode())  # type: dict
-                emotes = {}  # type: Dict[str, str]
-                for emote in bttvData['emotes']:  # type: Dict[str, str]
+                responseData: bytes = response.read()
+                bttvData: dict = json.loads(responseData.decode())
+                emotes: Dict[str, str] = {}
+                emote: Dict[str, str]
+                for emote in bttvData['emotes']:
                     emotes[emote['id']] = emote['code']
                 return emotes
     except HTTPError as e:
