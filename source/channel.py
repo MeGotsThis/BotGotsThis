@@ -20,13 +20,14 @@ def parse(chat: 'botData.Channel',
     if len(rawMessage) == 0:
         return
     
-    message = Message(rawMessage)  # type: Message
+    message: Message = Message(rawMessage)
     if len(message) == 0:
         return
     
-    name = '{channel}-{command}-{time}'.format(
-        channel=chat.channel, command=message.command, time=time.time())  # type: str
-    params = chat, tags, nick, message, timestamp  # type: tuple
+    name: str = '{channel}-{command}-{time}'.format(
+        channel=chat.channel, command=message.command, time=time.time())
+    params: tuple
+    params = chat, tags, nick, message, timestamp
     threading.Thread(target=chatCommand, args=params, name=name).start()
     
 
@@ -35,6 +36,11 @@ def chatCommand(chat: 'botData.Channel',
                 nick: str,
                 message: Message,
                 timestamp: datetime) -> None:
+    permitted: bool
+    manager: bool
+    permissions: ChatPermissionSet
+    arguments: data.ChatCommandArgs
+    command: data.ChatCommand
     try:
         if tags is not None:
             if 'room-id' in tags:
@@ -42,14 +48,15 @@ def chatCommand(chat: 'botData.Channel',
             if 'user-id' in tags:
                 utils.saveTwitchId(nick, str(tags['user-id']), timestamp)
         with factory.getDatabase() as database:
-            permitted = database.isPermittedUser(chat.channel, nick)  # type: bool
-            manager = database.isBotManager(nick)  # type: bool
-            permissions = ChatPermissionSet(tags, nick, chat, permitted, manager)  # type: ChatPermissionSet
+            permitted = database.isPermittedUser(chat.channel, nick)
+            manager = database.isBotManager(nick)
+            permissions = ChatPermissionSet(tags, nick, chat, permitted,
+                                            manager)
 
             arguments = data.ChatCommandArgs(
                 database, chat, tags, nick, message, permissions,
-                timestamp)  # type: data.ChatCommandArgs
-            for command in commandsToProcess(message.command):  # type: argument.ChatCommand
+                timestamp)
+            for command in commandsToProcess(message.command):
                 if command(arguments):
                     return
     except:

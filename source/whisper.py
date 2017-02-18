@@ -19,13 +19,14 @@ def parse(tags: IrcMessageTagsReadOnly,
     if len(rawMessage) == 0:
         return
     
-    message = Message(rawMessage)
+    message: Message = Message(rawMessage)
     if len(message) == 0:
         return
     
-    name = '{nick}-{command}-{time}'.format(
-        nick=nick, command=message.command, time=time.time())  # type: str
-    params = tags, nick, message, timestamp  # type: tuple
+    name: str = '{nick}-{command}-{time}'.format(
+        nick=nick, command=message.command, time=time.time())
+    params: tuple
+    params = tags, nick, message, timestamp
     threading.Thread(target=whisperCommand, args=params, name=name).start()
     
 
@@ -33,14 +34,18 @@ def whisperCommand(tags: IrcMessageTagsReadOnly,
                    nick: str,
                    message: Message,
                    timestamp: datetime) -> None:
+    manager: bool
+    permissions: WhisperPermissionSet
+    arguments: data.WhisperCommandArgs
+    command: data.WhisperCommand
     try:
         with factory.getDatabase() as database:
-            manager = database.isBotManager(nick)  # type: bool
-            permissions = WhisperPermissionSet(tags, nick, manager)  # type: WhisperPermissionSet
+            manager = database.isBotManager(nick)
+            permissions = WhisperPermissionSet(tags, nick, manager)
 
-            arguments = data.WhisperCommandArgs(
-                database, nick, message, permissions, timestamp)  # type: data.WhisperCommandArgs
-            for command in commandsToProcess(message.command):  # type: data.WhisperCommand
+            arguments = data.WhisperCommandArgs(database, nick, message,
+                                                permissions, timestamp)
+            for command in commandsToProcess(message.command):
                 if command(arguments):
                     return
     except:
