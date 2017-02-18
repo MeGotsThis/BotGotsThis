@@ -12,11 +12,11 @@ from source.public.channel import textformat
 from source.public.channel import wall
 from typing import Callable, List, Mapping, Optional
 
-filterMessage = [
+filterMessage: List[data.ChatCommand] = [
     block_url.filterNoUrlForBots
-    ]  # type: List[data.ChatCommand]
+    ]
 
-commands = {
+commands: Mapping[str, Optional[data.ChatCommand]] = {
     '!exit': owner.commandExit,
     '!managebot': owner.commandManageBot,
     '!reload': reload.commandReload,
@@ -94,12 +94,12 @@ commands = {
     '!come': broadcaster.commandCome,
     '!autojoin': broadcaster.commandAutoJoin,
     '!uptime': broadcaster.commandUptime,
-    }  # type: Mapping[str, Optional[data.ChatCommand]]
-commandsStartWith = {
+    }
+commandsStartWith: Mapping[str, Optional[data.ChatCommand]] = {
     '!pyramid-': pyramid.commandPyramidLong,
     '!wall-': wall.commandWallLong,
     '!autorepeat-': repeat.commandAutoRepeat,
     '!settimeoutlevel-': broadcaster.commandSetTimeoutLevel,
-    }  # type: Mapping[str, Optional[data.ChatCommand]]
+    }
 
-processNoCommand = [custom.customCommands]  # type: List[data.ChatCommand]
+processNoCommand: List[data.ChatCommand] = [custom.customCommands]

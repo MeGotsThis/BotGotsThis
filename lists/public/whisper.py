@@ -2,7 +2,7 @@
 from source.public.whisper import broadcaster, feature, owner, reload
 from typing import Mapping, Optional
 
-commands = {
+commands: Mapping[str, Optional[data.WhisperCommand]] = {
     '!hello': owner.commandHello,
     '!exit': owner.commandExit,
     '!say': owner.commandSay,
@@ -19,4 +19,4 @@ commands = {
     '!come': broadcaster.commandCome,
     '!autojoin': broadcaster.commandAutoJoin,
     '!feature': feature.commandFeature,
-    }  # type: Mapping[str, Optional[data.WhisperCommand]]
+    }

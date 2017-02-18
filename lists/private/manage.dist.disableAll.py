@@ -1,8 +1,8 @@
 ﻿from source.data import ManageBotCommand
-from typing import Callable, Mapping, Optional
+from typing import Mapping, Optional
 
-methods = {
+methods: Mapping[str, Optional[ManageBotCommand]] = {
     'listchats': None,
     'autojoin': None,
     'banned': None,
-    }  # type: Mapping[str, Optional[ManageBotCommand]]
+    }

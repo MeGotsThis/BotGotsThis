@@ -1,11 +1,11 @@
 ﻿from source.data import ChatCommand
 from typing import List, Mapping, Optional
 
-disableFilters = True  # type: bool
-disableCustomMessage = True  # type: bool
+disableFilters: bool = True
+disableCustomMessage: bool = True
 
-filterMessage = []  # type: List[ChatCommand]
-commands = {
+filterMessage: List[ChatCommand] = []
+commands: Mapping[str, Optional[ChatCommand]] = {
     '!exit': None,
     '!managebot': None,
     '!reload': None,
@@ -40,11 +40,11 @@ commands = {
     '!come': None,
     '!autojoin': None,
     '!uptime': None,
-    }  # type: Mapping[str, Optional[ChatCommand]
-commandsStartWith = {
+    }
+commandsStartWith: Mapping[str, Optional[ChatCommand]] = {
     '!pyramid-': None,
     '!wall-': None,
     '!autorepeat-': None,
-    }  # type: Mapping[str, Optional[ChatCommand]]
-noCommandPreCustom = []  # type: List[ChatCommand]
-noCommandPostCustom = []  # type: List[ChatCommand]
+    }
+noCommandPreCustom: List[ChatCommand] = []
+noCommandPostCustom: List[ChatCommand] = []

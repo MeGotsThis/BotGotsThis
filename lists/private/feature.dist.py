@@ -1,3 +1,3 @@
 from typing import Mapping, Optional
 
-features = {}  # type: Mapping[str, Optional[str]]
+features: Mapping[str, Optional[str]] = {}

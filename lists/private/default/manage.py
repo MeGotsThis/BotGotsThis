@@ -1,4 +1,4 @@
 from source.data import ManageBotCommand
-from typing import Callable, Mapping, Optional
+from typing import Mapping
 
-methods = {}  # type: Mapping[str, ManageBotCommand]
+methods: Mapping[str, ManageBotCommand] = {}

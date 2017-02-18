@@ -1,9 +1,9 @@
 ﻿from typing import Mapping, Optional
 
-features = {
+features: Mapping[str, Optional[str]] = {
     'textconvert': None,
     'modpyramid': None,
     'modwall': None,
     'nocustom': None,
     'nourlredirect': None,
-    }  # type: Mapping[str, Optional[str]]
+    }

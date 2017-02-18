@@ -9,4 +9,4 @@ except ImportError:
 
 MethodDict = Mapping[str, Optional[data.ManageBotCommand]]
 
-methods = ChainMap(privateList.methods, publicList.methods)  # type: MethodDict
+methods: MethodDict = ChainMap(privateList.methods, publicList.methods)

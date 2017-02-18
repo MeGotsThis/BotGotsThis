@@ -1,4 +1,4 @@
 from source.data import WhisperCommand
-from typing import Callable, Mapping, Optional
+from typing import Mapping, Optional
 
-commands = {}  # type: Mapping[str, Optional[WhisperCommand]]
+commands: Mapping[str, Optional[WhisperCommand]] = {}

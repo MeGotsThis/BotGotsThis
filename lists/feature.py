@@ -8,4 +8,5 @@ except ImportError:
 
 FeatureDict = Mapping[str, Optional[str]]
 
-features = ChainMap(privateFeature.features, publicFeature.features)  # type: FeatureDict
+features: FeatureDict
+features = ChainMap(privateFeature.features, publicFeature.features)
