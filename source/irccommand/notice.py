@@ -1,9 +1,9 @@
 ﻿from bot import data
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from bot.data.error import LoginUnsuccessful
-from typing import Optional
+from typing import List, Optional
 
-invalidLogin = [
+invalidLogin: List[str] = [
     'Login unsuccessful',
     'Error logging in',
 
@@ -22,7 +22,7 @@ def parse(tags: Optional[IrcMessageTagsReadOnly],
             and isinstance(chat, data.Channel)
             and 'msg-id' in tags
             and isinstance(tags['msg-id'], str)):
-        msgId = tags['msg-id']  # type: str
+        msgId: str = tags['msg-id']
         if msgId in ['msg_duplicate', 'msg_ratelimit']:
             chat.isMod = False
         if msgId in ['msg_banned', 'msg_timedout']:

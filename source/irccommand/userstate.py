@@ -18,7 +18,7 @@ def parse(channel: 'data.Channel',
         channel.isMod = bool(int(tags['mod'])) or bot.globals.isGlobalMod
         channel.isSubscriber = bool(int(tags['subscriber']))
 
-    emoteset = [int(i) for i in str(tags['emote-sets']).split(',')]  # List[int]
+    emoteset: List[int] = [int(i) for i in str(tags['emote-sets']).split(',')]
     # This is to remove twitch turbo emotes that are shared with
     # global emoticons
     if 33 in emoteset:
