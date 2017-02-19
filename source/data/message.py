@@ -5,8 +5,8 @@ class Tokenized(Sequence[str]):
     def __init__(self, string: str) -> None:
         if not isinstance(string, str):
             raise TypeError('message needs to be a str')
-        self._string = string  # type: str
-        self._tokens = self._string.split()  # type: List[str]
+        self._string: str = string
+        self._tokens: List[str] = self._string.split()
 
     def __eq__(self, other:object) -> bool:
         if isinstance(other, Tokenized):
@@ -78,8 +78,8 @@ class Tokenized(Sequence[str]):
 class Message(Tokenized):
     def __init__(self, message: str) -> None:
         super().__init__(message)
-        self._query = None  # type: str
-        self._lower = None  # type: Tokenized
+        self._query: str = None
+        self._lower: Tokenized = None
     
     @property
     def command(self) -> str:

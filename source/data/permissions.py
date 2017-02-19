@@ -1,13 +1,13 @@
 import bot.config
 # from bot import data  -- https://github.com/python/mypy/issues/1701
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from typing import Any, Optional
+from typing import Any, Optional, Set
 
 
-typeTwitchStaff = {'staff'}
-typeTwitchAdmin = {'staff', 'admin'}
-typeGlobalModerator = {'staff', 'admin', 'global_mod'}
-typeModerator = {'staff', 'admin', 'global_mod', 'mod'}
+typeTwitchStaff: Set[str] = {'staff'}
+typeTwitchAdmin: Set[str] = {'staff', 'admin'}
+typeGlobalModerator: Set[str] = {'staff', 'admin', 'global_mod'}
+typeModerator: Set[str] = {'staff', 'admin', 'global_mod', 'mod'}
 
 
 class ChatPermissionSet:
@@ -17,38 +17,38 @@ class ChatPermissionSet:
                  channel: Any,
                  permitted: bool,
                  manager: bool) -> None:
-        userType = None  # type: str
+        userType: str
         if tags is not None and 'user-type' in tags:
             userType = str(tags['user-type'])
         else:
             userType = ''
-        self._tags = tags  # type: Optional[IrcMessageTagsReadOnly]
-        self._userType = userType  # type: str
-        self._user = user  # type: str
-        self._channel = channel
-        self._isOwner = None  # type: bool
-        self._isManager = manager  # type: bool
-        self._inOwnerChannel = None  # type: bool
-        self._isTwitchStaff = None  # type: bool
-        self._isTwitchAdmin = None  # type: bool
-        self._isGlobalMod = None  # type: bool
-        self._isBroadcaster = None  # type: bool
-        self._isModerator = None  # type: bool
-        self._isSubscriber = None  # type: bool
-        self._permitted = permitted  # type: bool
-        self._bannable = None  # type: bool
+        self._tags: Optional[IrcMessageTagsReadOnly] = tags
+        self._userType: str = userType
+        self._user: str = user
+        self._channel: Any = channel
+        self._isOwner: bool
+        self._isManager: bool = manager
+        self._inOwnerChannel: bool
+        self._isTwitchStaff: bool
+        self._isTwitchAdmin: bool
+        self._isGlobalMod: bool
+        self._isBroadcaster: bool
+        self._isModerator: bool
+        self._isSubscriber: bool
+        self._permitted: bool = permitted
+        self._bannable: bool
 
     @property
     def owner(self) -> bool:
-        if self._isOwner is None:
+        if not hasattr(self, '_isOwner'):
             self._isOwner = self._user == bot.config.owner
         return self._isOwner
     
     @property
     def inOwnerChannel(self) -> bool:
-        if self._inOwnerChannel is None:
-            inOwner = self._channel.channel == bot.config.owner  # type: bool
-            inBot = self._channel.channel == bot.config.botnick  # type: bool
+        if not hasattr(self, '_inOwnerChannel'):
+            inOwner: bool = self._channel.channel == bot.config.owner
+            inBot: bool = self._channel.channel == bot.config.botnick
             self._inOwnerChannel = inOwner or inBot
         return self._inOwnerChannel
 
@@ -58,43 +58,43 @@ class ChatPermissionSet:
 
     @property
     def twitchStaff(self) -> bool:
-        if self._isTwitchStaff is None:
+        if not hasattr(self, '_isTwitchStaff'):
             self._isTwitchStaff = self._userType in typeTwitchStaff
             self._isTwitchStaff = self.manager or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
     def twitchAdmin(self) -> bool:
-        if self._isTwitchAdmin is None:
+        if not hasattr(self, '_isTwitchAdmin'):
             self._isTwitchAdmin = self._userType in typeTwitchAdmin
             self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
     
     @property
     def globalModerator(self) -> bool:
-        if self._isGlobalMod is None:
+        if not hasattr(self, '_isGlobalMod'):
             self._isGlobalMod = self._userType in typeGlobalModerator
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod
     
     @property
     def broadcaster(self) -> bool:
-        if self._isBroadcaster is None:
+        if not hasattr(self, '_isBroadcaster'):
             self._isBroadcaster = self._channel.channel == self._user
             self._isBroadcaster = self.globalModerator or self._isBroadcaster
         return self._isBroadcaster
     
     @property
     def moderator(self) -> bool:
-        if self._isModerator is None:
+        if not hasattr(self, '_isModerator'):
             self._isModerator = self._userType in typeModerator
             self._isModerator = self.broadcaster or self._isModerator
         return self._isModerator
 
     @property
     def subscriber(self) -> bool:
-        if self._isSubscriber is None:
-            subscriber = None  # type: int
+        if not hasattr(self, '_isSubscriber'):
+            subscriber: int
             if self._tags is not None and 'subscriber' in self._tags:
                 subscriber = int(self._tags['subscriber'])
             else:
@@ -108,7 +108,7 @@ class ChatPermissionSet:
 
     @property
     def bannable(self) -> bool:
-        if self._bannable is None:
+        if not hasattr(self, '_bannable'):
             self._bannable = (self._userType not in typeModerator
                               and self._channel.channel != self._user)
         return self._bannable
@@ -152,24 +152,24 @@ class WhisperPermissionSet:
                  tags: IrcMessageTagsReadOnly,
                  user: str,
                  manager: bool) -> None:
-        userType = None  # type: str
+        userType: str
         if 'user-type' in tags:
             userType = str(tags['user-type'])
         else:
             userType = ''
-        self._tags = tags  # type: IrcMessageTagsReadOnly
-        self._userType = userType  # type: str
-        self._user = user  # type: str
-        self._isOwner = None  # type: bool
-        self._isManager = manager  # type: bool
-        self._isTwitchStaff = None  # type: bool
-        self._isTwitchAdmin = None  # type: bool
-        self._isGlobalMod = None  # type: bool
-        self._isTurbo = None  # type: bool
+        self._tags: IrcMessageTagsReadOnly = tags
+        self._userType: str = userType
+        self._user: str = user
+        self._isOwner: bool
+        self._isManager: bool = manager
+        self._isTwitchStaff: bool
+        self._isTwitchAdmin: bool
+        self._isGlobalMod: bool
+        self._isTurbo: bool
     
     @property
     def owner(self) -> bool:
-        if self._isOwner is None:
+        if not hasattr(self, '_isOwner'):
             self._isOwner = self._user == bot.config.owner
         return self._isOwner
 
@@ -179,21 +179,21 @@ class WhisperPermissionSet:
 
     @property
     def twitchStaff(self) -> bool:
-        if self._isTwitchStaff is None:
+        if not hasattr(self, '_isTwitchStaff'):
             self._isTwitchStaff = self._userType in typeTwitchStaff
             self._isTwitchStaff = self.manager or self._isTwitchStaff
         return self._isTwitchStaff
     
     @property
     def twitchAdmin(self) -> bool:
-        if self._isTwitchAdmin is None:
+        if not hasattr(self, '_isTwitchAdmin'):
             self._isTwitchAdmin = self._userType in typeTwitchAdmin
             self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
     
     @property
     def globalModerator(self) -> bool:
-        if self._isGlobalMod is None:
+        if not hasattr(self, '_isGlobalMod'):
             self._isGlobalMod = self._userType in typeGlobalModerator
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod

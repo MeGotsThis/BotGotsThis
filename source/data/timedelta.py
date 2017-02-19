@@ -1,25 +1,26 @@
 ﻿from datetime import timedelta
+from typing import List
 
 
 def format(timeDelta: timedelta) -> str:
     if not isinstance(timeDelta, timedelta):
         raise TypeError()
-    formatted = []
+    formatted: List[str] = []
     if timeDelta.days == 1:
         formatted.append('1 day')
     elif timeDelta.days > 1:
         formatted.append('{days} days'.format(days=timeDelta.days))
-    hours = timeDelta.seconds // 3600
+    hours: int = timeDelta.seconds // 3600
     if hours == 1:
         formatted.append('1 hour')
     elif hours > 1:
         formatted.append('{hours} hours'.format(hours=hours))
-    minutes = timeDelta.seconds // 60 % 60
+    minutes: int = timeDelta.seconds // 60 % 60
     if minutes == 1:
         formatted.append('1 minute')
     elif minutes > 1:
         formatted.append('{minutes} minutes'.format(minutes=minutes))
-    seconds = timeDelta.seconds % 60
+    seconds: int = timeDelta.seconds % 60
     if seconds == 1:
         formatted.append('1 second')
     elif seconds > 1:

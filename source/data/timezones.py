@@ -6,12 +6,13 @@ import configparser
 import os
 import sqlite3
 
-Transition = NamedTuple('Transition',
-                        [('start', int),  # in unix timestamp
-                         ('abbreviation', str),
-                         ('offset', int)])  # in seconds
+class Transition(NamedTuple):
+    start: int  # in unix timestamp
+    abbreviation: str
+    offset: int  # in seconds
 
-ZERO = timedelta(0)
+
+ZERO: timedelta = timedelta(0)
 
 
 class BaseTimeZone(tzinfo, metaclass=ABCMeta):
@@ -31,8 +32,8 @@ class BasicTimeZone(BaseTimeZone):
             raise TypeError()
         if not isinstance(name, str):
             raise TypeError()
-        self.__offset = timedelta(minutes=offset)  # type: timedelta
-        self.__name = name  # type: str
+        self.__offset: timedelta = timedelta(minutes=offset)
+        self.__name: str = name
     
     def zone(self) -> str:
         return self.__name
@@ -60,8 +61,8 @@ class TimeZone(BaseTimeZone):
             raise TypeError()
         if not transitions:
             raise ValueError()
-        self.__zone = zone  # type: str
-        self._transitions = transitions  # type: Sequence[Transition]
+        self.__zone: str = zone
+        self._transitions: Sequence[Transition] = transitions
     
     def zone(self) -> str:
         return self.__zone
@@ -71,9 +72,11 @@ class TimeZone(BaseTimeZone):
             return self._transitions[0].abbreviation
         if not isinstance(dt, datetime):
             raise TypeError()
-        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
-        transistion = self._transitions[0]  # type: Transition
-        for t in self._transitions[::-1]:  # type: Transition
+        unixTime: int
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
+        transistion: Transition = self._transitions[0]
+        t: Transition
+        for t in self._transitions[::-1]:
             if unixTime >= t.start:
                 transistion = t
                 break
@@ -84,9 +87,11 @@ class TimeZone(BaseTimeZone):
             return timedelta(minutes=self._transitions[0].offset // 60)
         if not isinstance(dt, datetime):
             raise TypeError()
-        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
-        transistion = self._transitions[0]  # type: Transition
-        for t in self._transitions[::-1]:  # type: Transition
+        unixTime: int
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
+        transistion: Transition = self._transitions[0]
+        t: Transition
+        for t in self._transitions[::-1]:
             if unixTime >= t.start:
                 transistion = t
                 break
@@ -97,19 +102,21 @@ class TimeZone(BaseTimeZone):
             return ZERO
         if not isinstance(dt, datetime):
             raise TypeError()
-        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())  # type: int
-        transistion = self._transitions[0]  # type: Transition
-        for t in self._transitions[::-1]:  # type: Transition
+        unixTime: int
+        unixTime = int((dt.replace(tzinfo=None) - unixEpoch).total_seconds())
+        transistion: Transition = self._transitions[0]
+        t: Transition
+        for t in self._transitions[::-1]:
             if unixTime >= t.start:
                 transistion = t
                 break
-        delta = transistion.offset - self._transitions[0].offset  # type: int
+        delta: int = transistion.offset - self._transitions[0].offset
         return timedelta(minutes=delta // 60)
 
-utc = BasicTimeZone(0, 'UTC')
-unixEpoch = datetime(1970, 1, 1, 0, 0, 0, 0)
+utc: BasicTimeZone = BasicTimeZone(0, 'UTC')
+unixEpoch: datetime = datetime(1970, 1, 1, 0, 0, 0, 0)
 
-timezones = [
+timezones: List[BaseTimeZone] = [
     utc,
     BasicTimeZone(0, 'UTC±00:00'),
     BasicTimeZone(0, 'UTC+00:00'),
@@ -192,11 +199,12 @@ timezones = [
     BasicTimeZone(-600, 'UTC-10'),
     BasicTimeZone(-660, 'UTC-11'),
     BasicTimeZone(-720, 'UTC-12'),
-    ]  # type: List[BaseTimeZone]
+    ]
 
 if os.path.isfile('config.ini'):
-    _ini = configparser.ConfigParser()
+    _ini: configparser.ConfigParser = configparser.ConfigParser()
     _ini.read('config.ini')
+    _cursor: sqlite3.Cursor
     with sqlite3.connect(
         _ini['TIMEZONEDB']['timezonedb'], detect_types=True) as _connection, \
             closing(_connection.cursor()) as _cursor:
@@ -214,10 +222,11 @@ UNION ALL SELECT abbreviation, gmt_offset FROM timezone
         # I have choosen: America/Chicago, America/Boa_Vista,
         # America/Puerto_Rico, Asia/Muscat, Asia/Jerusalem, Asia/Seoul,
         #  Europe/London
+        _row: tuple
         for _row in _cursor:
             timezones.append(BasicTimeZone(_row[1] // 60, _row[0]))
-        _zones = {}  # type: Dict[int, str]
-        _transitions = {}  # type: Dict[int, List[Transition]]
+        _zones: Dict[int, str] = {}
+        _transitions: Dict[int, List[Transition]] = {}
         _cursor.execute('SELECT zone_id, zone_name FROM zone ORDER BY zone_id')
         for _row in _cursor:
             _zones[_row[0]] = _row[1]
@@ -227,10 +236,12 @@ UNION ALL SELECT abbreviation, gmt_offset FROM timezone
                         'ORDER BY zone_id, time_start')
         for _row in _cursor:
             _transitions[_row[0]].append(Transition(_row[2], _row[1], _row[3]))
+        _z: int
         for _z in _zones:
             timezones.append(TimeZone(_zones[_z], _transitions[_z]))
     del _ini, _connection, _cursor, _row, _z, _zones, _transitions
 
+abbreviations: Dict[str, BaseTimeZone]
 abbreviations = {tz.zone().lower(): tz for tz in timezones}
 
 del closing, configparser, os, sqlite3, tzinfo
