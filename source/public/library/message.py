@@ -6,12 +6,12 @@ from typing import Generator, Iterable, Optional
 def messagesFromItems(items:Iterable[str],
                       prepend:Optional[str]=None) -> Generator[str, None, None]:
     prepend = prepend or ''
-    limit = bot.config.messageLimit - len(prepend)
-    queue = deque(items)  # type: deque
-    itemsMsg = deque()  # type: deque
-    length = 0  # type: int
+    limit: int = bot.config.messageLimit - len(prepend)
+    queue: deque = deque(items)
+    itemsMsg: deque= deque()
+    length: int = 0
     while queue:
-        item = queue.popleft()  # type: str
+        item: str = queue.popleft()
         itemsMsg.append(item)
         if length:
             length += 2

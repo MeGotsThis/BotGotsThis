@@ -11,9 +11,10 @@ def manage_bot(database: DatabaseBase,
                send: Send,
                nick: str,
                message: Message) -> bool:
-    argument = ManageBotArgs(database, permissions, send, nick, message)  # type: ManageBotArgs
+    argument: ManageBotArgs
+    argument = ManageBotArgs(database, permissions, send, nick, message)
     
-    method = message.lower[1]  # type: str
+    method: str = message.lower[1]
     if (method in lists.manage.methods
             and lists.manage.methods[method] is not None):
         return lists.manage.methods[method](argument)

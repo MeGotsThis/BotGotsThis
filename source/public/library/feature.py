@@ -4,26 +4,26 @@ from ...data import Send
 from ...data.message import Message
 from ...database import DatabaseBase
 
-enable = {
+enable: Set[str] = {
     '',
     'enable',
     'yes',
     '1',
-    }  # type: Set[str]
-disable = {
+    }
+disable: Set[str] = {
     'disable',
     'no',
     '0',
-    }  # type: Set[str]
+    }
 
 
 def feature(database: DatabaseBase,
             channel: str,
             message: Message,
             send: Send) -> bool:
-    action = message.lower[2] if len(message) >= 3 else ''  # type: str
+    action: str = message.lower[2] if len(message) >= 3 else ''
 
-    feature_ = message.lower[1]
+    feature_: str = message.lower[1]
     if (feature_ not in lists.feature.features
             or lists.feature.features[feature_] is None):
         send('Unrecognized feature: ' + feature_)
@@ -34,8 +34,7 @@ def feature(database: DatabaseBase,
     if action in disable:
         return feature_remove(database, channel, feature_, send)
 
-    msg = 'Unrecognized second parameter: ' + action  # type: str
-    send(msg)
+    send('Unrecognized second parameter: ' + action)
     return True
 
 
@@ -43,12 +42,13 @@ def feature_add(database: DatabaseBase,
                 channel: str,
                 feature_: str,
                 send: Send) -> bool:
-    hasFeature = database.hasFeature(channel, feature_)  # type: bool
+    hasFeature: bool = database.hasFeature(channel, feature_)
     if not hasFeature:
         database.addFeature(channel, feature_)
 
+    msg: str
     if hasFeature:
-        msg = 'The feature {feature} has already been enabled in {channel}'  # type: str
+        msg = 'The feature {feature} has already been enabled in {channel}'
     else:
         msg = 'The feature {feature} has been enabled in {channel}'
     send(msg.format(feature=lists.feature.features[feature_], channel=channel))
@@ -59,12 +59,13 @@ def feature_remove(database: DatabaseBase,
                    channel: str,
                    feature_: str,
                    send: Send) -> bool:
-    hasFeature = database.hasFeature(channel, feature_)  # type: bool
+    hasFeature: bool = database.hasFeature(channel, feature_)
     if hasFeature:
         database.removeFeature(channel, feature_)
 
+    msg: str
     if hasFeature:
-        msg = 'The feature {feature} has been disabled in {channel}'  # type: str
+        msg = 'The feature {feature} has been disabled in {channel}'
     else:
         msg = 'The feature {feature} was not enabled in {channel}'
     send(msg.format(feature=lists.feature.features[feature_], channel=channel))

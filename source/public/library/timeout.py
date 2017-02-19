@@ -3,7 +3,7 @@ from bot import data, utils
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timedelta
-from typing import Dict, Iterable, Iterator, Mapping, List, Optional, Tuple
+from typing import Dict, Iterable, Mapping, List, Optional
 from typing import Union
 from ...database import DatabaseBase
 
@@ -15,31 +15,36 @@ def timeout_user(database: DatabaseBase,
                  base_level: int=0,
                  message: Optional[str]=None,
                  reason: Optional[str]=None):
-    properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2']  # type: List[str]
+    properties: List[str]
+    defaults: Dict[str, int]
+    chatProp: Mapping[str, int]
+    timeouts: List[int]
+    properties = ['timeoutLength0', 'timeoutLength1', 'timeoutLength2']
     defaults = {'timeoutLength0': bot.config.moderatorDefaultTimeout[0],
                 'timeoutLength1': bot.config.moderatorDefaultTimeout[1],
                 'timeoutLength2': bot.config.moderatorDefaultTimeout[2],
-                }  # type: Dict[str, int]
+                }
     chatProp = database.getChatProperties(chat.channel, properties, defaults,
-                                          int)  # type: Mapping[str, int]
-    timeouts = (chatProp['timeoutLength0'],
+                                          int)
+    timeouts = [chatProp['timeoutLength0'],
                 chatProp['timeoutLength1'],
-                chatProp['timeoutLength2'],)  # type: Tuple[int, ...]
+                chatProp['timeoutLength2'],]
     
     if 'timeouts' not in chat.sessionData:
         chat.sessionData['timeouts'] = defaultdict(
             lambda: defaultdict(
                 lambda: (datetime.min, 0)))
     
-    timestamp = utils.now()  # type: datetime
-    duration = timedelta(seconds=bot.config.warningDuration)  # type: timedelta
+    timestamp: datetime = utils.now()
+    duration: timedelta = timedelta(seconds=bot.config.warningDuration)
+    level: int
     if timestamp - chat.sessionData['timeouts'][module][user][0] >= duration:
-        level = min(max(base_level, 0), 2)  # type: int
+        level = min(max(base_level, 0), 2)
     else:
-        prevLevel = chat.sessionData['timeouts'][module][user][1]  # type: int
+        prevLevel: int = chat.sessionData['timeouts'][module][user][1]
         level = min(max(base_level + 1, prevLevel + 1, 0), 2)
     chat.sessionData['timeouts'][module][user] = timestamp, level
-    length = timeouts[level]  # type: int
+    length: int = timeouts[level]
     if length:
         chat.send(
             '.timeout {user} {length} {reason}'.format(
@@ -59,11 +64,16 @@ def record_timeout(database: DatabaseBase,
                    module: str):
     if isinstance(messages, str):
         messages = messages,
-    for message in messages:  # type: str
-        who, length = None, None  # type: Optional[str], Optional[Union[int, bool]]
-        reason = None  # type: Optional[str]
+    message: str
+    for message in messages:
+        who: Optional[str]
+        length: Optional[Union[int, bool]]
+        reason: Optional[str]
+        parts: List[str]
+        who, length = None, None
+        reason = None
         if message.startswith(('.ban', '/ban')):
-            parts = message.split(None, 2)  # type: List[str]
+            parts = message.split(None, 2)
             if len(parts) >= 2:
                 who, length = parts[1], 0
             if len(parts) >= 3:

@@ -1,15 +1,15 @@
 import lists.custom
 from typing import Dict, Iterable, List, Optional
 from ...data import ChatCommandArgs, CustomFieldArgs, CustomCommand
-from ...data import CommandActionTokens, CustomCommandProcess
-from ...data import CustomFieldParts, CustomProcessArgs
+from ...data import CommandActionTokens, CustomCommandField
+from ...data import CustomCommandProcess, CustomFieldParts, CustomProcessArgs
 from ...data.message import Message
 from ...data.permissions import ChatPermissionSet
 from ...database import DatabaseBase
 from ..library import textformat
 
 
-permissions = {
+permissions: Dict[Optional[str], str] = {
     None: '',
     '': '',
     'any': '',
@@ -38,20 +38,25 @@ permissions = {
     'bot': 'owner',
     }
 
-permissionsOrder = ['', 'permitted', 'subscriber', 'moderator', 'broadcaster',
-                    'globalMod', 'admin', 'staff', 'manager', 'owner']  # type: List[str]
+permissionsOrder: List[str] = [
+    '', 'permitted', 'subscriber', 'moderator', 'broadcaster', 'globalMod',
+    'admin', 'staff', 'manager', 'owner']
 
 
 def get_command(database: DatabaseBase,
                 command: str,
                 channel: str,
                 permissions: ChatPermissionSet) -> Optional[CustomCommand]:
-    commands = database.getChatCommands(channel, command)  # type: Dict[str, Dict[str, str]]
-    for permission in reversed(permissionsOrder):  # type: str
+    commands: Dict[str, Dict[str, str]]
+    commands = database.getChatCommands(channel, command)
+    permission: str
+    broadcaster: str
+    message: str
+    for permission in reversed(permissionsOrder):
         if not permission or permissions[permission]:
-            for broadcaster in [channel, '#global']:  # type: str
+            for broadcaster in [channel, '#global']:
                 if permission in commands[broadcaster]:
-                    message = commands[broadcaster][permission]  # type: str
+                    message = commands[broadcaster][permission]
                     return CustomCommand(message, broadcaster, permission)
     return None
 
@@ -59,18 +64,19 @@ def get_command(database: DatabaseBase,
 def create_messages(command: CustomCommand,
                     args: ChatCommandArgs) -> List[str]:
     textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
-    messageParts = []  # type: List[str]
+    messageParts: List[str] = []
     try:
-        for parts in split_message(command.message):  # type: CustomFieldParts
+        parts: CustomFieldParts
+        for parts in split_message(command.message):
             messageParts.append(parts.plainText)
             try:
                 if parts.field is not None:
-                    fieldArgument = CustomFieldArgs(
+                    fieldArgument: CustomFieldArgs = CustomFieldArgs(
                         parts.field, parts.param, parts.prefix,
                         parts.suffix, parts.default, args.message,
                         args.chat.channel, args.nick, args.permissions,
-                        args.timestamp)  # type: CustomFieldArgs
-                    string = convert_field(fieldArgument)  # type: Optional[str]
+                        args.timestamp)
+                    string: Optional[str] = convert_field(fieldArgument)
                     if string is not None:
                         string = format(string, parts.format, textFormat)
                     else:
@@ -80,21 +86,23 @@ def create_messages(command: CustomCommand,
                 messageParts.append(parts.original)
     except ValueError:
         return [str(command.message)]
-    messages = [''.join(messageParts)]  # type: List[str]
-    processArgument = CustomProcessArgs(
+    messages: List[str] = [''.join(messageParts)]
+    processArgument: CustomProcessArgs = CustomProcessArgs(
         args.database, args.chat, args.tags, args.nick, args.permissions,
         command.broadcaster, command.level, args.message.command,
-        messages)  # type: CustomProcessArgs
-    for process in lists.custom.postProcess:  # type: CustomCommandProcess
+        messages)
+    process: CustomCommandProcess
+    for process in lists.custom.postProcess:
         process(processArgument)
     return messages
 
 
-def parse_action_message(message: Message, broadcaster: str) -> Optional[CommandActionTokens]:
+def parse_action_message(message: Message,
+                         broadcaster: str) -> Optional[CommandActionTokens]:
     try:
         action = message.lower[1]
         i = 2
-        level = None  # type: Optional[str]
+        level: Optional[str] = None
         if message[2].startswith('level='):
             i = 3
             level = message.lower[2][len('level='):]
@@ -112,14 +120,14 @@ def parse_action_message(message: Message, broadcaster: str) -> Optional[Command
 
 def split_message(message: str) -> Iterable[CustomFieldParts]:
     # Format: {field:format<prefix>suffix@param!default}
-    parsed = []  # type: List[CustomFieldParts]
-    i = 0  # type: int
-    length = len(message)  # type: int
+    parsed: List[CustomFieldParts] = []
+    i: int = 0
+    length: int = len(message)
     
     while True:
-        noFormat = []  # type: List[str]
+        noFormat: List[str] = []
         while i < length:
-            char = message[i]  # type: str
+            char: str = message[i]
             i += 1
             
             if char == '}':
@@ -143,12 +151,12 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                                      None, None, None))
             break
         
-        s = i  # type: int
+        s: int = i
         i += 1
         if i == length:
             raise ValueError()
         
-        field = []  # type: List[str]
+        field: List[str] = []
         while True:
             if i == length:
                 raise ValueError()
@@ -194,7 +202,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                     break
             field.append(char)
 
-        format = None  # type: Optional[List[str]]
+        format: Optional[List[str]] = None
         if char == ':':
             format = []
             while True:
@@ -237,7 +245,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                         break
                 format.append(char)
 
-        prefix = None  # type: Optional[List[str]]
+        prefix: Optional[List[str]] = None
         if char == '<':
             prefix = []
             while True:
@@ -275,7 +283,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                         break
                 prefix.append(char)
 
-        suffix = None  # type: Optional[List[str]]
+        suffix: Optional[List[str]] = None
         if char == '>':
             suffix = []
             while True:
@@ -308,7 +316,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                         break
                 suffix.append(char)
 
-        param = None  # type: Optional[List[str]]
+        param: Optional[List[str]] = None
         if char == '@':
             param = []
             while True:
@@ -336,7 +344,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                         break
                 param.append(char)
 
-        default = None  # type: Optional[List[str]]
+        default: Optional[List[str]] = None
         if char == '!':
             default = []
             while True:
@@ -362,7 +370,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
         if char != '}':
             raise ValueError()
         i += 1
-        original = message[s:i]
+        original: str = message[s:i]
         
         parsed.append(
             CustomFieldParts(
@@ -379,8 +387,9 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
 
 
 def convert_field(args: CustomFieldArgs) -> Optional[str]:
-    for convert in lists.custom.fields:  # type: CustomCommandField
-        result = convert(args)  # type: Optional[str]
+    convert: CustomCommandField
+    for convert in lists.custom.fields:
+        result: Optional[str] = convert(args)
         if result is not None:
             return result
     return None

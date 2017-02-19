@@ -83,7 +83,9 @@ def permission_feature(*levelFeatures: Tuple[str, str]):
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            for level, featureKey in levelFeatures:  # type: str, str
+            level: str
+            featureKey: str
+            for level, featureKey in levelFeatures:
                 hasPermission = level is None or args.permissions[level]
                 hasFeature = (featureKey is None
                               or args.database.hasFeature(args.chat.channel,
@@ -102,7 +104,9 @@ def permission_not_feature(*levelFeatures: Tuple[str, str]):
         @wraps(func)
         def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            for level, featureKey in levelFeatures:  # type: str, str
+            level: str
+            featureKey: str
+            for level, featureKey in levelFeatures:
                 hasPermission = level is None or args.permissions[level]
                 hasFeature = (featureKey is None
                               or not args.database.hasFeature(
@@ -149,7 +153,8 @@ def in_user_cooldown(args: data.ChatCommandArgs,
     if key not in args.chat.sessionData:
         args.chat.sessionData[key] = defaultdict(lambda: datetime.min)
     if level is None or not args.permissions[level]:
-        since = args.timestamp - args.chat.sessionData[key][args.nick]  # type: timedelta
+        since: timedelta
+        since = args.timestamp - args.chat.sessionData[key][args.nick]
         if since < cooldown:
             return True
     args.chat.sessionData[key][args.nick] = args.timestamp

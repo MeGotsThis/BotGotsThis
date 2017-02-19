@@ -14,15 +14,15 @@ def join(database: DatabaseBase,
     if database.isChannelBannedReason(channel):
         send('Chat ' + channel + ' is banned from joining')
         return True
-    priority = database.getAutoJoinsPriority(channel)  # type: Union[int, float]
+    priority: Union[int, float] = database.getAutoJoinsPriority(channel)
 
-    cluster = twitch.chat_server(channel)  # type: Optional[str]
+    cluster: Optional[str] = twitch.chat_server(channel)
     if cluster not in bot.globals.clusters:
         send('Unknown chat server for ' + channel)
     elif utils.joinChannel(channel, priority, cluster):
         send('Joining ' + channel)
     else:
-        result = utils.ensureServer(channel, priority, cluster)  # type: int
+        result: int = utils.ensureServer(channel, priority, cluster)
         if result == utils.ENSURE_CORRECT:
             send('Already joined ' + channel)
         elif result == utils.ENSURE_REJOIN:
@@ -46,8 +46,8 @@ def say(database: DatabaseBase,
         channel: str,
         message: str) -> bool:
     if channel in bot.globals.channels:
-        timeout.record_timeout(
-            database, bot.globals.channels[channel], nick, message, None, 'say')
+        timeout.record_timeout(database, bot.globals.channels[channel], nick,
+                               message, None, 'say')
         bot.globals.channels[channel].send(message)
         return True
     return False
