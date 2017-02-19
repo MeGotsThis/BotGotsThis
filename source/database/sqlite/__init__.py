@@ -14,29 +14,31 @@ class SQLiteDatabase(DatabaseBase):
                  ini: Mapping[str, str],
                  **kwargs) -> None:
         super().__init__(ini, **kwargs)
-        self._engine = 'SQLite'  # type: str
-        self._dbfile = ini['file']  # type: str
-        self._oauthfile = ini['oauth']  # type: str
-        self._timeoutlogfile = ini['timeoutlog']  # type: str
+        self._engine: str = 'SQLite'
+        self._dbfile: str = ini['file']
+        self._oauthfile: str = ini['oauth']
+        self._timeoutlogfile: str = ini['timeoutlog']
 
     def connect(self) -> None:
-        self._connection = sqlite3.connect(
+        self._connection: sqlite3.Connection = sqlite3.connect(
             database=self._dbfile,
             detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES,
-            )  # type: sqlite3.Connection
+            )
         self._connection.execute('PRAGMA foreign_keys = ON')
 
     def getAutoJoinsChats(self) -> Iterable[AutoJoinChannel]:
-        query = '''
-SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             yield from map(lambda r: AutoJoinChannel(*r), cursor.execute(query))
     
     def getAutoJoinsPriority(self, broadcaster: str) -> Union[int, float]:
-        query = '''SELECT priority FROM auto_join WHERE broadcaster=?'''  # type: str
+        query: str = '''SELECT priority FROM auto_join WHERE broadcaster=?'''
+        cursor: sqlite3.Cursor
         with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster,))
-            autoJoinRow = cursor.fetchone()  # type: Optional[Tuple[int]]
+            autoJoinRow: Optional[Tuple[int]] = cursor.fetchone()
             if autoJoinRow is not None:
                 return int(autoJoinRow[0])
             else:
@@ -46,9 +48,10 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC'''  #
                      broadcaster: str,
                      priority: Union[int, float]=0,
                      cluster: str='aws') -> bool:
-        query = '''
-INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             try:
                 cursor.execute(query, (broadcaster, priority, cluster))
                 self.connection.commit()
@@ -57,8 +60,9 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''  # ty
                 return False
     
     def discardAutoJoin(self, broadcaster: str) -> bool:
-        query = '''DELETE FROM auto_join WHERE broadcaster=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''DELETE FROM auto_join WHERE broadcaster=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster,))
             self.connection.commit()
             return cursor.rowcount != 0
@@ -66,8 +70,9 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''  # ty
     def setAutoJoinPriority(self,
                             broadcaster: str,
                             priority: Union[int, float]) -> bool:
-        query = '''UPDATE auto_join SET priority=? WHERE broadcaster=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''UPDATE auto_join SET priority=? WHERE broadcaster=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (priority, broadcaster))
             self.connection.commit()
             return cursor.rowcount != 0
@@ -75,8 +80,9 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''  # ty
     def setAutoJoinServer(self,
                           broadcaster: str,
                           cluster: str = 'aws') -> bool:
-        query = '''UPDATE auto_join SET cluster=? WHERE broadcaster=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''UPDATE auto_join SET cluster=? WHERE broadcaster=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (cluster, broadcaster))
             self.connection.commit()
             return cursor.rowcount != 0
@@ -88,45 +94,50 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)'''  # ty
             pass
 
     def getOAuthToken(self, broadcaster:str) -> Optional[str]:
-        query = '''SELECT token FROM oauth.oauth_tokens WHERE broadcaster=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = 'SELECT token FROM oauth.oauth_tokens WHERE broadcaster=?'
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             self._attachOauth(cursor)
             cursor.execute(query, (broadcaster,))
-            token = cursor.fetchone()  # type: Optional[Tuple[str]]
-            return token and token[0]  # type: ignore
+            token: Optional[Tuple[str]] = cursor.fetchone()
+            return token and token[0]
 
     def saveBroadcasterToken(self,
                              broadcaster: str,
                              token: str) -> None:
-        query = '''
-REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             self._attachOauth(cursor)
             cursor.execute(query, (broadcaster, token))
             self.connection.commit()
     
     def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
-        query = '''
+        query: str = '''
 SELECT DISTINCT twitchGame
     FROM game_abbreviations
     WHERE abbreviation=?
         OR twitchGame=?
-    ORDER BY twitchGame=? DESC'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    ORDER BY twitchGame=? DESC'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (abbreviation, abbreviation, abbreviation,))
-            game = cursor.fetchone()  # type: Optional[Tuple[str]]
-            return game and game[0]  # type: ignore
+            game: Optional[Tuple[str]] = cursor.fetchone()
+            return game and game[0]
 
     def getChatCommands(self,
                         broadcaster: str,
                         command: str) -> Dict[str, Dict[str, str]]:
-        query = '''
+        query: str = '''
 SELECT broadcaster, permission, fullMessage
-    FROM custom_commands WHERE broadcaster IN (?, \'#global\') AND command=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            commands = {broadcaster: {}, '#global': {}}  # type: Dict[str, Dict[str, str]]
-            for row in cursor.execute(
-                    query, (broadcaster, command)):  # type: Optional[CommandTuple]
+    FROM custom_commands WHERE broadcaster IN (?, \'#global\') AND command=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
+            commands: Dict[str, Dict[str, str]]
+            commands = {broadcaster: {}, '#global': {}}
+            row: Optional[CommandTuple]
+            for row in cursor.execute(query, (broadcaster, command)):
                 commands[row[0]][row[1]] = row[2]
             cursor.close()
             return commands
@@ -135,13 +146,14 @@ SELECT broadcaster, permission, fullMessage
                          broadcaster: str,
                          permission: str,
                          command: str) -> Optional[str]:
-        find = '''
+        find: str = '''
 SELECT fullMessage FROM custom_commands
-    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(find, (broadcaster, permission, command.lower()))
-            row = cursor.fetchone()  # type: Optional[Tuple[str]]
-            return row and row[0]  # type: ignore
+            row: Optional[Tuple[str]] = cursor.fetchone()
+            return row and row[0]
 
     def insertCustomCommand(self,
                             broadcaster: str,
@@ -149,20 +161,23 @@ SELECT fullMessage FROM custom_commands
                             command: str,
                             fullMessage: str,
                             user: str) -> bool:
-        query = '''
+        query: str = '''
 INSERT INTO custom_commands
     (broadcaster, permission, command, commandDisplay, fullMessage, creator,
     created, lastEditor, lastUpdated)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''  # type: str
-        history = '''
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''
+        history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             try:
-                lower = command.lower()
-                display = None if lower == command else command  # type: Optional[str]
+                lower: str = command.lower()
+                display: Optional[str] = None
+                if lower != command:
+                    display = command
                 cursor.execute(query, (broadcaster, permission, lower, display,
                                        fullMessage, user, user))
             except sqlite3.IntegrityError:
@@ -179,18 +194,21 @@ INSERT INTO custom_commands_history
                             command: str,
                             fullMessage: str,
                             user: str) -> bool:
-        query = '''
+        query: str = '''
 UPDATE custom_commands
     SET commandDisplay=?, fullMessage=?, lastEditor=?,
         lastUpdated=CURRENT_TIMESTAMP
-    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
-        history = '''
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            display = None if command.lower() == command else command  # type: Optional[str]
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
+            display: Optional[str] = None
+            if command.lower() != command:
+                display = command
             cursor.execute(query, (display, fullMessage, user, broadcaster,
                                    permission, command.lower()))
             self.connection.commit()
@@ -208,18 +226,21 @@ INSERT INTO custom_commands_history
                              command: str,
                              fullMessage: str,
                              user: str):
-        query = '''
+        query: str = '''
 REPLACE INTO custom_commands
     (broadcaster, permission, command, commandDisplay, fullMessage, creator,
     created, lastEditor, lastUpdated)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''  # type: str
-        history = '''
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''
+        history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            display = None if command.lower() == command else command  # type: Optional[str]
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
+            display: Optional[str] = None
+            if command.lower() != command:
+                display = command
             cursor.execute(query, (broadcaster, permission, command.lower(),
                                    display, fullMessage, user, user))
             self.connection.commit()
@@ -237,26 +258,29 @@ INSERT INTO custom_commands_history
                             command: str,
                             message: str,
                             user: str):
-        find = '''
+        find: str = '''
 SELECT fullMessage FROM custom_commands
-    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
-        query = '''
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        query: str = '''
 UPDATE custom_commands
     SET fullMessage=?, lastEditor=?, lastUpdated=CURRENT_TIMESTAMP
-    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
-        history = '''
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(find, (broadcaster, permission, command.lower()))
-            original = cursor.fetchone()  # type: Optional[Tuple[str]]
+            original: Optional[Tuple[str]] = cursor.fetchone()
             if original is None:
                 return False
-            fullMessage = original[0] + message  # type: str
+            fullMessage: str = original[0] + message
             
-            display = None if command.lower() == command else command  # type: Optional[str]
+            display: Optional[str] = None
+            if command.lower() != command:
+                display = command
             cursor.execute(query, (fullMessage, user, broadcaster, permission,
                                    command.lower()))
             self.connection.commit()
@@ -273,22 +297,25 @@ INSERT INTO custom_commands_history
                             permission: str,
                             command: str,
                             user: str):
-        query = '''
+        query: str = '''
 DELETE FROM custom_commands
-    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
-        history = '''
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, permission, command.lower()))
             
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
             
-            display = None if command.lower() == command else command  # type: Optional[str]
+            display: Optional[str] = None
+            if command.lower() != command:
+                display = command
             cursor.execute(history, (broadcaster, permission, command.lower(),
                                      display, 'delete', None, user))
             self.connection.commit()
@@ -300,15 +327,16 @@ INSERT INTO custom_commands_history
                            command: str,
                            user: str,
                            new_permission: str) -> bool:
-        query = '''
+        query: str = '''
 UPDATE custom_commands SET permission=?
-    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
-        history = '''
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             try:
                 cursor.execute(query, (new_permission, broadcaster, permission,
                                        command.lower()))
@@ -319,7 +347,9 @@ INSERT INTO custom_commands_history
             if cursor.rowcount == 0:
                 return False
 
-            display = None if command.lower() == command else command  # type: Optional[str]
+            display: Optional[str] = None
+            if command.lower() != command:
+                display = command
             cursor.execute(history, (broadcaster, new_permission,
                                      command.lower(), display, 'level',
                                      permission, user))
@@ -332,17 +362,19 @@ INSERT INTO custom_commands_history
                            command: str,
                            user: str,
                            new_command: str) -> bool:
-        query = '''
+        query: str = '''
 UPDATE custom_commands SET command=?, commandDisplay=?
-    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
-        history = '''
+    WHERE broadcaster=? AND permission=? AND command=?'''
+        history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            display = (None if new_command.lower() == new_command else
-                       new_command)  # type: Optional[str]
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
+            display: Optional[str] = None
+            if new_command.lower() != new_command:
+                display = new_command
             try:
                 cursor.execute(query, (new_command.lower(), display,
                                        broadcaster, permission,
@@ -366,14 +398,20 @@ INSERT INTO custom_commands_history
             permission: str,
             command: str,
             property: Optional[CommandProperty]=None) -> Optional[CommandReturn]:
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str
+        cursor: sqlite3.Cursor
+        p: str
+        v: str
+        params: tuple
+        values: Dict[str, str]
+        with closing(self.connection.cursor()) as cursor:
             if property is None:
                 query = '''
 SELECT property, value FROM custom_command_properties
-    WHERE broadcaster=? AND permission=? AND command=?'''  # type: str
-                values = {}  # type: Dict[str, str]
-                for p, v in cursor.execute(query, (broadcaster, permission,
-                                                   command.lower())):  # type: str, str
+    WHERE broadcaster=? AND permission=? AND command=?'''
+                values = {}
+                params = (broadcaster, permission, command.lower())
+                for p, v in cursor.execute(query, params):
                     values[p] = v
                 return values
             elif isinstance(property, list):
@@ -383,10 +421,10 @@ SELECT property, value FROM custom_command_properties
         AND property IN (%s)''' % ','.join('?' * len(property))
                 values = {}
                 params = (broadcaster, permission, command.lower(),
-                          ) + tuple(property) # type: tuple
-                for p, v in cursor.execute(query, params):  # type: str, str
+                                 ) + tuple(property)
+                for p, v in cursor.execute(query, params):
                     values[p] = v
-                for p in property:  # type: str
+                for p in property:
                     if p not in values:
                         values[p] = None
                 return values
@@ -396,8 +434,8 @@ SELECT value FROM custom_command_properties
     WHERE broadcaster=? AND permission=? AND command=? AND property=?'''
                 cursor.execute(query, (broadcaster, permission,
                                        command.lower(), property))
-                row = cursor.fetchone()  # type: Optional[Tuple[str]]
-                return row and row[0]  # type: ignore
+                row: Optional[Tuple[str]] = cursor.fetchone()
+                return row and row[0]
 
     def processCustomCommandProperty(self,
                                      broadcaster: str,
@@ -405,12 +443,14 @@ SELECT value FROM custom_command_properties
                                      command: str,
                                      property: str,
                                      value: Optional[str]=None) -> bool:
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             try:
                 if value is None:
                     query = '''
 DELETE FROM custom_command_properties
-    WHERE broadcaster=? AND permission=? AND command=? AND property=?'''  # type: str
+    WHERE broadcaster=? AND permission=? AND command=? AND property=?'''
                     cursor.execute(query, (broadcaster, permission,
                                            command.lower(), property))
                 else:
@@ -428,18 +468,20 @@ REPLACE INTO custom_command_properties
     def hasFeature(self,
                    broadcaster: str,
                    feature: str) -> bool:
-        query = '''
-SELECT 1 FROM chat_features WHERE broadcaster=? AND feature=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+SELECT 1 FROM chat_features WHERE broadcaster=? AND feature=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, feature))
             return cursor.fetchone() is not None
 
     def addFeature(self,
                    broadcaster: str,
                    feature: str) -> bool:
-        query = '''
-INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             try:
                 cursor.execute(query, (broadcaster, feature))
                 self.connection.commit()
@@ -450,40 +492,45 @@ INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)'''  # type: str
     def removeFeature(self,
                       broadcaster: str,
                       feature: str) -> bool:
-        query = '''
-DELETE FROM chat_features WHERE broadcaster=? AND feature=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+DELETE FROM chat_features WHERE broadcaster=? AND feature=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, feature))
             self.connection.commit()
             return cursor.rowcount != 0
     
     def listBannedChannels(self) -> Iterable[str]:
-        query = '''SELECT broadcaster FROM banned_channels'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            for broadcaster, in cursor.execute(query): # type: str
+        query: str = '''SELECT broadcaster FROM banned_channels'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
+            broadcaster: str
+            for broadcaster, in cursor.execute(query):
                 yield broadcaster
 
     def isChannelBannedReason(self, broadcaster: str) -> Optional[str]:
-        query = '''
-SELECT reason FROM banned_channels WHERE broadcaster=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+SELECT reason FROM banned_channels WHERE broadcaster=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster,))
-            row = cursor.fetchone()  # type: Optional[Tuple[str]]
-            return row and row[0]  # type: ignore
+            row: Optional[Tuple[str]] = cursor.fetchone()
+            return row and row[0]
 
     def addBannedChannel(self,
                          broadcaster: str,
                          reason: str,
                          nick: str) -> bool:
-        query = '''
+        query: str = '''
 INSERT INTO banned_channels 
     (broadcaster, currentTime, reason, who)
-    VALUES (?, CURRENT_TIMESTAMP, ?, ?)'''  # type: str
-        history = '''
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?)'''
+        history: str = '''
 INSERT INTO banned_channels_log
     (broadcaster, currentTime, reason, who, actionLog) 
-    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             try:
                 cursor.execute(query, (broadcaster, reason, nick))
                 self.connection.commit()
@@ -498,13 +545,14 @@ INSERT INTO banned_channels_log
                             broadcaster: str,
                             reason: str,
                             nick: str) -> bool:
-        query = '''
-DELETE FROM banned_channels WHERE broadcaster=?'''  # type: str
-        history = '''
+        query: str = '''
+DELETE FROM banned_channels WHERE broadcaster=?'''
+        history: str = '''
 INSERT INTO banned_channels_log
     (broadcaster, currentTime, reason, who, actionLog) 
-    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster,))
             self.connection.commit()
             if cursor.rowcount == 0:
@@ -530,11 +578,12 @@ INSERT INTO banned_channels_log
                       length: Optional[int],
                       message: Optional[str],
                       reason: Optional[str]) -> bool:
-        query = '''
+        query: str = '''
 INSERT INTO timeout.timeout_logs 
     (broadcaster, twitchUser, fromUser, module, level, length, message, reason)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             self._attachTimeout(cursor)
             try:
                 cursor.execute(query, (broadcaster, user, fromUser, module,
@@ -549,11 +598,12 @@ INSERT INTO timeout.timeout_logs
                         property: str,
                         default: Any=None,
                         parse: Optional[Callable[[str], Any]]=None) -> Any:
-        query = '''
-SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, property,))
-            row = cursor.fetchone()  # type: Optional[Tuple[str]]
+            row: Optional[Tuple[str]] = cursor.fetchone()
             if row is None:
                 return default
             if parse is not None:
@@ -565,18 +615,19 @@ SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''  # type:
                           properties: Sequence[str],
                           default: Any=None,
                           parse: Any=None) -> Mapping[str, Any]:
-        query = '''
+        query: str = '''
 SELECT property, value FROM chat_properties
     WHERE broadcaster=? AND property IN (%s)
-''' % ','.join('?' * len(properties))  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            values = {}  # type: Dict[str, Any]
+''' % ','.join('?' * len(properties))
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
+            values: Dict[str, Any] = {}
             params = (broadcaster,) + tuple(properties)
             for property, value in cursor.execute(query, params):
                 if isinstance(parse, dict) and property in parse:
                     value = parse[property](value)
                 if isinstance(parse, Callable):  # type: ignore
-                    value = parse(value)  # type: ignore
+                    value = parse(value)
                 values[property] = value
             for property in properties:
                 if property not in values:
@@ -594,11 +645,14 @@ SELECT property, value FROM chat_properties
                         broadcaster: str,
                         property: str,
                         value: Optional[str]=None) -> bool:
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
+            query: str
+            params: tuple
             if value is None:
                 query = '''
-DELETE FROM chat_properties WHERE broadcaster=? AND property=?'''  # type: str
-                params = broadcaster, property,  # type: tuple
+DELETE FROM chat_properties WHERE broadcaster=? AND property=?'''
+                params = broadcaster, property,
             else:
                 query = '''
 REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)'''
@@ -610,9 +664,10 @@ REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)'''
     def isPermittedUser(self,
                         broadcaster: str,
                         user: str) -> bool:
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            query = '''
-SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''  # type: str
+        query: str = '''
+SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, user,))
             return bool(cursor.fetchone())
 
@@ -620,13 +675,14 @@ SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''  # type: s
                          broadcaster: str,
                          user: str,
                          moderator: str) -> bool:
-        query = '''
-INSERT INTO permitted_users (broadcaster, twitchUser) VALUES (?, ?)'''  # type: str
-        history = '''
+        query: str = '''
+INSERT INTO permitted_users (broadcaster, twitchUser) VALUES (?, ?)'''
+        history: str = '''
 INSERT INTO permitted_users_log
     (broadcaster, twitchUser, moderator, created, actionLog)
-    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             try:
                 cursor.execute(query, (broadcaster, user))
                 self.connection.commit()
@@ -641,13 +697,14 @@ INSERT INTO permitted_users_log
                             broadcaster: str,
                             user: str,
                             moderator: str) -> bool:
-        query = '''
-DELETE FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''  # type: str
-        history = '''
+        query: str = '''
+DELETE FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''
+        history: str = '''
 INSERT INTO permitted_users_log
     (broadcaster, twitchUser, moderator, created, actionLog)
-    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, user))
             self.connection.commit()
             if cursor.rowcount == 0:
@@ -658,19 +715,21 @@ INSERT INTO permitted_users_log
             return True
 
     def isBotManager(self, user: str) -> bool:
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            query = '''SELECT 1 FROM bot_managers WHERE twitchUser=?'''  # type: str
+        query: str = '''SELECT 1 FROM bot_managers WHERE twitchUser=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (user,))
             return bool(cursor.fetchone())
 
     def addBotManager(self, user: str) -> bool:
-        query = '''
-INSERT INTO bot_managers (twitchUser) VALUES (?)'''  # type: str
-        history = '''
+        query: str = '''
+INSERT INTO bot_managers (twitchUser) VALUES (?)'''
+        history: str = '''
 INSERT INTO bot_managers_log
     (twitchUser, created, actionLog)
-    VALUES (?, CURRENT_TIMESTAMP, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, CURRENT_TIMESTAMP, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             try:
                 cursor.execute(query, (user,))
                 self.connection.commit()
@@ -682,13 +741,14 @@ INSERT INTO bot_managers_log
             return True
 
     def removeBotManager(self, user: str) -> bool:
-        query = '''
-DELETE FROM bot_managers WHERE twitchUser=?'''  # type: str
-        history = '''
+        query: str = '''
+DELETE FROM bot_managers WHERE twitchUser=?'''
+        history: str = '''
 INSERT INTO bot_managers_log
     (twitchUser, created, actionLog)
-    VALUES (?, CURRENT_TIMESTAMP, ?)'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    VALUES (?, CURRENT_TIMESTAMP, ?)'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (user,))
             self.connection.commit()
             if cursor.rowcount == 0:
@@ -699,26 +759,35 @@ INSERT INTO bot_managers_log
             return True
 
     def getAutoRepeatToSend(self) -> Iterable[AutoRepeatMessage]:
-        query = '''
+        query: str = '''
 SELECT broadcaster, name, message FROM auto_repeat
     WHERE datetime(lastSent, '+' || duration || ' minutes')
-        <= CURRENT_TIMESTAMP'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        <= CURRENT_TIMESTAMP'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             for broadcaster, name, message in cursor.execute(query):
                 yield AutoRepeatMessage(broadcaster, name, message)
 
     def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatList]:
-        query = '''
+        query: str = '''
 SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
-    WHERE broadcaster=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
-            for row in cursor.execute(query, (broadcaster,)):  # type: tuple
-                name, message, count, duration, last = row  # type: str, str, Optional[int], float, datetime
+    WHERE broadcaster=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
+            row: tuple
+            for row in cursor.execute(query, (broadcaster,)):
+                name: str
+                message: str
+                count: Optional[int]
+                duration: float
+                last: datetime
+                name, message, count, duration, last = row
                 yield AutoRepeatList(name, message, count, duration, last)
 
     def clearAutoRepeat(self, broadcaster: str) -> bool:
-        query = '''DELETE FROM auto_repeat WHERE broadcaster=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''DELETE FROM auto_repeat WHERE broadcaster=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster,))
             self.connection.commit()
             return cursor.rowcount != 0
@@ -726,16 +795,17 @@ SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
     def sentAutoRepeat(self,
                        broadcaster: str,
                        name: str) -> bool:
-        query = '''
+        query: str = '''
 UPDATE auto_repeat SET numLeft=numLeft-1, lastSent=CURRENT_TIMESTAMP
-    WHERE broadcaster=? AND name=?'''  # type: str
-        delete = '''
+    WHERE broadcaster=? AND name=?'''
+        delete: str = '''
 DELETE FROM auto_repeat
-    WHERE broadcaster=? AND name=? AND numLeft IS NOT NULL AND numLeft<=0'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+    WHERE broadcaster=? AND name=? AND numLeft IS NOT NULL AND numLeft<=0'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, name))
             self.connection.commit()
-            ret = cursor.rowcount != 0  # type: bool
+            ret: bool = cursor.rowcount != 0
             cursor.execute(delete, (broadcaster, name))
             self.connection.commit()
             return ret
@@ -746,10 +816,11 @@ DELETE FROM auto_repeat
                       message: str,
                       count: Optional[int],
                       minutes: float) -> bool:
-        query = '''
+        query: str = '''
 REPLACE INTO auto_repeat (broadcaster, name, message, duration, lastSent)
-VALUES (?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+VALUES (?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, name, message, minutes,
                                    minutes))
             self.connection.commit()
@@ -758,9 +829,10 @@ VALUES (?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''  # type: str
     def removeAutoRepeat(self,
                          broadcaster: str,
                          name: str) -> bool:
-        query = '''
-DELETE FROM auto_repeat WHERE broadcaster=? AND name=?'''  # type: str
-        with closing(self.connection.cursor()) as cursor:  # type: sqlite3.Cursor
+        query: str = '''
+DELETE FROM auto_repeat WHERE broadcaster=? AND name=?'''
+        cursor: sqlite3.Cursor
+        with closing(self.connection.cursor()) as cursor:
             cursor.execute(query, (broadcaster, name))
             self.connection.commit()
             return cursor.rowcount != 0

@@ -3,20 +3,26 @@ from datetime import datetime
 from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
 from typing import Sequence, Union, overload
 
-AutoJoinChannel = NamedTuple('AutoJoinChannel',
-                             [('broadcaster', str),
-                              ('priority', Union[int, float]),
-                              ('cluster', str)])
-AutoRepeatMessage = NamedTuple('AutoRepeatMessage',
-                               [('broadcaster', str),
-                                ('name', str),
-                                ('message', str)])
-AutoRepeatList = NamedTuple('AutoRepeatList',
-                            [('name', str),
-                             ('message', str),
-                             ('count', Optional[int]),
-                             ('duration', float),
-                             ('last', datetime)])
+class AutoJoinChannel(NamedTuple):
+    broadcaster: str
+    priority: Union[int, float]
+    cluster: str
+
+
+class AutoRepeatMessage(NamedTuple):
+    broadcaster: str
+    name: str
+    message: str
+
+
+class AutoRepeatList(NamedTuple):
+    name: str
+    message: str
+    count: Optional[int]
+    duration: float
+    last: datetime
+
+
 CommandProperty = Union[str, Sequence[str]]
 CommandReturn = Union[str, Dict[str, str]]
 
@@ -98,12 +104,12 @@ class DatabaseBase(metaclass=ABCMeta):
                            command: str,
                            user: str,
                            new_command: str) -> bool: ...
-    def getCustomCommandProperty(
-            self,
-            broadcaster: str,
-            permission: str,
-            command: str,
-            property: Optional[CommandProperty]=None) -> Optional[CommandReturn]: ...
+    def getCustomCommandProperty(self,
+                                 broadcaster: str,
+                                 permission: str,
+                                 command: str,
+                                 property: Optional[CommandProperty]=None
+                                 ) -> Optional[CommandReturn]: ...
     def processCustomCommandProperty(self,
                                      broadcaster: str,
                                      permission: str,
@@ -148,13 +154,15 @@ class DatabaseBase(metaclass=ABCMeta):
                           broadcaster: str,
                           properties: Sequence[str],
                           default: Any=None,
-                          parse: Mapping[str, Any]=None) -> Mapping[str, Any]: ...
+                          parse: Mapping[str, Any]=None
+                          ) -> Mapping[str, Any]: ...
     @overload
     def getChatProperties(self,
                           broadcaster: str,
                           properties: Sequence[str],
                           default: Any,
-                          parse: Callable[[str], Any]) -> Mapping[str, Any]: ...
+                          parse: Callable[[str], Any]
+                          ) -> Mapping[str, Any]: ...
     def setChatProperty(self,
                         broadcaster: str,
                         property: str,

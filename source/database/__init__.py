@@ -3,20 +3,26 @@ from datetime import datetime
 from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
 from typing import Sequence, Union
 
-AutoJoinChannel = NamedTuple('AutoJoinChannel',
-                             [('broadcaster', str),
-                              ('priority', Union[int, float]),
-                              ('cluster', str)])
-AutoRepeatMessage = NamedTuple('AutoRepeatMessage',
-                               [('broadcaster', str),
-                                ('name', str),
-                                ('message', str)])
-AutoRepeatList = NamedTuple('AutoRepeatList',
-                            [('name', str),
-                             ('message', str),
-                             ('count', Optional[int]),
-                             ('duration', float),
-                             ('last', datetime)])
+class AutoJoinChannel(NamedTuple):
+    broadcaster: str
+    priority: Union[int, float]
+    cluster: str
+
+
+class AutoRepeatMessage(NamedTuple):
+    broadcaster: str
+    name: str
+    message: str
+
+
+class AutoRepeatList(NamedTuple):
+    name: str
+    message: str
+    count: Optional[int]
+    duration: float
+    last: datetime
+
+
 CommandProperty = Union[str, Sequence[str]]
 CommandReturn = Union[str, Dict[str, str]]
 
@@ -25,8 +31,8 @@ class DatabaseBase(metaclass=ABCMeta):
     def __init__(self,
                  ini: Mapping[str, str],
                  **kwargs) -> None:
-        self._engine = 'None'  # type: str
-        self._connection = None  # type: Any
+        self._engine: str
+        self._connection: Any
 
     @property
     def engine(self) -> str:
@@ -173,12 +179,12 @@ class DatabaseBase(metaclass=ABCMeta):
         return False
 
     @abstractmethod
-    def getCustomCommandProperty(
-            self,
-            broadcaster: str,
-            permission: str,
-            command: str,
-            property: Optional[CommandProperty]=None) -> Optional[CommandReturn]:
+    def getCustomCommandProperty(self,
+                                 broadcaster: str,
+                                 permission: str,
+                                 command: str,
+                                 property: Optional[CommandProperty]=None
+                                 ) -> Optional[CommandReturn]:
         if property is None:
             return {}
         elif isinstance(property, list):

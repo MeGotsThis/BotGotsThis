@@ -110,12 +110,12 @@ class DatabaseNone(DatabaseBase):
                            new_command: str) -> bool:
         return False
 
-    def getCustomCommandProperty(
-            self,
-            broadcaster: str,
-            permission: str,
-            command: str,
-            property: Optional[CommandProperty]=None) -> Optional[CommandReturn]:
+    def getCustomCommandProperty(self,
+                                 broadcaster: str,
+                                 permission: str,
+                                 command: str,
+                                 property: Optional[CommandProperty]=None
+                                 ) -> Optional[CommandReturn]:
         if property is None:
             return {}
         elif isinstance(property, list):

@@ -5,14 +5,14 @@ from .sqlite import SQLiteDatabase
 import configparser
 import os.path
 
-engines = {
+engines: Dict[str, Type[DatabaseBase]] = {
     'sqlite': SQLiteDatabase,
-    }  # type: Dict[str, Type[DatabaseBase]]
+    }
 
 
 def getDatabase() -> DatabaseBase:
     if os.path.isfile('config.ini'):
-        ini = configparser.ConfigParser()  # type: configparser.ConfigParser
+        ini: configparser.ConfigParser = configparser.ConfigParser()
         ini.read('config.ini')
         if ini['DATABASE']['engine'] in engines:
             return engines[ini['DATABASE']['engine']](ini['DATABASE'])
