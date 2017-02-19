@@ -4,7 +4,7 @@ import itertools
 import random
 from contextlib import suppress
 from datetime import timedelta
-from typing import Dict, List
+from typing import Dict, Iterator, List
 from ..library import chat, timeout
 from ..library.chat import min_args, permission_feature
 from ...data import ChatCommandArgs
@@ -13,7 +13,7 @@ from ...data import ChatCommandArgs
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)
 def commandPyramid(args: ChatCommandArgs) -> bool:
-    count = 5 if args.permissions.broadcaster else 3  # type: int
+    count: int = 5 if args.permissions.broadcaster else 3
     # If below generate a ValueError or IndexError,
     # only the above line gets used
     with suppress(ValueError, IndexError):
@@ -24,7 +24,7 @@ def commandPyramid(args: ChatCommandArgs) -> bool:
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)
 def commandPyramidLong(args: ChatCommandArgs) -> bool:
-    count = 5 if args.permissions.broadcaster else 3  # type: int
+    count: int = 5 if args.permissions.broadcaster else 3
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('pyramid-')[1])
     return process_pyramid(args, args.message.query, count)
@@ -36,16 +36,17 @@ def process_pyramid(args: ChatCommandArgs,
     count = min(count, (bot.config.messageLimit + 1) // (len(repetition) + 1))
     if not args.permissions.broadcaster:
         count = min(count, 5)
-        
-        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)  # type: timedelta
+
+        cooldown: timedelta
+        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)
         if chat.inCooldown(args, cooldown, 'modPyramid'):
             return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
-    messages = itertools.chain(
+    messages: Iterator[str] = itertools.chain(
         (' '.join((repetition,) * i) for i in range(1, count)),
         (' '.join((repetition,) * i) for i in range(count, 0, -1))
-        )  # type: itertools.chain[str]
+        )
     if args.permissions.chatModerator:
         timeout.record_timeout(
             args.database, args.chat, args.nick,
@@ -58,8 +59,8 @@ def process_pyramid(args: ChatCommandArgs,
 def commandRandomPyramid(args: ChatCommandArgs) -> bool:
     if not bot.globals.globalEmotes:
         return False
-    emotes = bot.globals.globalEmotes.copy()  # type: Dict[int, str]
-    count = 5 if args.permissions.broadcaster else 3  # type: int
+    emotes: Dict[int, str] = bot.globals.globalEmotes.copy()
+    count: int = 5 if args.permissions.broadcaster else 3
     # If below generate a ValueError or IndexError,
     # only the above line gets used
     with suppress(ValueError, IndexError):
@@ -67,21 +68,23 @@ def commandRandomPyramid(args: ChatCommandArgs) -> bool:
     rep = []
     if not args.permissions.broadcaster:
         count = min(count, 5)
-        
-        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)  # type: timedelta
+
+        cooldown: timedelta
+        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)
         if chat.inCooldown(args, cooldown, 'modPyramid'):
             return False
     elif not args.permissions.globalModerator:
         count = min(count, 20)
-    emoteIds = list(emotes.keys())  # type: List[int]
-    for i in range(count):  # type: int
+    emoteIds: List[int] = list(emotes.keys())
+    i: int
+    for i in range(count):
         rep.append(emotes[random.choice(emoteIds)])
         if len(' '.join(rep)) > bot.config.messageLimit:
             del rep[-1]
             count = len(rep)
             break
-    messages = itertools.chain(
+    messages: Iterator[str] = itertools.chain(
         (' '.join(rep[0:i]) for i in range(1, count)),
-        (' '.join(rep[0:i]) for i in range(count, 0, -1)))  # type: itertools.chain[str]
+        (' '.join(rep[0:i]) for i in range(count, 0, -1)))
     args.chat.send(messages, -1)
     return True

@@ -37,15 +37,16 @@ def process_wall(args: ChatCommandArgs,
                  rows: int) -> bool:
     if not args.permissions.broadcaster:
         rows = min(rows, 10)
-        
-        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)  # type: timedelta
+
+        cooldown: timedelta
+        cooldown = timedelta(seconds=bot.config.spamModeratorCooldown)
         if chat.inCooldown(args, cooldown, 'modWall'):
             return False
     elif not args.permissions.globalModerator:
         rows = min(rows, 500)
-    spacer = '' if args.permissions.chatModerator else ' \ufeff'  # type: str
-    messages = (repetition + ('' if i % 2 == 0 else spacer)
-                for i in range(rows))  # type: Iterator[str]
+    spacer: str = '' if args.permissions.chatModerator else ' \ufeff'
+    messages: Iterator[str] = (repetition + ('' if i % 2 == 0 else spacer)
+                               for i in range(rows))
     args.chat.send(messages, -1)
     if args.permissions.chatModerator:
         timeout.record_timeout(args.database, args.chat, args.nick, repetition,

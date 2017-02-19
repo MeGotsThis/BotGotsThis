@@ -14,31 +14,39 @@ def text_command(name: str, asciiTo: Callable[[str], str]) -> ChatCommand:
     command.__name__ = name
     return command
 
-commandFull = text_command('commandFull', textformat.to_full_width)  # type: ChatCommand
-commandParenthesized = text_command(
-    'commandParenthesized', textformat.to_parenthesized)  # type: ChatCommand
-commandCircled = text_command('commandCircled', textformat.to_circled)  # type: ChatCommand
-commandSmallCaps = text_command('commandSmallCaps', textformat.to_small_caps)  # type: ChatCommand
-commandUpsideDown = text_command(
-    'commandUpsideDown', textformat.to_upside_down)  # type: ChatCommand
-commandSerifBold = text_command('commandSerifBold', textformat.to_serif_bold)  # type: ChatCommand
-commandSerifItalic = text_command(
-    'commandSerifItalic', textformat.to_serif_italic)  # type: ChatCommand
-commandSerifBoldItalic = text_command(
-    'commandSerifBoldItalic', textformat.to_serif_bold_italic)  # type: ChatCommand
-commandSanSerif = text_command('commandSanSerif', textformat.to_sanserif)  # type: ChatCommand
-commandSanSerifBold = text_command(
-    'commandSanSerifBold', textformat.to_sanserif_bold)  # type: ChatCommand
-commandSanSerifItalic = text_command(
-    'commandSanSerifItalic', textformat.to_sanserif_italic)  # type: ChatCommand
-commandSanSerifBoldItalic = text_command(
-    'commandSanSerifBoldItalic', textformat.to_sanserif_bold_italic)  # type: ChatCommand
-commandScript = text_command('commandScript', textformat.to_script)  # type: ChatCommand
-commandScriptBold = text_command(
-    'commandScriptBold', textformat.to_script_bold)  # type: ChatCommand
-commandFraktur = text_command('commandFraktur', textformat.to_fraktur)  # type: ChatCommand
-commandFrakturBold = text_command(
-    'commandFrakturBold', textformat.to_fraktur_bold)  # type: ChatCommand
-commandMonospace = text_command('commandMonospace', textformat.to_monospace)  # type: ChatCommand
-commandDoubleStruck = text_command(
-    'commandDoubleStruck', textformat.to_double_struck)  # type: ChatCommand
+commandFull: ChatCommand = text_command(
+    'commandFull', textformat.to_full_width)
+commandParenthesized: ChatCommand = text_command(
+    'commandParenthesized', textformat.to_parenthesized)
+commandCircled: ChatCommand = text_command(
+    'commandCircled', textformat.to_circled)
+commandSmallCaps: ChatCommand = text_command(
+    'commandSmallCaps', textformat.to_small_caps)
+commandUpsideDown: ChatCommand = text_command(
+    'commandUpsideDown', textformat.to_upside_down)
+commandSerifBold: ChatCommand = text_command(
+    'commandSerifBold', textformat.to_serif_bold)
+commandSerifItalic: ChatCommand = text_command(
+    'commandSerifItalic', textformat.to_serif_italic)
+commandSerifBoldItalic: ChatCommand = text_command(
+    'commandSerifBoldItalic', textformat.to_serif_bold_italic)
+commandSanSerif: ChatCommand = text_command(
+    'commandSanSerif', textformat.to_sanserif)
+commandSanSerifBold: ChatCommand = text_command(
+    'commandSanSerifBold', textformat.to_sanserif_bold)
+commandSanSerifItalic: ChatCommand = text_command(
+    'commandSanSerifItalic', textformat.to_sanserif_italic)
+commandSanSerifBoldItalic: ChatCommand = text_command(
+    'commandSanSerifBoldItalic', textformat.to_sanserif_bold_italic)
+commandScript: ChatCommand = text_command(
+    'commandScript', textformat.to_script)
+commandScriptBold: ChatCommand = text_command(
+    'commandScriptBold', textformat.to_script_bold)
+commandFraktur: ChatCommand = text_command(
+    'commandFraktur', textformat.to_fraktur)
+commandFrakturBold: ChatCommand = text_command(
+    'commandFrakturBold', textformat.to_fraktur_bold)
+commandMonospace: ChatCommand = text_command(
+    'commandMonospace', textformat.to_monospace)
+commandDoubleStruck: ChatCommand = text_command(
+    'commandDoubleStruck', textformat.to_double_struck)

@@ -12,6 +12,7 @@ from ...data import ChatCommandArgs
 def commandStatus(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
+    msg: str
     if twitch.update(args.chat.channel, status=args.message.query):
         if args.message.query:
             msg = 'Channel Status set as: ' + args.message.query
@@ -28,7 +29,7 @@ def commandStatus(args: ChatCommandArgs) -> bool:
 def commandGame(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
-    game = args.message.query  # type: str
+    game: str = args.message.query
     game = args.database.getFullGameTitle(args.message.lower[1:]) or game
     game = game.replace('Pokemon', 'Pokémon').replace('Pokepark', 'Poképark')
     if twitch.update(args.chat.channel, game=game):
@@ -63,10 +64,12 @@ def commandRawGame(args: ChatCommandArgs) -> bool:
 def commandCommunity(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
-    community = None  # type: Optional[str]
+    community: Optional[str] = None
     if len(args.message) >= 2:
         community = args.message[1]
-    result = twitch.set_channel_community(args.chat.channel, community)  # type: Optional[bool]
+    result: Optional[bool]
+    result = twitch.set_channel_community(args.chat.channel, community)
+    msg: str
     if result is True:
         if community is not None:
             community = community.lower()
@@ -87,7 +90,7 @@ def commandCommunity(args: ChatCommandArgs) -> bool:
 @permission('chatModerator')
 @min_args(2)
 def commandPurge(args: ChatCommandArgs) -> bool:
-    reason = args.message[2:]  # type: str
+    reason: str = args.message[2:]
     args.chat.send(
         '.timeout {user} 1 {reason}'.format(
             user=args.message[1], reason=reason))
@@ -100,20 +103,19 @@ def commandPurge(args: ChatCommandArgs) -> bool:
 @permission('moderator')
 @min_args(2)
 def commandPermit(args: ChatCommandArgs) -> bool:
-    user = args.message.lower[1]  # type: str
+    user: str = args.message.lower[1]
+    msg: str
     if args.database.isPermittedUser(args.chat.channel, user):
         if args.database.removePermittedUser(args.chat.channel, user,
                                              args.nick):
-            args.chat.send(
-                '{mod} -> {user} is now unpermitted in {channel}'.format(
-                    mod=args.nick, user=user, channel=args.chat.channel))
+            msg = '{mod} -> {user} is now unpermitted in {channel}'
         else:
-            args.chat.send('{mod} -> Error'.format(mod=args.nick))
+            msg = '{mod} -> Error'
     else:
         if args.database.addPermittedUser(args.chat.channel, user, args.nick):
-            args.chat.send(
-                '{mod} -> {user} is now permitted in {channel}'.format(
-                    mod=args.nick, user=user, channel=args.chat.channel))
+            msg = '{mod} -> {user} is now unpermitted in {channel}'
         else:
-            args.chat.send('{mod} -> Error'.format(mod=args.nick))
+            msg = '{mod} -> Error'
+    args.chat.send(msg.format(mod=args.nick, user=user,
+                              channel=args.chat.channel))
     return True

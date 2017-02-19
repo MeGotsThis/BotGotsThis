@@ -13,7 +13,7 @@ def commandAutoRepeat(args: ChatCommandArgs) -> bool:
     !autorepeat off
     """
     
-    count = None  # type: Optional[int]
+    count: Optional[int] = None
     return process_auto_repeat(args, count)
 
 
@@ -25,7 +25,7 @@ def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
     !autorepeat-20 off
     """
     
-    count = 10  # type: Optional[int]
+    count: Optional[int] = 10
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('autorepeat-')[1])
     return process_auto_repeat(args, count)
@@ -34,11 +34,11 @@ def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
 @min_args(2)
 def process_auto_repeat(args: ChatCommandArgs,
                         count: Optional[int]) -> bool:
-    name = ''  # type: str
-    minutesDuration = 0  # type: float
-    message = None  # type: Optional[str]
+    name: str = ''
+    minutesDuration: float = 0
+    message: Optional[str] = None
 
-    secondArg = ''  # type: str
+    secondArg: str = ''
     if args.message.lower[1].startswith('name='):
         name = args.message.lower[1].split('name=', 1)[1]
         if len(args.message) >= 3:
@@ -49,13 +49,14 @@ def process_auto_repeat(args: ChatCommandArgs,
         message = args.message[2:] or None
 
     if secondArg == 'list':
-        repeats = list(args.database.listAutoRepeat(args.chat.channel)
-                       )  # type: List[AutoRepeatList]
+        repeats: List[AutoRepeatList]
+        repeats = list(args.database.listAutoRepeat(args.chat.channel))
         if not repeats:
             args.chat.send('No Active Auto Repeats')
         else:
             args.chat.send('Active Auto Repeats:')
-        for repeat in repeats:  # type: AutoRepeatList
+        repeat: AutoRepeatList
+        for repeat in repeats:
             name = repeat.name if repeat.name else '<default>'
             args.chat.send(
                 'Name: {name}, Duration: {duration} minutes, '

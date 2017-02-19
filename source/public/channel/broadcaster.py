@@ -47,9 +47,9 @@ def commandUptime(args: ChatCommandArgs) -> bool:
             '{channel} is currently not streaming or has not been for a '
             'minute'.format(channel=args.chat.channel))
     else:
-        currentTime = twitch.server_time()  # type: Optional[datetime]
+        currentTime: Optional[datetime] = twitch.server_time()
         if currentTime is not None:
-            uptime = currentTime - args.chat.streamingSince  # type: timedelta
+            uptime: timedelta = currentTime - args.chat.streamingSince
             args.chat.send('Uptime: {uptime}'.format(uptime=uptime))
         else:
             args.chat.send('Failed to get information from twitch.tv')
