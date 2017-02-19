@@ -6,13 +6,14 @@ import re
 
 def fieldParams(args: CustomFieldArgs) -> Optional[str]:
     with suppress(TypeError):
-        match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', args.field)  # type: Match[str]
+        match: Match[str]
+        match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', args.field)
         if match is not None:
-            prefix = args.prefix or ''
-            suffix = args.suffix or ''
-            matchParts = match.groups()  # type: Sequence[str]
-            start = None  # type: Optional[int]
-            stop = None  # type: Optional[int]
+            prefix: str = args.prefix or ''
+            suffix: str = args.suffix or ''
+            matchParts: Sequence[str] = match.groups()
+            start: Optional[int] = None
+            stop: Optional[int] = None
             if matchParts[0] is not None:
                 start = int(matchParts[0])
                 if matchParts[2] is not None:

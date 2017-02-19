@@ -7,12 +7,14 @@ def propertyMultipleLines(args: CustomProcessArgs) -> None:
             args.broadcaster, args.level, args.command, 'multiple'):
         return
 
+    value: Optional[Union[str, Dict[str, str]]]
     value = args.database.getCustomCommandProperty(
         args.broadcaster, args.level, args.command, 'delimiter'
-        )  # type: Optional[Union[str, Dict[str, str]]]
-    delimiter = (value if isinstance(value, str) else '') or '&&'  # type: str
+        )
+    delimiter: str = (value if isinstance(value, str) else '') or '&&'
     
-    msgs = args.messages[:]  # type: List[str]
+    msgs: List[str] = args.messages[:]
     args.messages.clear()
-    for msg in msgs:  # type: str
+    msg: str
+    for msg in msgs:
         args.messages.extend(msg.split(delimiter))

@@ -1,7 +1,7 @@
 ﻿from contextlib import suppress
 from functools import partial
 from http.client import HTTPResponse
-from typing import Callable, Iterator, Match, Optional
+from typing import BinaryIO, Callable, Iterator, Match, Optional, Union
 from ...data import CustomCommandField, CustomFieldArgs
 import re
 import bot.config
@@ -12,14 +12,15 @@ import urllib.request
 
 def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'url':
-        replace_func = None  # type: Callable[[Match[str]], str]
+        replace_func: Callable[[Match[str]], str]
         replace_func = partial(field_replace, args)  # type: ignore
-        url = re.sub(r'{([^\r\n\t\f {}]+)}', replace_func, args.param)  # type: str
+        url: str = re.sub(r'{([^\r\n\t\f {}]+)}', replace_func, args.param)
         with suppress(urllib.error.URLError):
-            with urllib.request.urlopen(
-                    url, timeout=bot.config.customMessageUrlTimeout) as res:  # type: HTTPResponse
+            urlTimeout: float = bot.config.customMessageUrlTimeout
+            res: Union[HTTPResponse, BinaryIO]
+            with urllib.request.urlopen(url, timeout=urlTimeout) as res:
                 if isinstance(res, HTTPResponse) and int(res.status) == 200:
-                    data = res.read().decode('utf-8')  # type: str
+                    data: str = res.read().decode('utf-8')
                     data = data.replace('\r\n', ' ')
                     data = data.replace('\n', ' ')
                     data = data.replace('\r', ' ')
@@ -29,15 +30,18 @@ def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
 
 
 def field_replace(args: CustomFieldArgs, match: Match[str]) -> str:
-    newargs = args._replace(field=match.group(1),  # type: ignore
+    newargs: CustomFieldArgs
+    newargs = args._replace(field=match.group(1),
                             param=None,
                             prefix=None,
                             suffix=None,
                             default=None,
-                            )  # type: CustomFieldArgs
-    fields = (f for f in lists.custom.fields if f is not fieldUrl)  # type: Iterator[CustomCommandField]
-    for field in fields:  # type: CustomCommandField
-        replacement = field(newargs)  # type: Optional[str]
+                            )
+    fields: Iterator[CustomCommandField]
+    fields = (f for f in lists.custom.fields if f is not fieldUrl)
+    field: CustomCommandField
+    for field in fields:
+        replacement: Optional[str] = field(newargs)
         if replacement is not None:
             return replacement
     return ''

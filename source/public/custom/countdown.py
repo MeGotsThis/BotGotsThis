@@ -10,53 +10,66 @@
 # {countdown@15:00,Friday 6:00PM,1/1 7:00 PST,12/22/2015 9:00 PM}
 
 from datetime import date, datetime, time, timedelta
-from typing import List, Match, NamedTuple, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Match, NamedTuple, Optional, Sequence, Union
 from ...data import CustomFieldArgs
 from ...data.timedelta import format as format_timedelta
 from ...data import timezones
 import math
 import re
 
-Date = NamedTuple('Date', [('year', Optional[int]),
-                           ('month', int),
-                           ('day', int)])
-DateTime = NamedTuple('DateTime', [('timestamp', datetime),
-                                   ('format24', bool)])
-DateTimeInstance = NamedTuple('DateTimeInstance',
-                              [('timeofday', time),
-                               ('dayofweek', Optional[int]),
-                               ('date', Optional[Date]),
-                               ('format24', bool)])
-NextPastCooldown = NamedTuple('NextPastCooldown',
-                              [('next', Optional[DateTime]),
-                               ('past', Optional[DateTime]),
-                               ('cooldown', Optional[float])])
 
-_pattern = r"(?:(?:(0?[1-9]|1[012])[\-/](0?[1-9]|[12][0-9]|3[01])"
-_pattern += r"(?:[\-/](\d{1,4}))?|(Sunday|Monday|Tuesday|Wednesday|Thursday|"
-_pattern += r"Friday|Saturday|Sun|Mon|Tue|Wed|Thu|Fri|Sat)) )?"
-_pattern += r"(?:(?:(0?[1-9]|1[0-2]):([0-5][0-9])"
-_pattern += r"(?::([0-5][0-9])(?:\.(\d{1,6}))?)?([AP]M?)|"
-_pattern += r"([01]?[0-9]|2[0-3]):([0-5][0-9])"
-_pattern += r"(?::([0-5][0-9])(?:\.(\d{1,6}))?)?))(?: (.*))?"
+class Date(NamedTuple):
+    year: Optional[int]
+    month: int
+    day: int
 
-_cooldownPattern = r"(\d{1,2}(?:\.\d{1,})?|100)%|"
-_cooldownPattern += r"(?!$)(?:(\d{1,})w)?(?:(\d{1,})d)?"
-_cooldownPattern += r"(?:([01]?[0-9]|2[0-3])h)?(?:([0-5]?[0-9])m)?"
-_cooldownPattern += r"(?:([0-5]?[0-9])s)?(?<!^)"
 
-_12HourFormat = '%m/%d/%Y %I:%M%p %Z'
-_24HourFormat = '%m/%d/%Y %H:%M %Z'
+class DateTime(NamedTuple):
+    timestamp: datetime
+    format24: bool
 
-MONDAY = 0
-TUESDAY = 1
-WEDNESDAY = 2
-THURSDAY = 3
-FRIDAY = 4
-SATURDAY = 5
-SUNDAY = 6
 
-daysOfWeek = {
+class DateTimeInstance(NamedTuple):
+    timeofday: time
+    dayofweek: Optional[int]
+    date: Optional[Date]
+    format24: bool
+
+
+class NextPastCooldown(NamedTuple):
+    next: Optional[DateTime]
+    past: Optional[DateTime]
+    cooldown: Optional[float]
+
+
+_pattern: str = (
+    r'(?:(?:(0?[1-9]|1[012])[\-/](0?[1-9]|[12][0-9]|3[01])'
+    r'(?:[\-/](\d{1,4}))?|(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|'
+    r'Saturday|Sun|Mon|Tue|Wed|Thu|Fri|Sat)) )?'
+    r'(?:(?:(0?[1-9]|1[0-2]):([0-5][0-9])'
+    r'(?::([0-5][0-9])(?:\.(\d{1,6}))?)?([AP]M?)|'
+    r'([01]?[0-9]|2[0-3]):([0-5][0-9])'
+    r'(?::([0-5][0-9])(?:\.(\d{1,6}))?)?))(?: (.*))?'
+    )
+
+_cooldownPattern: str = (
+    r'(\d{1,2}(?:\.\d{1,})?|100)%|'
+    r'(?!$)(?:(\d{1,})w)?(?:(\d{1,})d)?(?:([01]?[0-9]|2[0-3])h)?'
+    r'(?:([0-5]?[0-9])m)?(?:([0-5]?[0-9])s)?(?<!^)'
+    )
+
+_12HourFormat: str = '%m/%d/%Y %I:%M%p %Z'
+_24HourFormat: str = '%m/%d/%Y %H:%M %Z'
+
+MONDAY: int = 0
+TUESDAY: int = 1
+WEDNESDAY: int = 2
+THURSDAY: int = 3
+FRIDAY: int = 4
+SATURDAY: int = 5
+SUNDAY: int = 6
+
+daysOfWeek: Dict[str, int] = {
     'sunday': SUNDAY,
     'monday': MONDAY,
     'tuesday': TUESDAY,
@@ -77,9 +90,12 @@ daysOfWeek = {
 
 def fieldCountdown(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'countdown' and args.param is not None:
-        timestamp = args.timestamp.replace(tzinfo=timezones.utc)  # type: datetime
-        nsc = parse_next_past_cooldown(args.param, timestamp)  # type: NextPastCooldown
-        next, past, cooldown = nsc  # type: Optional[DateTime], Optional[DateTime], float
+        timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
+        npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
+        next: Optional[DateTime]
+        past: Optional[DateTime]
+        cooldown: float
+        next, past, cooldown = npc
         if next is None:
             if past is None:
                 return None
@@ -87,16 +103,19 @@ def fieldCountdown(args: CustomFieldArgs) -> Optional[str]:
         else:
             if cooldown is not None and not cooldown >= 0:
                 return args.default if args.default else 'has passed'
-            delta = format_timedelta(next.timestamp - timestamp)  # type: str
+            delta: str = format_timedelta(next.timestamp - timestamp)
             return (args.prefix or '') + delta + (args.suffix or '')
     return None
 
 
 def fieldSince(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'since' and args.param is not None:
-        timestamp = args.timestamp.replace(tzinfo=timezones.utc)  # type: datetime
-        nsc = parse_next_past_cooldown(args.param, timestamp)  # type: NextPastCooldown
-        next, past, cooldown = nsc  # type: Optional[DateTime], Optional[DateTime], float
+        timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
+        npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
+        next: Optional[DateTime]
+        past: Optional[DateTime]
+        cooldown: float
+        next, past, cooldown = npc
         if past is None:
             if next is None:
                 return None
@@ -104,23 +123,26 @@ def fieldSince(args: CustomFieldArgs) -> Optional[str]:
         else:
             if cooldown is not None and not cooldown <= 0:
                 return args.default if args.default else 'is coming'
-            delta = format_timedelta(timestamp - past.timestamp)  # type: str
+            delta: str = format_timedelta(timestamp - past.timestamp)
             return (args.prefix or '') + delta + (args.suffix or '')
     return None
 
 
 def fieldNext(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() in ['next', 'future'] and args.param is not None:
-        timestamp = args.timestamp.replace(tzinfo=timezones.utc)  # type: datetime
-        nsc = parse_next_past_cooldown(args.param, timestamp)  # type: NextPastCooldown
-        next, past, cooldown = nsc  # type: Optional[DateTime], Optional[DateTime], float
+        timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
+        npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
+        next: Optional[DateTime]
+        past: Optional[DateTime]
+        cooldown: float
+        next, past, cooldown = npc
         if next is None:
             if past is None:
                 return None
             return args.default if args.default is not None else 'None'
         else:
-            format = _24HourFormat if next.format24 else _12HourFormat
-            timeStr = next.timestamp.strftime(format)  # type: str
+            format: str = _24HourFormat if next.format24 else _12HourFormat
+            timeStr: str = next.timestamp.strftime(format)
             return (args.prefix or '') + timeStr + (args.suffix or '')
     return None
 
@@ -128,30 +150,36 @@ def fieldNext(args: CustomFieldArgs) -> Optional[str]:
 def fieldPrevious(args: CustomFieldArgs) -> Optional[str]:
     if (args.field.lower() in ['prev', 'previous', 'past']
             and args.param is not None):
-        timestamp = args.timestamp.replace(tzinfo=timezones.utc)  # type: datetime
-        nsc = parse_next_past_cooldown(args.param, timestamp)  # type: NextPastCooldown
-        next, past, cooldown = nsc  # type: Optional[DateTime], Optional[DateTime], float
+        timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
+        npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
+        next: Optional[DateTime]
+        past: Optional[DateTime]
+        cooldown: float
+        next, past, cooldown = npc
         if past is None:
             if next is None:
                 return None
             return args.default if args.default is not None else 'None'
         else:
-            format = _24HourFormat if past.format24 else _12HourFormat
-            timeStr = past.timestamp.strftime(format)  # type: str
+            format: str = _24HourFormat if past.format24 else _12HourFormat
+            timeStr: str = past.timestamp.strftime(format)
             return (args.prefix or '') + timeStr + (args.suffix or '')
     return None
 
 
 def parse_date_string(string: str) -> Optional[DateTimeInstance]:
-    match = re.fullmatch(_pattern, string, re.IGNORECASE)  # type: Match[str]
+    match: Match[str] = re.fullmatch(_pattern, string, re.IGNORECASE)
     if match is None:
         return None
-    g = match.groups()  # type: Sequence[str]
-    seconds = 0  # type: int
-    microseconds = 0  # type: int
+    g: Sequence[str] = match.groups()
+    hour: int
+    minute: int
+    seconds: int = 0
+    microseconds: int = 0
+    is24Hour: bool
     if g[9] is not None and g[10] is not None:
-        hour = int(g[9])  # type: int
-        minute = int(g[10])  # type: int
+        hour = int(g[9])
+        minute = int(g[10])
         if g[11] is not None:
             seconds = int(g[11])
             if g[12] is not None:
@@ -170,15 +198,16 @@ def parse_date_string(string: str) -> Optional[DateTimeInstance]:
         is24Hour = False
     else:
         return None
+    timezone: timezones.BaseTimeZone
     if g[13] is not None:
         if g[13].lower() not in timezones.abbreviations:
             return None
         timezone = timezones.abbreviations[g[13].lower()]
     else:
         timezone = timezones.utc
-    timeOfDay = time(hour, minute, seconds, microseconds, timezone)  # type: time
-    dayofweek = None  # type: Optional[int]
-    date_ = None  # type: Optional[Date]
+    timeOfDay: time = time(hour, minute, seconds, microseconds, timezone)
+    dayofweek: Optional[int] = None
+    date_: Optional[Date] = None
     if g[3] is not None:
         dayofweek = daysOfWeek[g[3].lower()]
     elif g[0] is not None and g[1] is not None:
@@ -206,22 +235,25 @@ def next_datetime(now: datetime,
                   dayofweek: Optional[int],
                   date_: Optional[Date],
                   is24Hour: bool) -> Optional[DateTime]:
+    today: date
     if timeOfDay.tzinfo is not None:
-        today = now.astimezone(timeOfDay.tzinfo).date()  # time: date
+        today = now.astimezone(timeOfDay.tzinfo).date()
     else:
         today = now.date()
+    dt: datetime
+    actualDate: date
     if date_ is not None:
         if date_.year is not None:
-            dt = datetime.combine(date(*date_), timeOfDay)  # type: datetime
+            dt = datetime.combine(date(*date_), timeOfDay)
             if dt > now:
                 return DateTime(dt, is24Hour)
             else:
                 return None
-        ldate = [today.year, date_.month, date_.day]  # type: List[int]
+        ldate: List[int] = [today.year, date_.month, date_.day]
         # For February 29
         while True:
             try:
-                actualDate = date(*ldate)  # type: date
+                actualDate = date(*ldate)
                 break
             except ValueError:
                 ldate[0] += 1
@@ -229,7 +261,7 @@ def next_datetime(now: datetime,
         if dt > now:
             return DateTime(dt, is24Hour)
         else:
-            year = actualDate.year + 1  # type: int
+            year: int = actualDate.year + 1
             # For February 29
             while True:
                 try:
@@ -239,7 +271,7 @@ def next_datetime(now: datetime,
                     year += 1
             return DateTime(datetime.combine(actualDate, timeOfDay), is24Hour)
     elif dayofweek is not None:
-        daysToAdd = dayofweek - today.weekday()  # type: int
+        daysToAdd: int = dayofweek - today.weekday()
         if daysToAdd < 0:
             daysToAdd += 7
         actualDate = today + timedelta(days=daysToAdd)
@@ -261,22 +293,25 @@ def past_datetime(now: datetime,
                   dayofweek: Optional[int],
                   date_: Optional[Date],
                   is24Hour: bool) -> Optional[DateTime]:
+    today: date
     if timeOfDay.tzinfo is not None:
-        today = now.astimezone(timeOfDay.tzinfo).date()  # time: date
+        today = now.astimezone(timeOfDay.tzinfo).date()
     else:
         today = now.date()
+    dt: datetime
+    actualDate: date
     if date_ is not None:
         if date_.year is not None:
-            dt = datetime.combine(date(*date_), timeOfDay)  # type: datetime
+            dt = datetime.combine(date(*date_), timeOfDay)
             if dt <= now:
                 return DateTime(dt, is24Hour)
             else:
                 return None
-        ldate = [today.year, date_.month, date_.day]  # type: List[int]
+        ldate: List[int] = [today.year, date_.month, date_.day]
         # For February 29
         while True:
             try:
-                actualDate = date(*ldate)  # type: date
+                actualDate = date(*ldate)
                 break
             except ValueError:
                 ldate[0] -= 1
@@ -284,7 +319,7 @@ def past_datetime(now: datetime,
         if dt <= now:
             return DateTime(dt, is24Hour)
         else:
-            year = actualDate.year - 1  # type: int
+            year: int = actualDate.year - 1
             # For February 29
             while True:
                 try:
@@ -294,7 +329,7 @@ def past_datetime(now: datetime,
                     year -= 1
             return DateTime(datetime.combine(actualDate, timeOfDay), is24Hour)
     elif dayofweek is not None:
-        daysToAdd = dayofweek - today.weekday()  # type: int
+        daysToAdd: int = dayofweek - today.weekday()
         if daysToAdd > 0:
             daysToAdd -= 7
         actualDate = today + timedelta(days=daysToAdd)
@@ -312,24 +347,24 @@ def past_datetime(now: datetime,
 
 
 def parse_cooldown(string: str) -> Optional[Union[float, timedelta]]:
-    match = re.fullmatch(_cooldownPattern, string.strip())  # type: Match[str]
-    if match is not None:
-        groups = match.groups()  # type: Sequence[str]
-        if groups[0] is not None:
-            return float(groups[0]) / 100.0
-        elif (groups[1] is not None
-              or groups[2] is not None
-              or groups[3] is not None
-              or groups[4] is not None
-              or groups[5] is not None):
-            weeks = int(groups[1] or 0)  # type: int
-            days = int(groups[2] or 0)  # type: int
-            hours = int(groups[3] or 0)  # type: int
-            minutes = int(groups[4] or 0)  # type: int
-            seconds = int(groups[5] or 0)  # type: int
-            return timedelta(weeks=weeks, days=days, hours=hours,
-                             minutes=minutes, seconds=seconds)
-    return None
+    match: Match[str] = re.fullmatch(_cooldownPattern, string.strip())
+    if match is None:
+        return None
+    groups: Sequence[str] = match.groups()
+    if groups[0] is not None:
+        return float(groups[0]) / 100.0
+    elif (groups[1] is not None
+          or groups[2] is not None
+          or groups[3] is not None
+          or groups[4] is not None
+          or groups[5] is not None):
+        weeks: int = int(groups[1] or 0)
+        days: int = int(groups[2] or 0)
+        hours: int = int(groups[3] or 0)
+        minutes: int = int(groups[4] or 0)
+        seconds: int = int(groups[5] or 0)
+        return timedelta(weeks=weeks, days=days, hours=hours,
+                         minutes=minutes, seconds=seconds)
 
 
 def test_cooldown(cooldown: Optional[Union[float, timedelta]],
@@ -342,14 +377,15 @@ def test_cooldown(cooldown: Optional[Union[float, timedelta]],
         return -math.inf
     if now > future:
         return math.inf
+    cooldown_: timedelta
     if isinstance(cooldown, float):
-        cooldown_ = (future - past) * cooldown  # type: timedelta
+        cooldown_ = (future - past) * cooldown
     elif isinstance(cooldown, timedelta):
         cooldown_ = cooldown
     else:
         return 0
-    begindelta = now - past  # type: timedelta
-    enddelta = future - now  # type: timedelta
+    begindelta: timedelta = now - past
+    enddelta: timedelta = future - now
     if begindelta <= cooldown_ and enddelta <= cooldown_:
         return math.nan
     elif begindelta >= cooldown_ and enddelta >= cooldown_:
@@ -362,23 +398,28 @@ def test_cooldown(cooldown: Optional[Union[float, timedelta]],
 
 def parse_next_past_cooldown(times: str,
                              now: datetime) -> NextPastCooldown:
-    cd = None  # type: Optional[Union[float, timedelta]]
-    instances = []  # type: List[DateTimeInstance]
-    for i, timeStr in enumerate(times.split(',')):  # type: int, str
+    cd: Optional[Union[float, timedelta]] = None
+    instances: List[DateTimeInstance] = []
+    i: int
+    timeStr: str
+    for i, timeStr in enumerate(times.split(',')):
         if i == 0:
             cd = parse_cooldown(timeStr)
             if cd is not None:
                 continue
-        instance = parse_date_string(timeStr.strip())  # type: Optional[DateTimeInstance]
+        instance: Optional[DateTimeInstance]
+        instance = parse_date_string(timeStr.strip())
         if instance is not None:
             instances.append(instance)
-    nextDts = [next_datetime(now, *i) for i in instances]  # type: List[Optional[DateTime]]
-    pastDts = [past_datetime(now, *i) for i in instances]  # type: List[Optional[DateTime]]
-    nextDatetimes = [dt for dt in nextDts if dt is not None]  # type: List[DateTime]
-    pastDatetimes = [dt for dt in pastDts if dt is not None]  # type: List[DateTime]
-    next = min(nextDatetimes) if nextDatetimes else None  # type: DateTime
-    past = max(pastDatetimes) if pastDatetimes else None  # type: DateTime
-    cooldown = None  # type: Optional[float]
+    nextDts: List[Optional[DateTime]]
+    pastDts: List[Optional[DateTime]]
+    nextDts = [next_datetime(now, *inst) for inst in instances]
+    pastDts = [past_datetime(now, *inst) for inst in instances]
+    nextDatetimes: List[DateTime] = [dt for dt in nextDts if dt is not None]
+    pastDatetimes: List[DateTime] = [dt for dt in pastDts if dt is not None]
+    next: DateTime = min(nextDatetimes) if nextDatetimes else None
+    past: DateTime = max(pastDatetimes) if pastDatetimes else None
+    cooldown: Optional[float] = None
     if next is not None and past is not None:
         cooldown = test_cooldown(cd, past.timestamp, next.timestamp, now)
     return NextPastCooldown(next, past, cooldown)
