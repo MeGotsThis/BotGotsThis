@@ -6,11 +6,12 @@ from ...database import DatabaseBase, factory
 
 
 def autoRepeatMessage(timestamp: datetime) -> None:
-    with factory.getDatabase() as database:  # type: DatabaseBase
+    database: DatabaseBase
+    with factory.getDatabase() as database:
         for broadcaster, name, message in list(database.getAutoRepeatToSend()):
             if broadcaster in bot.globals.channels:
                 database.sentAutoRepeat(broadcaster, name)
-                channel = bot.globals.channels[broadcaster]  # type: data.Channel
+                channel: data.Channel = bot.globals.channels[broadcaster]
                 channel.send(message)
                 if channel.isMod:
                     timeout.record_timeout(database, channel, None, message,

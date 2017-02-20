@@ -11,19 +11,21 @@ from ...database import factory
 def checkTwitchIds(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
-    channels = [c for c in bot.globals.channels
-                if c not in bot.globals.twitchId]  # type: List[str]
-    cacheDuration = timedelta(hours=1)
+    channels: List[str] = [c for c in bot.globals.channels
+                           if c not in bot.globals.twitchId]
+    cacheDuration: timedelta = timedelta(hours=1)
     channels += [c for c in bot.globals.twitchId
                  if c not in channels
                  if bot.globals.twitchIdCache[c] + cacheDuration <= timestamp]
     if not channels:
         return
 
-    ids = twitch.getTwitchIds(channels)  # type: Optional[Dict[str, str]]
+    ids: Optional[Dict[str, str]] = twitch.getTwitchIds(channels)
     if ids is None:
         return
-    for channel, id in ids.items():  # type: str, str
+    channel: str
+    id: str
+    for channel, id in ids.items():
         utils.saveTwitchId(channel, id, timestamp)
     for channel in bot.globals.channels:
         if channel in ids:
@@ -34,13 +36,14 @@ def checkTwitchIds(timestamp: datetime) -> None:
 def checkStreamsAndChannel(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
-    channels = copy.copy(bot.globals.channels)  # type: Dict[str, data.Channel]
-    onlineStreams = twitch.active_streams(
-        channels.keys())  # type: Optional[twitch.OnlineStreams]
+    channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
+    onlineStreams: Optional[twitch.OnlineStreams]
+    onlineStreams = twitch.active_streams(channels.keys())
     if onlineStreams is None:
         return
-    for channel in onlineStreams:  # type: str
-        chat = channels[channel]
+    channel: str
+    for channel in onlineStreams:
+        chat: data.Channel = channels[channel]
         chat.twitchCache = timestamp
         (chat.streamingSince, chat.twitchStatus,
          chat.twitchGame, chat.community) = onlineStreams[channel]
@@ -56,10 +59,11 @@ def checkStreamsAndChannel(timestamp: datetime) -> None:
 def checkOfflineChannels(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
-    cacheDuration = timedelta(seconds=300)  # type: timedelta
+    cacheDuration: timedelta = timedelta(seconds=300)
+    offlineChannels: List[data.Channel]
     offlineChannels = [ch for ch in bot.globals.channels.values()
                        if (not ch.isStreaming
-                           and timestamp - ch.twitchCache >= cacheDuration)]  # type: List[data.Channel]
+                           and timestamp - ch.twitchCache >= cacheDuration)]
     if not offlineChannels:
         return
     if 'offlineCheck' not in bot.globals.globalSessionData:
@@ -69,15 +73,16 @@ def checkOfflineChannels(timestamp: datetime) -> None:
         if t >= timestamp - timedelta(minutes=1)]
     if len(bot.globals.globalSessionData['offlineCheck']) >= 40:
         return
-    chat = random.choice(offlineChannels)  # type: data.Channel
+    chat: data.Channel = random.choice(offlineChannels)
     chat.twitchCache = timestamp
-    current = twitch.channel_properties(chat.channel)  # type: Optional[twitch.TwitchStatus]
+    current: Optional[twitch.TwitchStatus]
+    current = twitch.channel_properties(chat.channel)
     if current is None:
         chat.twitchCache = timestamp - cacheDuration + timedelta(seconds=60)
         return
     (chat.streamingSince, chat.twitchStatus,
      chat.twitchGame, shouldBeNone) = current
-    community = twitch.channel_community(chat.channel)  # type: twitch.TwitchCommunity
+    community: twitch.TwitchCommunity = twitch.channel_community(chat.channel)
     if community is not None:
         chat.community = community.id
         bot.utils.saveTwitchCommunity(community.name, community.id, timestamp)
@@ -85,21 +90,21 @@ def checkOfflineChannels(timestamp: datetime) -> None:
 
 
 def checkChatServers(timestamp: datetime) -> None:
-    cooldown = timedelta(seconds=3600)  # type: timedelta
-    channels = copy.copy(bot.globals.channels)  # type: Dict[str, data.Channel]
-    toCheck = [c for c, ch in channels.items()
-               if (timestamp - ch.serverCheck >= cooldown)]  # type: List[str]
+    cooldown: timedelta = timedelta(seconds=3600)
+    channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
+    toCheck: List[str] = [c for c, ch in channels.items()
+                          if (timestamp - ch.serverCheck >= cooldown)]
     if not toCheck:
         return
-    channel = random.choice(toCheck)  # type: str
+    channel: str = random.choice(toCheck)
     channels[channel].serverCheck = timestamp
-    cluster = twitch.chat_server(channel)  # type: Optional[str]
+    cluster: Optional[str] = twitch.chat_server(channel)
     if cluster is None:
         return
     if (cluster in bot.globals.clusters
             and bot.globals.clusters[cluster] is channels[channel].socket):
         return
     with factory.getDatabase() as db:
-        priority = db.getAutoJoinsPriority(channel)  # type: Union[int, float]
+        priority: Union[int, float] = db.getAutoJoinsPriority(channel)
         utils.ensureServer(channel, priority, cluster)
         db.setAutoJoinServer(channel, cluster)

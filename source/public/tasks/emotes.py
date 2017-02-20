@@ -12,7 +12,8 @@ from ...api import twitch
 def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalEmotesCache >= timedelta(hours=1):
         bot.globals.globalEmotesCache = timestamp
-        data = twitch.twitch_emotes()  # type: Optional[Tuple[Dict[int, str], Dict[int, int]]]
+        data: Optional[Tuple[Dict[int, str], Dict[int, int]]]
+        data = twitch.twitch_emotes()
         if data:
             emotes, emoteSets = data
             bot.globals.globalEmotes = emotes
@@ -29,17 +30,19 @@ def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
 
 def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalFfzEmotesCache >= timedelta(hours=1):
-        emotes = ffz.getGlobalEmotes()  # type: Optional[Dict[int, str]]
+        emotes: Optional[Dict[int, str]]
+        emotes = ffz.getGlobalEmotes()
         bot.globals.globalFfzEmotesCache = timestamp
         if emotes is not None:
             bot.globals.globalFfzEmotes = emotes
 
 
 def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
-    channels = copy.copy(bot.globals.channels)  # type: Dict[str, data.Channel]
+    channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
+    toUpdate: List[data.Channel]
     toUpdate = [chan for chan in channels.values()
                 if timestamp - chan.ffzCache >= timedelta(hours=1)
-                and chan.isStreaming]  # type: List[data.Channel]
+                and chan.isStreaming]
     if not toUpdate:
         toUpdate = [chan for chan in channels.values()
                     if timestamp - chan.ffzCache >= timedelta(hours=1)
@@ -62,10 +65,11 @@ def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
 
 
 def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
-    channels = copy.copy(bot.globals.channels)  # type: Dict[str, data.Channel]
+    channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
+    toUpdate: List[data.Channel]
     toUpdate = [chan for chan in channels.values()
                 if timestamp - chan.bttvCache >= timedelta(hours=1)
-                and chan.isStreaming]  # type: List[data.Channel]
+                and chan.isStreaming]
     if not toUpdate:
         toUpdate = [chan for chan in channels.values()
                     if timestamp - chan.bttvCache >= timedelta(hours=1)
