@@ -28,7 +28,7 @@ def manageAutoJoin(args: ManageBotArgs) -> bool:
         return broadcaster.auto_join_delete(
             args.database, args.message.lower[3], args.send)
     if args.message.lower[2] in ['pri', 'priority']:
-        priority = 0  # type: int
+        priority: int = 0
         with suppress(ValueError, IndexError):
             priority = int(args.message[4])
         return auto_join_priority(
@@ -40,7 +40,7 @@ def auto_join_priority(database: DatabaseBase,
                        channel: str,
                        priority: int,
                        send: Send) -> bool:
-        result = database.setAutoJoinPriority(channel, priority)  # type: bool
+        result: bool = database.setAutoJoinPriority(channel, priority)
         if result:
             send('Auto join for {channel} is set to priority '
                  '{priority}'.format(channel=channel, priority=priority))
@@ -52,8 +52,9 @@ def auto_join_priority(database: DatabaseBase,
 
 def reload_server(database: DatabaseBase,
                   send: Send) -> bool:
-    for autojoin in database.getAutoJoinsChats():  # type: AutoJoinChannel
-        cluster = twitch.chat_server(autojoin.broadcaster)  # type: Optional[str]
+    autojoin: AutoJoinChannel
+    for autojoin in database.getAutoJoinsChats():
+        cluster: Optional[str] = twitch.chat_server(autojoin.broadcaster)
         if cluster is not None and autojoin.cluster != cluster:
             database.setAutoJoinServer(autojoin.broadcaster, cluster)
             utils.ensureServer(autojoin.broadcaster, autojoin.priority,

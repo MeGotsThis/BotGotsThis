@@ -5,7 +5,8 @@ from ..library import message
 from ...data import ManageBotArgs, Send
 from ...database import DatabaseBase
 
-needReason = ['add', 'insert', 'del', 'delete', 'rem', 'remove', 'remove']  # type: List[str]
+needReason: List[str] = ['add', 'insert', 'del', 'delete', 'rem', 'remove',
+                         'remove']
 
 
 def manageBanned(args: ManageBotArgs) -> bool:
@@ -19,7 +20,7 @@ def manageBanned(args: ManageBotArgs) -> bool:
             args.send(args.nick + ' -> Reason needs to be specified')
             return True
         return False
-    channel = args.message.lower[3]  # type: str
+    channel: str = args.message.lower[3]
     if args.message.lower[2] in ['add', 'insert']:
         return insert_banned_channel(channel, args.message[4:], args.nick,
                                      args.database, args.send)
@@ -31,7 +32,7 @@ def manageBanned(args: ManageBotArgs) -> bool:
 
 def list_banned_channels(database: DatabaseBase,
                          send: Send) -> bool:
-    bannedChannels = database.listBannedChannels()  # type: Iterable[str]
+    bannedChannels: Iterable[str] = database.listBannedChannels()
     if bannedChannels:
         send(message.messagesFromItems(bannedChannels, 'Banned Channels: '))
     else:
@@ -47,16 +48,17 @@ def insert_banned_channel(channel: str,
     if channel == bot.config.botnick:
         send('Cannot ban the bot itself')
         return True
-    isBannedOrReason = database.isChannelBannedReason(channel)  # type: Optional[str]
+    isBannedOrReason: Optional[str] = database.isChannelBannedReason(channel)
     if isBannedOrReason is not None:
         send('{channel} is already banned for: {reason}'.format(
             channel=channel, reason=isBannedOrReason))
         return True
-    result = database.addBannedChannel(channel, reason, nick)  # type: bool
+    result: bool = database.addBannedChannel(channel, reason, nick)
     if result:
         database.discardAutoJoin(channel)
         utils.partChannel(channel)
 
+    msg: str
     if result:
         msg = 'Chat {channel} is now banned'
     else:
@@ -70,12 +72,13 @@ def delete_banned_channel(channel: str,
                           nick: str,
                           database: DatabaseBase,
                           send: Send) -> bool:
-    isBannedOrReason = database.isChannelBannedReason(channel)
+    isBannedOrReason: Optional[str] = database.isChannelBannedReason(channel)
     if isBannedOrReason is None:
         send('{channel} is not banned'.format(channel=channel))
         return True
-    result = database.removeBannedChannel(channel, reason, nick)
+    result: bool = database.removeBannedChannel(channel, reason, nick)
 
+    msg: str
     if result:
         msg = 'Chat {channel} is now unbanned'
     else:

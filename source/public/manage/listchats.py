@@ -6,7 +6,7 @@ from ...data import ManageBotArgs
 
 def manageListChats(args: ManageBotArgs) -> bool:
     if bot.globals.channels:
-        channels = sorted(bot.globals.channels.keys())  # type: List[str]
+        channels: List[str] = sorted(bot.globals.channels.keys())
         args.send(message.messagesFromItems(channels, 'Twitch Chats: '))
     else:
         args.send('I am somehow not in any channels, please help me here')

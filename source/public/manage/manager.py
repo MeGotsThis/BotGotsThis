@@ -10,7 +10,7 @@ from ...database import DatabaseBase
 def manageManager(args: ManageBotArgs) -> bool:
     if len(args.message) < 4:
         return False
-    user = args.message.lower[3]  # type: str
+    user: str = args.message.lower[3]
     if args.message.lower[2] in ['add', 'insert']:
         return insert_manager(user, args.database, args.send)
     if args.message.lower[2] in ['del', 'delete', 'rem', 'remove']:
@@ -24,6 +24,7 @@ def insert_manager(user: str,
     if database.isBotManager(user):
         send('{user} is already a manager'.format(user=user))
         return True
+    msg: str
     if database.addBotManager(user):
         msg = '{user} is now a manager'
     else:
@@ -38,6 +39,7 @@ def delete_manager(user: str,
     if not database.isBotManager(user):
         send('{user} is already not a manager'.format(user=user))
         return True
+    msg: str
     if database.removeBotManager(user):
         msg = '{user} has been removed as a manager'
     else:
