@@ -213,7 +213,7 @@ def update(channel: str, *,
 
 def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
     with suppress(ConnectionError, client.HTTPException):
-        allChannels: List[str] = [c for c in channels
+        allChannels: List[str] = [bot.globals.twitchId[c] for c in channels
                                   if bot.utils.loadTwitchId(c)
                                   and bot.globals.twitchId[c] is not None]
         if not allChannels:
