@@ -365,6 +365,7 @@ def parse_cooldown(string: str) -> Optional[Union[float, timedelta]]:
         seconds: int = int(groups[5] or 0)
         return timedelta(weeks=weeks, days=days, hours=hours,
                          minutes=minutes, seconds=seconds)
+    return None
 
 
 def test_cooldown(cooldown: Optional[Union[float, timedelta]],
