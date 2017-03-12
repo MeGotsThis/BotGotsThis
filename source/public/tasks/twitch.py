@@ -11,10 +11,11 @@ from ...database import factory
 def checkTwitchIds(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
+    twitchIds: Dict[str, Optional[str]] = copy.copy(bot.globals.twitchId)
     channels: List[str] = [c for c in bot.globals.channels
-                           if c not in bot.globals.twitchId]
+                           if c not in twitchIds]
     cacheDuration: timedelta = timedelta(hours=1)
-    channels += [c for c in bot.globals.twitchId
+    channels += [c for c in twitchIds
                  if c not in channels
                  if bot.globals.twitchIdCache[c] + cacheDuration <= timestamp]
     if not channels:
