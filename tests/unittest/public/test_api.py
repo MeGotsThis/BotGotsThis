@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
-from source import api
+from source.api import cache
 from unittest.mock import patch
 
 
@@ -14,7 +14,7 @@ class TestApi(unittest.TestCase):
         mock_globals.globalSessionData = data
         i = 0
 
-        @api.cache('Kappa', timedelta(seconds=60))
+        @cache.cache('Kappa', timedelta(seconds=60))
         def d():
             nonlocal i
             i += 1
@@ -44,7 +44,7 @@ class TestApi(unittest.TestCase):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_globals.globalSessionData = {}
 
-        @api.cache('Kappa', timedelta(seconds=60))
+        @cache.cache('Kappa', timedelta(seconds=60))
         def d():
             raise ConnectionError()
 

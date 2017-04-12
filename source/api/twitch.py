@@ -1,4 +1,4 @@
-﻿from . import cache, oauth
+﻿from source.api import oauth
 from contextlib import closing, suppress
 from datetime import datetime, timedelta
 from http import client
