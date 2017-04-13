@@ -27,8 +27,6 @@ def main(argv: Optional[List[str]]=None) -> int:
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
 
     bot.globals.join = JoinThread(name='Join Thread')
-    bot.globals.groupChannel = data.Channel('jtv', bot.globals.clusters['aws'],
-                                            float('-inf'))
 
     bot.globals.logging = Logging()
     bot.globals.background = BackgroundTasker(name='Background Tasker')
@@ -53,6 +51,7 @@ def main(argv: Optional[List[str]]=None) -> int:
 
     try:
         utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
+        bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
         if bot.config.owner:
             utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
         with getDatabase() as db:
