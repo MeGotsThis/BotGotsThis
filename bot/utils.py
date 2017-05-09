@@ -192,7 +192,7 @@ def print(*args: Any,
         bot.globals.logging.log(
             filename,
             '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
-                time=_timestamp, message=''.join(str(a) for a in args)))
+                time=_timestamp, message=' '.join(str(a) for a in args)))
 
 
 def logIrcMessage(filename: str,

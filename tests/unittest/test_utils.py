@@ -692,6 +692,20 @@ class TestUtils(unittest.TestCase):
             'output.log', '2000-01-01T00:00:00.000000 Kappa\n')
 
     @patch('bot.globals', autospec=True)
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('bot.config', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    def test_print_file_multiple(self, mock_now, mock_config, mock_stdout,
+                                 mock_globals):
+        mock_globals.logging = Mock(spec=Logging)
+        mock_now.return_value = datetime(2000, 1, 1)
+        mock_config.development = False
+        utils.print('Kappa', 'Kappa', file=True)
+        self.assertEqual(mock_stdout.getvalue(), '')
+        mock_globals.logging.log.assert_called_once_with(
+            'output.log', '2000-01-01T00:00:00.000000 Kappa Kappa\n')
+
+    @patch('bot.globals', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logIrcMessage_config(self, mock_now, mock_config, mock_globals):
