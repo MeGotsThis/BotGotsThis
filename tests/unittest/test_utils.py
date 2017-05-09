@@ -671,10 +671,10 @@ class TestUtils(unittest.TestCase):
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
-    def test_print_override(self, mock_now, mock_config, mock_stdout):
+    def test_print_override_dev(self, mock_now, mock_config, mock_stdout):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.development = True
-        utils.print('Kappa', override=True)
+        utils.print('Kappa', override=False)
         self.assertEqual(mock_stdout.getvalue(), '2000-01-01 00:00:00 Kappa\n')
 
     @patch('bot.globals', autospec=True)

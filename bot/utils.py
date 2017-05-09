@@ -177,10 +177,10 @@ def ensureServer(channel: str,
 
 def print(*args: Any,
           timestamp: Optional[datetime]=None,
-          override: bool=True,
+          override: bool=False,
           file: Union[bool, str]=False) -> None:
     _timestamp: datetime = timestamp or now()
-    if not override or bot.config.development:
+    if override or bot.config.development:
         builtins.print(_timestamp, *args)
 
     if file:
