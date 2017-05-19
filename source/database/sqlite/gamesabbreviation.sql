@@ -8,9 +8,8 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ga
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('programming', 'Programming');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('creative', 'Creative');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('music', 'Music');
-INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gts', 'Gaming Talk Shows');
-INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('talkshow', 'Gaming Talk Shows');
-INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gametalkshow', 'Gaming Talk Shows');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('ts', 'Talk Shows');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('talkshow', 'Talk Shows');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('poker', 'Poker');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('blackjack', 'Blackjack');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pinball', 'Pinball');
