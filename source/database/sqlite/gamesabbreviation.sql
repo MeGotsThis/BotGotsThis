@@ -509,6 +509,16 @@ INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('yu
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('smonk', 'Skullmonkeys');
 
 
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('plcv', 'Professor Layton and the Curious Village');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pldb', 'Professor Layton and the Diabolical Box');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('pluf', 'Professor Layton and the Unwound Future');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('plls', 'Professor Layton and the Last Specter');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('plmm', 'Professor Layton and the Miracle Mask');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('plal', 'Professor Layton and the Azran Legacy');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('plvspwaa', 'Professor Layton vs. Phoenix Wright: Ace Attorney');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('plpw', 'Professor Layton vs. Phoenix Wright: Ace Attorney');
+
+
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gdash', 'Geometry Dash');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('geometrydash', 'Geometry Dash');
 
