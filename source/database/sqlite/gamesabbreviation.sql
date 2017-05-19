@@ -5,6 +5,7 @@ DELETE FROM game_abbreviations;
 
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gd', 'Game Development');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gamedev', 'Game Development');
+INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('programming', 'Programming');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('creative', 'Creative');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('music', 'Music');
 INSERT OR REPLACE INTO game_abbreviations (abbreviation, twitchGame) VALUES ('gts', 'Gaming Talk Shows');
