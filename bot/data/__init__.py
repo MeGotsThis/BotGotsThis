@@ -5,8 +5,8 @@ import source.ircmessage
 import threading
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple
-from typing import Optional, Set, Tuple, TypeVar, Union
+from typing import Any, Callable, Deque, Dict, Generic, Iterable, List
+from typing import NamedTuple, Optional, Set, Tuple, TypeVar, Union
 from source.api import bttv, ffz
 from .error import ConnectionReset, LoginUnsuccessful
 from .. import utils
@@ -305,7 +305,7 @@ class Socket:
                  name: str,
                  server: str,
                  port: int) -> None:
-        self._writeQueue: deque[Tuple[Tuple[IrcMessage], dict]] = deque()
+        self._writeQueue: Deque[Tuple[Tuple[IrcMessage], dict]] = deque()
         self._name: str = name
         self._server: str = server
         self._port: int = port
@@ -351,7 +351,7 @@ class Socket:
         return self._messaging
 
     @property
-    def writeQueue(self) -> 'deque[Tuple[Tuple[IrcMessage], dict]]':
+    def writeQueue(self) -> 'Deque[Tuple[Tuple[IrcMessage], dict]]':
         return self._writeQueue
 
     def fileno(self) -> Optional[int]:
