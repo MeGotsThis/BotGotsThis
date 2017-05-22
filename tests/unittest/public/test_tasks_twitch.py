@@ -54,7 +54,20 @@ class TestTasksTwitchIds(TestTasksTwitchBase):
         self.mock_twitchid.return_value = {'botgotsthis': '1'}
         twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
+        self.mock_twitchid.assert_called_once_with(['botgotsthis'])
         self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
+
+    def test_multiple(self):
+        mgtChannel = Mock(spec=Channel)
+        mgtChannel.channel = 'botgotsthis'
+        self.mock_globals.channels['megotsthis'] = mgtChannel
+        self.mock_globals.twitchId = {'botgotsthis': '1'}
+        self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
+        self.mock_globals.twitchIdCache = {'botgotsthis': self.now}
+        self.mock_twitchid.return_value = {'megotsthis': '2'}
+        twitch.checkTwitchIds(self.now)
+        self.mock_twitchid.assert_called_once_with(['megotsthis'])
+        self.mock_save.assert_called_once_with('megotsthis', '2', self.now)
 
     def test_recent(self):
         self.mock_globals.twitchId = {'botgotsthis': '1'}

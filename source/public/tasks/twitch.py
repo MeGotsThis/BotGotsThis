@@ -31,6 +31,11 @@ def checkTwitchIds(timestamp: datetime) -> None:
     for channel in bot.globals.channels:
         if channel in ids:
             continue
+        if channel in bot.globals.twitchIdCache:
+            cacheExpired: datetime
+            cacheExpired = bot.globals.twitchIdCache[channel] + cacheDuration
+            if cacheExpired >= timestamp:
+                continue
         utils.saveTwitchId(channel, None, timestamp)
 
 
