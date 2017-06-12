@@ -12,7 +12,6 @@ from source.database import AutoJoinChannel
 from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
 from . import data, utils
-from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.logging import Logging
 from .thread.socket import SocketsThread
@@ -32,12 +31,10 @@ def main(argv: Optional[List[str]]=None) -> int:
     bot.globals.join = JoinThread(name='Join Thread')
 
     bot.globals.logging = Logging()
-    bot.globals.background = BackgroundTasker(name='Background Tasker')
 
     # Start the Threads
     bot.globals.logging.start()
     bot.globals.sockets.start()
-    #bot.globals.background.start()
     bot.globals.join.start()
 
     _modulesList: ModuleList = [

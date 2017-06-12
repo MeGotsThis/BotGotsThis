@@ -1,6 +1,5 @@
 ﻿import bot.config
 from . import data
-from .thread import background as backgroundThread
 from .thread import logging as loggingThread
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
@@ -17,7 +16,6 @@ join: JoinThread = None
 groupChannel: 'data.Channel' = None
 
 logging: loggingThread.Logging = None
-background: backgroundThread.BackgroundTasker = None
 
 clusters: Dict[str, 'data.Socket'] = {
     'aws': None,
