@@ -4,9 +4,6 @@ checked as of version 0.4.2.
 '''
 
 import bot.globals
-from bot.thread.background import BackgroundTasker
-
-bot.globals.background = BackgroundTasker(name='Background Tasker')
 
 import source.public.autoload.twitch
 import source.public.autoload.emotes
