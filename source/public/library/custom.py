@@ -15,6 +15,7 @@ permissions: Dict[Optional[str], str] = {
     'any': '',
     'all': '',
     'public': '',
+    'regular': '',
     'permitted': 'permitted',
     'permit': 'permitted',
     'subscriber': 'subscriber',
