@@ -1,10 +1,13 @@
-﻿from ..tasks import repeat
-from bot.globals import background
+﻿import asyncio
 import datetime
 
+from bot.async_task import background
+from ..tasks import repeat
 
-def call_autorepeat(timestamp: datetime.datetime) -> None:
+
+async def call_autorepeat(timestamp: datetime.datetime) -> None:
+    await asyncio.sleep(0)
     repeat.autoRepeatMessage(timestamp)
 
 
-background.addTask(call_autorepeat, datetime.timedelta(seconds=0.5))
+background.add_task(call_autorepeat, datetime.timedelta(seconds=0.5))

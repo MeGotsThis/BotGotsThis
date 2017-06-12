@@ -1,4 +1,5 @@
 ﻿# Import some necessary libraries.
+import asyncio
 import bot.config
 import bot.globals
 import importlib
@@ -15,8 +16,10 @@ from .thread.background import BackgroundTasker
 from .thread.join import JoinThread
 from .thread.logging import Logging
 from .thread.socket import SocketsThread
+from .async_task import background
 
 ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
+
 
 def main(argv: Optional[List[str]]=None) -> int:
     print('{time} Starting'.format(time=utils.now()))
@@ -34,7 +37,7 @@ def main(argv: Optional[List[str]]=None) -> int:
     # Start the Threads
     bot.globals.logging.start()
     bot.globals.sockets.start()
-    bot.globals.background.start()
+    #bot.globals.background.start()
     bot.globals.join.start()
 
     _modulesList: ModuleList = [
@@ -59,8 +62,10 @@ def main(argv: Optional[List[str]]=None) -> int:
             for autoJoin in db.getAutoJoinsChats():
                 utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
                                   autoJoin.cluster)
-    
-        bot.globals.sockets.join()
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(background.run_tasks())
+        loop.close()
         return 0
     except:
         bot.globals.running = False
