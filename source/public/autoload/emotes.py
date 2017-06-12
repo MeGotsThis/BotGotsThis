@@ -1,20 +1,25 @@
-﻿from ..tasks import emotes
-from bot.globals import background
+﻿import asyncio
 import datetime
 
+from bot.async_task import background
+from ..tasks import emotes
 
-def call_twitch(timestamp: datetime.datetime) -> None:
+
+async def call_twitch(timestamp: datetime.datetime) -> None:
+    await asyncio.sleep(0)
     emotes.refreshTwitchGlobalEmotes(timestamp)
 
 
-def call_ffz(timestamp: datetime.datetime) -> None:
+async def call_ffz(timestamp: datetime.datetime) -> None:
+    await asyncio.sleep(0)
     emotes.refreshFrankerFaceZEmotes(timestamp)
 
 
-def call_bttv(timestamp: datetime.datetime) -> None:
+async def call_bttv(timestamp: datetime.datetime) -> None:
+    await asyncio.sleep(0)
     emotes.refreshBetterTwitchTvEmotes(timestamp)
 
 
-background.addTask(call_twitch, datetime.timedelta(seconds=1))
-background.addTask(call_ffz, datetime.timedelta(milliseconds=.75))
-background.addTask(call_bttv, datetime.timedelta(milliseconds=.75))
+background.add_task(call_twitch, datetime.timedelta(seconds=1))
+background.add_task(call_ffz, datetime.timedelta(milliseconds=.75))
+background.add_task(call_bttv, datetime.timedelta(milliseconds=.75))
