@@ -1,5 +1,4 @@
-﻿import asyncio
-import datetime
+﻿import datetime
 
 from bot.async_task import background
 from ..tasks import emotes
