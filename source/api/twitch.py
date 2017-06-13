@@ -42,6 +42,21 @@ def client_id() -> Optional[str]:
     return None
 
 
+def get_headers(headers: MutableMapping[str, str],
+                channel: Optional[str]) -> MutableMapping[str, str]:
+    if 'Accept' not in headers:
+        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
+    if 'Client-ID' not in headers:
+        clientId: Optional[str] = client_id()
+        if clientId is not None:
+            headers['Client-ID'] = clientId
+    if channel is not None and 'Authorization' not in headers:
+        token: Optional[str] = oauth.token(channel)
+        if token is not None:
+            headers['Authorization'] = 'OAuth ' + token
+    return headers
+
+
 def api_call(channel: Optional[str],
              method: str,
              uri: str,
@@ -50,19 +65,10 @@ def api_call(channel: Optional[str],
              ) -> Tuple[client.HTTPResponse, bytes]:
     if headers is None:
         headers = {}
+    headers = get_headers(headers, channel)
     connection: client.HTTPConnection
     connection = client.HTTPSConnection('api.twitch.tv')
     with closing(connection):
-        if 'Accept' not in headers:
-            headers['Accept'] = 'application/vnd.twitchtv.v5+json'
-        if 'Client-ID' not in headers:
-            clientId: Optional[str] = client_id()
-            if clientId is not None:
-                headers['Client-ID'] = clientId
-        if channel is not None and 'Authorization' not in headers:
-            token: Optional[str] = oauth.token(channel)
-            if token is not None:
-                headers['Authorization'] = 'OAuth ' + token
         dataStr: Optional[str] = None
         if data is not None:
             if isinstance(data, Mapping):
@@ -81,16 +87,7 @@ async def get_call(channel: Optional[str],
                    ) -> Tuple[Any, Optional[Dict]]:
     if headers is None:
         headers = {}
-    if 'Accept' not in headers:
-        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
-    if 'Client-ID' not in headers:
-        clientId: Optional[str] = client_id()
-        if clientId is not None:
-            headers['Client-ID'] = clientId
-    if channel is not None and 'Authorization' not in headers:
-        token: Optional[str] = oauth.token(channel)
-        if token is not None:
-            headers['Authorization'] = 'OAuth ' + token
+    headers = get_headers(headers, channel)
     async with aiohttp.ClientSession() as session:
         async with session.get('https://api.twitch.tv' + uri,
                                headers=headers) as response:
@@ -107,16 +104,7 @@ async def post_call(channel: Optional[str],
                     ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
     if headers is None:
         headers = {}
-    if 'Accept' not in headers:
-        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
-    if 'Client-ID' not in headers:
-        clientId: Optional[str] = client_id()
-        if clientId is not None:
-            headers['Client-ID'] = clientId
-    if channel is not None and 'Authorization' not in headers:
-        token: Optional[str] = oauth.token(channel)
-        if token is not None:
-            headers['Authorization'] = 'OAuth ' + token
+    headers = get_headers(headers, channel)
     dataStr: Optional[str] = None
     if data is not None:
         if isinstance(data, Mapping):
@@ -140,16 +128,7 @@ async def put_call(channel: Optional[str],
                     ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
     if headers is None:
         headers = {}
-    if 'Accept' not in headers:
-        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
-    if 'Client-ID' not in headers:
-        clientId: Optional[str] = client_id()
-        if clientId is not None:
-            headers['Client-ID'] = clientId
-    if channel is not None and 'Authorization' not in headers:
-        token: Optional[str] = oauth.token(channel)
-        if token is not None:
-            headers['Authorization'] = 'OAuth ' + token
+    headers = get_headers(headers, channel)
     dataStr: Optional[str] = None
     if data is not None:
         if isinstance(data, Mapping):
@@ -167,22 +146,13 @@ async def put_call(channel: Optional[str],
 
 
 async def delete_call(channel: Optional[str],
-                    uri: str,
-                    headers: MutableMapping[str, str]=None,
-                    data: Union[str, Mapping[str, str]]=None
-                    ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+                      uri: str,
+                      headers: MutableMapping[str, str]=None,
+                      data: Union[str, Mapping[str, str]]=None
+                      ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
     if headers is None:
         headers = {}
-    if 'Accept' not in headers:
-        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
-    if 'Client-ID' not in headers:
-        clientId: Optional[str] = client_id()
-        if clientId is not None:
-            headers['Client-ID'] = clientId
-    if channel is not None and 'Authorization' not in headers:
-        token: Optional[str] = oauth.token(channel)
-        if token is not None:
-            headers['Authorization'] = 'OAuth ' + token
+    headers = get_headers(headers, channel)
     dataStr: Optional[str] = None
     if data is not None:
         if isinstance(data, Mapping):

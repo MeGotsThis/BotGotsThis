@@ -256,28 +256,46 @@ class TestApiTwitchApiCalls(unittest.TestCase):
     def test_api_call(self):
         twitch.api_call('botgotsthis', 'GET', '/kraken/',
                         data={'bot': 'BotGotsThis'})
-        self.assertTrue(self.mock_clientid.called)
-        self.assertTrue(self.mock_token.called)
+        self.mock_clientid.assert_called_once_with()
+        self.mock_token.assert_called_once_with('botgotsthis')
 
     def test_api_call_channel_none(self):
         twitch.api_call(None, 'GET', '/kraken/', data={'bot': 'BotGotsThis'})
-        self.assertTrue(self.mock_clientid.called)
+        self.mock_clientid.assert_called_once_with()
         self.assertFalse(self.mock_token.called)
 
     def test_api_call_data_none(self):
         twitch.api_call(None, 'GET', '/kraken/')
-        self.assertTrue(self.mock_clientid.called)
+        self.mock_clientid.assert_called_once_with()
+        self.mock_clientid.assert_called_once_with()
         self.assertFalse(self.mock_token.called)
 
     def test_api_call_header(self):
         headers = {}
         twitch.api_call('botgotsthis', 'GET', '/kraken/', headers=headers)
-        self.assertTrue(self.mock_clientid.called)
-        self.assertTrue(self.mock_token.called)
+        self.mock_clientid.assert_called_once_with()
+        self.mock_token.assert_called_once_with('botgotsthis')
         self.assertEqual(headers,
                          {'Accept': 'application/vnd.twitchtv.v5+json',
                           'Client-ID': '0123456789abcdef',
                           'Authorization': 'OAuth abcdef0123456789'})
+
+    def test_get_headers(self):
+        headers = twitch.get_headers({}, 'botgotsthis')
+        self.mock_clientid.assert_called_once_with()
+        self.mock_token.assert_called_once_with('botgotsthis')
+        self.assertEqual(headers,
+                         {'Accept': 'application/vnd.twitchtv.v5+json',
+                          'Client-ID': '0123456789abcdef',
+                          'Authorization': 'OAuth abcdef0123456789'})
+
+    def test_get_headers_no_channel(self):
+        headers = twitch.get_headers({}, None)
+        self.mock_clientid.assert_called_once_with()
+        self.assertFalse(self.mock_token.called)
+        self.assertEqual(headers,
+                         {'Accept': 'application/vnd.twitchtv.v5+json',
+                          'Client-ID': '0123456789abcdef'})
 
     def test_chat_server(self):
         mock = MagicMock()
