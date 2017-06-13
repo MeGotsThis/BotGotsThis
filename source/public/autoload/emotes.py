@@ -10,8 +10,7 @@ async def call_twitch(timestamp: datetime.datetime) -> None:
 
 
 async def call_ffz(timestamp: datetime.datetime) -> None:
-    await asyncio.sleep(0)
-    emotes.refreshFrankerFaceZEmotes(timestamp)
+    await emotes.refreshFrankerFaceZEmotes(timestamp)
 
 
 async def call_bttv(timestamp: datetime.datetime) -> None:

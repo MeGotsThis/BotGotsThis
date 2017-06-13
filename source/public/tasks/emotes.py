@@ -26,18 +26,20 @@ async def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
         await asyncio.sleep(0)
 
 
-def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
-    refreshFfzGlobalEmotes(timestamp)
+async def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
+    await refreshFfzGlobalEmotes(timestamp)
     refreshFfzRandomBroadcasterEmotes(timestamp)
 
 
-def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
+async def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalFfzEmotesCache >= timedelta(hours=1):
         emotes: Optional[Dict[int, str]]
-        emotes = ffz.getGlobalEmotes()
+        emotes = await ffz.getGlobalEmotes()
         bot.globals.globalFfzEmotesCache = timestamp
         if emotes is not None:
             bot.globals.globalFfzEmotes = emotes
+    else:
+        await asyncio.sleep(0)
 
 
 def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
