@@ -1,4 +1,6 @@
-﻿import aiohttp
+﻿import asyncio
+
+import aiohttp
 
 from typing import Dict, Optional
 
@@ -25,6 +27,8 @@ async def getGlobalEmotes() -> Optional[Dict[int, str]]:
     except aiohttp.ClientResponseError as e:
         if e.code == 404:
             return {}
+    except asyncio.TimeoutError:
+        pass
     return None
 
 
@@ -47,4 +51,6 @@ async def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[int, str]]:
     except aiohttp.ClientResponseError as e:
         if e.code == 404:
             return {}
+    except asyncio.TimeoutError:
+        pass
     return None

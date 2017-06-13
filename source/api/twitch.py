@@ -6,6 +6,7 @@ from http import client
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
 import aiohttp
+import asyncio
 import bot.globals
 import bot.utils
 import configparser
@@ -187,7 +188,8 @@ def server_time() -> Optional[datetime]:
 async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
     uri: str = ('/kraken/chat/emoticon_images?emotesets='
                 + ','.join(str(i) for i in bot.globals.emoteset))
-    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError):
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
         response: aiohttp.ClientResponse
         data: Optional[Dict]
         globalEmotes: TwitchEmotes
