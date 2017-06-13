@@ -55,16 +55,14 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalEmoteSets, {})
         mock_emotes.assert_called_once_with()
 
-    @patch('source.public.tasks.emotes.refreshFfzGlobalEmotes',
-           autospec=True)
-    @patch('source.public.tasks.emotes.refreshFfzRandomBroadcasterEmotes',
-           autospec=True)
+    @patch('source.public.tasks.emotes.refreshFfzGlobalEmotes')
+    @patch('source.public.tasks.emotes.refreshFfzRandomBroadcasterEmotes')
     async def test_ffz(self, mock_broadcaster, mock_global):
         await emotes.refreshFrankerFaceZEmotes(self.now)
         mock_broadcaster.assert_called_once_with(self.now)
         mock_global.assert_called_once_with(self.now)
 
-    @patch('source.api.ffz.getGlobalEmotes', autospec=True)
+    @patch('source.api.ffz.getGlobalEmotes')
     async def test_ffz_global(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -76,7 +74,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalFfzEmotes, emotes_)
         mock_emotes.assert_called_once_with()
 
-    @patch('source.api.ffz.getGlobalEmotes', autospec=True)
+    @patch('source.api.ffz.getGlobalEmotes')
     async def test_ffz_global_recent(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -87,7 +85,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalFfzEmotes, {})
         self.assertFalse(mock_emotes.called)
 
-    @patch('source.api.ffz.getGlobalEmotes', autospec=True)
+    @patch('source.api.ffz.getGlobalEmotes')
     async def test_ffz_global_none(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -98,28 +96,27 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalFfzEmotes, {})
         mock_emotes.assert_called_once_with()
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_ffz_broadcaster(self):
+    async def test_ffz_broadcaster(self):
+        timestamp = self.now + timedelta(hours=1)
         channel = Mock(spec=Channel)
         channel.channel = 'botgotsthis'
         channel.isStreaming = False
         channel.ffzCache = self.now
         self.mock_globals.channels = {'botgotsthis': channel}
-        emotes.refreshFfzRandomBroadcasterEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshFfzRandomBroadcasterEmotes(timestamp)
         channel.updateFfzEmotes.assert_called_once_with()
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_ffz_broadcaster_recent(self):
+    async def test_ffz_broadcaster_recent(self):
         channel = Mock(spec=Channel)
         channel.channel = 'botgotsthis'
         channel.isStreaming = False
         channel.ffzCache = self.now
         self.mock_globals.channels = {'botgotsthis': channel}
-        emotes.refreshFfzRandomBroadcasterEmotes(self.now)
+        await emotes.refreshFfzRandomBroadcasterEmotes(self.now)
         self.assertFalse(channel.updateFfzEmotes.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_ffz_broadcaster_priority(self):
+    async def test_ffz_broadcaster_priority(self):
+        timestamp = self.now + timedelta(hours=1)
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
         bgtchannel.isStreaming = False
@@ -130,13 +127,13 @@ class TestTasksEmotes(asynctest.TestCase):
         mgtchannel.ffzCache = self.now
         self.mock_globals.channels = {'botgotsthis': bgtchannel,
                                       'megotsthis': mgtchannel}
-        emotes.refreshFfzRandomBroadcasterEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshFfzRandomBroadcasterEmotes(timestamp)
         mgtchannel.updateFfzEmotes.assert_called_once_with()
         self.assertFalse(bgtchannel.updateFfzEmotes.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('random.choice', autospec=True)
-    def test_ffz_broadcaster_onlyone(self, mock_choice):
+    async def test_ffz_broadcaster_onlyone(self, mock_choice):
+        timestamp = self.now + timedelta(hours=1)
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
         bgtchannel.isStreaming = False
@@ -148,15 +145,15 @@ class TestTasksEmotes(asynctest.TestCase):
         self.mock_globals.channels = {'botgotsthis': bgtchannel,
                                       'megotsthis': mgtchannel}
         mock_choice.return_value = bgtchannel
-        emotes.refreshFfzRandomBroadcasterEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshFfzRandomBroadcasterEmotes(timestamp)
         bgtchannel.updateFfzEmotes.assert_called_once_with()
         self.assertFalse(mgtchannel.updateFfzEmotes.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('random.choice', autospec=True)
-    def test_ffz_broadcaster_empty(self, mock_choice):
+    async def test_ffz_broadcaster_empty(self, mock_choice):
+        timestamp = self.now + timedelta(hours=1)
         self.mock_globals.channels = {}
-        emotes.refreshFfzRandomBroadcasterEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshFfzRandomBroadcasterEmotes(timestamp)
         self.assertFalse(mock_choice.called)
 
     @asynctest.fail_on(unused_loop=False)

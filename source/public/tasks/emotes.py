@@ -28,7 +28,7 @@ async def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
 
 async def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
     await refreshFfzGlobalEmotes(timestamp)
-    refreshFfzRandomBroadcasterEmotes(timestamp)
+    await refreshFfzRandomBroadcasterEmotes(timestamp)
 
 
 async def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
@@ -42,7 +42,7 @@ async def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
         await asyncio.sleep(0)
 
 
-def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
+async def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
     channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
     toUpdate: List[data.Channel]
     toUpdate = [chan for chan in channels.values()
@@ -53,7 +53,9 @@ def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
                     if timestamp - chan.ffzCache >= timedelta(hours=1)
                     and not chan.isStreaming]
     if toUpdate:
-        random.choice(toUpdate).updateFfzEmotes()
+        await random.choice(toUpdate).updateFfzEmotes()
+    else:
+        await asyncio.sleep(0)
 
 
 def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:

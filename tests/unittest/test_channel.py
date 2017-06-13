@@ -1,9 +1,10 @@
+import asynctest
 import math
 import unittest
 from bot.data import Channel, MessagingQueue, Socket
 from collections.abc import MutableMapping, MutableSet
 from datetime import datetime
-from unittest.mock import Mock, patch
+from asynctest.mock import Mock, patch
 
 
 class TestChannel(unittest.TestCase):
@@ -71,7 +72,7 @@ class TestChannel(unittest.TestCase):
         self.channel.ircOps.add('botgotsthis')
         self.assertIn('botgotsthis', self.channel.ircOps)
 
-    def test_ircUsers_set(self):
+    def test_ircOps_set(self):
         with self.assertRaises(AttributeError):
             self.channel.ircOps = set()
 
@@ -114,43 +115,6 @@ class TestChannel(unittest.TestCase):
     def test_ffzEmotes_set(self):
         with self.assertRaises(AttributeError):
             self.channel.ffzEmotes = {}
-
-    @patch('bot.utils.now', autospec=True)
-    @patch('source.api.ffz.getBroadcasterEmotes', autospec=True)
-    def test_updateFfzEmotes(self, mock_getFfzEmotes, mock_now):
-        now = datetime(2000, 1, 1)
-        emotes = {-1: 'FrankerFaceZ'}
-        mock_now.return_value = now
-        mock_getFfzEmotes.return_value = emotes
-        self.channel.updateFfzEmotes()
-        mock_getFfzEmotes.assert_called_once_with(self.channel.channel)
-        self.assertEqual(self.channel.ffzCache, now)
-        self.assertEqual(self.channel.ffzEmotes, emotes)
-
-    @patch('bot.utils.now', autospec=True)
-    @patch('source.api.ffz.getBroadcasterEmotes', autospec=True)
-    def test_updateFfzEmotes_empty(self, mock_getFfzEmotes, mock_now):
-        now = datetime(2000, 1, 1)
-        emotes = {}
-        mock_now.return_value = now
-        mock_getFfzEmotes.return_value = emotes
-        self.channel._ffzEmotes = {-1: 'FrankerFaceZ'}
-        self.channel.updateFfzEmotes()
-        mock_getFfzEmotes.assert_called_once_with(self.channel.channel)
-        self.assertEqual(self.channel.ffzCache, now)
-        self.assertEqual(self.channel.ffzEmotes, emotes)
-
-    @patch('bot.utils.now', autospec=True)
-    @patch('source.api.ffz.getBroadcasterEmotes', autospec=True)
-    def test_updateFfzEmotes_error(self, mock_getFfzEmotes, mock_now):
-        now = datetime(2000, 1, 1)
-        emotes = {-1: 'FrankerFaceZ'}
-        self.channel._ffzEmotes = emotes
-        mock_now.return_value = now
-        mock_getFfzEmotes.return_value = None
-        self.channel.updateFfzEmotes()
-        self.assertEqual(self.channel.ffzCache, datetime.min)
-        self.assertEqual(self.channel.ffzEmotes, emotes)
 
     @patch('bot.utils.now', autospec=True)
     @patch('source.api.bttv.getBroadcasterEmotes', autospec=True)
@@ -294,3 +258,47 @@ class TestChannel(unittest.TestCase):
         self.channel.send(messages, 0)
         self.socket.messaging.sendChat.assert_called_once_with(
             self.channel, messages, 0)
+
+
+class TestChannelAsync(asynctest.TestCase):
+    def setUp(self):
+        self.socket = Mock(spec=Socket)
+        self.socket.messaging = Mock(spec=MessagingQueue)
+        self.channel = Channel('botgotsthis', self.socket)
+
+    @patch('bot.utils.now', autospec=True)
+    @patch('source.api.ffz.getBroadcasterEmotes')
+    async def test_updateFfzEmotes(self, mock_getFfzEmotes, mock_now):
+        now = datetime(2000, 1, 1)
+        emotes = {-1: 'FrankerFaceZ'}
+        mock_now.return_value = now
+        mock_getFfzEmotes.return_value = emotes
+        await self.channel.updateFfzEmotes()
+        mock_getFfzEmotes.assert_called_once_with(self.channel.channel)
+        self.assertEqual(self.channel.ffzCache, now)
+        self.assertEqual(self.channel.ffzEmotes, emotes)
+
+    @patch('bot.utils.now', autospec=True)
+    @patch('source.api.ffz.getBroadcasterEmotes')
+    async def test_updateFfzEmotes_empty(self, mock_getFfzEmotes, mock_now):
+        now = datetime(2000, 1, 1)
+        emotes = {}
+        mock_now.return_value = now
+        mock_getFfzEmotes.return_value = emotes
+        self.channel._ffzEmotes = {-1: 'FrankerFaceZ'}
+        await self.channel.updateFfzEmotes()
+        mock_getFfzEmotes.assert_called_once_with(self.channel.channel)
+        self.assertEqual(self.channel.ffzCache, now)
+        self.assertEqual(self.channel.ffzEmotes, emotes)
+
+    @patch('bot.utils.now', autospec=True)
+    @patch('source.api.ffz.getBroadcasterEmotes')
+    async def test_updateFfzEmotes_error(self, mock_getFfzEmotes, mock_now):
+        now = datetime(2000, 1, 1)
+        emotes = {-1: 'FrankerFaceZ'}
+        self.channel._ffzEmotes = emotes
+        mock_now.return_value = now
+        mock_getFfzEmotes.return_value = None
+        await self.channel.updateFfzEmotes()
+        self.assertEqual(self.channel.ffzCache, datetime.min)
+        self.assertEqual(self.channel.ffzEmotes, emotes)
