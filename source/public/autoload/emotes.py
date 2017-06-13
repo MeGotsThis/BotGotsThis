@@ -6,8 +6,7 @@ from ..tasks import emotes
 
 
 async def call_twitch(timestamp: datetime.datetime) -> None:
-    await asyncio.sleep(0)
-    emotes.refreshTwitchGlobalEmotes(timestamp)
+    await emotes.refreshTwitchGlobalEmotes(timestamp)
 
 
 async def call_ffz(timestamp: datetime.datetime) -> None:
