@@ -1,8 +1,8 @@
-import unittest
+import asynctest
 from http.client import HTTPResponse
 from source.api import ffz
 from urllib.error import HTTPError, URLError
-from unittest.mock import MagicMock, Mock, patch
+from asynctest.mock import MagicMock, Mock, patch
 
 globalEmotes = b'''{
     "default_sets": [
@@ -114,7 +114,7 @@ broadcasterEmotes = b'''{
 }'''
 
 
-class TestApiFfz(unittest.TestCase):
+class TestApiFfz(asynctest.TestCase):
     @patch('urllib.request.urlopen', autospec=True)
     async def fail_test_globalEmotes(self, mock_urlopen):
         # TODO: Fix when asynctest is updated with magic mock
@@ -143,25 +143,30 @@ class TestApiFfz(unittest.TestCase):
         self.assertIsNone(await ffz.getGlobalEmotes())
 
     @patch('urllib.request.urlopen')
-    def test_broadcasterEmotes(self, mock_urlopen):
+    async def fail_test_broadcasterEmotes(self, mock_urlopen):
+        # TODO: Fix when asynctest is updated with magic mock
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.return_value = mockResponse
         mockResponse.status = 200
         mockResponse.read = Mock(spec=HTTPResponse.read)
         mockResponse.read.return_value = broadcasterEmotes
-        self.assertEqual(ffz.getBroadcasterEmotes('pokemonspeedrunstv'), {18146: 'KevinSquirtle'})
+        self.assertEqual(await ffz.getBroadcasterEmotes('pokemonspeedrunstv'),
+                         {18146: 'KevinSquirtle'})
 
     @patch('urllib.request.urlopen')
-    def test_broadcasterEmotes_404(self, mock_urlopen):
+    async def fail_test_broadcasterEmotes_404(self, mock_urlopen):
+        # TODO: Fix when asynctest is updated with magic mock
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = HTTPError(None, 404, None, None, None)
-        self.assertEqual(ffz.getBroadcasterEmotes('pokemonspeedrunstv'), {})
+        self.assertEqual(await ffz.getBroadcasterEmotes('pokemonspeedrunstv'),
+                         {})
 
     @patch('urllib.request.urlopen')
-    def test_broadcasterEmotes_error(self, mock_urlopen):
+    async def fail_test_broadcasterEmotes_error(self, mock_urlopen):
+        # TODO: Fix when asynctest is updated with magic mock
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = URLError(None)
-        self.assertIsNone(ffz.getBroadcasterEmotes('pokemonspeedrunstv'))
+        self.assertIsNone(await ffz.getBroadcasterEmotes('pokemonspeedrunstv'))

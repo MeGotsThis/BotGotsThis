@@ -271,12 +271,12 @@ class Channel:
     def clear(self):
         self.socket.messaging.clearChat(self)
 
-    def updateFfzEmotes(self) -> None:
+    async def updateFfzEmotes(self) -> None:
         oldTimestamp: datetime
         with self._ffzLock:
             oldTimestamp, self._ffzCache = self._ffzCache, utils.now()
         emotes: Optional[Dict[int, str]]
-        emotes = ffz.getBroadcasterEmotes(self._channel)
+        emotes = await ffz.getBroadcasterEmotes(self._channel)
         if emotes is not None:
             self._ffzEmotes = emotes
             with self._ffzLock:
