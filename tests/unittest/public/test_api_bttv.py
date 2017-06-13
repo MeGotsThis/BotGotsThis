@@ -65,29 +65,31 @@ class TestApiBttv(asynctest.TestCase):
         mockResponse.__enter__.side_effect = URLError(None)
         self.assertIsNone(await bttv.getGlobalEmotes())
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('urllib.request.urlopen')
-    def test_broadcasterEmotes(self, mock_urlopen):
+    async def fail_test_broadcasterEmotes(self, mock_urlopen):
+        # TODO: Fix when asynctest is updated with magic mock
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.return_value = mockResponse
         mockResponse.status = 200
         mockResponse.read = Mock(spec=HTTPResponse.read)
         mockResponse.read.return_value = broadcasterEmotes
-        self.assertEqual(bttv.getBroadcasterEmotes('pokemonspeedrunstv'), {'554da1a289d53f2d12781907': '(ditto)'})
+        self.assertEqual(await bttv.getBroadcasterEmotes('pokemonspeedrunstv'),
+                         {'554da1a289d53f2d12781907': '(ditto)'})
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('urllib.request.urlopen')
-    def test_broadcasterEmotes_404(self, mock_urlopen):
+    async def fail_test_broadcasterEmotes_404(self, mock_urlopen):
+        # TODO: Fix when asynctest is updated with magic mock
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = HTTPError(None, 404, None, None, None)
-        self.assertEqual(bttv.getBroadcasterEmotes('pokemonspeedrunstv'), {})
+        self.assertEqual(await bttv.getBroadcasterEmotes('pokemonspeedrunstv'),
+                         {})
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('urllib.request.urlopen')
-    def test_broadcasterEmotes_error(self, mock_urlopen):
+    async def fail_test_broadcasterEmotes_error(self, mock_urlopen):
+        # TODO: Fix when asynctest is updated with magic mock
         mockResponse = MagicMock(spec=HTTPResponse)
         mock_urlopen.return_value = mockResponse
         mockResponse.__enter__.side_effect = URLError(None)
-        self.assertIsNone(bttv.getBroadcasterEmotes('pokemonspeedrunstv'))
+        self.assertIsNone(await bttv.getBroadcasterEmotes('pokemonspeedrunstv'))

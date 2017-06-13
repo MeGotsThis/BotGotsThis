@@ -197,28 +197,27 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalBttvEmotes, {})
         mock_emotes.assert_called_once_with()
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_bttv_broadcaster(self):
+    async def test_bttv_broadcaster(self):
+        timestamp = self.now + timedelta(hours=1)
         channel = Mock(spec=Channel)
         channel.channel = 'botgotsthis'
         channel.isStreaming = False
         channel.bttvCache = self.now
         self.mock_globals.channels = {'botgotsthis': channel}
-        emotes.refreshBttvRandomBroadcasterEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshBttvRandomBroadcasterEmotes(timestamp)
         channel.updateBttvEmotes.assert_called_once_with()
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_bttv_broadcaster_recent(self):
+    async def test_bttv_broadcaster_recent(self):
         channel = Mock(spec=Channel)
         channel.channel = 'botgotsthis'
         channel.isStreaming = False
         channel.bttvCache = self.now
         self.mock_globals.channels = {'botgotsthis': channel}
-        emotes.refreshBttvRandomBroadcasterEmotes(self.now)
+        await emotes.refreshBttvRandomBroadcasterEmotes(self.now)
         self.assertFalse(channel.updateBttvEmotes.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_bttv_broadcaster_priority(self):
+    async def test_bttv_broadcaster_priority(self):
+        timestamp = self.now + timedelta(hours=1)
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
         bgtchannel.isStreaming = False
@@ -229,13 +228,13 @@ class TestTasksEmotes(asynctest.TestCase):
         mgtchannel.bttvCache = self.now
         self.mock_globals.channels = {'botgotsthis': bgtchannel,
                                       'megotsthis': mgtchannel}
-        emotes.refreshBttvRandomBroadcasterEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshBttvRandomBroadcasterEmotes(timestamp)
         mgtchannel.updateBttvEmotes.assert_called_once_with()
         self.assertFalse(bgtchannel.updateBttvEmotes.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('random.choice', autospec=True)
-    def test_bttv_broadcaster_onlyone(self, mock_choice):
+    async def test_bttv_broadcaster_onlyone(self, mock_choice):
+        timestamp = self.now + timedelta(hours=1)
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
         bgtchannel.isStreaming = False
@@ -247,13 +246,13 @@ class TestTasksEmotes(asynctest.TestCase):
         self.mock_globals.channels = {'botgotsthis': bgtchannel,
                                       'megotsthis': mgtchannel}
         mock_choice.return_value = bgtchannel
-        emotes.refreshBttvRandomBroadcasterEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshBttvRandomBroadcasterEmotes(timestamp)
         bgtchannel.updateBttvEmotes.assert_called_once_with()
         self.assertFalse(mgtchannel.updateBttvEmotes.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('random.choice', autospec=True)
-    def test_bttv_broadcaster_empty(self, mock_choice):
+    async def test_bttv_broadcaster_empty(self, mock_choice):
+        timestamp = self.now + timedelta(hours=1)
         self.mock_globals.channels = {}
-        emotes.refreshBttvRandomBroadcasterEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshBttvRandomBroadcasterEmotes(timestamp)
         self.assertFalse(mock_choice.called)
