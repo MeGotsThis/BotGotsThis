@@ -1,6 +1,5 @@
 ﻿import aiohttp
-from http.client import HTTPResponse
-from typing import BinaryIO, Dict, Optional, Union
+from typing import Dict, Optional
 
 
 async def getGlobalEmotes() -> Optional[Dict[int, str]]:

@@ -285,12 +285,12 @@ class Channel:
             with self._ffzLock:
                 self._ffzCache = oldTimestamp
 
-    def updateBttvEmotes(self) -> None:
+    async def updateBttvEmotes(self) -> None:
         oldTimestamp: datetime
         with self._bttvLock:
             oldTimestamp, self._bttvCache = self._bttvCache, utils.now()
         emotes: Optional[Dict[str, str]]
-        emotes = bttv.getBroadcasterEmotes(self._channel)
+        emotes = await bttv.getBroadcasterEmotes(self._channel)
         if emotes is not None:
             self._bttvEmotes = emotes
             with self._bttvLock:

@@ -60,7 +60,7 @@ async def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
 
 async def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:
     await refreshBttvGlobalEmotes(timestamp)
-    refreshBttvRandomBroadcasterEmotes(timestamp)
+    await refreshBttvRandomBroadcasterEmotes(timestamp)
 
 
 async def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
@@ -74,7 +74,7 @@ async def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
         await asyncio.sleep(0)
 
 
-def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
+async def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
     channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
     toUpdate: List[data.Channel]
     toUpdate = [chan for chan in channels.values()
@@ -85,4 +85,6 @@ def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
                     if timestamp - chan.bttvCache >= timedelta(hours=1)
                     and not chan.isStreaming]
     if toUpdate:
-        random.choice(toUpdate).updateBttvEmotes()
+        await random.choice(toUpdate).updateBttvEmotes()
+    else:
+        await asyncio.sleep(0)
