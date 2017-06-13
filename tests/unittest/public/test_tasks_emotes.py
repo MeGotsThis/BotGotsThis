@@ -1,5 +1,4 @@
 import asynctest
-import unittest
 from bot.data import Channel
 from datetime import datetime, timedelta
 from source.public.tasks import emotes
@@ -56,48 +55,44 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalEmoteSets, {})
         mock_emotes.assert_called_once_with()
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.public.tasks.emotes.refreshFfzGlobalEmotes',
            autospec=True)
     @patch('source.public.tasks.emotes.refreshFfzRandomBroadcasterEmotes',
            autospec=True)
-    def test_ffz(self, mock_broadcaster, mock_global):
-        emotes.refreshFrankerFaceZEmotes(self.now)
+    async def test_ffz(self, mock_broadcaster, mock_global):
+        await emotes.refreshFrankerFaceZEmotes(self.now)
         mock_broadcaster.assert_called_once_with(self.now)
         mock_global.assert_called_once_with(self.now)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.ffz.getGlobalEmotes', autospec=True)
-    def test_ffz_global(self, mock_emotes):
+    async def test_ffz_global(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
         emotes_ = {1: 'ZreknarF'}
         mock_emotes.return_value = emotes_
-        emotes.refreshFfzGlobalEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshFfzGlobalEmotes(self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalFfzEmotesCache,
                          self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalFfzEmotes, emotes_)
         mock_emotes.assert_called_once_with()
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.ffz.getGlobalEmotes', autospec=True)
-    def test_ffz_global_recent(self, mock_emotes):
+    async def test_ffz_global_recent(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
         emotes_ = {1: 'ZreknarF'}
         mock_emotes.return_value = emotes_
-        emotes.refreshFfzGlobalEmotes(self.now)
+        await emotes.refreshFfzGlobalEmotes(self.now)
         self.assertEqual(self.mock_globals.globalFfzEmotesCache, self.now)
         self.assertEqual(self.mock_globals.globalFfzEmotes, {})
         self.assertFalse(mock_emotes.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.ffz.getGlobalEmotes', autospec=True)
-    def test_ffz_global_none(self, mock_emotes):
+    async def test_ffz_global_none(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
         mock_emotes.return_value = None
-        emotes.refreshFfzGlobalEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshFfzGlobalEmotes(self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalFfzEmotesCache,
                          self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalFfzEmotes, {})
