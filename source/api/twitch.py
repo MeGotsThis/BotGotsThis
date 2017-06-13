@@ -1,4 +1,5 @@
-﻿from source.api import oauth
+﻿from bot import config
+from source.api import oauth
 from contextlib import closing, suppress
 from datetime import datetime, timedelta
 from http import client
@@ -89,7 +90,8 @@ async def get_call(channel: Optional[str],
     headers = get_headers(headers, channel)
     async with aiohttp.ClientSession() as session:
         async with session.get('https://api.twitch.tv' + uri,
-                               headers=headers) as response:
+                               headers=headers,
+                               timeout=config.httpTimeout) as response:
             try:
                 return response, await response.json()
             except ValueError:
@@ -113,7 +115,8 @@ async def post_call(channel: Optional[str],
     async with aiohttp.ClientSession() as session:
         async with session.post('https://api.twitch.tv' + uri,
                                 headers=headers,
-                                data=dataStr) as response:
+                                data=dataStr,
+                                timeout=config.httpTimeout) as response:
             try:
                 return response, await response.json()
             except ValueError:
@@ -137,7 +140,8 @@ async def put_call(channel: Optional[str],
     async with aiohttp.ClientSession() as session:
         async with session.put('https://api.twitch.tv' + uri,
                                headers=headers,
-                               data=dataStr) as response:
+                               data=dataStr,
+                               timeout=config.httpTimeout) as response:
             try:
                 return response, await response.json()
             except ValueError:
@@ -161,7 +165,8 @@ async def delete_call(channel: Optional[str],
     async with aiohttp.ClientSession() as session:
         async with session.delete('https://api.twitch.tv' + uri,
                                   headers=headers,
-                                  data=dataStr) as response:
+                                  data=dataStr,
+                                  timeout=config.httpTimeout) as response:
             return response, None
 
 

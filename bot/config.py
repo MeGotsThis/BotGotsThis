@@ -29,6 +29,8 @@ spamModeratorCooldown: float = 20
 warningDuration: float = 20
 moderatorDefaultTimeout: List[int] = [0, 0, 0]
 
+httpTimeout: float = 60
+
 joinLimit: int = 50
 joinPerSecond: float = 15
 
@@ -93,6 +95,8 @@ if os.path.isfile('config.ini'):
     joinLimit = min(int(ini['BOT']['joinLimit']), 50)
     joinPerSecond = float(ini['BOT']['joinPerSecond'])
     joinPerSecond = joinPerSecond if joinPerSecond > 0 else 20
+
+    httpTimeout = float(ini['BOT']['httpTimeout'])
 
     ircLogFolder = str(ini['BOT']['ircLogFolder'])
     exceptionLog = str(ini['BOT']['exceptionLog'])
