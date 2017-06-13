@@ -14,8 +14,7 @@ async def call_ffz(timestamp: datetime.datetime) -> None:
 
 
 async def call_bttv(timestamp: datetime.datetime) -> None:
-    await asyncio.sleep(0)
-    emotes.refreshBetterTwitchTvEmotes(timestamp)
+     await emotes.refreshBetterTwitchTvEmotes(timestamp)
 
 
 background.add_task(call_twitch, datetime.timedelta(seconds=1))
