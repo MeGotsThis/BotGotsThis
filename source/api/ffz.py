@@ -1,5 +1,8 @@
 ﻿import aiohttp
+
 from typing import Dict, Optional
+
+from bot import config
 
 
 async def getGlobalEmotes() -> Optional[Dict[int, str]]:
@@ -7,7 +10,8 @@ async def getGlobalEmotes() -> Optional[Dict[int, str]]:
     response: aiohttp.ClientResponse
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
+            async with session.get(url,
+                                   timeout=config.httpTimeout) as response:
                 if response.status != 200:
                     return None
                 ffzData: dict = await response.json()
@@ -29,7 +33,8 @@ async def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[int, str]]:
     response: aiohttp.ClientResponse
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
+            async with session.get(url,
+                                   timeout=config.httpTimeout) as response:
                 if response.status != 200:
                     return None
                 ffzData: dict = await response.json()
