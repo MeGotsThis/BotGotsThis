@@ -156,48 +156,42 @@ class TestTasksEmotes(asynctest.TestCase):
         await emotes.refreshFfzRandomBroadcasterEmotes(timestamp)
         self.assertFalse(mock_choice.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    @patch('source.public.tasks.emotes.refreshBttvGlobalEmotes',
-           autospec=True)
-    @patch('source.public.tasks.emotes.refreshBttvRandomBroadcasterEmotes',
-           autospec=True)
-    def test_bttv(self, mock_broadcaster, mock_global):
-        emotes.refreshBetterTwitchTvEmotes(self.now)
+    @patch('source.public.tasks.emotes.refreshBttvGlobalEmotes')
+    @patch('source.public.tasks.emotes.refreshBttvRandomBroadcasterEmotes')
+    async def test_bttv(self, mock_broadcaster, mock_global):
+        await emotes.refreshBetterTwitchTvEmotes(self.now)
         mock_broadcaster.assert_called_once_with(self.now)
         mock_global.assert_called_once_with(self.now)
 
-    @asynctest.fail_on(unused_loop=False)
-    @patch('source.api.bttv.getGlobalEmotes', autospec=True)
-    def test_bttv_global(self, mock_emotes):
+    @patch('source.api.bttv.getGlobalEmotes')
+    async def test_bttv_global(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}
         emotes_ = {'54fa925e01e468494b85b54d': 'OhMyGoodness'}
         mock_emotes.return_value = emotes_
-        emotes.refreshBttvGlobalEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshBttvGlobalEmotes(self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalBttvEmotesCache,
                          self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalBttvEmotes, emotes_)
         mock_emotes.assert_called_once_with()
 
-    @asynctest.fail_on(unused_loop=False)
-    @patch('source.api.bttv.getGlobalEmotes', autospec=True)
-    def test_bttv_global_recent(self, mock_emotes):
+    @patch('source.api.bttv.getGlobalEmotes')
+    async def test_bttv_global_recent(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}
         emotes_ = {'54fa925e01e468494b85b54d': 'OhMyGoodness'}
         mock_emotes.return_value = emotes_
-        emotes.refreshBttvGlobalEmotes(self.now)
+        await emotes.refreshBttvGlobalEmotes(self.now)
         self.assertEqual(self.mock_globals.globalBttvEmotesCache, self.now)
         self.assertEqual(self.mock_globals.globalBttvEmotes, {})
         self.assertFalse(mock_emotes.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    @patch('source.api.bttv.getGlobalEmotes', autospec=True)
-    def test_bttv_global_none(self, mock_emotes):
+    @patch('source.api.bttv.getGlobalEmotes')
+    async def test_bttv_global_none(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}
         mock_emotes.return_value = None
-        emotes.refreshBttvGlobalEmotes(self.now + timedelta(hours=1))
+        await emotes.refreshBttvGlobalEmotes(self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalBttvEmotesCache,
                          self.now + timedelta(hours=1))
         self.assertEqual(self.mock_globals.globalBttvEmotes, {})

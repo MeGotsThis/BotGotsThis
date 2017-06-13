@@ -58,17 +58,20 @@ async def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
         await asyncio.sleep(0)
 
 
-def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:
-    refreshBttvGlobalEmotes(timestamp)
+async def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:
+    await refreshBttvGlobalEmotes(timestamp)
     refreshBttvRandomBroadcasterEmotes(timestamp)
 
 
-def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
+async def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalBttvEmotesCache >= timedelta(hours=1):
-        emotes = bttv.getGlobalEmotes()
+        emotes: Optional[Dict[str, str]]
+        emotes = await bttv.getGlobalEmotes()
         bot.globals.globalBttvEmotesCache = timestamp
         if emotes is not None:
             bot.globals.globalBttvEmotes = emotes
+    else:
+        await asyncio.sleep(0)
 
 
 def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
