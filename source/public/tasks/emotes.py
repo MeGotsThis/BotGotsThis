@@ -27,8 +27,8 @@ async def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
 
 
 async def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
-    await refreshFfzGlobalEmotes(timestamp)
-    await refreshFfzRandomBroadcasterEmotes(timestamp)
+    await asyncio.wait([refreshFfzGlobalEmotes(timestamp),
+                        refreshFfzRandomBroadcasterEmotes(timestamp)])
 
 
 async def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
@@ -59,8 +59,8 @@ async def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
 
 
 async def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:
-    await refreshBttvGlobalEmotes(timestamp)
-    await refreshBttvRandomBroadcasterEmotes(timestamp)
+    await asyncio.wait([refreshBttvGlobalEmotes(timestamp),
+                        refreshBttvRandomBroadcasterEmotes(timestamp)])
 
 
 async def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
