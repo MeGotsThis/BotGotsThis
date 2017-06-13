@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from http import client
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
+import aiohttp
+import asyncio
 import bot.globals
 import bot.utils
 import configparser
@@ -73,6 +75,127 @@ def api_call(channel: Optional[str],
             return response, response.read()
 
 
+async def get_call(channel: Optional[str],
+                   uri: str,
+                   headers: MutableMapping[str, str]=None
+                   ) -> Tuple[Any, Optional[Dict]]:
+    if headers is None:
+        headers = {}
+    if 'Accept' not in headers:
+        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
+    if 'Client-ID' not in headers:
+        clientId: Optional[str] = client_id()
+        if clientId is not None:
+            headers['Client-ID'] = clientId
+    if channel is not None and 'Authorization' not in headers:
+        token: Optional[str] = oauth.token(channel)
+        if token is not None:
+            headers['Authorization'] = 'OAuth ' + token
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://api.twitch.tv' + uri,
+                               headers=headers) as response:
+            try:
+                return response, await response.json()
+            except ValueError:
+                return response, None
+
+
+async def post_call(channel: Optional[str],
+                    uri: str,
+                    headers: MutableMapping[str, str]=None,
+                    data: Union[str, Mapping[str, str]]=None
+                    ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+    if headers is None:
+        headers = {}
+    if 'Accept' not in headers:
+        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
+    if 'Client-ID' not in headers:
+        clientId: Optional[str] = client_id()
+        if clientId is not None:
+            headers['Client-ID'] = clientId
+    if channel is not None and 'Authorization' not in headers:
+        token: Optional[str] = oauth.token(channel)
+        if token is not None:
+            headers['Authorization'] = 'OAuth ' + token
+    dataStr: Optional[str] = None
+    if data is not None:
+        if isinstance(data, Mapping):
+            dataStr = urllib.parse.urlencode(data)
+        else:
+            dataStr = data
+    async with aiohttp.ClientSession() as session:
+        async with session.post('https://api.twitch.tv' + uri,
+                                headers=headers,
+                                data=dataStr) as response:
+            try:
+                return response, await response.json()
+            except ValueError:
+                return response, None
+
+
+async def put_call(channel: Optional[str],
+                    uri: str,
+                    headers: MutableMapping[str, str]=None,
+                    data: Union[str, Mapping[str, str]]=None
+                    ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+    if headers is None:
+        headers = {}
+    if 'Accept' not in headers:
+        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
+    if 'Client-ID' not in headers:
+        clientId: Optional[str] = client_id()
+        if clientId is not None:
+            headers['Client-ID'] = clientId
+    if channel is not None and 'Authorization' not in headers:
+        token: Optional[str] = oauth.token(channel)
+        if token is not None:
+            headers['Authorization'] = 'OAuth ' + token
+    dataStr: Optional[str] = None
+    if data is not None:
+        if isinstance(data, Mapping):
+            dataStr = urllib.parse.urlencode(data)
+        else:
+            dataStr = data
+    async with aiohttp.ClientSession() as session:
+        async with session.put('https://api.twitch.tv' + uri,
+                               headers=headers,
+                               data=dataStr) as response:
+            try:
+                return response, await response.json()
+            except ValueError:
+                return response, None
+
+
+async def delete_call(channel: Optional[str],
+                    uri: str,
+                    headers: MutableMapping[str, str]=None,
+                    data: Union[str, Mapping[str, str]]=None
+                    ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+    if headers is None:
+        headers = {}
+    if 'Accept' not in headers:
+        headers['Accept'] = 'application/vnd.twitchtv.v5+json'
+    if 'Client-ID' not in headers:
+        clientId: Optional[str] = client_id()
+        if clientId is not None:
+            headers['Client-ID'] = clientId
+    if channel is not None and 'Authorization' not in headers:
+        token: Optional[str] = oauth.token(channel)
+        if token is not None:
+            headers['Authorization'] = 'OAuth ' + token
+    dataStr: Optional[str] = None
+    if data is not None:
+        if isinstance(data, Mapping):
+            dataStr = urllib.parse.urlencode(data)
+        else:
+            dataStr = data
+    async with aiohttp.ClientSession() as session:
+        async with session.delete('https://api.twitch.tv' + uri,
+                                  headers=headers,
+                                  data=dataStr) as response:
+            return response, None
+
+
 def server_time() -> Optional[datetime]:
     with suppress(client.HTTPException):
         response: client.HTTPResponse
@@ -87,15 +210,17 @@ def server_time() -> Optional[datetime]:
     return None
 
 
-def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
+async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
     uri: str = ('/kraken/chat/emoticon_images?emotesets='
                 + ','.join(str(i) for i in bot.globals.emoteset))
-    with suppress(ConnectionError, client.HTTPException):
-        response: client.HTTPResponse
-        data: bytes
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError):
+        response: aiohttp.ClientResponse
+        data: Optional[Dict]
         globalEmotes: TwitchEmotes
-        response, data = api_call(None, 'GET', uri)
-        globalEmotes = json.loads(data.decode('utf-8'))['emoticon_sets']
+        response, data = await get_call(None, 'GET', uri)
+        if data is None:
+            return None
+        globalEmotes = data['emoticon_sets']
         emotes: Dict[int, str] = {}
         emoteSet: Dict[int, int] = {}
         replaceGlobal: Dict[int, str] = {

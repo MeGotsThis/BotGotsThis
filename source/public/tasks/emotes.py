@@ -1,4 +1,5 @@
-﻿import bot.globals
+﻿import asyncio
+import bot.globals
 import copy
 import random
 from bot import data
@@ -9,11 +10,11 @@ from ...api import ffz
 from ...api import twitch
 
 
-def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
+async def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalEmotesCache >= timedelta(hours=1):
         bot.globals.globalEmotesCache = timestamp
         data: Optional[Tuple[Dict[int, str], Dict[int, int]]]
-        data = twitch.twitch_emotes()
+        data = await twitch.twitch_emotes()
         if data:
             emotes, emoteSets = data
             bot.globals.globalEmotes = emotes
@@ -21,6 +22,8 @@ def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
         elif not bot.globals.globalEmotes:
             cache = timestamp - timedelta(hours=1) + timedelta(minutes=1)
             bot.globals.globalEmotesCache = cache
+    else:
+        await asyncio.sleep(0)
 
 
 def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
