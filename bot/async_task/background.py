@@ -3,7 +3,7 @@ import asyncio
 import bot.globals
 
 from datetime import datetime, timedelta
-from typing import Callable, List
+from typing import Awaitable, Callable, List
 from bot import utils
 
 _tasks: List['Task'] = []
@@ -11,18 +11,18 @@ _tasks: List['Task'] = []
 
 class Task:
     def __init__(self,
-                 task: Callable[[datetime], None],
+                 task: Callable[[datetime], Awaitable[None]],
                  interval: timedelta) -> None:
         if not isinstance(task, Callable):  # type: ignore
             raise TypeError()
         if not isinstance(interval, timedelta):
             raise TypeError()
-        self._task: Callable[[datetime], None] = task
+        self._task: Callable[[datetime], Awaitable[None]] = task
         self._interval: timedelta = interval
         self._timestamp: datetime = datetime.min
 
     @property
-    def task(self) -> Callable[[datetime], None]:
+    def task(self) -> Callable[[datetime], Awaitable[None]]:
         return self._task
 
     @property
@@ -51,7 +51,7 @@ async def run_tasks():
                 task.timestamp = timestamp
 
 
-async def _run_task(task: Callable[[datetime], None],
+async def _run_task(task: Callable[[datetime], Awaitable[None]],
                    timestamp: datetime) -> None:
     try:
         await task(timestamp)
@@ -59,6 +59,6 @@ async def _run_task(task: Callable[[datetime], None],
         utils.logException()
 
 
-def add_task(task: Callable[[datetime], None],
+def add_task(task: Callable[[datetime], Awaitable[None]],
              interval: timedelta=timedelta(seconds=60)) -> None:
     _tasks.append(Task(task, interval))
