@@ -5,7 +5,6 @@ from http import client
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
 import aiohttp
-import asyncio
 import bot.globals
 import bot.utils
 import configparser
@@ -187,7 +186,7 @@ async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
         response: aiohttp.ClientResponse
         data: Optional[Dict]
         globalEmotes: TwitchEmotes
-        response, data = await get_call(None, 'GET', uri)
+        response, data = await get_call(None, uri)
         if data is None:
             return None
         globalEmotes = data['emoticon_sets']
