@@ -369,6 +369,8 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_get_call.return_value[1] = json.loads(twitchEmotes)
         self.assertEqual(await twitch.twitch_emotes(),
                          ({25: 'Kappa'}, {25: 0}))
+        self.mock_get_call.assert_called_once_with(
+            None, StrContains('/kraken/chat/emoticon_images?emotesets='))
 
     async def test_twitch_emotes_special(self):
         self.mock_response.status = 200
@@ -387,10 +389,14 @@ class TestApiTwitch(asynctest.TestCase):
              3: ':D',
              8: ':o',
              4: '>('})
+        self.mock_get_call.assert_called_once_with(
+            None, StrContains('/kraken/chat/emoticon_images?emotesets='))
 
     async def test_twitch_emotes_except(self):
         self.mock_api_call.side_effect = ConnectionError
         self.assertIsNone(await twitch.twitch_emotes())
+        self.mock_get_call.assert_called_once_with(
+            None, StrContains('/kraken/chat/emoticon_images?emotesets='))
 
     @asynctest.fail_on(unused_loop=False)
     def test_is_valid_user(self):
