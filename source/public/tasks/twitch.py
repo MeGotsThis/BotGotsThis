@@ -98,16 +98,17 @@ async def checkOfflineChannels(timestamp: datetime) -> None:
     bot.globals.globalSessionData['offlineCheck'].append(timestamp)
 
 
-def checkChatServers(timestamp: datetime) -> None:
+async def checkChatServers(timestamp: datetime) -> None:
     cooldown: timedelta = timedelta(seconds=3600)
     channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
     toCheck: List[str] = [c for c, ch in channels.items()
                           if (timestamp - ch.serverCheck >= cooldown)]
     if not toCheck:
+        await asyncio.sleep(0)
         return
     channel: str = random.choice(toCheck)
     channels[channel].serverCheck = timestamp
-    cluster: Optional[str] = twitch.chat_server(channel)
+    cluster: Optional[str] = await twitch.chat_server(channel)
     if cluster is None:
         return
     if (cluster in bot.globals.clusters

@@ -240,16 +240,14 @@ async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
     return None
 
 
-def chat_server(chat:Optional[str]) -> Optional[str]:
-    connection: client.HTTPConnection = client.HTTPSConnection('tmi.twitch.tv')
-    with closing(connection):
-        response: client.HTTPResponse
-        data: bytes
-        connection.request('GET', '/servers?channel=' + chat)
-        with connection.getresponse() as response:
-            responseData: bytes = response.read()
-            with suppress(ValueError):
-                jData: dict = json.loads(responseData.decode('utf-8'))
+async def chat_server(chat:Optional[str]) -> Optional[str]:
+    session: aiohttp.ClientSession
+    response: aiohttp.ClientResponse
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://tmi.twitch.tv/servers?channel=' + chat,
+                               timeout=config.httpTimeout) as response:
+            with suppress(ValueError, aiohttp.ClientResponseError):
+                jData: dict = await response.json()
                 return str(jData['cluster'])
     return None
 

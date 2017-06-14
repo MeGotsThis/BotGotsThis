@@ -317,45 +317,40 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
                                       'aws': self.socket2
                                       }
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_empty(self):
+    async def test_empty(self):
         self.mock_globals.channels = {}
-        twitch.checkChatServers(self.now + timedelta(hours=1))
+        await twitch.checkChatServers(self.now + timedelta(hours=1))
         self.assertFalse(self.mock_chatserver.called)
         self.assertFalse(self.mock_database.called)
         self.assertFalse(self.mock_ensureserver.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_recent(self):
-        twitch.checkChatServers(self.now)
+    async def test_recent(self):
+        await twitch.checkChatServers(self.now)
         self.assertFalse(self.mock_chatserver.called)
         self.assertFalse(self.mock_database.called)
         self.assertFalse(self.mock_ensureserver.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_none(self):
+    async def test_none(self):
         self.mock_chatserver.return_value = None
-        twitch.checkChatServers(self.now + timedelta(hours=1))
+        await twitch.checkChatServers(self.now + timedelta(hours=1))
         self.check_property.assert_has_calls(
             [call(), call(self.now + timedelta(hours=1))])
         self.mock_chatserver.assert_called_once_with('botgotsthis')
         self.assertFalse(self.mock_database.called)
         self.assertFalse(self.mock_ensureserver.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_same_cluster(self):
+    async def test_same_cluster(self):
         self.mock_chatserver.return_value = 'twitch'
-        twitch.checkChatServers(self.now + timedelta(hours=1))
+        await twitch.checkChatServers(self.now + timedelta(hours=1))
         self.check_property.assert_has_calls(
             [call(), call(self.now + timedelta(hours=1))])
         self.mock_chatserver.assert_called_once_with('botgotsthis')
         self.assertFalse(self.mock_database.called)
         self.assertFalse(self.mock_ensureserver.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_unknown_cluster(self):
+    async def test_unknown_cluster(self):
         self.mock_chatserver.return_value = 'where is this'
-        twitch.checkChatServers(self.now + timedelta(hours=1))
+        await twitch.checkChatServers(self.now + timedelta(hours=1))
         self.check_property.assert_has_calls(
             [call(), call(self.now + timedelta(hours=1))])
         self.mock_chatserver.assert_called_once_with('botgotsthis')
@@ -364,10 +359,9 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.assertTrue(self.database.setAutoJoinServer.called)
         self.assertTrue(self.mock_ensureserver.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_different_cluster(self):
+    async def test_different_cluster(self):
         self.mock_chatserver.return_value = 'aws'
-        twitch.checkChatServers(self.now + timedelta(hours=1))
+        await twitch.checkChatServers(self.now + timedelta(hours=1))
         self.check_property.assert_has_calls(
             [call(), call(self.now + timedelta(hours=1))])
         self.mock_chatserver.assert_called_once_with('botgotsthis')
