@@ -55,7 +55,7 @@ async def checkStreamsAndChannel(timestamp: datetime) -> None:
         (chat.streamingSince, chat.twitchStatus,
          chat.twitchGame, chat.community) = onlineStreams[channel]
         if chat.community is not None:
-            bot.utils.loadTwitchCommunity(chat.community)
+            await bot.utils.loadTwitchCommunity(chat.community)
 
     for channel in channels:
         if channel in onlineStreams:

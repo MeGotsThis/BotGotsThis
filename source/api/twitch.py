@@ -398,15 +398,15 @@ async def channel_community(channel: str) -> Optional[TwitchCommunity]:
     return None
 
 
-def get_community(communityName: str) -> Optional[TwitchCommunity]:
+async def get_community(communityName: str) -> Optional[TwitchCommunity]:
     uri: str = '/kraken/communities?name=' + urllib.parse.quote(communityName)
-    with suppress(ConnectionError, client.HTTPException):
-        response: client.HTTPResponse
-        responseData: bytes
-        response, responseData = api_call(None, 'GET', uri)
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
+        response: aiohttp.ClientResponse
+        community: Optional[Dict[str, str]]
+        response, community = await get_call(None, uri)
         if response.status != 200:
             return TwitchCommunity(None, None)
-        community: Dict[str, str] = json.loads(responseData.decode('utf-8'))
         return TwitchCommunity(community['_id'], community['name'])
     return None
 
@@ -434,7 +434,9 @@ def set_channel_community(channel: str,
     responseData: bytes
     if communityName is not None:
         name: str = communityName.lower()
-        if not bot.utils.loadTwitchCommunity(communityName):
+        loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+        if not loop.run_until_complete(
+                bot.utils.loadTwitchCommunity(communityName)):
             return None
         if bot.globals.twitchCommunity[name] is None:
             return False

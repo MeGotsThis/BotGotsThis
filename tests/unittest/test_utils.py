@@ -277,143 +277,6 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(mock_globals.twitchIdName['1'], 'botgotsthis')
         self.assertEqual(mock_globals.twitchIdCache['botgotsthis'], now)
 
-    @patch('source.api.twitch.get_community', autospec=True)
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchCommunity', autospec=True)
-    def test_loadTwitchCommunity(
-            self, mock_save, mock_now, mock_globals, mock_get):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchCommunity = {}
-        mock_globals.twitchCommunityCache = {}
-        mock_get.return_value = TwitchCommunity(
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421', 'Speedrunning')
-        self.assertTrue(utils.loadTwitchCommunity('Speedrunning'))
-        mock_now.assert_called_once_with()
-        mock_get.assert_called_once_with('speedrunning')
-        mock_save.assert_called_once_with(
-            'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
-
-    @patch('source.api.twitch.get_community', autospec=True)
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchCommunity', autospec=True)
-    def test_loadTwitchCommunity_no_id(
-            self, mock_save, mock_now, mock_globals, mock_get):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchCommunity = {}
-        mock_globals.twitchCommunityCache = {}
-        mock_get.return_value = TwitchCommunity(None, None)
-        self.assertTrue(utils.loadTwitchCommunity('Speedrunning'))
-        mock_now.assert_called_once_with()
-        mock_get.assert_called_once_with('speedrunning')
-        mock_save.assert_called_once_with('Speedrunning', None, now)
-
-    @patch('source.api.twitch.get_community', autospec=True)
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchCommunity', autospec=True)
-    def test_loadTwitchCommunity_api_error(
-            self, mock_save, mock_now, mock_globals, mock_get):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchCommunity = {}
-        mock_globals.twitchCommunityCache = {}
-        mock_get.return_value = None
-        self.assertFalse(utils.loadTwitchCommunity('Speedrunning'))
-        mock_now.assert_called_once_with()
-        mock_get.assert_called_once_with('speedrunning')
-        self.assertFalse(mock_save.called)
-
-    @patch('source.api.twitch.get_community', autospec=True)
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchCommunity', autospec=True)
-    def test_loadTwitchCommunity_timestamp(
-            self, mock_save, mock_now, mock_globals, mock_get):
-        now = datetime(2000, 1, 1)
-        mock_globals.twitchCommunity = {}
-        mock_globals.twitchCommunityCache = {}
-        mock_get.return_value = TwitchCommunity(
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421', 'Speedrunning')
-        self.assertTrue(utils.loadTwitchCommunity('Speedrunning', now))
-        self.assertFalse(mock_now.called)
-        mock_get.assert_called_once_with('speedrunning')
-        mock_save.assert_called_once_with(
-            'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
-
-    @patch('source.api.twitch.get_community', autospec=True)
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchCommunity', autospec=True)
-    def test_loadTwitchCommunity_recent(
-            self, mock_save, mock_now, mock_globals, mock_get):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchCommunity = {
-            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'}
-        mock_globals.twitchCommunityCache = {'speedrunning': now}
-        self.assertTrue(utils.loadTwitchCommunity('Speedrunning'))
-        mock_now.assert_called_once_with()
-        self.assertFalse(mock_get.called)
-        self.assertFalse(mock_save.called)
-
-    @patch('source.api.twitch.get_community', autospec=True)
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchCommunity', autospec=True)
-    def test_loadTwitchCommunity_recent_None(
-            self, mock_save, mock_now, mock_globals, mock_get):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchCommunity = {'speedrunning': None}
-        mock_globals.twitchCommunityCache = {'speedrunning': now}
-        self.assertTrue(utils.loadTwitchCommunity('Speedrunning'))
-        mock_now.assert_called_once_with()
-        self.assertFalse(mock_get.called)
-        self.assertFalse(mock_save.called)
-
-    @patch('source.api.twitch.get_community', autospec=True)
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchCommunity', autospec=True)
-    def test_loadTwitchCommunity_expired(
-            self, mock_save, mock_now, mock_globals, mock_get):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchCommunity = {
-            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'}
-        mock_globals.twitchCommunityCache = {
-            'speedrunning': now - timedelta(days=1)}
-        mock_get.return_value = TwitchCommunity(
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421', 'Speedrunning')
-        self.assertTrue(utils.loadTwitchCommunity('Speedrunning'))
-        mock_now.assert_called_once_with()
-        mock_get.assert_called_once_with('speedrunning')
-        mock_save.assert_called_once_with(
-            'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
-
-    @patch('source.api.twitch.get_community', autospec=True)
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchCommunity', autospec=True)
-    def test_loadTwitchCommunity_expired_None(
-            self, mock_save, mock_now, mock_globals, mock_get):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchCommunity = {'speedrunning': None}
-        mock_globals.twitchCommunityCache = {
-            'speedrunning': now - timedelta(hours=1)}
-        mock_get.return_value = TwitchCommunity(
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421', 'Speedrunning')
-        self.assertTrue(utils.loadTwitchCommunity('Speedrunning'))
-        mock_now.assert_called_once_with()
-        mock_get.assert_called_once_with('speedrunning')
-        mock_save.assert_called_once_with(
-            'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
-
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_saveTwitchCommunity(self, mock_now, mock_globals):
@@ -785,6 +648,143 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_now.assert_called_once_with()
         mock_get.assert_called_once_with(
             '6e940c4a-c42f-47d2-af83-0a2c7e47c421')
+        mock_save.assert_called_once_with(
+            'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
+
+    @patch('source.api.twitch.get_community')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchCommunity', autospec=True)
+    async def test_loadTwitchCommunity(
+            self, mock_save, mock_now, mock_globals, mock_get):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchCommunity = {}
+        mock_globals.twitchCommunityCache = {}
+        mock_get.return_value = TwitchCommunity(
+            '6e940c4a-c42f-47d2-af83-0a2c7e47c421', 'Speedrunning')
+        self.assertTrue(await utils.loadTwitchCommunity('Speedrunning'))
+        mock_now.assert_called_once_with()
+        mock_get.assert_called_once_with('speedrunning')
+        mock_save.assert_called_once_with(
+            'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
+
+    @patch('source.api.twitch.get_community')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchCommunity', autospec=True)
+    async def test_loadTwitchCommunity_no_id(
+            self, mock_save, mock_now, mock_globals, mock_get):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchCommunity = {}
+        mock_globals.twitchCommunityCache = {}
+        mock_get.return_value = TwitchCommunity(None, None)
+        self.assertTrue(await utils.loadTwitchCommunity('Speedrunning'))
+        mock_now.assert_called_once_with()
+        mock_get.assert_called_once_with('speedrunning')
+        mock_save.assert_called_once_with('Speedrunning', None, now)
+
+    @patch('source.api.twitch.get_community')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchCommunity', autospec=True)
+    async def test_loadTwitchCommunity_api_error(
+            self, mock_save, mock_now, mock_globals, mock_get):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchCommunity = {}
+        mock_globals.twitchCommunityCache = {}
+        mock_get.return_value = None
+        self.assertFalse(await utils.loadTwitchCommunity('Speedrunning'))
+        mock_now.assert_called_once_with()
+        mock_get.assert_called_once_with('speedrunning')
+        self.assertFalse(mock_save.called)
+
+    @patch('source.api.twitch.get_community')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchCommunity', autospec=True)
+    async def test_loadTwitchCommunity_timestamp(
+            self, mock_save, mock_now, mock_globals, mock_get):
+        now = datetime(2000, 1, 1)
+        mock_globals.twitchCommunity = {}
+        mock_globals.twitchCommunityCache = {}
+        mock_get.return_value = TwitchCommunity(
+            '6e940c4a-c42f-47d2-af83-0a2c7e47c421', 'Speedrunning')
+        self.assertTrue(await utils.loadTwitchCommunity('Speedrunning', now))
+        self.assertFalse(mock_now.called)
+        mock_get.assert_called_once_with('speedrunning')
+        mock_save.assert_called_once_with(
+            'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
+
+    @patch('source.api.twitch.get_community')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchCommunity', autospec=True)
+    async def test_loadTwitchCommunity_recent(
+            self, mock_save, mock_now, mock_globals, mock_get):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchCommunity = {
+            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'}
+        mock_globals.twitchCommunityCache = {'speedrunning': now}
+        self.assertTrue(await utils.loadTwitchCommunity('Speedrunning'))
+        mock_now.assert_called_once_with()
+        self.assertFalse(mock_get.called)
+        self.assertFalse(mock_save.called)
+
+    @patch('source.api.twitch.get_community')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchCommunity', autospec=True)
+    async def test_loadTwitchCommunity_recent_None(
+            self, mock_save, mock_now, mock_globals, mock_get):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchCommunity = {'speedrunning': None}
+        mock_globals.twitchCommunityCache = {'speedrunning': now}
+        self.assertTrue(await utils.loadTwitchCommunity('Speedrunning'))
+        mock_now.assert_called_once_with()
+        self.assertFalse(mock_get.called)
+        self.assertFalse(mock_save.called)
+
+    @patch('source.api.twitch.get_community')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchCommunity', autospec=True)
+    async def test_loadTwitchCommunity_expired(
+            self, mock_save, mock_now, mock_globals, mock_get):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchCommunity = {
+            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'}
+        mock_globals.twitchCommunityCache = {
+            'speedrunning': now - timedelta(days=1)}
+        mock_get.return_value = TwitchCommunity(
+            '6e940c4a-c42f-47d2-af83-0a2c7e47c421', 'Speedrunning')
+        self.assertTrue(await utils.loadTwitchCommunity('Speedrunning'))
+        mock_now.assert_called_once_with()
+        mock_get.assert_called_once_with('speedrunning')
+        mock_save.assert_called_once_with(
+            'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
+
+    @patch('source.api.twitch.get_community')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchCommunity', autospec=True)
+    async def test_loadTwitchCommunity_expired_None(
+            self, mock_save, mock_now, mock_globals, mock_get):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchCommunity = {'speedrunning': None}
+        mock_globals.twitchCommunityCache = {
+            'speedrunning': now - timedelta(hours=1)}
+        mock_get.return_value = TwitchCommunity(
+            '6e940c4a-c42f-47d2-af83-0a2c7e47c421', 'Speedrunning')
+        self.assertTrue(await utils.loadTwitchCommunity('Speedrunning'))
+        mock_now.assert_called_once_with()
+        mock_get.assert_called_once_with('speedrunning')
         mock_save.assert_called_once_with(
             'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
