@@ -92,8 +92,8 @@ def saveTwitchId(channel: str,
     bot.globals.twitchIdCache[channel] = timestamp
 
 
-def loadTwitchCommunityId(id: str,
-                          timestamp: Optional[datetime]=None) -> bool:
+async def loadTwitchCommunityId(id: str,
+                                timestamp: Optional[datetime]=None) -> bool:
     if timestamp is None:
         timestamp = now()
     if id in bot.globals.twitchCommunityId:
@@ -105,8 +105,8 @@ def loadTwitchCommunityId(id: str,
         else:
             if timestamp < cacheTime + timedelta(days=1):
                 return True
-    # community: Optional[twitch.TwitchCommunity]
-    community = twitch.get_community_by_id(id)
+    community: Optional[twitch.TwitchCommunity]
+    community = await twitch.get_community_by_id(id)
     if community is None:
         return False
     saveTwitchCommunity(community.name, community.id, timestamp)

@@ -732,28 +732,25 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_api_call.assert_called_once_with(
             None, 'GET', '/kraken/communities?name=%3F%3F%3F')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_get_community_id_404(self):
-        self.mock_response.status = 404
-        self.assertEqual(twitch.get_community_by_id('6e940c4a-c42f-47d2-'
-                                                     'af83-0a2c7e47c421'),
+    async def test_get_community_id_404(self):
+        self.mock_async_response.status = 404
+        id = '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
+        self.assertEqual(await twitch.get_community_by_id(id),
                          twitch.TwitchCommunity(None, None))
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_get_community_id_exception(self):
-        self.mock_api_call.side_effect = HTTPException
-        self.assertIsNone(twitch.get_community_by_id('6e940c4a-c42f-47d2-'
-                                                     'af83-0a2c7e47c421'))
+    async def test_get_community_id_exception(self):
+        exception = aiohttp.ClientResponseError(None, None)
+        self.mock_get_call.side_effect = exception
+        id = '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
+        self.assertIsNone(await twitch.get_community_by_id(id))
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_get_community_id(self):
-        self.mock_response.status = 200
-        self.mock_api_call.return_value[1] = speedrunCommunityResponse
-        self.assertEqual(twitch.get_community_by_id('6e940c4a-c42f-47d2-'
-                                                     'af83-0a2c7e47c421'),
-                         twitch.TwitchCommunity('6e940c4a-c42f-47d2-'
-                                                'af83-0a2c7e47c421',
-                                                'Speedrunning'))
+    async def test_get_community_id(self):
+        self.mock_async_response.status = 200
+        data = json.loads(speedrunCommunityResponse.decode())
+        self.mock_get_call.return_value[1] = data
+        id = '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
+        self.assertEqual(await twitch.get_community_by_id(id),
+                         twitch.TwitchCommunity(id, 'Speedrunning'))
 
     @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.loadTwitchCommunity', autospec=True)

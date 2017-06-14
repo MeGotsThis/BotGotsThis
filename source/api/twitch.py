@@ -411,15 +411,15 @@ def get_community(communityName: str) -> Optional[TwitchCommunity]:
     return None
 
 
-def get_community_by_id(communityId: str) -> Optional[TwitchCommunity]:
+async def get_community_by_id(communityId: str) -> Optional[TwitchCommunity]:
     uri: str = '/kraken/communities/' + communityId
-    with suppress(ConnectionError, client.HTTPException):
-        response: client.HTTPResponse
-        responseData: bytes
-        response, responseData = api_call(None, 'GET', uri)
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
+        response: aiohttp.ClientResponse
+        community: Optional[Dict[str, str]]
+        response, community = await get_call(None, uri)
         if response.status != 200:
             return TwitchCommunity(None, None)
-        community: Dict[str, str] = json.loads(responseData.decode('utf-8'))
         return TwitchCommunity(community['_id'], community['name'])
     return None
 
