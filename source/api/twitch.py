@@ -294,9 +294,9 @@ def num_followers(user: str) -> Optional[int]:
     return None
 
 
-def update(channel: str, *,
-           status:Optional[str]=None,
-           game:Optional[str]=None) -> Optional[bool]:
+async def update(channel: str, *,
+                 status: Optional[str]=None,
+                 game: Optional[str]=None) -> Optional[bool]:
     if (not bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
@@ -307,15 +307,13 @@ def update(channel: str, *,
         postData['channel[game]'] = game
     if not postData:
         return None
-    with suppress(ConnectionError, client.HTTPException):
-        response: client.HTTPResponse
-        data: bytes
-        response, data = api_call(
-            channel, 'PUT',
-            '/kraken/channels/' + bot.globals.twitchId[channel],
-            headers={
-                'Content-Type': 'application/x-www-form-urlencoded',
-                },
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
+        response: aiohttp.ClientResponse
+        data: Optional[dict]
+        response, data = await put_call(
+            channel, '/kraken/channels/' + bot.globals.twitchId[channel],
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
             data=postData)
         return response.status == 200
     return None

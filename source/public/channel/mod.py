@@ -15,7 +15,9 @@ def commandStatus(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
     msg: str
-    if twitch.update(args.chat.channel, status=args.message.query):
+    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+    if loop.run_until_complete(
+            twitch.update(args.chat.channel, status=args.message.query)):
         if args.message.query:
             msg = 'Channel Status set as: ' + args.message.query
         else:
@@ -34,7 +36,8 @@ def commandGame(args: ChatCommandArgs) -> bool:
     game: str = args.message.query
     game = args.database.getFullGameTitle(args.message.lower[1:]) or game
     game = game.replace('Pokemon', 'Pokémon').replace('Pokepark', 'Poképark')
-    if twitch.update(args.chat.channel, game=game):
+    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+    if loop.run_until_complete(twitch.update(args.chat.channel, game=game)):
         if game:
             msg = 'Channel Game set as: ' + game
         else:
@@ -50,7 +53,9 @@ def commandGame(args: ChatCommandArgs) -> bool:
 def commandRawGame(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
-    if twitch.update(args.chat.channel, game=args.message.query):
+    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+    if loop.run_until_complete(
+            twitch.update(args.chat.channel, game=args.message.query)):
         if args.message.query:
             msg = 'Channel Game set as: ' + args.message.query
         else:
