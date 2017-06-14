@@ -1,4 +1,6 @@
-﻿from datetime import datetime, timedelta
+﻿import asyncio
+
+from datetime import datetime, timedelta
 from typing import Optional
 from ..library import broadcaster
 from ..library.chat import cooldown, permission, ownerChannel, send
@@ -47,7 +49,9 @@ def commandUptime(args: ChatCommandArgs) -> bool:
             '{channel} is currently not streaming or has not been for a '
             'minute'.format(channel=args.chat.channel))
     else:
-        currentTime: Optional[datetime] = twitch.server_time()
+        loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+        currentTime: Optional[datetime]
+        currentTime = loop.run_until_complete(twitch.server_time())
         if currentTime is not None:
             uptime: timedelta = currentTime - args.chat.streamingSince
             args.chat.send('Uptime: {uptime}'.format(uptime=uptime))
