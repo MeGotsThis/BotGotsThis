@@ -273,18 +273,16 @@ async def getTwitchIds(channels: Iterable[str]) -> Optional[Dict[str, str]]:
     return None
 
 
-def is_valid_user(user: str) -> Optional[bool]:
-    if not bot.utils.loadTwitchId(user):
+async def is_valid_user(user: str) -> Optional[bool]:
+    if not await bot.utils.loadTwitchId(user):
         return None
     return bot.globals.twitchId[user] is not None
 
 
 async def num_followers(user: str) -> Optional[int]:
-    if not bot.utils.loadTwitchId(user):
-        await asyncio.sleep(0)
+    if not await bot.utils.loadTwitchId(user):
         return None
     if bot.globals.twitchId[user] is None:
-        await asyncio.sleep(0)
         return 0
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
@@ -300,7 +298,7 @@ async def num_followers(user: str) -> Optional[int]:
 async def update(channel: str, *,
                  status: Optional[str]=None,
                  game: Optional[str]=None) -> Optional[bool]:
-    if (not bot.utils.loadTwitchId(channel)
+    if (not await bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
     postData: Dict[str, str] = {}
@@ -326,7 +324,7 @@ async def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
         allChannels: List[str] = [bot.globals.twitchId[c] for c in channels
-                                  if bot.utils.loadTwitchId(c)
+                                  if await bot.utils.loadTwitchId(c)
                                   and bot.globals.twitchId[c] is not None]
         if not allChannels:
             return {}
@@ -366,7 +364,7 @@ def _handle_streams(streams: List[Dict[str, Any]],
 
 
 async def channel_properties(channel: str) -> Optional[TwitchStatus]:
-    if (not bot.utils.loadTwitchId(channel)
+    if (not await bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
     uri: str = '/kraken/channels/' + bot.globals.twitchId[channel]
@@ -382,7 +380,7 @@ async def channel_properties(channel: str) -> Optional[TwitchStatus]:
 
 
 async def channel_community(channel: str) -> Optional[TwitchCommunity]:
-    if (not bot.utils.loadTwitchId(channel)
+    if (not await bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
     uri: str = ('/kraken/channels/' + bot.globals.twitchId[channel]
@@ -428,7 +426,7 @@ async def get_community_by_id(communityId: str) -> Optional[TwitchCommunity]:
 async def set_channel_community(channel: str,
                                 communityName: Optional[str]
                                 ) -> Optional[bool]:
-    if (not bot.utils.loadTwitchId(channel)
+    if (not await bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
     uri: str

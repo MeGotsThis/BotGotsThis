@@ -103,131 +103,6 @@ class TestUtils(unittest.TestCase):
         utils.clearAllChat()
         socket.messaging.clearAllChat.assert_called_once_with()
 
-    @patch('source.api.twitch.getTwitchIds')
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
-    def test_loadTwitchId(self, mock_save, mock_now, mock_globals,
-                          mock_getIds):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchId = {}
-        mock_globals.twitchIdCache = {}
-        mock_getIds.return_value = {'botgotsthis': '1'}
-        self.assertTrue(utils.loadTwitchId('botgotsthis'))
-        mock_now.assert_called_once_with()
-        mock_getIds.assert_called_once_with(['botgotsthis'])
-        mock_save.assert_called_once_with('botgotsthis', '1', now)
-
-    @patch('source.api.twitch.getTwitchIds')
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
-    def test_loadTwitchId_no_id(self, mock_save, mock_now, mock_globals,
-                                mock_getIds):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchId = {}
-        mock_globals.twitchIdCache = {}
-        mock_getIds.return_value = {}
-        self.assertTrue(utils.loadTwitchId('botgotsthis'))
-        mock_now.assert_called_once_with()
-        mock_getIds.assert_called_once_with(['botgotsthis'])
-        mock_save.assert_called_once_with('botgotsthis', None, now)
-
-    @patch('source.api.twitch.getTwitchIds')
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
-    def test_loadTwitchId_api_error(self, mock_save, mock_now, mock_globals,
-                                    mock_getIds):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchId = {}
-        mock_globals.twitchIdCache = {}
-        mock_getIds.return_value = None
-        self.assertFalse(utils.loadTwitchId('botgotsthis'))
-        mock_now.assert_called_once_with()
-        mock_getIds.assert_called_once_with(['botgotsthis'])
-        self.assertFalse(mock_save.called)
-
-    @patch('source.api.twitch.getTwitchIds')
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
-    def test_loadTwitchId_timestamp(self, mock_save, mock_now, mock_globals,
-                                    mock_getIds):
-        now = datetime(2000, 1, 1)
-        mock_globals.twitchId = {}
-        mock_globals.twitchIdCache = {}
-        mock_getIds.return_value = {'botgotsthis': '1'}
-        self.assertTrue(utils.loadTwitchId('botgotsthis', now))
-        self.assertFalse(mock_now.called)
-        mock_getIds.assert_called_once_with(['botgotsthis'])
-        mock_save.assert_called_once_with('botgotsthis', '1', now)
-
-    @patch('source.api.twitch.getTwitchIds')
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
-    def test_loadTwitchId_recent(self, mock_save, mock_now, mock_globals,
-                                 mock_getIds):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchId = {'botgotsthis': '1'}
-        mock_globals.twitchIdCache = {'botgotsthis': now}
-        self.assertTrue(utils.loadTwitchId('botgotsthis'))
-        mock_now.assert_called_once_with()
-        self.assertFalse(mock_getIds.called)
-        self.assertFalse(mock_save.called)
-
-    @patch('source.api.twitch.getTwitchIds')
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
-    def test_loadTwitchId_recent_None(self, mock_save, mock_now, mock_globals,
-                                 mock_getIds):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchId = {'botgotsthis': None}
-        mock_globals.twitchIdCache = {'botgotsthis': now}
-        self.assertTrue(utils.loadTwitchId('botgotsthis'))
-        mock_now.assert_called_once_with()
-        self.assertFalse(mock_getIds.called)
-        self.assertFalse(mock_save.called)
-
-    @patch('source.api.twitch.getTwitchIds')
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
-    def test_loadTwitchId_expired(self, mock_save, mock_now, mock_globals,
-                                  mock_getIds):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchId = {'botgotsthis': '1'}
-        mock_globals.twitchIdCache = {'botgotsthis': now - timedelta(days=1)}
-        mock_getIds.return_value = {'botgotsthis': '1'}
-        self.assertTrue(utils.loadTwitchId('botgotsthis'))
-        mock_now.assert_called_once_with()
-        mock_getIds.assert_called_once_with(['botgotsthis'])
-        mock_save.assert_called_once_with('botgotsthis', '1', now)
-
-    @patch('source.api.twitch.getTwitchIds')
-    @patch('bot.globals', autospec=True)
-    @patch('bot.utils.now', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
-    def test_loadTwitchId_expired_None(self, mock_save, mock_now, mock_globals,
-                                       mock_getIds):
-        now = datetime(2000, 1, 1)
-        mock_now.return_value = now
-        mock_globals.twitchId = {'botgotsthis': None}
-        mock_globals.twitchIdCache = {'botgotsthis': now - timedelta(hours=1)}
-        mock_getIds.return_value = {'botgotsthis': '1'}
-        self.assertTrue(utils.loadTwitchId('botgotsthis'))
-        mock_now.assert_called_once_with()
-        mock_getIds.assert_called_once_with(['botgotsthis'])
-        mock_save.assert_called_once_with('botgotsthis', '1', now)
-
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_saveTwitchId(self, mock_now, mock_globals):
@@ -505,6 +380,131 @@ class TestUtils(unittest.TestCase):
 
 
 class TestUtilsAsync(asynctest.TestCase):
+    @patch('source.api.twitch.getTwitchIds')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    async def test_loadTwitchId(self, mock_save, mock_now, mock_globals,
+                                mock_getIds):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchId = {}
+        mock_globals.twitchIdCache = {}
+        mock_getIds.return_value = {'botgotsthis': '1'}
+        self.assertTrue(await utils.loadTwitchId('botgotsthis'))
+        mock_now.assert_called_once_with()
+        mock_getIds.assert_called_once_with(['botgotsthis'])
+        mock_save.assert_called_once_with('botgotsthis', '1', now)
+
+    @patch('source.api.twitch.getTwitchIds')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    async def test_loadTwitchId_no_id(self, mock_save, mock_now, mock_globals,
+                                      mock_getIds):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchId = {}
+        mock_globals.twitchIdCache = {}
+        mock_getIds.return_value = {}
+        self.assertTrue(await utils.loadTwitchId('botgotsthis'))
+        mock_now.assert_called_once_with()
+        mock_getIds.assert_called_once_with(['botgotsthis'])
+        mock_save.assert_called_once_with('botgotsthis', None, now)
+
+    @patch('source.api.twitch.getTwitchIds')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    async def test_loadTwitchId_api_error(self, mock_save, mock_now,
+                                          mock_globals, mock_getIds):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchId = {}
+        mock_globals.twitchIdCache = {}
+        mock_getIds.return_value = None
+        self.assertFalse(await utils.loadTwitchId('botgotsthis'))
+        mock_now.assert_called_once_with()
+        mock_getIds.assert_called_once_with(['botgotsthis'])
+        self.assertFalse(mock_save.called)
+
+    @patch('source.api.twitch.getTwitchIds')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    async def test_loadTwitchId_timestamp(self, mock_save, mock_now,
+                                          mock_globals, mock_getIds):
+        now = datetime(2000, 1, 1)
+        mock_globals.twitchId = {}
+        mock_globals.twitchIdCache = {}
+        mock_getIds.return_value = {'botgotsthis': '1'}
+        self.assertTrue(await utils.loadTwitchId('botgotsthis', now))
+        self.assertFalse(mock_now.called)
+        mock_getIds.assert_called_once_with(['botgotsthis'])
+        mock_save.assert_called_once_with('botgotsthis', '1', now)
+
+    @patch('source.api.twitch.getTwitchIds')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    async def test_loadTwitchId_recent(self, mock_save, mock_now, mock_globals,
+                                       mock_getIds):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchId = {'botgotsthis': '1'}
+        mock_globals.twitchIdCache = {'botgotsthis': now}
+        self.assertTrue(await utils.loadTwitchId('botgotsthis'))
+        mock_now.assert_called_once_with()
+        self.assertFalse(mock_getIds.called)
+        self.assertFalse(mock_save.called)
+
+    @patch('source.api.twitch.getTwitchIds')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    async def test_loadTwitchId_recent_None(self, mock_save, mock_now,
+                                            mock_globals, mock_getIds):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchId = {'botgotsthis': None}
+        mock_globals.twitchIdCache = {'botgotsthis': now}
+        self.assertTrue(await utils.loadTwitchId('botgotsthis'))
+        mock_now.assert_called_once_with()
+        self.assertFalse(mock_getIds.called)
+        self.assertFalse(mock_save.called)
+
+    @patch('source.api.twitch.getTwitchIds')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    async def test_loadTwitchId_expired(self, mock_save, mock_now,
+                                        mock_globals, mock_getIds):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchId = {'botgotsthis': '1'}
+        mock_globals.twitchIdCache = {'botgotsthis': now - timedelta(days=1)}
+        mock_getIds.return_value = {'botgotsthis': '1'}
+        self.assertTrue(await utils.loadTwitchId('botgotsthis'))
+        mock_now.assert_called_once_with()
+        mock_getIds.assert_called_once_with(['botgotsthis'])
+        mock_save.assert_called_once_with('botgotsthis', '1', now)
+
+    @patch('source.api.twitch.getTwitchIds')
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.now', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    async def test_loadTwitchId_expired_None(self, mock_save, mock_now,
+                                             mock_globals, mock_getIds):
+        now = datetime(2000, 1, 1)
+        mock_now.return_value = now
+        mock_globals.twitchId = {'botgotsthis': None}
+        mock_globals.twitchIdCache = {'botgotsthis': now - timedelta(hours=1)}
+        mock_getIds.return_value = {'botgotsthis': '1'}
+        self.assertTrue(await utils.loadTwitchId('botgotsthis'))
+        mock_now.assert_called_once_with()
+        mock_getIds.assert_called_once_with(['botgotsthis'])
+        mock_save.assert_called_once_with('botgotsthis', '1', now)
+
     @patch('source.api.twitch.get_community_by_id')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)

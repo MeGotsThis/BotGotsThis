@@ -56,22 +56,21 @@ def clearAllChat() -> None:
         c.messaging.clearAllChat()
 
 
-def loadTwitchId(channel: str,
-                 timestamp: Optional[datetime]=None) -> bool:
+async def loadTwitchId(channel: str,
+                       timestamp: Optional[datetime]=None) -> bool:
     if timestamp is None:
         timestamp = now()
     if channel in bot.globals.twitchId:
         cacheTime: datetime = bot.globals.twitchIdCache[channel]
         if bot.globals.twitchId[channel] is None:
             if timestamp < cacheTime + timedelta(hours=1):
+                await asyncio.sleep(0)
                 return True
         else:
             if timestamp < cacheTime + timedelta(days=1):
+                await asyncio.sleep(0)
                 return True
-    ids: Optional[Dict[str, str]]
-    # TODO: Convert to async
-    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-    ids = loop.run_until_complete(twitch.getTwitchIds([channel]))
+    ids: Optional[Dict[str, str]] = await twitch.getTwitchIds([channel])
     if ids is None:
         return False
     if channel in ids:
