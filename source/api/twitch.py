@@ -312,29 +312,28 @@ def update(channel: str, *,
     return None
 
 
-def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
-    with suppress(ConnectionError, client.HTTPException):
+async def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
         allChannels: List[str] = [bot.globals.twitchId[c] for c in channels
                                   if bot.utils.loadTwitchId(c)
                                   and bot.globals.twitchId[c] is not None]
         if not allChannels:
             return {}
         uri: str = '/kraken/streams?limit=100&channel=' + ','.join(allChannels)
-        response: client.HTTPResponse
-        responseData: bytes
-        response, responseData = api_call(None, 'GET', uri)
+        response: aiohttp.ClientResponse
+        streamsData: dict
+        response, streamsData = await get_call(None, uri)
         if response.status != 200:
             return None
         online: Dict[str, TwitchStatus] = {}
-        streamsData: dict = json.loads(responseData.decode('utf-8'))
         _handle_streams(streamsData['streams'], online)
         for offset in range(100, streamsData['_total'], 100):
             time.sleep(0.05)
             offsetUri: str = uri + '&offset=' + str(offset)
-            response, responseData = api_call(None, 'GET', offsetUri)
+            response, streamsData = await get_call(None, offsetUri)
             if response.status != 200:
                 break
-            streamsData = json.loads(responseData.decode('utf-8'))
             _handle_streams(streamsData['streams'], online)
         return online
     return None
