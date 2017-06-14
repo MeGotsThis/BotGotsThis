@@ -504,27 +504,24 @@ class TestApiTwitch(asynctest.TestCase):
         self.assertIsNone(twitch.is_valid_user('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_num_followers(self):
-        self.mock_api_call.return_value[1] = numFollowers
-        self.assertEqual(twitch.num_followers('botgotsthis'), 1)
+    async def test_num_followers(self):
+        data = json.loads(numFollowers.decode())
+        self.mock_get_call.return_value[1] = data
+        self.assertEqual(await twitch.num_followers('botgotsthis'), 1)
         self.mock_load.assert_called_once_with('botgotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_num_followers_no_load(self):
+    async def test_num_followers_no_load(self):
         self.mock_load.return_value = False
-        self.assertIsNone(twitch.num_followers('botgotsthis'))
+        self.assertIsNone(await twitch.num_followers('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_num_followers_no_user(self):
-        self.assertEqual(twitch.num_followers('megotsthis'), 0)
+    async def test_num_followers_no_user(self):
+        self.assertEqual(await twitch.num_followers('megotsthis'), 0)
         self.mock_load.assert_called_once_with('megotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_num_followers_except(self):
+    async def test_num_followers_except(self):
         self.mock_load.return_value = False
-        self.assertIsNone(twitch.num_followers('botgotsthis'))
+        self.assertIsNone(await twitch.num_followers('botgotsthis'))
 
     async def test_update(self):
         self.assertIsNone(await twitch.update('botgotsthis'))
