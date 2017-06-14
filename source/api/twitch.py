@@ -93,9 +93,11 @@ async def get_call(channel: Optional[str],
         async with session.get('https://api.twitch.tv' + uri,
                                headers=headers,
                                timeout=config.httpTimeout) as response:
+            if response.status == 204:
+                return response, None
             try:
                 return response, await response.json()
-            except ValueError:
+            except aiohttp.ClientResponseError:
                 return response, None
 
 
@@ -118,9 +120,11 @@ async def post_call(channel: Optional[str],
                                 headers=headers,
                                 data=dataStr,
                                 timeout=config.httpTimeout) as response:
+            if response.status == 204:
+                return response, None
             try:
                 return response, await response.json()
-            except ValueError:
+            except aiohttp.ClientResponseError:
                 return response, None
 
 
@@ -143,9 +147,11 @@ async def put_call(channel: Optional[str],
                                headers=headers,
                                data=dataStr,
                                timeout=config.httpTimeout) as response:
+            if response.status == 204:
+                return response, None
             try:
                 return response, await response.json()
-            except ValueError:
+            except aiohttp.ClientResponseError:
                 return response, None
 
 
@@ -168,7 +174,12 @@ async def delete_call(channel: Optional[str],
                                   headers=headers,
                                   data=dataStr,
                                   timeout=config.httpTimeout) as response:
-            return response, None
+            if response.status == 204:
+                return response, None
+            try:
+                return response, await response.json()
+            except aiohttp.ClientResponseError:
+                return response, None
 
 
 def server_time() -> Optional[datetime]:
@@ -371,7 +382,7 @@ async def channel_properties(channel: str) -> Optional[TwitchStatus]:
     return None
 
 
-def channel_community(channel: str) -> Optional[TwitchCommunity]:
+async def channel_community(channel: str) -> Optional[TwitchCommunity]:
     if (not bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
@@ -379,13 +390,12 @@ def channel_community(channel: str) -> Optional[TwitchCommunity]:
                 + '/community')
     with suppress(ConnectionError, client.HTTPException):
         response: client.HTTPResponse
-        responseData: bytes
-        response, responseData = api_call(None, 'GET', uri)
-        if response.status == 204:
-            return TwitchCommunity(None, None)
-        if response.status != 200:
+        community: Optional[Dict[str, str]]
+        response, community = await get_call(None, uri)
+        if response.status not in [200, 204]:
             return None
-        community: Dict[str, str] = json.loads(responseData.decode('utf-8'))
+        if community is None:
+            return TwitchCommunity(None, None)
         return TwitchCommunity(community['_id'], community['name'])
     return None
 
