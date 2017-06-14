@@ -355,18 +355,18 @@ def _handle_streams(streams: List[Dict[str, Any]],
     return online
 
 
-def channel_properties(channel: str) -> Optional[TwitchStatus]:
+async def channel_properties(channel: str) -> Optional[TwitchStatus]:
     if (not bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
     uri: str = '/kraken/channels/' + bot.globals.twitchId[channel]
-    with suppress(ConnectionError, client.HTTPException):
-        response: client.HTTPResponse
-        responseData: bytes
-        response, responseData = api_call(None, 'GET', uri)
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
+        response: aiohttp.ClientResponse
+        channel_: Optional[Dict[str, str]]
+        response, channel_ = await get_call(None, uri)
         if response.status != 200:
             return None
-        channel_: Dict[str, str] = json.loads(responseData.decode('utf-8'))
         return TwitchStatus(None, channel_['status'], channel_['game'], None)
     return None
 
