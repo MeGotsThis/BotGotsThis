@@ -526,48 +526,43 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_load.return_value = False
         self.assertIsNone(twitch.num_followers('botgotsthis'))
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_update(self):
-        self.assertIsNone(twitch.update('botgotsthis'))
+    async def test_update(self):
+        self.assertIsNone(await twitch.update('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
-        self.assertFalse(self.mock_api_call.called)
+        self.assertFalse(self.mock_put_call.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_update_no_load(self):
+    async def test_update_no_load(self):
         self.mock_load.return_value = False
-        self.assertIsNone(twitch.update('botgotsthis'))
+        self.assertIsNone(await twitch.update('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
-        self.assertFalse(self.mock_api_call.called)
+        self.assertFalse(self.mock_put_call.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_update_no_user(self):
-        self.assertIsNone(twitch.update('megotsthis'))
+    async def test_update_no_user(self):
+        self.assertIsNone(await twitch.update('megotsthis'))
         self.mock_load.assert_called_once_with('megotsthis')
-        self.assertFalse(self.mock_api_call.called)
+        self.assertFalse(self.mock_put_call.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_update_status(self):
-        self.mock_response.status = 200
-        self.assertIs(twitch.update('botgotsthis', status=''), True)
+    async def test_update_status(self):
+        self.mock_async_response.status = 200
+        self.assertIs(await twitch.update('botgotsthis', status=''), True)
         self.mock_load.assert_called_once_with('botgotsthis')
-        self.mock_api_call.assert_called_once_with(
-            'botgotsthis', 'PUT', StrContains(), headers=TypeMatch(dict),
+        self.mock_put_call.assert_called_once_with(
+            'botgotsthis', StrContains(), headers=TypeMatch(dict),
             data={'channel[status]': ' '})
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_update_game(self):
-        self.mock_response.status = 200
-        self.assertIs(twitch.update('botgotsthis', game=''), True)
+    async def test_update_game(self):
+        self.mock_async_response.status = 200
+        self.assertIs(await twitch.update('botgotsthis', game=''), True)
         self.mock_load.assert_called_once_with('botgotsthis')
-        self.mock_api_call.assert_called_once_with(
-            'botgotsthis', 'PUT', StrContains(), headers=TypeMatch(dict),
+        self.mock_put_call.assert_called_once_with(
+            'botgotsthis', StrContains(), headers=TypeMatch(dict),
             data={'channel[game]': ''})
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_update_except(self):
-        self.mock_api_call.side_effect = HTTPException
-        self.assertIsNone(twitch.update('botgotsthis'))
-        self.assertFalse(self.mock_api_call.called)
+    async def test_update_except(self):
+        exception = aiohttp.ClientResponseError(None, None)
+        self.mock_put_call.side_effect = exception
+        self.assertIsNone(await twitch.update('botgotsthis'))
+        self.assertFalse(self.mock_put_call.called)
         self.mock_load.assert_called_once_with('botgotsthis')
 
     @patch('source.api.twitch._handle_streams')
