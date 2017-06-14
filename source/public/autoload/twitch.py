@@ -7,8 +7,7 @@ from ..tasks import twitch
 
 
 async def call_ids(timestamp: datetime.datetime) -> None:
-    await asyncio.sleep(0)
-    twitch.checkTwitchIds(timestamp)
+    await twitch.checkTwitchIds(timestamp)
 
 
 async def call_streams(timestamp: datetime.datetime) -> None:

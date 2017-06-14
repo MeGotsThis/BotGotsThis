@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from io import StringIO
 from source.api.twitch import TwitchCommunity
 from tests.unittest.mock_class import StrContains
-from unittest.mock import Mock, patch
+from asynctest.mock import Mock, patch
 
 
 class TestUtils(unittest.TestCase):
@@ -100,7 +100,7 @@ class TestUtils(unittest.TestCase):
         utils.clearAllChat()
         socket.messaging.clearAllChat.assert_called_once_with()
 
-    @patch('source.api.twitch.getTwitchIds', autospec=True)
+    @patch('source.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -116,7 +116,7 @@ class TestUtils(unittest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', '1', now)
 
-    @patch('source.api.twitch.getTwitchIds', autospec=True)
+    @patch('source.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -132,7 +132,7 @@ class TestUtils(unittest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', None, now)
 
-    @patch('source.api.twitch.getTwitchIds', autospec=True)
+    @patch('source.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -148,7 +148,7 @@ class TestUtils(unittest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.getTwitchIds', autospec=True)
+    @patch('source.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -163,7 +163,7 @@ class TestUtils(unittest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', '1', now)
 
-    @patch('source.api.twitch.getTwitchIds', autospec=True)
+    @patch('source.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -178,7 +178,7 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(mock_getIds.called)
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.getTwitchIds', autospec=True)
+    @patch('source.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -193,7 +193,7 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(mock_getIds.called)
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.getTwitchIds', autospec=True)
+    @patch('source.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -209,7 +209,7 @@ class TestUtils(unittest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', '1', now)
 
-    @patch('source.api.twitch.getTwitchIds', autospec=True)
+    @patch('source.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)

@@ -1,13 +1,16 @@
 import unittest
+
+import asynctest
+
 from bot.data import Channel, Socket
 from datetime import datetime, timedelta
 from source.database import DatabaseBase
 from source.public.tasks import twitch
 from source.api.twitch import TwitchCommunity, TwitchStatus
-from unittest.mock import MagicMock, Mock, PropertyMock, call, patch
+from asynctest.mock import MagicMock, Mock, PropertyMock, call, patch
 
 
-class TestTasksTwitchBase(unittest.TestCase):
+class TestTasksTwitchBase(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
 
@@ -38,26 +41,26 @@ class TestTasksTwitchIds(TestTasksTwitchBase):
         self.mock_twitchid = patcher.start()
         self.mock_twitchid.return_value = {}
 
-    def test_empty(self):
+    async def test_empty(self):
         self.mock_globals.channels = {}
-        twitch.checkTwitchIds(self.now)
+        await twitch.checkTwitchIds(self.now)
         self.assertFalse(self.mock_twitchid.called)
         self.assertFalse(self.mock_save.called)
 
-    def test_none(self):
+    async def test_none(self):
         self.mock_twitchid.return_value = None
-        twitch.checkTwitchIds(self.now)
+        await twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
         self.assertFalse(self.mock_save.called)
 
-    def test(self):
+    async def test(self):
         self.mock_twitchid.return_value = {'botgotsthis': '1'}
-        twitch.checkTwitchIds(self.now)
+        await twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
         self.mock_twitchid.assert_called_once_with(['botgotsthis'])
         self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
 
-    def test_multiple(self):
+    async def test_multiple(self):
         mgtChannel = Mock(spec=Channel)
         mgtChannel.channel = 'botgotsthis'
         self.mock_globals.channels['megotsthis'] = mgtChannel
@@ -65,42 +68,42 @@ class TestTasksTwitchIds(TestTasksTwitchBase):
         self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
         self.mock_globals.twitchIdCache = {'botgotsthis': self.now}
         self.mock_twitchid.return_value = {'megotsthis': '2'}
-        twitch.checkTwitchIds(self.now)
+        await twitch.checkTwitchIds(self.now)
         self.mock_twitchid.assert_called_once_with(['megotsthis'])
         self.mock_save.assert_called_once_with('megotsthis', '2', self.now)
 
-    def test_recent(self):
+    async def test_recent(self):
         self.mock_globals.twitchId = {'botgotsthis': '1'}
         self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
         self.mock_globals.twitchIdCache = {'botgotsthis': self.now}
         self.mock_twitchid.return_value = {'botgotsthis': '1'}
-        twitch.checkTwitchIds(self.now)
+        await twitch.checkTwitchIds(self.now)
         self.assertFalse(self.mock_twitchid.called)
         self.assertFalse(self.mock_save.called)
 
-    def test_no_id(self):
+    async def test_no_id(self):
         self.mock_twitchid.return_value = {}
-        twitch.checkTwitchIds(self.now)
+        await twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
         self.mock_save.assert_called_once_with('botgotsthis', None, self.now)
 
-    def test_cache_expired(self):
+    async def test_cache_expired(self):
         self.mock_globals.twitchId = {'botgotsthis': '1'}
         self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
         self.mock_globals.twitchIdCache = {
             'botgotsthis': self.now - timedelta(days=1)}
         self.mock_twitchid.return_value = {'botgotsthis': '1'}
-        twitch.checkTwitchIds(self.now)
+        await twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
         self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
 
-    def test_cache_expired_none(self):
+    async def test_cache_expired_none(self):
         self.mock_globals.twitchId = {'botgotsthis': None}
         self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
         self.mock_globals.twitchIdCache = {
             'botgotsthis': self.now - timedelta(hours=1)}
         self.mock_twitchid.return_value = {'botgotsthis': '1'}
-        twitch.checkTwitchIds(self.now)
+        await twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
         self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
 
@@ -121,12 +124,14 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.game_property = PropertyMock(return_value=None)
         type(self.channel).twitchGame = self.game_property
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch.active_streams')
     def test_streams_empty(self, mock_active):
         self.mock_globals.channels = {}
         twitch.checkStreamsAndChannel(self.now)
         self.assertFalse(mock_active.called)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch.active_streams')
     def test_streams_none(self, mock_active):
         mock_active.return_value = None
@@ -137,6 +142,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch.active_streams')
     def test_streams(self, mock_active):
         streamed = datetime(1999, 1, 1)
@@ -150,6 +156,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.status_property.assert_called_once_with('Kappa')
         self.game_property.assert_called_once_with('Creative')
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch.active_streams')
     def test_streams_offline(self, mock_active):
         streamed = datetime(1999, 1, 1)
@@ -161,6 +168,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
@@ -175,6 +183,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_community.called)
         self.assertFalse(mock_save.called)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
@@ -190,6 +199,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_community.called)
         self.assertFalse(mock_save.called)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
@@ -206,6 +216,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_community.called)
         self.assertFalse(mock_save.called)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
@@ -225,6 +236,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_community.called)
         self.assertFalse(mock_save.called)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
@@ -242,6 +254,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         mock_community.assert_called_once_with('botgotsthis')
         self.assertFalse(mock_save.called)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
@@ -259,6 +272,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         mock_community.assert_called_once_with('botgotsthis')
         mock_save.assert_called_once_with(None, None, self.now)
 
+    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
@@ -309,6 +323,7 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
                                       'aws': self.socket2
                                       }
 
+    @asynctest.fail_on(unused_loop=False)
     def test_empty(self):
         self.mock_globals.channels = {}
         twitch.checkChatServers(self.now + timedelta(hours=1))
@@ -316,12 +331,14 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.assertFalse(self.mock_database.called)
         self.assertFalse(self.mock_ensureserver.called)
 
+    @asynctest.fail_on(unused_loop=False)
     def test_recent(self):
         twitch.checkChatServers(self.now)
         self.assertFalse(self.mock_chatserver.called)
         self.assertFalse(self.mock_database.called)
         self.assertFalse(self.mock_ensureserver.called)
 
+    @asynctest.fail_on(unused_loop=False)
     def test_none(self):
         self.mock_chatserver.return_value = None
         twitch.checkChatServers(self.now + timedelta(hours=1))
@@ -331,6 +348,7 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.assertFalse(self.mock_database.called)
         self.assertFalse(self.mock_ensureserver.called)
 
+    @asynctest.fail_on(unused_loop=False)
     def test_same_cluster(self):
         self.mock_chatserver.return_value = 'twitch'
         twitch.checkChatServers(self.now + timedelta(hours=1))
@@ -340,6 +358,7 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.assertFalse(self.mock_database.called)
         self.assertFalse(self.mock_ensureserver.called)
 
+    @asynctest.fail_on(unused_loop=False)
     def test_unknown_cluster(self):
         self.mock_chatserver.return_value = 'where is this'
         twitch.checkChatServers(self.now + timedelta(hours=1))
@@ -351,6 +370,7 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.assertTrue(self.database.setAutoJoinServer.called)
         self.assertTrue(self.mock_ensureserver.called)
 
+    @asynctest.fail_on(unused_loop=False)
     def test_different_cluster(self):
         self.mock_chatserver.return_value = 'aws'
         twitch.checkChatServers(self.now + timedelta(hours=1))
