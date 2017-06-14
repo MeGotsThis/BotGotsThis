@@ -3,8 +3,9 @@ import unittest
 import urllib.error
 from datetime import datetime
 from http.client import HTTPResponse
-from unittest.mock import Mock, call, patch
 from urllib.request import Request
+
+from asynctest.mock import Mock, call, patch
 
 from bot.data import Channel
 from source.data.message import Message
@@ -14,7 +15,7 @@ from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import StrContains, TypeMatch
 
 
-@patch('source.public.channel.block_url.check_domain_redirect', autospec=True)
+@patch('source.public.channel.block_url.check_domain_redirect')
 class TestChannelBlockUrlFilterNoUrl(TestChannel):
     def test_nomod(self, mock_check):
         self.features.append('nourlredirect')
@@ -53,7 +54,7 @@ class TestChannelBlockUrlCheckDomainRedirect(unittest.TestCase):
         self.channel.ircChannel = '#botgotsthis'
         self.now = datetime(2000, 1, 1)
 
-        patcher = patch('source.api.twitch.num_followers', autospec=True)
+        patcher = patch('source.api.twitch.num_followers')
         self.addCleanup(patcher.stop)
         self.mock_followers = patcher.start()
 

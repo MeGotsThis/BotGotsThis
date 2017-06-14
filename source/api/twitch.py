@@ -278,18 +278,20 @@ def is_valid_user(user: str) -> Optional[bool]:
     return bot.globals.twitchId[user] is not None
 
 
-def num_followers(user: str) -> Optional[int]:
+async def num_followers(user: str) -> Optional[int]:
     if not bot.utils.loadTwitchId(user):
+        await asyncio.sleep(0)
         return None
     if bot.globals.twitchId[user] is None:
+        await asyncio.sleep(0)
         return 0
-    with suppress(ConnectionError, client.HTTPException):
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
         response: client.HTTPResponse
-        data: bytes
+        followerData: dict
         uri: str = '/kraken/users/{}/follows/channels?limit=1'.format(
             bot.globals.twitchId[user])
-        response, data = api_call(None, 'GET', uri)
-        followerData: dict = json.loads(data.decode('utf-8'))
+        response, followerData = await get_call(None, uri)
         return int(followerData['_total'])
     return None
 

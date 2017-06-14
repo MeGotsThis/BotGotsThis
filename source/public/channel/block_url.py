@@ -9,6 +9,7 @@ from datetime import datetime
 from http.client import HTTPResponse
 from urllib.parse import ParseResult, urlparse
 from typing import BinaryIO, Match, Tuple, Union
+import asyncio
 import bot.config
 import re
 import socket
@@ -39,7 +40,8 @@ def check_domain_redirect(chat: 'data.Channel',
                           nick: str,
                           message: Message,
                           timestamp: datetime) -> None:
-    if twitch.num_followers(nick):
+    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+    if loop.run_until_complete(twitch.num_followers(nick)):
         return
     
     # Record all urls with users of no follows
