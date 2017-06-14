@@ -15,8 +15,7 @@ async def call_streams(timestamp: datetime.datetime) -> None:
 
 
 async def call_offline(timestamp: datetime.datetime) -> None:
-    await asyncio.sleep(0)
-    twitch.checkOfflineChannels(timestamp)
+    await twitch.checkOfflineChannels(timestamp)
 
 
 async def call_server(timestamp: datetime.datetime) -> None:

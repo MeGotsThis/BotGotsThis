@@ -622,31 +622,32 @@ class TestApiTwitch(asynctest.TestCase):
                          {'botgotsthis': twitch.TwitchStatus(
                              datetime(2000, 1, 1), None, None, '1')})
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_properties_no_load(self):
+    async def test_properties_no_load(self):
         self.mock_load.return_value = False
-        self.assertIsNone(twitch.channel_properties('botgotsthis'))
+        self.assertIsNone(await twitch.channel_properties('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertFalse(self.mock_get_call.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_properties_404(self):
-        self.mock_response.status = 404
-        self.assertIsNone(twitch.channel_properties('botgotsthis'))
+    async def test_properties_404(self):
+        self.mock_async_response.status = 404
+        self.assertIsNone(await twitch.channel_properties('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertTrue(self.mock_get_call.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_properties_exception(self):
+    async def test_properties_exception(self):
         self.mock_api_call.side_effect = HTTPException
-        self.assertIsNone(twitch.channel_properties('botgotsthis'))
+        self.assertIsNone(await twitch.channel_properties('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertTrue(self.mock_get_call.called)
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_properties_something(self):
-        self.mock_response.status = 200
-        self.mock_api_call.return_value[1] = channelProperties
-        self.assertEqual(twitch.channel_properties('botgotsthis'),
+    async def test_properties_something(self):
+        self.mock_async_response.status = 200
+        data = json.loads(channelProperties.decode())
+        self.mock_get_call.return_value[1] = data
+        self.assertEqual(await twitch.channel_properties('botgotsthis'),
                          twitch.TwitchStatus(None, None, None, None))
         self.mock_load.assert_called_once_with('botgotsthis')
+        self.assertTrue(self.mock_get_call.called)
 
     async def test_twitch_ids(self):
         self.mock_async_response.status = 200

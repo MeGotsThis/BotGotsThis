@@ -1,4 +1,5 @@
-﻿import bot.globals
+﻿import asyncio
+import bot.globals
 import copy
 import random
 from bot import data, utils
@@ -62,7 +63,8 @@ async def checkStreamsAndChannel(timestamp: datetime) -> None:
         channels[channel].streamingSince = None
 
 
-def checkOfflineChannels(timestamp: datetime) -> None:
+async def checkOfflineChannels(timestamp: datetime) -> None:
+    await asyncio.sleep(0)
     if not bot.globals.channels:
         return
     cacheDuration: timedelta = timedelta(seconds=300)
@@ -82,7 +84,7 @@ def checkOfflineChannels(timestamp: datetime) -> None:
     chat: data.Channel = random.choice(offlineChannels)
     chat.twitchCache = timestamp
     current: Optional[twitch.TwitchStatus]
-    current = twitch.channel_properties(chat.channel)
+    current = await twitch.channel_properties(chat.channel)
     if current is None:
         chat.twitchCache = timestamp - cacheDuration + timedelta(seconds=60)
         return

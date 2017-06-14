@@ -164,13 +164,13 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
-    def test_offline_empty(self, mock_channel, mock_community, mock_save):
+    async def test_offline_empty(self, mock_channel, mock_community,
+                                 mock_save):
         self.mock_globals.channels = {}
-        twitch.checkOfflineChannels(self.now)
+        await twitch.checkOfflineChannels(self.now)
         self.assertFalse(mock_channel.called)
         self.assertFalse(self.cache_property.called)
         self.assertFalse(self.streaming_property.called)
@@ -179,14 +179,14 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_community.called)
         self.assertFalse(mock_save.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
-    def test_offline_streaming(self, mock_channel, mock_community, mock_save):
+    async def test_offline_streaming(self, mock_channel, mock_community,
+                                     mock_save):
         self.channel.isStreaming = True
         self.cache_property.return_value = self.now - timedelta(hours=1)
-        twitch.checkOfflineChannels(self.now)
+        await twitch.checkOfflineChannels(self.now)
         self.assertFalse(mock_channel.called)
         self.assertFalse(self.cache_property.called)
         self.assertFalse(self.streaming_property.called)
@@ -195,15 +195,15 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_community.called)
         self.assertFalse(mock_save.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
-    def test_offline_recent(self, mock_channel, mock_community, mock_save):
+    async def test_offline_recent(self, mock_channel, mock_community,
+                                  mock_save):
         mock_community.return_value = None
         self.channel.isStreaming = False
         self.cache_property.return_value = self.now
-        twitch.checkOfflineChannels(self.now)
+        await twitch.checkOfflineChannels(self.now)
         self.assertFalse(mock_channel.called)
         self.cache_property.assert_called_once_with()
         self.assertFalse(self.streaming_property.called)
@@ -212,16 +212,15 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_community.called)
         self.assertFalse(mock_save.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
-    def test_offline_none(self, mock_channel, mock_community, mock_save):
+    async def test_offline_none(self, mock_channel, mock_community, mock_save):
         mock_community.return_value = None
         mock_channel.return_value = None
         self.channel.isStreaming = False
         self.cache_property.return_value = self.now - timedelta(hours=1)
-        twitch.checkOfflineChannels(self.now)
+        await twitch.checkOfflineChannels(self.now)
         mock_channel.assert_called_once_with('botgotsthis')
         self.cache_property.assert_has_calls(
             [call(), call(self.now),
@@ -232,16 +231,15 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_community.called)
         self.assertFalse(mock_save.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
-    def test_offline(self, mock_channel, mock_community, mock_save):
+    async def test_offline(self, mock_channel, mock_community, mock_save):
         mock_community.return_value = None
         mock_channel.return_value = TwitchStatus(None, 'Keepo', 'Music', None)
         self.channel.isStreaming = False
         self.cache_property.return_value = self.now - timedelta(hours=1)
-        twitch.checkOfflineChannels(self.now)
+        await twitch.checkOfflineChannels(self.now)
         mock_channel.assert_called_once_with('botgotsthis')
         self.cache_property.assert_has_calls([call(), call(self.now)])
         self.streaming_property.assert_called_once_with(None)
@@ -250,16 +248,16 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         mock_community.assert_called_once_with('botgotsthis')
         self.assertFalse(mock_save.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
-    def test_offline_community_None(self, mock_channel, mock_community, mock_save):
+    async def test_offline_community_None(self, mock_channel, mock_community,
+                                          mock_save):
         mock_community.return_value = TwitchCommunity(None, None)
         mock_channel.return_value = TwitchStatus(None, 'Keepo', 'Music', None)
         self.channel.isStreaming = False
         self.cache_property.return_value = self.now - timedelta(hours=1)
-        twitch.checkOfflineChannels(self.now)
+        await twitch.checkOfflineChannels(self.now)
         mock_channel.assert_called_once_with('botgotsthis')
         self.cache_property.assert_has_calls([call(), call(self.now)])
         self.streaming_property.assert_called_once_with(None)
@@ -268,16 +266,16 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         mock_community.assert_called_once_with('botgotsthis')
         mock_save.assert_called_once_with(None, None, self.now)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')
     @patch('source.api.twitch.channel_properties')
-    def test_offline_community(self, mock_channel, mock_community, mock_save):
+    async def test_offline_community(self, mock_channel, mock_community,
+                                     mock_save):
         mock_community.return_value = TwitchCommunity('1', 'BotGotsThis')
         mock_channel.return_value = TwitchStatus(None, 'Keepo', 'Music', None)
         self.channel.isStreaming = False
         self.cache_property.return_value = self.now - timedelta(hours=1)
-        twitch.checkOfflineChannels(self.now)
+        await twitch.checkOfflineChannels(self.now)
         mock_channel.assert_called_once_with('botgotsthis')
         self.cache_property.assert_has_calls([call(), call(self.now)])
         self.streaming_property.assert_called_once_with(None)
