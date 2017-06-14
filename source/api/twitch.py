@@ -182,13 +182,14 @@ async def delete_call(channel: Optional[str],
                 return response, None
 
 
-def server_time() -> Optional[datetime]:
-    with suppress(client.HTTPException):
-        response: client.HTTPResponse
-        data: bytes
-        response, data = api_call(None, 'GET', '/kraken/')
+async def server_time() -> Optional[datetime]:
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
+        response: aiohttp.ClientResponse
+        data: dict
+        response, data = await get_call(None, '/kraken/')
         if response.status == 200:
-            date = response.getheader('Date')
+            date = response.headers['Date']
             if data is not None:
                 dateStruct: DateTuple = email.utils.parsedate(date)
                 unixTimestamp: float = time.mktime(dateStruct)

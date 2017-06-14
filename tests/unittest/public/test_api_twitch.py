@@ -442,20 +442,21 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_load = patcher.start()
         self.mock_load.return_value = True
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_server_time(self):
+    async def test_server_time(self):
         timestamp = 'Sat, 1 Jan 2000 00:00:00 GMT'
-        self.mock_response.status = 200
-        self.mock_response.getheader.return_value = timestamp
-        self.assertEqual(twitch.server_time(), datetime(2000, 1, 1))
+        self.mock_async_response.status = 200
+        self.mock_async_response.headers = {}
+        self.mock_async_response.headers['Date'] = timestamp
+        self.mock_get_call.return_value[1] = {}
+        self.assertEqual(await twitch.server_time(), datetime(2000, 1, 1))
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_server_time_except(self):
-        self.mock_api_call.side_effect = HTTPException
-        self.assertIsNone(twitch.server_time())
+    async def test_server_time_except(self):
+        exception = aiohttp.ClientResponseError(None, None)
+        self.mock_api_call.side_effect = exception
+        self.assertIsNone(await twitch.server_time())
 
     async def test_twitch_emotes(self):
-        self.mock_response.status = 200
+        self.mock_async_response.status = 200
         self.mock_get_call.return_value[1] = json.loads(twitchEmotes)
         self.assertEqual(await twitch.twitch_emotes(),
                          ({25: 'Kappa'}, {25: 0}))
@@ -463,7 +464,7 @@ class TestApiTwitch(asynctest.TestCase):
             None, StrContains('/kraken/chat/emoticon_images?emotesets='))
 
     async def test_twitch_emotes_special(self):
-        self.mock_response.status = 200
+        self.mock_async_response.status = 200
         self.mock_get_call.return_value[1] = json.loads(twitchEmotesSpecial)
         self.assertEqual(
             (await twitch.twitch_emotes())[0],
