@@ -8,7 +8,7 @@ from ...api import twitch
 from ...database import factory
 
 
-def checkTwitchIds(timestamp: datetime) -> None:
+async def checkTwitchIds(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
     twitchIds: Dict[str, Optional[str]] = copy.copy(bot.globals.twitchId)
@@ -21,7 +21,7 @@ def checkTwitchIds(timestamp: datetime) -> None:
     if not channels:
         return
 
-    ids: Optional[Dict[str, str]] = twitch.getTwitchIds(channels)
+    ids: Optional[Dict[str, str]] = await twitch.getTwitchIds(channels)
     if ids is None:
         return
     channel: str

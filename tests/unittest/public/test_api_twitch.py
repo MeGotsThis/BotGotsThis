@@ -1,8 +1,9 @@
-import aiohttp
+import asyncio
 import bot.globals
 import json
 import unittest
 
+import aiohttp
 import asynctest
 
 from collections import defaultdict
@@ -652,22 +653,23 @@ class TestApiTwitch(asynctest.TestCase):
                          twitch.TwitchStatus(None, None, None, None))
         self.mock_load.assert_called_once_with('botgotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_twitch_ids(self):
-        self.mock_response.status = 200
-        self.mock_api_call.return_value[1] = twitchIdReponse
-        self.assertEqual(twitch.getTwitchIds(['botgotsthis', 'megotsthis']),
-                         {'botgotsthis': '1'})
+    async def test_twitch_ids(self):
+        self.mock_async_response.status = 200
+        data = twitchIdReponse.decode()
+        self.mock_get_call.return_value[1] = json.loads(data)
+        self.assertEqual(
+            await twitch.getTwitchIds(['botgotsthis', 'megotsthis']),
+            {'botgotsthis': '1'})
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_twitch_ids_404(self):
-        self.mock_response.status = 404
-        self.assertIsNone(twitch.getTwitchIds(['botgotsthis', 'megotsthis']))
+    async def test_twitch_ids_404(self):
+        self.mock_async_response.status = 404
+        self.assertIsNone(
+            await twitch.getTwitchIds(['botgotsthis', 'megotsthis']))
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_twitch_ids_exception(self):
-        self.mock_api_call.side_effect = HTTPException
-        self.assertIsNone(twitch.getTwitchIds(['botgotsthis', 'megotsthis']))
+    async def test_twitch_ids_exception(self):
+        self.mock_get_call.side_effect = asyncio.TimeoutError
+        self.assertIsNone(
+            await twitch.getTwitchIds(['botgotsthis', 'megotsthis']))
 
     @asynctest.fail_on(unused_loop=False)
     def test_channel_community_no_load(self):

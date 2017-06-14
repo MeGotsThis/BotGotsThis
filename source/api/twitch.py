@@ -243,20 +243,20 @@ def chat_server(chat:Optional[str]) -> Optional[str]:
     return None
 
 
-def getTwitchIds(channels: Iterable[str]) -> Optional[Dict[str, str]]:
-    with suppress(ConnectionError, client.HTTPException):
+async def getTwitchIds(channels: Iterable[str]) -> Optional[Dict[str, str]]:
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
         allChannels: List[str] = list(channels)
         ids: Dict[str, str] = {}
         for i in range((len(allChannels) + 99) // 100):
             channelsToCheck: List[str] = allChannels[i*100:(i+1)*100]
             uri: str
             uri = '/kraken/users?limit=100&login=' + ','.join(channelsToCheck)
-            response: client.HTTPResponse
-            responseData: bytes
-            response, responseData = api_call(None, 'GET', uri)
-            if response.status != 200:
+            response: aiohttp.ClientResponse
+            idData: Optional[dict]
+            response, idData = await get_call(None, uri)
+            if response.status != 200 or idData is None:
                 return None
-            idData: dict = json.loads(responseData.decode('utf-8'))
             for userData in idData['users']:
                 ids[userData['name']] = userData['_id']
         return ids

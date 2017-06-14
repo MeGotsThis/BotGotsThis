@@ -1,8 +1,9 @@
 ﻿from . import data
 from datetime import datetime, timedelta
 from types import TracebackType
-from typing import Any, Iterable, List, Optional, Type, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Type, Tuple, Union
 from source.api import twitch
+import asyncio
 import builtins
 import bot.config
 import bot.globals
@@ -67,7 +68,10 @@ def loadTwitchId(channel: str,
         else:
             if timestamp < cacheTime + timedelta(days=1):
                 return True
-    ids = twitch.getTwitchIds([channel])
+    ids: Optional[Dict[str, str]]
+    # TODO: Convert to async
+    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+    ids = loop.run_until_complete(twitch.getTwitchIds([channel]))
     if ids is None:
         return False
     if channel in ids:
