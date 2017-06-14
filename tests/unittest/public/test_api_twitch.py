@@ -437,7 +437,7 @@ class TestApiTwitch(asynctest.TestCase):
             'abc': None,
             }
 
-        patcher = patch('bot.utils.loadTwitchId', autospec=True)
+        patcher = patch('bot.utils.loadTwitchId')
         self.addCleanup(patcher.stop)
         self.mock_load = patcher.start()
         self.mock_load.return_value = True
@@ -489,20 +489,17 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_get_call.assert_called_once_with(
             None, StrContains('/kraken/chat/emoticon_images?emotesets='))
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_is_valid_user(self):
-        self.assertIs(twitch.is_valid_user('botgotsthis'), True)
+    async def test_is_valid_user(self):
+        self.assertIs(await twitch.is_valid_user('botgotsthis'), True)
         self.mock_load.assert_called_once_with('botgotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_is_valid_user_false(self):
-        self.assertIs(twitch.is_valid_user('megotsthis'), False)
+    async def test_is_valid_user_false(self):
+        self.assertIs(await twitch.is_valid_user('megotsthis'), False)
         self.mock_load.assert_called_once_with('megotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_is_valid_user_no_load(self):
+    async def test_is_valid_user_no_load(self):
         self.mock_load.return_value = False
-        self.assertIsNone(twitch.is_valid_user('botgotsthis'))
+        self.assertIsNone(await twitch.is_valid_user('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
 
     async def test_num_followers(self):
