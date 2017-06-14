@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from asynctest.mock import patch
 
 from source.data.message import Message
 from source.public.channel import mod
@@ -241,7 +241,7 @@ class TestChannelMod(TestChannel):
 
     @patch('bot.globals', autospec=True)
     @patch('source.api.oauth.token', autospec=True)
-    @patch('source.api.twitch.set_channel_community', autospec=True)
+    @patch('source.api.twitch.set_channel_community')
     def test_community_false(self, mock_update, mock_token, mock_globals):
         mock_globals.twitchCommunity = {
             'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
@@ -266,7 +266,7 @@ class TestChannelMod(TestChannel):
 
     @patch('bot.globals', autospec=True)
     @patch('source.api.oauth.token', autospec=True)
-    @patch('source.api.twitch.set_channel_community', autospec=True)
+    @patch('source.api.twitch.set_channel_community')
     def test_community(self, mock_update, mock_token, mock_globals):
         mock_globals.twitchCommunity = {
             'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
@@ -288,7 +288,7 @@ class TestChannelMod(TestChannel):
 
     @patch('bot.globals', autospec=True)
     @patch('source.api.oauth.token', autospec=True)
-    @patch('source.api.twitch.set_channel_community', autospec=True)
+    @patch('source.api.twitch.set_channel_community')
     def test_community_unset(self, mock_update, mock_token, mock_globals):
         mock_globals.twitchCommunity = {
             'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
@@ -310,7 +310,7 @@ class TestChannelMod(TestChannel):
 
     @patch('bot.globals', autospec=True)
     @patch('source.api.oauth.token', autospec=True)
-    @patch('source.api.twitch.set_channel_community', autospec=True)
+    @patch('source.api.twitch.set_channel_community')
     def test_community_not_exist(self, mock_update, mock_token, mock_globals):
         mock_globals.twitchCommunity = {
             'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
@@ -332,7 +332,7 @@ class TestChannelMod(TestChannel):
 
     @patch('bot.globals', autospec=True)
     @patch('source.api.oauth.token', autospec=True)
-    @patch('source.api.twitch.set_channel_community', autospec=True)
+    @patch('source.api.twitch.set_channel_community')
     def test_community_fail(self, mock_update, mock_token, mock_globals):
         mock_globals.twitchCommunity = {
             'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'

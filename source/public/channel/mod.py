@@ -1,6 +1,8 @@
-﻿from typing import Optional
+﻿import asyncio
 
 import bot.globals
+
+from typing import Optional
 
 from ..library.chat import min_args, permission_not_feature, permission
 from ...api import oauth, twitch
@@ -67,8 +69,10 @@ def commandCommunity(args: ChatCommandArgs) -> bool:
     community: Optional[str] = None
     if len(args.message) >= 2:
         community = args.message[1]
+    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
     result: Optional[bool]
-    result = twitch.set_channel_community(args.chat.channel, community)
+    result = loop.run_until_complete(
+        twitch.set_channel_community(args.chat.channel, community))
     msg: str
     if result is True:
         if community is not None:

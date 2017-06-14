@@ -424,31 +424,34 @@ async def get_community_by_id(communityId: str) -> Optional[TwitchCommunity]:
     return None
 
 
-def set_channel_community(channel: str,
-                          communityName: Optional[str]) -> Optional[bool]:
+async def set_channel_community(channel: str,
+                                communityName: Optional[str]
+                                ) -> Optional[bool]:
     if (not bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
     uri: str
-    response: client.HTTPResponse
-    responseData: bytes
+    response: aiohttp.ClientResponse
+    data: Optional[dict]
     if communityName is not None:
         name: str = communityName.lower()
-        loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-        if not loop.run_until_complete(
-                bot.utils.loadTwitchCommunity(communityName)):
+        if not await bot.utils.loadTwitchCommunity(communityName):
             return None
         if bot.globals.twitchCommunity[name] is None:
             return False
         uri = ('/kraken/channels/' + bot.globals.twitchId[channel]
                + '/community/' + bot.globals.twitchCommunity[name])
-        with suppress(ConnectionError, client.HTTPException):
-            response, responseData = api_call(channel, 'PUT', uri)
+        with suppress(aiohttp.ClientConnectionError,
+                      aiohttp.ClientResponseError,
+                      asyncio.TimeoutError):
+            response, data = await put_call(channel, uri)
             return True if response.status == 204 else None
     else:
         uri = ('/kraken/channels/' + bot.globals.twitchId[channel]
                + '/community')
-        with suppress(ConnectionError, client.HTTPException):
-            response, responseData = api_call(channel, 'DELETE', uri)
+        with suppress(aiohttp.ClientConnectionError,
+                      aiohttp.ClientResponseError,
+                      asyncio.TimeoutError):
+            response, data = await delete_call(channel, uri)
             return True if response.status == 204 else None
     return None
