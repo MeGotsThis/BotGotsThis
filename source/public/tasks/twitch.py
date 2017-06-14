@@ -39,12 +39,12 @@ async def checkTwitchIds(timestamp: datetime) -> None:
         utils.saveTwitchId(channel, None, timestamp)
 
 
-def checkStreamsAndChannel(timestamp: datetime) -> None:
+async def checkStreamsAndChannel(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
     channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
     onlineStreams: Optional[twitch.OnlineStreams]
-    onlineStreams = twitch.active_streams(channels.keys())
+    onlineStreams = await twitch.active_streams(channels.keys())
     if onlineStreams is None:
         return
     channel: str

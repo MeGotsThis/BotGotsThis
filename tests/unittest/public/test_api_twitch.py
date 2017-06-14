@@ -563,49 +563,44 @@ class TestApiTwitch(asynctest.TestCase):
         self.assertFalse(self.mock_api_call.called)
         self.mock_load.assert_called_once_with('botgotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch._handle_streams')
-    def test_active_streams_no_load(self, mock_handle):
+    async def test_active_streams_no_load(self, mock_handle):
         self.mock_load.return_value = False
-        self.assertEqual(twitch.active_streams(['botgotsthis']), {})
+        self.assertEqual(await twitch.active_streams(['botgotsthis']), {})
         self.mock_load.assert_called_once_with('botgotsthis')
-        self.assertFalse(self.mock_api_call.called)
+        self.assertFalse(self.mock_get_call.called)
         self.assertEqual(mock_handle.call_count, 0)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch._handle_streams')
-    def test_active_streams_no_user(self, mock_handle):
-        self.assertEqual(twitch.active_streams(['megotsthis']), {})
+    async def test_active_streams_no_user(self, mock_handle):
+        self.assertEqual(await twitch.active_streams(['megotsthis']), {})
         self.mock_load.assert_called_once_with('megotsthis')
-        self.assertFalse(self.mock_api_call.called)
+        self.assertFalse(self.mock_get_call.called)
         self.assertEqual(mock_handle.call_count, 0)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch._handle_streams')
-    def test_active_streams_404(self, mock_handle):
-        self.mock_response.status = 404
-        self.assertIsNone(twitch.active_streams(['botgotsthis']))
+    async def test_active_streams_404(self, mock_handle):
+        self.mock_async_response.status = 404
+        self.assertIsNone(await twitch.active_streams(['botgotsthis']))
         self.mock_load.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 0)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch._handle_streams')
-    def test_active_streams_one(self, mock_handle):
-        self.mock_response.status = 200
-        self.mock_api_call.return_value[1] = noStreams
-        self.assertEqual(twitch.active_streams(['botgotsthis']), {})
+    async def test_active_streams_one(self, mock_handle):
+        self.mock_async_response.status = 200
+        self.mock_get_call.return_value[1] = json.loads(noStreams.decode())
+        self.assertEqual(await twitch.active_streams(['botgotsthis']), {})
         self.mock_load.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 1)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch._handle_streams')
-    def test_active_streams_too_many(self, mock_handle):
-        self.mock_response.status = 200
-        self.mock_api_call.side_effect = [
-            [self.mock_response, multiStreams],
-            [self.mock_response, noStreams]
+    async def test_active_streams_too_many(self, mock_handle):
+        self.mock_async_response.status = 200
+        self.mock_get_call.side_effect = [
+            [self.mock_async_response, json.loads(multiStreams.decode())],
+            [self.mock_async_response, json.loads(noStreams.decode())]
         ]
-        self.assertEqual(twitch.active_streams(['botgotsthis']), {})
+        self.assertEqual(await twitch.active_streams(['botgotsthis']), {})
         self.mock_load.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 2)
 

@@ -124,44 +124,40 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.game_property = PropertyMock(return_value=None)
         type(self.channel).twitchGame = self.game_property
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch.active_streams')
-    def test_streams_empty(self, mock_active):
+    async def test_streams_empty(self, mock_active):
         self.mock_globals.channels = {}
-        twitch.checkStreamsAndChannel(self.now)
+        await twitch.checkStreamsAndChannel(self.now)
         self.assertFalse(mock_active.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch.active_streams')
-    def test_streams_none(self, mock_active):
+    async def test_streams_none(self, mock_active):
         mock_active.return_value = None
-        twitch.checkStreamsAndChannel(self.now)
+        await twitch.checkStreamsAndChannel(self.now)
         self.assertTrue(mock_active.called)
         self.assertFalse(self.cache_property.called)
         self.assertFalse(self.streaming_property.called)
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch.active_streams')
-    def test_streams(self, mock_active):
+    async def test_streams(self, mock_active):
         streamed = datetime(1999, 1, 1)
         mock_active.return_value = {
             'botgotsthis': TwitchStatus(streamed, 'Kappa', 'Creative', None)
             }
-        twitch.checkStreamsAndChannel(self.now)
+        await twitch.checkStreamsAndChannel(self.now)
         self.assertTrue(mock_active.called)
         self.cache_property.assert_called_once_with(self.now)
         self.streaming_property.assert_called_once_with(streamed)
         self.status_property.assert_called_once_with('Kappa')
         self.game_property.assert_called_once_with('Creative')
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.api.twitch.active_streams')
-    def test_streams_offline(self, mock_active):
+    async def test_streams_offline(self, mock_active):
         streamed = datetime(1999, 1, 1)
         mock_active.return_value = {}
-        twitch.checkStreamsAndChannel(self.now)
+        await twitch.checkStreamsAndChannel(self.now)
         self.assertTrue(mock_active.called)
         self.assertFalse(self.cache_property.called)
         self.streaming_property.assert_called_once_with(None)

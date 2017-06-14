@@ -11,8 +11,7 @@ async def call_ids(timestamp: datetime.datetime) -> None:
 
 
 async def call_streams(timestamp: datetime.datetime) -> None:
-    await asyncio.sleep(0)
-    twitch.checkStreamsAndChannel(timestamp)
+    await twitch.checkStreamsAndChannel(timestamp)
 
 
 async def call_offline(timestamp: datetime.datetime) -> None:
