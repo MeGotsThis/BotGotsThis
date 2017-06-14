@@ -19,8 +19,7 @@ async def call_offline(timestamp: datetime.datetime) -> None:
 
 
 async def call_server(timestamp: datetime.datetime) -> None:
-    await asyncio.sleep(0)
-    twitch.checkChatServers(timestamp)
+    await twitch.checkChatServers(timestamp)
 
 
 threading.Timer(1.5, background.add_task,
