@@ -7,7 +7,6 @@ from asynctest.mock import Mock, patch
 
 from bot import utils
 from bot.data import Channel, Socket, MessagingQueue
-from bot.thread.logging import Logging
 from source.api.twitch import TwitchCommunity
 from tests.unittest.mock_class import StrContains
 
@@ -272,63 +271,58 @@ class TestUtils(unittest.TestCase):
         utils.print('Kappa', override=False)
         self.assertEqual(mock_stdout.getvalue(), '2000-01-01 00:00:00 Kappa\n')
 
-    @patch('bot.globals', autospec=True)
+    @patch('bot.async_task.logging', autospec=True)
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_print_file(self, mock_now, mock_config, mock_stdout,
-                        mock_globals):
-        mock_globals.logging = Mock(spec=Logging)
+                        mock_logging):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.development = False
         utils.print('Kappa', file=True)
         self.assertEqual(mock_stdout.getvalue(), '')
-        mock_globals.logging.log.assert_called_once_with(
+        mock_logging.log.assert_called_once_with(
             'output.log', '2000-01-01T00:00:00.000000 Kappa\n')
 
-    @patch('bot.globals', autospec=True)
+    @patch('bot.async_task.logging', autospec=True)
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_print_file_multiple(self, mock_now, mock_config, mock_stdout,
-                                 mock_globals):
-        mock_globals.logging = Mock(spec=Logging)
+                                 mock_logging):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.development = False
         utils.print('Kappa', 'Kappa', file=True)
         self.assertEqual(mock_stdout.getvalue(), '')
-        mock_globals.logging.log.assert_called_once_with(
+        mock_logging.log.assert_called_once_with(
             'output.log', '2000-01-01T00:00:00.000000 Kappa Kappa\n')
 
-    @patch('bot.globals', autospec=True)
+    @patch('bot.async_task.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
-    def test_logIrcMessage_config(self, mock_now, mock_config, mock_globals):
-        mock_globals.logging = Mock(spec=Logging)
+    def test_logIrcMessage_config(self, mock_now, mock_config, mock_logging):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.ircLogFolder = 'log'
         utils.logIrcMessage('botgotsthis', 'Kappa')
-        mock_globals.logging.log.assert_called_once_with(
+        mock_logging.log.assert_called_once_with(
             StrContains('botgotsthis'), StrContains('Kappa'))
 
-    @patch('bot.globals', autospec=True)
+    @patch('bot.async_task.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logIrcMessage_config_None(self, mock_now, mock_config,
-                                       mock_globals):
-        mock_globals.logging = Mock(spec=Logging)
+                                       mock_logging):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.ircLogFolder = None
         utils.logIrcMessage('botgotsthis', 'Kappa')
-        self.assertFalse(mock_globals.logging.log.called)
+        self.assertFalse(mock_logging.log.called)
 
     @patch('sys.stderr', new_callable=StringIO)
-    @patch('bot.globals', autospec=True)
+    @patch('bot.async_task.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
-    def test_logException(self, mock_now, mock_config, mock_globals,
+    def test_logException(self, mock_now, mock_config, mock_logging,
                           mock_stderr):
-        mock_globals.logging = Mock(spec=Logging)
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.development = True
         mock_config.exceptionLog = 'exception'
@@ -336,7 +330,7 @@ class TestUtils(unittest.TestCase):
             raise Exception()
         except Exception:
             utils.logException()
-        mock_globals.logging.log.assert_called_once_with(
+        mock_logging.log.assert_called_once_with(
             StrContains('exception'),
             StrContains('2000', '01', 'Exception', __file__,
                         'test_logException', 'raise Exception'))
@@ -345,12 +339,11 @@ class TestUtils(unittest.TestCase):
                                       'test_logException', 'raise Exception'))
 
     @patch('sys.stderr', new_callable=StringIO)
-    @patch('bot.globals', autospec=True)
+    @patch('bot.async_task.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logException_no_development(
-            self, mock_now, mock_config, mock_globals, mock_stderr):
-        mock_globals.logging = Mock(spec=Logging)
+            self, mock_now, mock_config, mock_logging, mock_stderr):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.development = False
         mock_config.exceptionLog = 'exception'
@@ -358,25 +351,24 @@ class TestUtils(unittest.TestCase):
             raise Exception()
         except Exception:
             utils.logException()
-        mock_globals.logging.log.assert_called_once_with(
+        mock_logging.log.assert_called_once_with(
             StrContains('exception'),
             StrContains('2000', '1', 'Exception', __file__,
                         'test_logException', 'raise Exception'))
         self.assertEquals(mock_stderr.getvalue(), '')
 
-    @patch('bot.globals', autospec=True)
+    @patch('bot.async_task.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logException_config_None(self, mock_now, mock_config,
-                                      mock_globals):
-        mock_globals.logging = Mock(spec=Logging)
+                                      mock_logging):
         mock_now.return_value = datetime(2000, 1, 1)
         mock_config.exceptionLog = None
         try:
             raise Exception()
         except Exception:
             utils.logException()
-        self.assertFalse(mock_globals.logging.log.called)
+        self.assertFalse(mock_logging.log.called)
 
 
 class TestUtilsAsync(asynctest.TestCase):
