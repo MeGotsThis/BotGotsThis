@@ -3,6 +3,7 @@ import bot.globals
 import socket
 import source.ircmessage
 import threading
+from bot.coroutine import join
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
 from typing import Any, Callable, Deque, Dict, Generic, Iterable, List
@@ -377,7 +378,7 @@ class Socket:
         now = utils.now()
         self.lastSentPing = now
         self.lastPing = now
-        bot.globals.join.connected(self)
+        join.connected(self)
 
     def login(self, connection: pysocket) -> None:
         if not isinstance(connection, pysocket):
@@ -407,7 +408,7 @@ class Socket:
         if self._socket is None:
             raise ConnectionError()
         self._socket.close()
-        bot.globals.join.disconnected(self)
+        join.disconnected(self)
         self._socket = None
         self.lastSentPing = datetime.max
         self.lastPing = datetime.max
@@ -442,7 +443,7 @@ class Socket:
             self.lastSentPing = timestamp
         if command.command == 'JOIN' and isinstance(channel, Channel):
             channel.onJoin()
-            bot.globals.join.recordJoin()
+            join.record_join()
             print('{time} Joined {channel} on {socket}'.format(
                 time=timestamp, channel=channel.channel, socket=self.name))
 
@@ -586,7 +587,7 @@ class Socket:
             self.queueWrite(IrcMessage(None, None, 'PART',
                                        IrcMessageParams(channel.ircChannel)))
             del self._channels[channel.channel]
-        bot.globals.join.onPart(channel.channel)
+        join.on_part(channel.channel)
         print('{time} Parted {channel}'.format(
             time=utils.now(), channel=channel.channel))
 

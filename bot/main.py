@@ -14,7 +14,7 @@ from typing import Generator, List, Iterable, Optional, Tuple
 from . import data, utils
 from .thread.join import JoinThread
 from .thread.socket import SocketsThread
-from .coroutine import background, logging
+from .coroutine import background, join, logging
 
 ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 
@@ -27,11 +27,11 @@ def main(argv: Optional[List[str]]=None) -> int:
     bot.globals.clusters['aws'] = data.Socket(
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
 
-    bot.globals.join = JoinThread(name='Join Thread')
+    # bot.globals.join = JoinThread(name='Join Thread')
 
     # Start the Threads
     bot.globals.sockets.start()
-    bot.globals.join.start()
+    # bot.globals.join.start()
 
     _modulesList: ModuleList = [
         pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore
@@ -58,7 +58,8 @@ def main(argv: Optional[List[str]]=None) -> int:
 
         loop = asyncio.get_event_loop()
         coro = asyncio.gather(background.background_tasks(),
-                              logging.record_logs())
+                              logging.record_logs(),
+                              join.join_manager())
         loop.run_until_complete(coro)
         loop.close()
         return 0
