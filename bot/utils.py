@@ -7,6 +7,7 @@ import asyncio
 import builtins
 import bot.config
 import bot.globals
+import bot.async_task.logging
 import os.path
 import sys
 import threading
@@ -196,7 +197,7 @@ def print(*args: Any,
             filename = file
         else:
             filename = 'output.log'
-        bot.globals.logging.log(
+        bot.async_task.logging.log(
             filename,
             '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
                 time=_timestamp, message=' '.join(str(a) for a in args)))
@@ -208,7 +209,7 @@ def logIrcMessage(filename: str,
     if bot.config.ircLogFolder is None:
         return
     timestamp = timestamp or now()
-    bot.globals.logging.log(
+    bot.async_task.logging.log(
         os.path.join(bot.config.ircLogFolder, filename),
         '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
             time=timestamp, message=message))
@@ -228,7 +229,7 @@ def logException(extraMessage: str='',
     excep = traceback.format_exception(exceptType, excecption, trackback)
     if extraMessage:
         extraMessage += '\n'
-    bot.globals.logging.log(
+    bot.async_task.logging.log(
         bot.config.exceptionLog,
         '{time:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {thread}:\n'
         '{extra}{exception}'.format(

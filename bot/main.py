@@ -15,7 +15,7 @@ from . import data, utils
 from .thread.join import JoinThread
 from .thread.logging import Logging
 from .thread.socket import SocketsThread
-from .async_task import background
+from .async_task import background, logging
 
 ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 
@@ -30,10 +30,10 @@ def main(argv: Optional[List[str]]=None) -> int:
 
     bot.globals.join = JoinThread(name='Join Thread')
 
-    bot.globals.logging = Logging()
+    #bot.globals.logging = Logging()
 
     # Start the Threads
-    bot.globals.logging.start()
+    #bot.globals.logging.start()
     bot.globals.sockets.start()
     bot.globals.join.start()
 
@@ -61,7 +61,9 @@ def main(argv: Optional[List[str]]=None) -> int:
                                   autoJoin.cluster)
 
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(background.run_tasks())
+        coro = asyncio.gather(background.run_tasks(),
+                              logging.record_logs())
+        loop.run_until_complete(coro)
         loop.close()
         return 0
     except:
@@ -69,6 +71,4 @@ def main(argv: Optional[List[str]]=None) -> int:
         utils.logException()
         raise
     finally:
-        while bot.globals.logging.queue.qsize():
-            pass
         print('{time} Ended'.format(time=utils.now()))
