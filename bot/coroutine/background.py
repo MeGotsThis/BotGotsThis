@@ -40,18 +40,22 @@ class Task:
         self._timestamp = value
 
 
-async def run_tasks():
+async def background_tasks():
     name = 'Background Tasker'
     print('{time} Starting {name}'.format(time=utils.now(), name=name))
     while bot.globals.running:
         await asyncio.sleep(0)
-        timestamp: datetime = utils.now()
-        task: Task
-        for task in _tasks[:]:
-            if timestamp >= task.timestamp + task.interval:
-                asyncio.ensure_future(_run_task(task.task, timestamp))
-                task.timestamp = timestamp
+        run_tasks()
     print('{time} Ending {name}'.format(time=utils.now(), name=name))
+
+
+def run_tasks():
+    timestamp: datetime = utils.now()
+    task: Task
+    for task in _tasks[:]:
+        if timestamp >= task.timestamp + task.interval:
+            asyncio.ensure_future(_run_task(task.task, timestamp))
+            task.timestamp = timestamp
 
 
 async def _run_task(task: Callable[[datetime], Awaitable[None]],
