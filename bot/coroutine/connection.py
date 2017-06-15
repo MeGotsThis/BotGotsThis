@@ -96,7 +96,6 @@ class ConnectionHandler:
 
         now: datetime = utils.now()
         if now - self.lastConnectAttempt < timedelta(seconds=1):
-            await asyncio.sleep(0)
             return None
         self.lastConnectAttempt = now
 

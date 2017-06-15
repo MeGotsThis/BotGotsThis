@@ -67,11 +67,9 @@ async def loadTwitchId(channel: str,
         cacheTime: datetime = bot.globals.twitchIdCache[channel]
         if bot.globals.twitchId[channel] is None:
             if timestamp < cacheTime + timedelta(hours=1):
-                await asyncio.sleep(0)
                 return True
         else:
             if timestamp < cacheTime + timedelta(days=1):
-                await asyncio.sleep(0)
                 return True
     ids: Optional[Dict[str, str]] = await twitch.getTwitchIds([channel])
     if ids is None:
@@ -103,11 +101,9 @@ async def loadTwitchCommunityId(id: str,
         cacheTime: datetime = bot.globals.twitchCommunityCache[name]
         if bot.globals.twitchCommunity[name] is None:
             if timestamp < cacheTime + timedelta(hours=1):
-                await asyncio.sleep(0)
                 return True
         else:
             if timestamp < cacheTime + timedelta(days=1):
-                await asyncio.sleep(0)
                 return True
     community: Optional[twitch.TwitchCommunity]
     community = await twitch.get_community_by_id(id)
@@ -126,11 +122,9 @@ async def loadTwitchCommunity(name: str,
         cacheTime: datetime = bot.globals.twitchCommunityCache[lname]
         if bot.globals.twitchCommunity[lname] is None:
             if timestamp < cacheTime + timedelta(hours=1):
-                await asyncio.sleep(0)
                 return True
         else:
             if timestamp < cacheTime + timedelta(days=1):
-                await asyncio.sleep(0)
                 return True
     community: Optional[twitch.TwitchCommunity]
     community = await twitch.get_community(lname)
