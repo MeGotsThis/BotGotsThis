@@ -57,7 +57,7 @@ def main(argv: Optional[List[str]]=None) -> int:
                                   autoJoin.cluster)
 
         loop = asyncio.get_event_loop()
-        coro = asyncio.gather(background.run_tasks(),
+        coro = asyncio.gather(background.background_tasks(),
                               logging.record_logs())
         loop.run_until_complete(coro)
         loop.close()
