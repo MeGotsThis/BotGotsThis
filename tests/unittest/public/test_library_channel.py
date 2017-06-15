@@ -1,7 +1,7 @@
 import math
 import unittest
 from bot import utils
-from bot.data import Channel, Socket
+from bot.data import Channel, SocketHandler
 from source.database import DatabaseBase
 from source.public.library import channel
 from tests.unittest.mock_class import StrContains
@@ -20,7 +20,7 @@ class TestLibraryChannelJoin(unittest.TestCase):
         patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
-        self.mock_globals.clusters = {'twitch': Mock(spec=Socket)}
+        self.mock_globals.clusters = {'twitch': Mock(spec=SocketHandler)}
 
         patcher = patch('source.api.twitch.chat_server', autospec=True)
         self.addCleanup(patcher.stop)

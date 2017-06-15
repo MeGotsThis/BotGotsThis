@@ -49,11 +49,11 @@ def join_a_channel() -> None:
     _channelJoined.add(chat.channel)
 
 
-def connected(socket: 'data.Socket') -> None:
+def connected(socket: 'data.SocketHandler') -> None:
     _joinTimes.append(utils.now())
 
 
-def disconnected(socket: 'data.Socket') -> None:
+def disconnected(socket: 'data.SocketHandler') -> None:
     global _channelJoined
     _channelJoined -= socket.channels.keys()
 
@@ -76,7 +76,7 @@ def _can_process() -> bool:
 
 def _connected_channels() -> Dict[str, 'data.Channel']:
     channels: Dict[str, data.Channel] = {}
-    socketManager: data.Socket
+    socketManager: data.SocketHandler
     chans: Dict[str, data.Channel]
     chan: str
     for socketManager in bot.globals.clusters.values():

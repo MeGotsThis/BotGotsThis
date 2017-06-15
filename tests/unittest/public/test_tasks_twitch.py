@@ -2,7 +2,7 @@ import unittest
 
 import asynctest
 
-from bot.data import Channel, Socket
+from bot.data import Channel, SocketHandler
 from datetime import datetime, timedelta
 from source.database import DatabaseBase
 from source.public.tasks import twitch
@@ -289,8 +289,8 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
     def setUp(self):
         super().setUp()
 
-        self.socket1 = Mock(spec=Socket)
-        self.socket2 = Mock(spec=Socket)
+        self.socket1 = Mock(spec=SocketHandler)
+        self.socket2 = Mock(spec=SocketHandler)
 
         self.check_property = PropertyMock(return_value=self.now)
         type(self.channel).serverCheck = self.check_property

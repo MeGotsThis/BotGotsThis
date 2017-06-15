@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 
 from unittest.mock import Mock, PropertyMock, patch
 
-from bot.data import Channel, Socket
+from bot.data import Channel, SocketHandler
 
 
 class TestJoinManager(unittest.TestCase):
     def setUp(self):
-        self.socket = Socket('Twitch', 'irc.twitch.tv', 6667)
+        self.socket = SocketHandler('Twitch', 'irc.twitch.tv', 6667)
         self.channel = Channel('botgotsthis', self.socket)
         self.socket._channels[self.channel.channel] = self.channel
 
@@ -61,20 +61,20 @@ class TestJoinManager(unittest.TestCase):
         self.assertEqual(list(bot.coroutine.join._joinTimes),
                          [datetime(2000, 1, 1)] * 5)
 
-    @patch.object(Socket, 'isConnected', new_callable=PropertyMock)
+    @patch.object(SocketHandler, 'isConnected', new_callable=PropertyMock)
     def test_connected_channels(self, mock_isConnected):
         mock_isConnected.return_value = True
         self.assertEquals(bot.coroutine.join._connected_channels(),
                           {'botgotsthis': self.channel})
 
-    @patch.object(Socket, 'isConnected', new_callable=PropertyMock)
+    @patch.object(SocketHandler, 'isConnected', new_callable=PropertyMock)
     def test_connected_channels_not_connected(self, mock_isConnected):
         mock_isConnected.return_value = False
         self.assertFalse(bot.coroutine.join._connected_channels())
 
-    @patch.object(Socket, 'isConnected', new_callable=PropertyMock)
+    @patch.object(SocketHandler, 'isConnected', new_callable=PropertyMock)
     def test_connected_channels_multi_sockets(self, mock_isConnected):
-        s = Mock(spec=Socket)
+        s = Mock(spec=SocketHandler)
         p = PropertyMock(return_value=False)
         type(s).isConnected = p
         c = Channel('megotsthis', self.socket)
@@ -135,7 +135,7 @@ class TestJoinManager(unittest.TestCase):
             bot.coroutine.join._get_join_with_lowest_priority(channels,
                                                               notJoined))
 
-    @patch.object(Socket, 'queueWrite')
+    @patch.object(SocketHandler, 'queueWrite')
     @patch('bot.coroutine.join._get_join_with_lowest_priority')
     @patch('bot.coroutine.join._can_process')
     @patch('bot.coroutine.join._connected_channels')
@@ -148,7 +148,7 @@ class TestJoinManager(unittest.TestCase):
         self.assertFalse(mock_queueWrite.called)
         self.assertFalse(mock_queueWrite.called)
 
-    @patch.object(Socket, 'queueWrite')
+    @patch.object(SocketHandler, 'queueWrite')
     @patch('bot.coroutine.join._get_join_with_lowest_priority')
     @patch('bot.coroutine.join._can_process')
     @patch('bot.coroutine.join._connected_channels')
@@ -160,7 +160,7 @@ class TestJoinManager(unittest.TestCase):
         self.assertFalse(mock_lowPriority.called)
         self.assertFalse(mock_queueWrite.called)
 
-    @patch.object(Socket, 'queueWrite')
+    @patch.object(SocketHandler, 'queueWrite')
     @patch('bot.coroutine.join._get_join_with_lowest_priority')
     @patch('bot.coroutine.join._can_process')
     @patch('bot.coroutine.join._connected_channels')
@@ -173,7 +173,7 @@ class TestJoinManager(unittest.TestCase):
         self.assertFalse(mock_lowPriority.called)
         self.assertFalse(mock_queueWrite.called)
 
-    @patch.object(Socket, 'queueWrite')
+    @patch.object(SocketHandler, 'queueWrite')
     @patch('bot.coroutine.join._get_join_with_lowest_priority')
     @patch('bot.coroutine.join._can_process')
     @patch('bot.coroutine.join._connected_channels')

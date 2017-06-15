@@ -23,7 +23,7 @@ def main(argv: Optional[List[str]]=None) -> int:
     bot.globals.running = True
     bot.globals.sockets = SocketsThread(name='Sockets Thread')
 
-    bot.globals.clusters['aws'] = data.Socket(
+    bot.globals.clusters['aws'] = data.SocketHandler(
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
 
     # Start the Threads

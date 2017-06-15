@@ -1,5 +1,5 @@
 import unittest
-from bot.data import Channel, Socket
+from bot.data import Channel, SocketHandler
 from bot.twitchmessage import IrcMessage, IrcMessageParams
 from datetime import datetime
 from source import ircmessage
@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch
 
 class PublicTestIrcMessage(unittest.TestCase):
     def setUp(self):
-        self.socket = Mock(spec=Socket)
+        self.socket = Mock(spec=SocketHandler)
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.channel.ircOps = set()

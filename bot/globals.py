@@ -12,7 +12,7 @@ sockets: SocketsThread = None
 
 groupChannel: 'data.Channel' = None
 
-clusters: Dict[str, 'data.Socket'] = {
+clusters: Dict[str, 'data.SocketHandler'] = {
     'aws': None,
     }
 whisperCluster: str = 'aws'

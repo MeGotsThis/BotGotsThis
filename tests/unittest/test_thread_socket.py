@@ -1,5 +1,5 @@
 import unittest
-from bot.data import Socket
+from bot.data import SocketHandler
 from bot.thread.socket import SocketsThread
 from unittest.mock import Mock, PropertyMock, patch
 
@@ -8,11 +8,11 @@ class TestSocketThread(unittest.TestCase):
     def setUp(self):
         self.socketThead = SocketsThread()
 
-        self.socket1 = Mock(spec=Socket)
+        self.socket1 = Mock(spec=SocketHandler)
         self.socket1_isConnected = PropertyMock(return_value=True)
         type(self.socket1).isConnected = self.socket1_isConnected
 
-        self.socket2 = Mock(spec=Socket)
+        self.socket2 = Mock(spec=SocketHandler)
         self.socket2_isConnected = PropertyMock(return_value=False)
         type(self.socket2).isConnected = self.socket2_isConnected
         self.socket2.disconnect.side_effect = ConnectionError

@@ -11,7 +11,7 @@ try:
 except ImportError:
     from .public.default import ircmessage  # type: ignore
 
-IrcHandler = Callable[['data.Socket', IrcMessage, datetime], None]
+IrcHandler = Callable[['data.SocketHandler', IrcMessage, datetime], None]
 ircHandlers: Dict[Union[str, int], IrcHandler] = {}
 
 _logCommandPerChannel: List[str] = [
@@ -20,7 +20,7 @@ _logCommandPerChannel: List[str] = [
     ]
 
 
-def parseMessage(socket: 'data.Socket',
+def parseMessage(socket: 'data.SocketHandler',
                  ircmsg: str,
                  timestamp: datetime) -> None:
     message: IrcMessage = IrcMessage.fromMessage(ircmsg)
@@ -41,7 +41,7 @@ def registerIrc(command: Union[str, int]) -> Callable[[IrcHandler], IrcHandler]:
 
 @registerIrc('PRIVMSG')
 def irc_privmsg(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = socket.channels
@@ -59,7 +59,7 @@ def irc_privmsg(
 
 @registerIrc('WHISPER')
 def irc_whisper(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     tags: IrcMessageTagsReadOnly = message.tags
@@ -78,7 +78,7 @@ def irc_whisper(
 
 @registerIrc('NOTICE')
 def irc_notice(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = socket.channels
@@ -97,7 +97,7 @@ def irc_notice(
 
 @registerIrc('CLEARCHAT')
 def irc_clearchat(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = socket.channels
@@ -116,7 +116,7 @@ def irc_clearchat(
 
 @registerIrc('ROOMSTATE')
 def irc_roomstate(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     where: Optional[str] = message.params.middle
@@ -126,7 +126,7 @@ def irc_roomstate(
 
 @registerIrc('HOSTTARGET')
 def irc_hosttarget(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     where: Optional[str] = message.params.middle
@@ -136,7 +136,7 @@ def irc_hosttarget(
 
 @registerIrc('MODE')
 def irc_mode(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = socket.channels
@@ -153,7 +153,7 @@ def irc_mode(
 
 @registerIrc('JOIN')
 def irc_join(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = socket.channels
@@ -165,7 +165,7 @@ def irc_join(
 
 @registerIrc(353)
 def irc_353(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = socket.channels
@@ -180,7 +180,7 @@ def irc_353(
 
 @registerIrc(366)
 def irc_366(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     where: str = message.params.middle.split()[-1]
@@ -191,7 +191,7 @@ def irc_366(
 
 @registerIrc('PART')
 def irc_part(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = socket.channels
@@ -203,7 +203,7 @@ def irc_part(
 
 @registerIrc('PING')
 def irc_ping(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     if message.params.trailing is not None:
@@ -212,7 +212,7 @@ def irc_ping(
 
 @registerIrc('PONG')
 def irc_pong(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     if (message.prefix is not None
@@ -226,7 +226,7 @@ def irc_pong(
 
 @registerIrc('USERSTATE')
 def irc_userstate(
-        socket: 'data.Socket',
+        socket: 'data.SocketHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = socket.channels

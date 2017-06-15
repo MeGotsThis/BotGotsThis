@@ -96,17 +96,17 @@ class Channel:
 
     def __init__(self,
                  channel: str,
-                 socket: 'Socket',
+                 socket: 'SocketHandler',
                  joinPriority: Union[int, float, str]=float('inf')) -> None:
         if not isinstance(channel, str):
             raise TypeError()
-        if not isinstance(socket, Socket):
+        if not isinstance(socket, SocketHandler):
             raise TypeError()
         if not channel:
             raise ValueError()
         self._channel: str = channel
         self._ircChannel: str = '#' + channel
-        self._socket: Socket = socket
+        self._socket: SocketHandler = socket
         self._isMod: bool = False
         self._isSubscriber: bool = False
         self._ircUsers: Set[str] = set()
@@ -135,7 +135,7 @@ class Channel:
         return self._ircChannel
 
     @property
-    def socket(self) -> 'Socket':
+    def socket(self) -> 'SocketHandler':
         return self._socket
 
     @property
@@ -301,7 +301,7 @@ class Channel:
                 self._bttvCache = oldTimestamp
 
 
-class Socket:
+class SocketHandler:
     def __init__(self,
                  name: str,
                  server: str,
