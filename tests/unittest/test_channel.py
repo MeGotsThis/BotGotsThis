@@ -1,7 +1,7 @@
 import asynctest
 import math
 import unittest
-from bot.data import Channel, MessagingQueue, Socket
+from bot.data import Channel, MessagingQueue, SocketHandler
 from collections.abc import MutableMapping, MutableSet
 from datetime import datetime
 from asynctest.mock import Mock, patch
@@ -9,7 +9,7 @@ from asynctest.mock import Mock, patch
 
 class TestChannel(unittest.TestCase):
     def setUp(self):
-        self.socket = Mock(spec=Socket)
+        self.socket = Mock(spec=SocketHandler)
         self.socket.messaging = Mock(spec=MessagingQueue)
         self.channel = Channel('botgotsthis', self.socket)
 
@@ -225,7 +225,7 @@ class TestChannel(unittest.TestCase):
 
 class TestChannelAsync(asynctest.TestCase):
     def setUp(self):
-        self.socket = Mock(spec=Socket)
+        self.socket = Mock(spec=SocketHandler)
         self.socket.messaging = Mock(spec=MessagingQueue)
         self.channel = Channel('botgotsthis', self.socket)
 

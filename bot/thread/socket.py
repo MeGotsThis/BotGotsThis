@@ -23,9 +23,9 @@ class SocketsThread(threading.Thread):
             time=utils.now(), name=self.__class__.__name__))
 
     def process(self):
-        sockets: List[data.Socket] = list(bot.globals.clusters.values())
-        isActive: Callable[[data.Socket], bool] = lambda s: s.isConnected
-        socket: data.Socket
+        sockets: List[data.SocketHandler] = list(bot.globals.clusters.values())
+        isActive: Callable[[data.SocketHandler], bool] = lambda s: s.isConnected
+        socket: data.SocketHandler
         try:
             for socket in filterfalse(isActive, sockets):
                 socket.connect()
@@ -33,11 +33,11 @@ class SocketsThread(threading.Thread):
             utils.logException()
         for socket in filter(isActive, sockets):
             socket.queueMessages()
-        connections: List[data.Socket] = list(filter(isActive, sockets))
+        connections: List[data.SocketHandler] = list(filter(isActive, sockets))
         if connections:
-            read: List[data.Socket]
-            write: List[data.Socket]
-            exceptional: List[data.Socket]
+            read: List[data.SocketHandler]
+            write: List[data.SocketHandler]
+            exceptional: List[data.SocketHandler]
             read, write, exceptional = select.select(
                 connections, connections, connections, 0.01)
             for socket in filter(isActive, read):
@@ -48,7 +48,7 @@ class SocketsThread(threading.Thread):
             socket.sendPing()
     
     def terminate(self):
-        socket: data.Socket
+        socket: data.SocketHandler
         for socket in bot.globals.clusters.values():
             with suppress(ConnectionError):
                 socket.disconnect()
