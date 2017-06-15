@@ -1,4 +1,6 @@
-﻿from bot import utils
+﻿import asyncio
+
+from bot import utils
 from contextlib import suppress
 from typing import Optional
 from ..library import broadcaster
@@ -54,7 +56,8 @@ def reload_server(database: DatabaseBase,
                   send: Send) -> bool:
     autojoin: AutoJoinChannel
     for autojoin in database.getAutoJoinsChats():
-        cluster: Optional[str] = twitch.chat_server(autojoin.broadcaster)
+        cluster: Optional[str] = asyncio.get_event_loop().run_until_complete(
+            twitch.chat_server(autojoin.broadcaster))
         if cluster is not None and autojoin.cluster != cluster:
             database.setAutoJoinServer(autojoin.broadcaster, cluster)
             utils.ensureServer(autojoin.broadcaster, autojoin.priority,
