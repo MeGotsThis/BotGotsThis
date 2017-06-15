@@ -3,7 +3,7 @@ import bot.globals
 import socket
 import source.ircmessage
 import threading
-from bot.coroutine import join
+from bot.coroutine import connection, join
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
 from typing import Any, Callable, Deque, Dict, Generic, Iterable, List
@@ -86,7 +86,7 @@ class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
 
 
 class Channel:
-    __slots__ = ['_channel', '_ircChannel', '_socket', '_isMod',
+    __slots__ = ['_channel', '_ircChannel', '_connection', '_isMod',
                  '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
                  '_joinPriority', '_ffzEmotes', '_ffzCache', '_ffzLock',
                  '_bttvEmotes', '_bttvCache', '_twitchCache', '_bttvLock',
@@ -96,17 +96,17 @@ class Channel:
 
     def __init__(self,
                  channel: str,
-                 socket: 'SocketHandler',
+                 connection_: 'connection.ConnectionHandler',
                  joinPriority: Union[int, float, str]=float('inf')) -> None:
         if not isinstance(channel, str):
             raise TypeError()
-        if not isinstance(socket, SocketHandler):
+        if not isinstance(connection_, connection.ConnectionHandler):
             raise TypeError()
         if not channel:
             raise ValueError()
         self._channel: str = channel
         self._ircChannel: str = '#' + channel
-        self._socket: SocketHandler = socket
+        self._connection: connection.ConnectionHandler = connection_
         self._isMod: bool = False
         self._isSubscriber: bool = False
         self._ircUsers: Set[str] = set()
@@ -135,8 +135,8 @@ class Channel:
         return self._ircChannel
 
     @property
-    def socket(self) -> 'SocketHandler':
-        return self._socket
+    def connection(self) -> 'connection.ConnectionHandler':
+        return self._connection
 
     @property
     def isMod(self) -> bool:
@@ -261,16 +261,16 @@ class Channel:
         self._ircOps.clear()
 
     def part(self) -> None:
-        self.socket.partChannel(self)
-        self.socket.messaging.clearChat(self)
+        self.connection.part_channel(self)
+        self.connection.messaging.clearChat(self)
 
     def send(self,
              messages: Union[str, Iterable[str]],
              priority: int=1) -> None:
-        self.socket.messaging.sendChat(self, messages, priority)
+        self.connection.messaging.sendChat(self, messages, priority)
 
     def clear(self):
-        self.socket.messaging.clearChat(self)
+        self.connection.messaging.clearChat(self)
 
     async def updateFfzEmotes(self) -> None:
         oldTimestamp: datetime

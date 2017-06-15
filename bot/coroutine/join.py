@@ -9,6 +9,7 @@ from typing import Dict, Deque, List, Optional, Set
 
 from bot import data, utils
 from bot.twitchmessage import IrcMessage, IrcMessageParams
+from . import connection
 
 joinDuration: timedelta = timedelta(seconds=10.05)
 _joinTimes: Deque[datetime] = deque()
@@ -41,19 +42,19 @@ def join_a_channel() -> None:
     if broadcaster is None:
         return
     chat: data.Channel = channels[broadcaster]
-    if chat.socket is None:
+    if chat.connection is None:
         return
     ircCommand: IrcMessage = IrcMessage(
         None, None, 'JOIN', IrcMessageParams(chat.ircChannel))
-    chat.socket.queueWrite(ircCommand, channel=chat)
+    chat.connection.queue_write(ircCommand, channel=chat)
     _channelJoined.add(chat.channel)
 
 
-def connected(socket: 'data.SocketHandler') -> None:
+def connected(socket: 'connection.ConnectionHandler') -> None:
     _joinTimes.append(utils.now())
 
 
-def disconnected(socket: 'data.SocketHandler') -> None:
+def disconnected(socket: 'connection.ConnectionHandler') -> None:
     global _channelJoined
     _channelJoined -= socket.channels.keys()
 
@@ -76,13 +77,13 @@ def _can_process() -> bool:
 
 def _connected_channels() -> Dict[str, 'data.Channel']:
     channels: Dict[str, data.Channel] = {}
-    socketManager: data.SocketHandler
+    connection_: connection.ConnectionHandler
     chans: Dict[str, data.Channel]
     chan: str
-    for socketManager in bot.globals.clusters.values():
-        if not socketManager.isConnected:
+    for connection_ in bot.globals.clusters.values():
+        if not connection_.isConnected:
             continue
-        chans = socketManager.channels
+        chans = connection_.channels
         for chan in chans:
             channels[chan] = chans[chan]
     return channels

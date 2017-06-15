@@ -13,7 +13,7 @@ from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
 from . import data, utils
 from .thread.socket import SocketsThread
-from .coroutine import background, join, logging
+from .coroutine import background, connection, join, logging
 
 ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 
@@ -21,13 +21,13 @@ ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 def main(argv: Optional[List[str]]=None) -> int:
     print('{time} Starting'.format(time=utils.now()))
     bot.globals.running = True
-    bot.globals.sockets = SocketsThread(name='Sockets Thread')
+    #bot.globals.sockets = SocketsThread(name='Sockets Thread')
 
-    bot.globals.clusters['aws'] = data.SocketHandler(
+    bot.globals.clusters['aws'] = connection.ConnectionHandler(
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
 
     # Start the Threads
-    bot.globals.sockets.start()
+    #bot.globals.sockets.start()
 
     _modulesList: ModuleList = [
         pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore
@@ -55,7 +55,9 @@ def main(argv: Optional[List[str]]=None) -> int:
         loop = asyncio.get_event_loop()
         coro = asyncio.gather(background.background_tasks(),
                               logging.record_logs(),
-                              join.join_manager())
+                              join.join_manager(),
+                              *[c.run_connection() for c
+                                in bot.globals.clusters.values()])
         loop.run_until_complete(coro)
         loop.close()
         return 0
