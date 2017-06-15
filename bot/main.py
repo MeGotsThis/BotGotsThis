@@ -12,7 +12,6 @@ from source.database import AutoJoinChannel
 from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
 from . import data, utils
-from .thread.join import JoinThread
 from .thread.socket import SocketsThread
 from .coroutine import background, join, logging
 
@@ -27,11 +26,8 @@ def main(argv: Optional[List[str]]=None) -> int:
     bot.globals.clusters['aws'] = data.Socket(
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
 
-    # bot.globals.join = JoinThread(name='Join Thread')
-
     # Start the Threads
     bot.globals.sockets.start()
-    # bot.globals.join.start()
 
     _modulesList: ModuleList = [
         pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore
