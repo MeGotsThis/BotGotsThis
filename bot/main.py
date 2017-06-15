@@ -13,9 +13,8 @@ from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
 from . import data, utils
 from .thread.join import JoinThread
-from .thread.logging import Logging
 from .thread.socket import SocketsThread
-from .async_task import background, logging
+from .coroutine import background, logging
 
 ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 
@@ -30,10 +29,7 @@ def main(argv: Optional[List[str]]=None) -> int:
 
     bot.globals.join = JoinThread(name='Join Thread')
 
-    #bot.globals.logging = Logging()
-
     # Start the Threads
-    #bot.globals.logging.start()
     bot.globals.sockets.start()
     bot.globals.join.start()
 

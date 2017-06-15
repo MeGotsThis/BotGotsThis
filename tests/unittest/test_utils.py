@@ -271,7 +271,7 @@ class TestUtils(unittest.TestCase):
         utils.print('Kappa', override=False)
         self.assertEqual(mock_stdout.getvalue(), '2000-01-01 00:00:00 Kappa\n')
 
-    @patch('bot.async_task.logging', autospec=True)
+    @patch('bot.coroutine.logging', autospec=True)
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
@@ -284,7 +284,7 @@ class TestUtils(unittest.TestCase):
         mock_logging.log.assert_called_once_with(
             'output.log', '2000-01-01T00:00:00.000000 Kappa\n')
 
-    @patch('bot.async_task.logging', autospec=True)
+    @patch('bot.coroutine.logging', autospec=True)
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
@@ -297,7 +297,7 @@ class TestUtils(unittest.TestCase):
         mock_logging.log.assert_called_once_with(
             'output.log', '2000-01-01T00:00:00.000000 Kappa Kappa\n')
 
-    @patch('bot.async_task.logging', autospec=True)
+    @patch('bot.coroutine.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logIrcMessage_config(self, mock_now, mock_config, mock_logging):
@@ -307,7 +307,7 @@ class TestUtils(unittest.TestCase):
         mock_logging.log.assert_called_once_with(
             StrContains('botgotsthis'), StrContains('Kappa'))
 
-    @patch('bot.async_task.logging', autospec=True)
+    @patch('bot.coroutine.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logIrcMessage_config_None(self, mock_now, mock_config,
@@ -318,7 +318,7 @@ class TestUtils(unittest.TestCase):
         self.assertFalse(mock_logging.log.called)
 
     @patch('sys.stderr', new_callable=StringIO)
-    @patch('bot.async_task.logging', autospec=True)
+    @patch('bot.coroutine.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logException(self, mock_now, mock_config, mock_logging,
@@ -339,7 +339,7 @@ class TestUtils(unittest.TestCase):
                                       'test_logException', 'raise Exception'))
 
     @patch('sys.stderr', new_callable=StringIO)
-    @patch('bot.async_task.logging', autospec=True)
+    @patch('bot.coroutine.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logException_no_development(
@@ -357,7 +357,7 @@ class TestUtils(unittest.TestCase):
                         'test_logException', 'raise Exception'))
         self.assertEquals(mock_stderr.getvalue(), '')
 
-    @patch('bot.async_task.logging', autospec=True)
+    @patch('bot.coroutine.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_logException_config_None(self, mock_now, mock_config,
