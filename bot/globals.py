@@ -1,6 +1,5 @@
 ﻿import bot.config
 from . import data
-from .thread.join import JoinThread
 from .thread.socket import SocketsThread
 from datetime import datetime
 from typing import Any, Dict, Optional, List
@@ -11,7 +10,6 @@ running: bool = True
 # Import some necessary libraries.
 sockets: SocketsThread = None
 
-join: JoinThread = None
 groupChannel: 'data.Channel' = None
 
 clusters: Dict[str, 'data.Socket'] = {
