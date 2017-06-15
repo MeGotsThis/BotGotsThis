@@ -1,6 +1,6 @@
 ﻿import datetime
 
-from bot.async_task import background
+from bot.coroutine import background
 from ..tasks import emotes
 
 

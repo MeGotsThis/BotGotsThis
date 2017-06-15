@@ -2,7 +2,7 @@
 import datetime
 import threading
 
-from bot.async_task import background
+from bot.coroutine import background
 from ..tasks import twitch
 
 
