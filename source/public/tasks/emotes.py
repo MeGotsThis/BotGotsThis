@@ -34,8 +34,8 @@ async def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
 async def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalFfzEmotesCache >= timedelta(hours=1):
         emotes: Optional[Dict[int, str]]
-        emotes = await ffz.getGlobalEmotes()
         bot.globals.globalFfzEmotesCache = timestamp
+        emotes = await ffz.getGlobalEmotes()
         if emotes is not None:
             bot.globals.globalFfzEmotes = emotes
     else:
@@ -66,8 +66,8 @@ async def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:
 async def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalBttvEmotesCache >= timedelta(hours=1):
         emotes: Optional[Dict[str, str]]
-        emotes = await bttv.getGlobalEmotes()
         bot.globals.globalBttvEmotesCache = timestamp
+        emotes = await bttv.getGlobalEmotes()
         if emotes is not None:
             bot.globals.globalBttvEmotes = emotes
     else:
