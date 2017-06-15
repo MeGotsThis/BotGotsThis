@@ -22,8 +22,6 @@ async def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
         elif not bot.globals.globalEmotes:
             cache = timestamp - timedelta(hours=1) + timedelta(minutes=1)
             bot.globals.globalEmotesCache = cache
-    else:
-        await asyncio.sleep(0)
 
 
 async def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:
@@ -38,8 +36,6 @@ async def refreshFfzGlobalEmotes(timestamp: datetime) -> None:
         emotes = await ffz.getGlobalEmotes()
         if emotes is not None:
             bot.globals.globalFfzEmotes = emotes
-    else:
-        await asyncio.sleep(0)
 
 
 async def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
@@ -54,8 +50,6 @@ async def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
                     and not chan.isStreaming]
     if toUpdate:
         await random.choice(toUpdate).updateFfzEmotes()
-    else:
-        await asyncio.sleep(0)
 
 
 async def refreshBetterTwitchTvEmotes(timestamp: datetime) -> None:
@@ -70,8 +64,6 @@ async def refreshBttvGlobalEmotes(timestamp: datetime) -> None:
         emotes = await bttv.getGlobalEmotes()
         if emotes is not None:
             bot.globals.globalBttvEmotes = emotes
-    else:
-        await asyncio.sleep(0)
 
 
 async def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
@@ -86,5 +78,3 @@ async def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
                     and not chan.isStreaming]
     if toUpdate:
         await random.choice(toUpdate).updateBttvEmotes()
-    else:
-        await asyncio.sleep(0)

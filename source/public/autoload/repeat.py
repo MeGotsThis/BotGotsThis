@@ -6,7 +6,6 @@ from ..tasks import repeat
 
 
 async def call_autorepeat(timestamp: datetime.datetime) -> None:
-    await asyncio.sleep(0)
     repeat.autoRepeatMessage(timestamp)
 
 

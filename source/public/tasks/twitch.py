@@ -64,7 +64,6 @@ async def checkStreamsAndChannel(timestamp: datetime) -> None:
 
 
 async def checkOfflineChannels(timestamp: datetime) -> None:
-    await asyncio.sleep(0)
     if not bot.globals.channels:
         return
     cacheDuration: timedelta = timedelta(seconds=300)
@@ -104,7 +103,6 @@ async def checkChatServers(timestamp: datetime) -> None:
     toCheck: List[str] = [c for c, ch in channels.items()
                           if (timestamp - ch.serverCheck >= cooldown)]
     if not toCheck:
-        await asyncio.sleep(0)
         return
     channel: str = random.choice(toCheck)
     channels[channel].serverCheck = timestamp
