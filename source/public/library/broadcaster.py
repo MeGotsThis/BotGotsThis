@@ -1,4 +1,5 @@
-﻿import bot.config
+﻿import asyncio
+import bot.config
 import bot.globals
 import time
 from bot import utils
@@ -16,7 +17,8 @@ def come(database: DatabaseBase,
         send('Chat {channel} is banned from joining'.format(channel=channel))
         return True
     priority: Union[float, int] = database.getAutoJoinsPriority(channel)
-    cluster: Optional[str] = twitch.chat_server(channel)
+    cluster: Optional[str] = asyncio.get_event_loop().run_until_complete(
+        twitch.chat_server(channel))
     joinResult: Optional[bool] = utils.joinChannel(channel, priority, cluster)
     if joinResult is None:
         send('Unable to join {channel} on a specified server according to '
@@ -75,7 +77,8 @@ def auto_join(database: DatabaseBase,
 def auto_join_add(database: DatabaseBase,
                   channel: str,
                   send: Send) -> bool:
-    cluster: Optional[str] = twitch.chat_server(channel)
+    cluster: Optional[str] = asyncio.get_event_loop().run_until_complete(
+        twitch.chat_server(channel))
     if cluster is None:
         send('Auto join for {channel} failed due to Twitch '
              'error'.format(channel=channel))

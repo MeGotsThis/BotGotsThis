@@ -3,7 +3,7 @@ import bot.globals
 import socket
 import source.ircmessage
 import threading
-from bot.coroutine import connection, join
+from bot.coroutine import connection as connectionM
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
 from typing import Any, Callable, Deque, Dict, Generic, Iterable, List
@@ -96,17 +96,17 @@ class Channel:
 
     def __init__(self,
                  channel: str,
-                 connection_: 'connection.ConnectionHandler',
+                 connection_: 'connectionM.ConnectionHandler',
                  joinPriority: Union[int, float, str]=float('inf')) -> None:
         if not isinstance(channel, str):
             raise TypeError()
-        if not isinstance(connection_, connection.ConnectionHandler):
+        if not isinstance(connection_, connectionM.ConnectionHandler):
             raise TypeError()
         if not channel:
             raise ValueError()
         self._channel: str = channel
         self._ircChannel: str = '#' + channel
-        self._connection: connection.ConnectionHandler = connection_
+        self._connection: connectionM.ConnectionHandler = connection_
         self._isMod: bool = False
         self._isSubscriber: bool = False
         self._ircUsers: Set[str] = set()
@@ -135,7 +135,7 @@ class Channel:
         return self._ircChannel
 
     @property
-    def connection(self) -> 'connection.ConnectionHandler':
+    def connection(self) -> 'connectionM.ConnectionHandler':
         return self._connection
 
     @property

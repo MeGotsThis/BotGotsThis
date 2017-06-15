@@ -33,7 +33,6 @@ def log(file: str,
 async def _process_log() -> None:
     filename: str
     log: str
-    file: IO[str]
     filename, log = _queue.popleft()
     async with aiofiles.open(filename, 'a', encoding='utf-8') as file:
         await file.write(log)

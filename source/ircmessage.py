@@ -11,7 +11,8 @@ try:
 except ImportError:
     from .public.default import ircmessage  # type: ignore
 
-IrcHandler = Callable[['data.SocketHandler', IrcMessage, datetime], None]
+IrcHandler = Callable[['connection.ConnectionHandler', IrcMessage, datetime],
+                      None]
 ircHandlers: Dict[Union[str, int], IrcHandler] = {}
 
 _logCommandPerChannel: List[str] = [

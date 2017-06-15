@@ -34,10 +34,10 @@ def joinChannel(broadcaster: str,
         t = min(bot.globals.channels[broadcaster].joinPriority, priority)
         bot.globals.channels[broadcaster].joinPriority = float(t)
         return False
-    cluster: connection.ConnectionHandler = bot.globals.clusters[cluster]
-    channel: data.Channel = data.Channel(broadcaster, cluster, priority)
+    cluster_: connection.ConnectionHandler = bot.globals.clusters[cluster]
+    channel: data.Channel = data.Channel(broadcaster, cluster_, priority)
     bot.globals.channels[broadcaster] = channel
-    cluster.join_channel(channel)
+    cluster_.join_channel(channel)
     return True
 
 
