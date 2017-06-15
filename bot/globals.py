@@ -1,15 +1,11 @@
 ﻿import bot.config
 from . import data
 from .coroutine import connection
-from .thread.socket import SocketsThread
 from datetime import datetime
 from typing import Any, Dict, Optional, List
 
 
 running: bool = True
-
-# Import some necessary libraries.
-sockets: SocketsThread = None
 
 groupChannel: 'data.Channel' = None
 

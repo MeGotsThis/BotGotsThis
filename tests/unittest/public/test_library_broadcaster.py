@@ -1,6 +1,7 @@
 import unittest
 from bot import utils
-from bot.data import Channel, SocketHandler
+from bot.coroutine.connection import ConnectionHandler
+from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from source.data.message import Message
 from source.database import DatabaseBase
@@ -295,7 +296,7 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
-        self.mock_globals.clusters = {'twitch': Mock(spec=SocketHandler)}
+        self.mock_globals.clusters = {'twitch': Mock(spec=ConnectionHandler)}
 
         patcher = patch('source.api.twitch.chat_server', autospec=True)
         self.addCleanup(patcher.stop)

@@ -2,7 +2,8 @@ import unittest
 
 import asynctest
 
-from bot.data import Channel, SocketHandler
+from bot.coroutine.connection import ConnectionHandler
+from bot.data import Channel
 from datetime import datetime, timedelta
 from source.database import DatabaseBase
 from source.public.tasks import twitch
@@ -289,13 +290,13 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
     def setUp(self):
         super().setUp()
 
-        self.socket1 = Mock(spec=SocketHandler)
-        self.socket2 = Mock(spec=SocketHandler)
+        self.connection1 = Mock(spec=ConnectionHandler)
+        self.connection2 = Mock(spec=ConnectionHandler)
 
         self.check_property = PropertyMock(return_value=self.now)
         type(self.channel).serverCheck = self.check_property
 
-        self.socket_property = PropertyMock(return_value=self.socket1)
+        self.socket_property = PropertyMock(return_value=self.connection1)
         type(self.channel).socket = self.socket_property
 
         patcher = patch('source.database.factory.getDatabase')
@@ -313,8 +314,8 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.addCleanup(patcher.stop)
         self.mock_ensureserver = patcher.start()
 
-        self.mock_globals.clusters = {'twitch': self.socket1,
-                                      'aws': self.socket2
+        self.mock_globals.clusters = {'twitch': self.connection1,
+                                      'aws': self.connection2
                                       }
 
     async def test_empty(self):
