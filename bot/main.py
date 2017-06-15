@@ -12,7 +12,6 @@ from source.database import AutoJoinChannel
 from source.database.factory import getDatabase
 from typing import Generator, List, Iterable, Optional, Tuple
 from . import data, utils
-from .thread.socket import SocketsThread
 from .coroutine import background, connection, join, logging
 
 ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
@@ -21,13 +20,9 @@ ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 def main(argv: Optional[List[str]]=None) -> int:
     print('{time} Starting'.format(time=utils.now()))
     bot.globals.running = True
-    #bot.globals.sockets = SocketsThread(name='Sockets Thread')
 
     bot.globals.clusters['aws'] = connection.ConnectionHandler(
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
-
-    # Start the Threads
-    #bot.globals.sockets.start()
 
     _modulesList: ModuleList = [
         pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore
