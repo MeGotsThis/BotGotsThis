@@ -1,4 +1,5 @@
 ﻿from . import data
+from .coroutine import connection
 from datetime import datetime, timedelta
 from types import TracebackType
 from typing import Any, Dict, Iterable, List, Optional, Type, Tuple, Union
@@ -33,9 +34,10 @@ def joinChannel(broadcaster: str,
         t = min(bot.globals.channels[broadcaster].joinPriority, priority)
         bot.globals.channels[broadcaster].joinPriority = float(t)
         return False
-    bot.globals.channels[broadcaster] = data.Channel(
-        broadcaster, bot.globals.clusters[cluster], priority)
-    bot.globals.clusters[cluster].joinChannel(bot.globals.channels[broadcaster])
+    cluster: connection.ConnectionHandler = bot.globals.clusters[cluster]
+    channel: data.Channel = data.Channel(broadcaster, cluster, priority)
+    bot.globals.channels[broadcaster] = channel
+    cluster.join_channel(channel)
     return True
 
 

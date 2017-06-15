@@ -1,7 +1,8 @@
 import asynctest
 import math
 import unittest
-from bot.data import Channel, MessagingQueue, SocketHandler
+from bot.data import Channel, MessagingQueue
+from bot.coroutine.connection import ConnectionHandler
 from collections.abc import MutableMapping, MutableSet
 from datetime import datetime
 from asynctest.mock import Mock, patch
@@ -9,21 +10,21 @@ from asynctest.mock import Mock, patch
 
 class TestChannel(unittest.TestCase):
     def setUp(self):
-        self.socket = Mock(spec=SocketHandler)
-        self.socket.messaging = Mock(spec=MessagingQueue)
-        self.channel = Channel('botgotsthis', self.socket)
+        self.connection = Mock(spec=ConnectionHandler)
+        self.connection.messaging = Mock(spec=MessagingQueue)
+        self.channel = Channel('botgotsthis', self.connection)
 
     def test_constructor_name_none(self):
-        self.assertRaises(TypeError, Channel, None, self.socket)
+        self.assertRaises(TypeError, Channel, None, self.connection)
 
     def test_constructor_name_bytes(self):
-        self.assertRaises(TypeError, Channel, b'', self.socket)
+        self.assertRaises(TypeError, Channel, b'', self.connection)
 
     def test_constructor_socket_none(self):
         self.assertRaises(TypeError, Channel, 'botgotsthis', None)
 
     def test_constructor_name_empty(self):
-        self.assertRaises(ValueError, Channel, '', self.socket)
+        self.assertRaises(ValueError, Channel, '', self.connection)
 
     def test_channel(self):
         self.assertEqual(self.channel.channel, 'botgotsthis')
@@ -32,7 +33,7 @@ class TestChannel(unittest.TestCase):
         self.assertEqual(self.channel.ircChannel, '#botgotsthis')
 
     def test_socket(self):
-        self.assertIs(self.channel.socket, self.socket)
+        self.assertIs(self.channel.connection, self.connection)
 
     def test_isMod(self):
         self.assertIs(self.channel.isMod, False)
@@ -203,31 +204,31 @@ class TestChannel(unittest.TestCase):
 
     def test_part(self):
         self.channel.part()
-        self.socket.partChannel.assert_called_once_with(self.channel)
-        self.socket.messaging.clearChat.assert_called_once_with(self.channel)
+        self.connection.part_channel.assert_called_once_with(self.channel)
+        self.connection.messaging.clearChat.assert_called_once_with(self.channel)
 
     def test_clear(self):
         self.channel.clear()
-        self.socket.messaging.clearChat.assert_called_once_with(self.channel)
+        self.connection.messaging.clearChat.assert_called_once_with(self.channel)
 
     def test_send(self):
         self.channel.send('Kappa')
-        self.socket.messaging.sendChat.assert_called_once_with(
+        self.connection.messaging.sendChat.assert_called_once_with(
             self.channel, 'Kappa', 1)
 
     def test_send_iterable_priority(self):
         messages = ['Kappa', 'Keepo', 'KappaHD', 'KappaPride', 'KappaRoss',
                     'KappaClaus']
         self.channel.send(messages, 0)
-        self.socket.messaging.sendChat.assert_called_once_with(
+        self.connection.messaging.sendChat.assert_called_once_with(
             self.channel, messages, 0)
 
 
 class TestChannelAsync(asynctest.TestCase):
     def setUp(self):
-        self.socket = Mock(spec=SocketHandler)
-        self.socket.messaging = Mock(spec=MessagingQueue)
-        self.channel = Channel('botgotsthis', self.socket)
+        self.connection = Mock(spec=ConnectionHandler)
+        self.connection.messaging = Mock(spec=MessagingQueue)
+        self.channel = Channel('botgotsthis', self.connection)
 
     @patch('bot.utils.now', autospec=True)
     @patch('source.api.ffz.getBroadcasterEmotes')

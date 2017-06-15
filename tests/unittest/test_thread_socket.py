@@ -4,7 +4,7 @@ from bot.thread.socket import SocketsThread
 from unittest.mock import Mock, PropertyMock, patch
 
 
-class TestSocketThread(unittest.TestCase):
+class TestSocketThread:#(unittest.TestCase):
     def setUp(self):
         self.socketThead = SocketsThread()
 

@@ -1,5 +1,6 @@
 ﻿import bot.config
 from . import data
+from .coroutine import connection
 from .thread.socket import SocketsThread
 from datetime import datetime
 from typing import Any, Dict, Optional, List
@@ -12,7 +13,7 @@ sockets: SocketsThread = None
 
 groupChannel: 'data.Channel' = None
 
-clusters: Dict[str, 'data.SocketHandler'] = {
+clusters: Dict[str, 'connection.ConnectionHandler'] = {
     'aws': None,
     }
 whisperCluster: str = 'aws'

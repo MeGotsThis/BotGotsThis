@@ -6,7 +6,8 @@ from io import StringIO
 from asynctest.mock import Mock, patch
 
 from bot import utils
-from bot.data import Channel, SocketHandler, MessagingQueue
+from bot.coroutine import connection
+from bot.data import Channel, MessagingQueue
 from source.api.twitch import TwitchCommunity
 from tests.unittest.mock_class import StrContains
 
@@ -19,7 +20,7 @@ class TestUtils(unittest.TestCase):
     def test_joinChannel_none(self, mock_globals):
         mock_globals.channels = {}
         mock_globals.clusters = {
-            'aws': Mock(spec=SocketHandler)
+            'aws': Mock(spec=connection.ConnectionHandler)
             }
         self.assertRaises(TypeError, utils.joinChannel, None)
 
@@ -27,7 +28,7 @@ class TestUtils(unittest.TestCase):
     def test_joinChannel_nocluster(self, mock_globals):
         mock_globals.channels = {}
         mock_globals.clusters = {
-            'twitch': Mock(spec=SocketHandler)
+            'twitch': Mock(spec=connection.ConnectionHandler)
             }
         self.assertIs(
             utils.joinChannel('botgotsthis', cluster='botgotsthis'), None)
@@ -36,7 +37,7 @@ class TestUtils(unittest.TestCase):
     @patch('bot.globals', autospec=True)
     def test_joinChannel_existing_channel(self, mock_globals):
         mock_globals.clusters = {
-            'twitch': Mock(spec=SocketHandler)
+            'twitch': Mock(spec=connection.ConnectionHandler)
             }
         mock_globals.channels = {
             'botgotsthis': Channel('botgotsthis',
@@ -51,12 +52,12 @@ class TestUtils(unittest.TestCase):
     def test_joinChannel(self, mock_globals):
         mock_globals.channels = {}
         mock_globals.clusters = {
-            'twitch': Mock(spec=SocketHandler)
+            'twitch': Mock(spec=connection.ConnectionHandler)
             }
         self.assertIs(utils.joinChannel('botgotsthis', 0, 'twitch'), True)
         self.assertIn('botgotsthis', mock_globals.channels)
         self.assertEqual(mock_globals.channels['botgotsthis'].joinPriority, 0)
-        mock_globals.clusters['twitch'].joinChannel.assert_called_once_with(
+        mock_globals.clusters['twitch'].join_channel.assert_called_once_with(
             mock_globals.channels['botgotsthis'])
 
     @patch('bot.globals', autospec=True)
@@ -82,25 +83,25 @@ class TestUtils(unittest.TestCase):
 
     @patch('bot.globals', autospec=True)
     def test_whisper(self, mock_globals):
-        socket = Mock(spec=SocketHandler)
-        socket.messaging = Mock(spec=MessagingQueue)
+        connection_ = Mock(spec=connection.ConnectionHandler)
+        connection_.messaging = Mock(spec=MessagingQueue)
         mock_globals.clusters = {
-            'twitch': socket
+            'twitch': connection_
             }
         mock_globals.whisperCluster = 'twitch'
         utils.whisper('botgotsthis', 'Kappa')
-        socket.messaging.sendWhisper.assert_called_once_with(
+        connection_.messaging.sendWhisper.assert_called_once_with(
             'botgotsthis', 'Kappa')
 
     @patch('bot.globals', autospec=True)
     def test_clearAllChat(self, mock_globals):
-        socket = Mock(spec=SocketHandler)
-        socket.messaging = Mock(spec=MessagingQueue)
+        connection_ = Mock(spec=connection.ConnectionHandler)
+        connection_.messaging = Mock(spec=MessagingQueue)
         mock_globals.clusters = {
-            'twitch': socket
+            'twitch': connection_
             }
         utils.clearAllChat()
-        socket.messaging.clearAllChat.assert_called_once_with()
+        connection_.messaging.clearAllChat.assert_called_once_with()
 
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
@@ -787,8 +788,8 @@ class TesEnsureServer(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.mock_globals.clusters = {
-            'justin': Mock(spec=SocketHandler),
-            'twitch': Mock(spec=SocketHandler)
+            'justin': Mock(spec=connection.ConnectionHandler),
+            'twitch': Mock(spec=connection.ConnectionHandler)
             }
         self.channel = Mock(spec=Channel)
         self.mock_globals.channels = {

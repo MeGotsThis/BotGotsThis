@@ -1,7 +1,8 @@
-﻿from bot import data
+﻿from bot.coroutine import connection
 from datetime import datetime
 
-def parseMessage(socket: 'data.SocketHandler',
+
+def parseMessage(connection: 'connection.ConnectionHandler',
                  ircmsg: str,
                  now: datetime) -> None:
-    return
+    pass
