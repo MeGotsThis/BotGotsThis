@@ -89,7 +89,7 @@ async def get_call(channel: Optional[str],
     if headers is None:
         headers = {}
     headers = get_headers(headers, channel)
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(raise_for_status=True) as session:
         async with session.get('https://api.twitch.tv' + uri,
                                headers=headers,
                                timeout=config.httpTimeout) as response:
@@ -115,7 +115,7 @@ async def post_call(channel: Optional[str],
             dataStr = urllib.parse.urlencode(data)
         else:
             dataStr = data
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(raise_for_status=True) as session:
         async with session.post('https://api.twitch.tv' + uri,
                                 headers=headers,
                                 data=dataStr,
@@ -142,7 +142,7 @@ async def put_call(channel: Optional[str],
             dataStr = urllib.parse.urlencode(data)
         else:
             dataStr = data
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(raise_for_status=True) as session:
         async with session.put('https://api.twitch.tv' + uri,
                                headers=headers,
                                data=dataStr,
@@ -169,7 +169,7 @@ async def delete_call(channel: Optional[str],
             dataStr = urllib.parse.urlencode(data)
         else:
             dataStr = data
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(raise_for_status=True) as session:
         async with session.delete('https://api.twitch.tv' + uri,
                                   headers=headers,
                                   data=dataStr,
@@ -242,6 +242,7 @@ async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
 
 
 async def chat_server(chat:Optional[str]) -> Optional[str]:
+    return None
     session: aiohttp.ClientSession
     response: aiohttp.ClientResponse
     async with aiohttp.ClientSession() as session:

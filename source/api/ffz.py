@@ -11,7 +11,7 @@ async def getGlobalEmotes() -> Optional[Dict[int, str]]:
     url: str = 'https://api.frankerfacez.com/v1/set/global'
     response: aiohttp.ClientResponse
     try:
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(raise_for_status=True) as session:
             async with session.get(url,
                                    timeout=config.httpTimeout) as response:
                 if response.status != 200:
@@ -36,7 +36,7 @@ async def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[int, str]]:
     url: str = 'https://api.frankerfacez.com/v1/room/' + broadcaster
     response: aiohttp.ClientResponse
     try:
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(raise_for_status=True) as session:
             async with session.get(url,
                                    timeout=config.httpTimeout) as response:
                 if response.status != 200:
