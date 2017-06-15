@@ -65,17 +65,16 @@ class TestSocket(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.utils.now', autospec=True)
-    @patch('bot.globals', autospec=True)
+    @patch('bot.coroutine.join.connected', autospec=True)
     @patch('bot.data.socket.socket.connect', spec=SocketSpec.connect)
     @patch.object(Socket, 'login', autospec=True)
-    def test_connect(self, mock_login, mock_connect, mock_globals, mock_now,
+    def test_connect(self, mock_login, mock_connect, mock_connected, mock_now,
                      mock_stdout):
         now = datetime(2000, 1, 1)
         mock_now.return_value = now
-        mock_globals.join = Mock(spec=JoinThread)
         self.socket.connect()
         mock_connect.assert_any_call(('irc.twitch.tv', 6667))
-        mock_globals.join.connected.assert_called_with(self.socket)
+        mock_connected.assert_called_with(self.socket)
         self.assertNotEquals(mock_stdout.getvalue(), '')
         mock_login.assert_called_once_with(self.socket, self.socket.socket)
         self.assertEqual(self.socket.lastSentPing, now)
@@ -84,18 +83,17 @@ class TestSocket(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=StringIO)
     @patch('bot.utils.now', autospec=True)
-    @patch('bot.globals', autospec=True)
+    @patch('bot.coroutine.join.connected', autospec=True)
     @patch('bot.data.socket.socket.connect', spec=SocketSpec.connect)
     @patch.object(Socket, 'login', autospec=True)
-    def test_connect_throttle(self, mock_login, mock_connect, mock_globals,
+    def test_connect_throttle(self, mock_login, mock_connect, mock_connected,
                               mock_now, mock_stdout):
         now = datetime(2000, 1, 1)
         mock_now.return_value = now
-        mock_globals.join = Mock(spec=JoinThread)
         self.socket.lastConnectAttempt = now
         self.socket.connect()
         mock_connect.assert_not_called()
-        mock_globals.join.connected.assert_not_called()
+        mock_connected.assert_not_called()
         self.assertEquals(mock_stdout.getvalue(), '')
         self.assertFalse(mock_login.called)
         self.assertEqual(self.socket.lastSentPing, datetime.max)
@@ -127,15 +125,14 @@ class TestSocket(unittest.TestCase):
                           IrcMessage(None, None, 'PING'))
 
     @patch('sys.stdout', new_callable=StringIO)
-    @patch('bot.globals', autospec=True)
+    @patch('bot.coroutine.join.record_join', autospec=True)
     @patch.object(Channel, 'onJoin', autospec=True)
-    def test_onwrite_join(self, mock_onJoin, mock_globals, mock_stdout):
+    def test_onwrite_join(self, mock_onJoin, mock_record_join, mock_stdout):
         now = datetime(2000, 1, 1)
         message = IrcMessage(None, None, 'JOIN')
-        mock_globals.join = Mock(spec=JoinThread)
         self.socket._onWrite(message, now, channel=self.channel)
         mock_onJoin.assert_called_once_with(self.channel)
-        mock_globals.join.recordJoin.assert_called_once_with()
+        mock_record_join.assert_called_once_with()
         self.assertNotEquals(mock_stdout.getvalue(), '')
 
     def test_onwrite_ping(self):
@@ -332,16 +329,15 @@ class TestSocket(unittest.TestCase):
         self.assertFalse(mock_queueWrite.called)
 
     @patch('sys.stdout', new_callable=StringIO)
-    @patch('bot.globals', autospec=True)
+    @patch('bot.coroutine.join.on_part', autospec=True)
     @patch.object(Socket, 'queueWrite', autospec=True)
-    def test_partChannel_contains(self, mock_queueWrite, mock_globals,
+    def test_partChannel_contains(self, mock_queueWrite, mock_on_part,
                                   mock_stdout):
-        mock_globals.join = Mock(spec=JoinThread)
         self.socket._channels[self.channel.channel] = self.channel
         self.socket.partChannel(self.channel)
         self.assertNotIn(self.channel.channel, self.socket._channels)
         self.assertTrue(mock_queueWrite.called)
-        self.assertTrue(mock_globals.join.onPart.called)
+        self.assertTrue(mock_on_part.called)
         self.assertTrue(any(m for m in mock_queueWrite.call_args_list
                             if m[0][1].command == 'PART'))
         self.assertNotEquals(mock_stdout.getvalue(), '')
@@ -373,6 +369,7 @@ class TestSocket(unittest.TestCase):
                              and m[1]['whisper'].nick in ['megotsthis',
                                                           'botgotsthis']]), 2)
 
+
 class TestSocketConnected(unittest.TestCase):
     def setUp(self):
         self.socket = Socket('Kappa', 'irc.twitch.tv', 6667)
@@ -390,9 +387,9 @@ class TestSocketConnected(unittest.TestCase):
         self.now = datetime(2000, 1, 1, 0, 0, 0)
         self.mock_now.return_value = self.now
 
-        patcher = patch('bot.globals', autospec=True)
+        patcher = patch('bot.coroutine.join.disconnected', autospec=True)
         self.addCleanup(patcher.stop)
-        self.mock_globals = patcher.start()
+        self.mock_disconnected = patcher.start()
 
         patch_connect = patch('socket.socket.connect',
                               spec=SocketSpec.connect)
@@ -420,6 +417,7 @@ class TestSocketConnected(unittest.TestCase):
         self.socket.disconnect()
         self.assertIsNone(self.socket.socket)
         self.assertTrue(mock_close.called)
+        self.assertTrue(self.mock_disconnected.called)
         self.assertEqual(self.socket.lastPing, datetime.max)
         self.assertEqual(self.socket.lastSentPing, datetime.max)
 
