@@ -1,17 +1,14 @@
 import bot.config
 import bot.globals
 import socket
-import source.ircmessage
-import threading
 from bot.coroutine import connection as connectionM
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
-from typing import Any, Callable, Deque, Dict, Generic, Iterable, List
-from typing import NamedTuple, Optional, Set, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple
+from typing import Optional, Set, Tuple, TypeVar, Union
 from source.api import bttv, ffz
 from .error import ConnectionReset, LoginUnsuccessful
 from .. import utils
-from ..twitchmessage import IrcMessage, IrcMessageParams
 
 pysocket = socket.socket
 
@@ -115,10 +112,8 @@ class Channel:
         self._sessionData: Dict[Any, Any] = {}
         self._ffzEmotes: Dict[int, str] = {}
         self._ffzCache: datetime = datetime.min
-        self._ffzLock: threading.Lock = threading.Lock()
         self._bttvEmotes: Dict[str, str] = {}
         self._bttvCache: datetime = datetime.min
-        self._bttvLock: threading.Lock = threading.Lock()
         self._twitchCache: datetime = datetime.min
         self._streamingSince: Optional[datetime] = None
         self._twitchStatus: Optional[str] = ''
@@ -176,8 +171,7 @@ class Channel:
 
     @property
     def ffzCache(self) -> datetime:
-        with self._ffzLock:
-            return self._ffzCache
+        return self._ffzCache
 
     @property
     def ffzEmotes(self) -> Dict[int, str]:
@@ -185,8 +179,7 @@ class Channel:
 
     @property
     def bttvCache(self) -> datetime:
-        with self._bttvLock:
-            return self._bttvCache
+        return self._bttvCache
 
     @property
     def bttvEmotes(self) -> Dict[str, str]:
@@ -274,31 +267,25 @@ class Channel:
 
     async def updateFfzEmotes(self) -> None:
         oldTimestamp: datetime
-        with self._ffzLock:
-            oldTimestamp, self._ffzCache = self._ffzCache, utils.now()
+        oldTimestamp, self._ffzCache = self._ffzCache, utils.now()
         emotes: Optional[Dict[int, str]]
         emotes = await ffz.getBroadcasterEmotes(self._channel)
         if emotes is not None:
             self._ffzEmotes = emotes
-            with self._ffzLock:
-                self._ffzCache = utils.now()
+            self._ffzCache = utils.now()
         else:
-            with self._ffzLock:
-                self._ffzCache = oldTimestamp
+            self._ffzCache = oldTimestamp
 
     async def updateBttvEmotes(self) -> None:
         oldTimestamp: datetime
-        with self._bttvLock:
-            oldTimestamp, self._bttvCache = self._bttvCache, utils.now()
+        oldTimestamp, self._bttvCache = self._bttvCache, utils.now()
         emotes: Optional[Dict[str, str]]
         emotes = await bttv.getBroadcasterEmotes(self._channel)
         if emotes is not None:
             self._bttvEmotes = emotes
-            with self._bttvLock:
-                self._bttvCache = utils.now()
+            self._bttvCache = utils.now()
         else:
-            with self._bttvLock:
-                self._bttvCache = oldTimestamp
+            self._bttvCache = oldTimestamp
 
 
 class MessagingQueue:
@@ -306,7 +293,6 @@ class MessagingQueue:
         self._chatQueues: Tuple[List[ChatMessage], ...]
         self._chatQueues = [], [], []
         self._whisperQueue: deque[WhisperMessage] = deque()
-        self._queueLock: threading.Lock = threading.Lock()
         self._chatSent: List[datetime] = []
         self._whisperSent: List[datetime] = []
         self._lowQueueRecent: OrderedDict[str, Any] = OrderedDict()
@@ -343,22 +329,22 @@ class MessagingQueue:
             raise ValueError()
         whispers: DefaultOrderedDict[str, List[str]]
         whispers = DefaultOrderedDict(list)
-        with self._queueLock:
-            message: str
-            for message in listMessages:
-                if not message:
+
+        message: str
+        for message in listMessages:
+            if not message:
+                continue
+            if (not bypass
+                and message.startswith(tuple(disallowedCommands))):
+                continue
+            if message.startswith(('/w ', '.w ')):
+                tokens = message.split(' ', 2)
+                if len(tokens) < 3:
                     continue
-                if (not bypass
-                    and message.startswith(tuple(disallowedCommands))):
-                    continue
-                if message.startswith(('/w ', '.w ')):
-                    tokens = message.split(' ', 2)
-                    if len(tokens) < 3:
-                        continue
-                    whispers[tokens[1].lower()].append(tokens[2])
-                else:
-                    self._chatQueues[priority].append(
-                        ChatMessage(channel, message))
+                whispers[tokens[1].lower()].append(tokens[2])
+            else:
+                self._chatQueues[priority].append(
+                    ChatMessage(channel, message))
         if whispers:
             for nick in whispers:  # type; str
                 self.sendWhisper(nick, whispers[nick])
@@ -372,10 +358,9 @@ class MessagingQueue:
             messages = messages,
         elif not isinstance(messages, Iterable):
             raise TypeError()
-        with self._queueLock:
-            message: str
-            for message in messages:
-                self._whisperQueue.append(WhisperMessage(nick, message))
+        message: str
+        for message in messages:
+            self._whisperQueue.append(WhisperMessage(nick, message))
 
     def popChat(self) -> Optional[ChatMessage]:
         timestamp: datetime = utils.now()
@@ -389,48 +374,48 @@ class MessagingQueue:
         isModGood: bool = len(self._chatSent) < bot.config.modLimit
         isModSpamGood: bool = len(self._chatSent) < bot.config.modSpamLimit
         isPublicGood: bool = len(self._chatSent) < bot.config.publicLimit
-        with self._queueLock:
-            if isPublicGood:
-                queue: List[ChatMessage]
-                i: int
-                message: ChatMessage
-                for queue in self._chatQueues:
-                    for i, message in enumerate(queue):
-                        last: datetime
-                        last = self._publicTime[message.channel.channel]
-                        if (self._isMod(message.channel)
-                            or timestamp - last < publicDelay):
-                            continue
-                        self._publicTime[message.channel.channel] = timestamp
-                        del queue[i]
-                        return message
-            if isModGood:
-                for queue in self._chatQueues[:-1]:
-                    for i, message in enumerate(queue):
-                        if not self._isMod(message.channel):
-                            continue
-                        del queue[i]
-                        return message
-                else:
-                    for i, message in enumerate(self._chatQueues[-1]):
-                        if message.channel.channel in self._lowQueueRecent:
-                            continue
-                        if not self._isMod(message.channel):
-                            continue
-                        del self._chatQueues[-1][i]
-                        self._lowQueueRecent[message.channel.channel] = True
-                        return message
-            if isModSpamGood and self._chatQueues[-1]:
-                for channel in self._lowQueueRecent:
-                    for i, message in enumerate(self._chatQueues[-1]):
-                        if message.channel.channel != channel:
-                            continue
-                        if not self._isMod(message.channel):
-                            continue
-                        del self._chatQueues[-1][i]
-                        self._lowQueueRecent[message.channel.channel] = True
-                        self._lowQueueRecent.move_to_end(message.channel.channel)
-                        return message
+
+        if isPublicGood:
+            queue: List[ChatMessage]
+            i: int
+            message: ChatMessage
+            for queue in self._chatQueues:
+                for i, message in enumerate(queue):
+                    last: datetime
+                    last = self._publicTime[message.channel.channel]
+                    if (self._isMod(message.channel)
+                        or timestamp - last < publicDelay):
+                        continue
+                    self._publicTime[message.channel.channel] = timestamp
+                    del queue[i]
+                    return message
+        if isModGood:
+            for queue in self._chatQueues[:-1]:
+                for i, message in enumerate(queue):
+                    if not self._isMod(message.channel):
+                        continue
+                    del queue[i]
+                    return message
+            else:
+                for i, message in enumerate(self._chatQueues[-1]):
+                    if message.channel.channel in self._lowQueueRecent:
+                        continue
+                    if not self._isMod(message.channel):
+                        continue
+                    del self._chatQueues[-1][i]
+                    self._lowQueueRecent[message.channel.channel] = True
+                    return message
+        if isModSpamGood and self._chatQueues[-1]:
+            for channel in self._lowQueueRecent:
+                for i, message in enumerate(self._chatQueues[-1]):
+                    if message.channel.channel != channel:
+                        continue
+                    if not self._isMod(message.channel):
+                        continue
+                    del self._chatQueues[-1][i]
+                    self._lowQueueRecent[message.channel.channel] = True
+                    self._lowQueueRecent.move_to_end(message.channel.channel)
+                    return message
         return None
 
     @staticmethod
@@ -444,16 +429,14 @@ class MessagingQueue:
         return None
 
     def clearChat(self, channel: Channel) -> None:
-        with self._queueLock:
-            queue: List[ChatMessage]
-            message: ChatMessage
-            for queue in self._chatQueues:
-                for message in queue[:]:
-                    if message.channel.channel == channel.channel:
-                        queue.remove(message)
+        queue: List[ChatMessage]
+        message: ChatMessage
+        for queue in self._chatQueues:
+            for message in queue[:]:
+                if message.channel.channel == channel.channel:
+                    queue.remove(message)
 
     def clearAllChat(self) -> None:
-        with self._queueLock:
-            queue: List[ChatMessage]
-            for queue in self._chatQueues:
-                queue.clear()
+        queue: List[ChatMessage]
+        for queue in self._chatQueues:
+            queue.clear()
