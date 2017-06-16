@@ -21,12 +21,12 @@ def min_args(amount: int,
              reason: Optional[str]=None):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
-        def command(args: data.WhisperCommandArgs,
+        async def command(args: data.WhisperCommandArgs,
                     *pargs, **kwargs) -> Any:
             if len(args.message) < amount:
                 if reason:
                     utils.whisper(args.nick, reason)
                 return _return
-            return func(args, *pargs, **kwargs)
+            return await func(args, *pargs, **kwargs)
         return command
     return decorator
