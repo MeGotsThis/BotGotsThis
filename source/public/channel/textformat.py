@@ -8,7 +8,7 @@ def text_command(name: str, asciiTo: Callable[[str], str]) -> ChatCommand:
     @feature('textconvert')
     @min_args(2)
     @permission('moderator')
-    def command(args: ChatCommandArgs) -> bool:
+    async def command(args: ChatCommandArgs) -> bool:
         args.chat.send(asciiTo(args.message.query))
         return True
     command.__name__ = name
