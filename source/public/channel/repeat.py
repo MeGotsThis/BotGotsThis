@@ -6,7 +6,7 @@ from ...database import AutoRepeatList
 
 
 @permission('broadcaster')
-def commandAutoRepeat(args: ChatCommandArgs) -> bool:
+async def commandAutoRepeat(args: ChatCommandArgs) -> bool:
     """
     !autorepeat 1 MONEY MONEY
     !autorepeat 0
@@ -14,11 +14,11 @@ def commandAutoRepeat(args: ChatCommandArgs) -> bool:
     """
     
     count: Optional[int] = None
-    return process_auto_repeat(args, count)
+    return await process_auto_repeat(args, count)
 
 
 @permission('broadcaster')
-def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
+async def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
     """
     !autorepeat-20 0.5 MONEY MONEY 
     !autorepeat-20 0
@@ -28,12 +28,12 @@ def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
     count: Optional[int] = 10
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('autorepeat-')[1])
-    return process_auto_repeat(args, count)
+    return await process_auto_repeat(args, count)
 
 
 @min_args(2)
-def process_auto_repeat(args: ChatCommandArgs,
-                        count: Optional[int]) -> bool:
+async def process_auto_repeat(args: ChatCommandArgs,
+                              count: Optional[int]) -> bool:
     name: str = ''
     minutesDuration: float = 0
     message: Optional[str] = None
