@@ -1,5 +1,4 @@
-﻿import asyncio
-import bot.config
+﻿import bot.config
 import bot.globals
 import time
 from bot import utils
@@ -10,15 +9,14 @@ from ...data.message import Message
 from ...database import DatabaseBase
 
 
-def come(database: DatabaseBase,
-         channel: str,
-         send: Send) -> bool:
+async def come(database: DatabaseBase,
+               channel: str,
+               send: Send) -> bool:
     if database.isChannelBannedReason(channel) is not None:
         send('Chat {channel} is banned from joining'.format(channel=channel))
         return True
     priority: Union[float, int] = database.getAutoJoinsPriority(channel)
-    cluster: Optional[str] = asyncio.get_event_loop().run_until_complete(
-        twitch.chat_server(channel))
+    cluster: Optional[str] = await twitch.chat_server(channel)
     joinResult: Optional[bool] = utils.joinChannel(channel, priority, cluster)
     if joinResult is None:
         send('Unable to join {channel} on a specified server according to '
@@ -57,10 +55,10 @@ def empty(channel: str,
     return True
 
 
-def auto_join(database: DatabaseBase,
-              channel: str,
-              send: Send,
-              message: Message) -> bool:
+async def auto_join(database: DatabaseBase,
+                    channel: str,
+                    send: Send,
+                    message: Message) -> bool:
     if database.isChannelBannedReason(channel) is not None:
         send('Chat {channel} is banned from '
              'joining'.format(channel=channel))
@@ -71,14 +69,13 @@ def auto_join(database: DatabaseBase,
                                  'del', 'leave', 'part']
         if message.lower[1] in removeMsgs:
             return auto_join_delete(database, channel, send)
-    return auto_join_add(database, channel, send)
+    return await auto_join_add(database, channel, send)
 
 
-def auto_join_add(database: DatabaseBase,
-                  channel: str,
-                  send: Send) -> bool:
-    cluster: Optional[str] = asyncio.get_event_loop().run_until_complete(
-        twitch.chat_server(channel))
+async def auto_join_add(database: DatabaseBase,
+                        channel: str,
+                        send: Send) -> bool:
+    cluster: Optional[str] = await twitch.chat_server(channel)
     if cluster is None:
         send('Auto join for {channel} failed due to Twitch '
              'error'.format(channel=channel))
