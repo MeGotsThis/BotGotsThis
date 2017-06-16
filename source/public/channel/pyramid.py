@@ -12,27 +12,27 @@ from ...data import ChatCommandArgs
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)
-def commandPyramid(args: ChatCommandArgs) -> bool:
+async def commandPyramid(args: ChatCommandArgs) -> bool:
     count: int = 5 if args.permissions.broadcaster else 3
     # If below generate a ValueError or IndexError,
     # only the above line gets used
     with suppress(ValueError, IndexError):
         count = int(args.message[2])
-    return process_pyramid(args, args.message[1], count)
+    return await process_pyramid(args, args.message[1], count)
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 @min_args(2)
-def commandPyramidLong(args: ChatCommandArgs) -> bool:
+async def commandPyramidLong(args: ChatCommandArgs) -> bool:
     count: int = 5 if args.permissions.broadcaster else 3
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('pyramid-')[1])
-    return process_pyramid(args, args.message.query, count)
+    return await process_pyramid(args, args.message.query, count)
 
 
-def process_pyramid(args: ChatCommandArgs,
-                    repetition: str,
-                    count: int) -> bool:
+async def process_pyramid(args: ChatCommandArgs,
+                          repetition: str,
+                          count: int) -> bool:
     count = min(count, (bot.config.messageLimit + 1) // (len(repetition) + 1))
     if not args.permissions.broadcaster:
         count = min(count, 5)
@@ -56,7 +56,7 @@ def process_pyramid(args: ChatCommandArgs,
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
-def commandRandomPyramid(args: ChatCommandArgs) -> bool:
+async def commandRandomPyramid(args: ChatCommandArgs) -> bool:
     if not bot.globals.globalEmotes:
         return False
     emotes: Dict[int, str] = bot.globals.globalEmotes.copy()
