@@ -59,7 +59,7 @@ class ManageBotArgs(NamedTuple):
 
 ChatCommand = Callable[[ChatCommandArgs], Awaitable[bool]]
 
-WhisperCommand = Callable[[WhisperCommandArgs], bool]
+WhisperCommand = Callable[[WhisperCommandArgs], Awaitable[bool]]
 
 CustomCommandField = Callable[[CustomFieldArgs], Optional[str]]
 
