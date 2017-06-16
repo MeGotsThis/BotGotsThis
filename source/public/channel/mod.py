@@ -1,6 +1,4 @@
-﻿import asyncio
-
-import bot.globals
+﻿import bot.globals
 
 from typing import Optional
 
@@ -11,13 +9,11 @@ from ...data import ChatCommandArgs
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
-def commandStatus(args: ChatCommandArgs) -> bool:
+async def commandStatus(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
     msg: str
-    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-    if loop.run_until_complete(
-            twitch.update(args.chat.channel, status=args.message.query)):
+    if await twitch.update(args.chat.channel, status=args.message.query):
         if args.message.query:
             msg = 'Channel Status set as: ' + args.message.query
         else:
@@ -30,14 +26,13 @@ def commandStatus(args: ChatCommandArgs) -> bool:
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
-def commandGame(args: ChatCommandArgs) -> bool:
+async def commandGame(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
     game: str = args.message.query
     game = args.database.getFullGameTitle(args.message.lower[1:]) or game
     game = game.replace('Pokemon', 'Pokémon').replace('Pokepark', 'Poképark')
-    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-    if loop.run_until_complete(twitch.update(args.chat.channel, game=game)):
+    if await twitch.update(args.chat.channel, game=game):
         if game:
             msg = 'Channel Game set as: ' + game
         else:
@@ -50,12 +45,10 @@ def commandGame(args: ChatCommandArgs) -> bool:
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
-def commandRawGame(args: ChatCommandArgs) -> bool:
+async def commandRawGame(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
-    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
-    if loop.run_until_complete(
-            twitch.update(args.chat.channel, game=args.message.query)):
+    if await twitch.update(args.chat.channel, game=args.message.query):
         if args.message.query:
             msg = 'Channel Game set as: ' + args.message.query
         else:
@@ -68,16 +61,14 @@ def commandRawGame(args: ChatCommandArgs) -> bool:
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
-def commandCommunity(args: ChatCommandArgs) -> bool:
+async def commandCommunity(args: ChatCommandArgs) -> bool:
     if oauth.token(args.chat.channel, database=args.database) is None:
         return False
     community: Optional[str] = None
     if len(args.message) >= 2:
         community = args.message[1]
-    loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
     result: Optional[bool]
-    result = loop.run_until_complete(
-        twitch.set_channel_community(args.chat.channel, community))
+    result = await twitch.set_channel_community(args.chat.channel, community)
     msg: str
     if result is True:
         if community is not None:
@@ -98,7 +89,7 @@ def commandCommunity(args: ChatCommandArgs) -> bool:
 @permission('moderator')
 @permission('chatModerator')
 @min_args(2)
-def commandPurge(args: ChatCommandArgs) -> bool:
+async def commandPurge(args: ChatCommandArgs) -> bool:
     reason: str = args.message[2:]
     args.chat.send(
         '.timeout {user} 1 {reason}'.format(
@@ -111,7 +102,7 @@ def commandPurge(args: ChatCommandArgs) -> bool:
 
 @permission('moderator')
 @min_args(2)
-def commandPermit(args: ChatCommandArgs) -> bool:
+async def commandPermit(args: ChatCommandArgs) -> bool:
     user: str = args.message.lower[1]
     msg: str
     if args.database.isPermittedUser(args.chat.channel, user):
