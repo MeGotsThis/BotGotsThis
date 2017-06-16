@@ -1,5 +1,4 @@
-﻿import asyncio
-import bot.config
+﻿import bot.config
 import bot.globals
 from bot import utils
 from typing import Optional, Union
@@ -9,16 +8,15 @@ from ...data import Send
 from ...database import DatabaseBase
 
 
-def join(database: DatabaseBase,
-         channel: str,
-         send: Send) -> bool:
+async def join(database: DatabaseBase,
+               channel: str,
+               send: Send) -> bool:
     if database.isChannelBannedReason(channel):
         send('Chat ' + channel + ' is banned from joining')
         return True
     priority: Union[int, float] = database.getAutoJoinsPriority(channel)
 
-    cluster: Optional[str] = asyncio.get_event_loop().run_until_complete(
-        twitch.chat_server(channel))
+    cluster: Optional[str] = await twitch.chat_server(channel)
     if cluster not in bot.globals.clusters:
         send('Unknown chat server for ' + channel)
     elif utils.joinChannel(channel, priority, cluster):
