@@ -1,15 +1,18 @@
-import unittest
+import asynctest
+
+from datetime import datetime
+
+from asynctest.mock import MagicMock, Mock
+
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
-from datetime import datetime
 from source.data import WhisperCommandArgs
 from source.data.message import Message
 from source.data.permissions import WhisperPermissionSet
 from source.database import DatabaseBase
-from unittest.mock import MagicMock, Mock
 
 
-class TestWhisper(unittest.TestCase):
+class TestWhisper(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.channel = Mock(spec=Channel)
