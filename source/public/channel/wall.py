@@ -9,7 +9,7 @@ from typing import Iterator
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
 @min_args(2)
-def commandWall(args: ChatCommandArgs) -> bool:
+async def commandWall(args: ChatCommandArgs) -> bool:
     length, rows = (5, 20) if args.permissions.broadcaster else (3, 5)
     # If below generate a ValueError, only the above line gets used
     with suppress(ValueError, IndexError):
@@ -18,23 +18,24 @@ def commandWall(args: ChatCommandArgs) -> bool:
         length, rows = rows, int(args.message[3])
     limit = (bot.config.messageLimit + 1) // (len(args.message[1]) + 1)
     length = min(length, limit)
-    return process_wall(args, ' '.join((args.message[1],) * length), rows)
+    message: str = ' '.join((args.message[1],) * length)
+    return await process_wall(args, message, rows)
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))
 @min_args(2)
-def commandWallLong(args: ChatCommandArgs) -> bool:
+async def commandWallLong(args: ChatCommandArgs) -> bool:
     rows = 20 if args.permissions.broadcaster else 5
     # If below generate a ValueError or IndexError,
     # only the above line gets used
     with suppress(ValueError, IndexError):
         rows = int(args.message.command.split('wall-')[1])
-    return process_wall(args, args.message.query, rows)
+    return await process_wall(args, args.message.query, rows)
 
 
-def process_wall(args: ChatCommandArgs,
-                 repetition: str,
-                 rows: int) -> bool:
+async def process_wall(args: ChatCommandArgs,
+                       repetition: str,
+                       rows: int) -> bool:
     if not args.permissions.broadcaster:
         rows = min(rows, 10)
 
