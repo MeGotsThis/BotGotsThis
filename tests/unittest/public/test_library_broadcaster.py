@@ -1,4 +1,9 @@
 import unittest
+
+import asynctest
+
+from asynctest.mock import Mock, patch
+
 from bot import utils
 from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
@@ -7,14 +12,13 @@ from source.data.message import Message
 from source.database import DatabaseBase
 from source.public.library import broadcaster
 from tests.unittest.mock_class import StrContains, TypeMatch
-from unittest.mock import Mock, patch
 
 
 def send(messages):
     pass
 
 
-class TestLibraryBroadcasterCome(unittest.TestCase):
+class TestLibraryBroadcasterCome(asynctest.TestCase):
     def setUp(self):
         self.tags = IrcMessageTags()
         self.database = Mock(spec=DatabaseBase)
@@ -25,7 +29,7 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': Mock(spec=Channel)}
 
-        patcher = patch('source.api.twitch.chat_server', autospec=True)
+        patcher = patch('source.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_chat_server = patcher.start()
 
@@ -141,6 +145,7 @@ class TestLibraryBroadcasterCome(unittest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_chat_server.assert_called_once_with('botgotsthis')
 
+    @asynctest.fail_on(unused_loop=False)
     def test_banned(self):
         self.database.isChannelBannedReason.return_value = ''
         self.assertIs(
@@ -288,7 +293,7 @@ class TestLibraryBroadcasterAutoJoin(unittest.TestCase):
         self.send.assert_called_once_with(StrContains('banned', 'botgotsthis'))
 
 
-class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
+class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
@@ -298,7 +303,7 @@ class TestLibraryBroadcasterAutoJoinAdd(unittest.TestCase):
         self.mock_globals = patcher.start()
         self.mock_globals.clusters = {'twitch': Mock(spec=ConnectionHandler)}
 
-        patcher = patch('source.api.twitch.chat_server', autospec=True)
+        patcher = patch('source.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_chat_server = patcher.start()
 
