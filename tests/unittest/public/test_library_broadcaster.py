@@ -41,14 +41,15 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_ensure = patcher.start()
 
-    def test(self):
+    async def test(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = True
         self.mock_globals.channels = {}
         self.assertIs(
-            broadcaster.come(self.database, 'botgotsthis', self.send), True)
+            await broadcaster.come(self.database, 'botgotsthis', self.send),
+            True)
         self.send.assert_called_once_with(
             StrContains('Joining', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
@@ -59,14 +60,15 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_chat_server.assert_called_once_with('botgotsthis')
 
-    def test_existing(self):
+    async def test_existing(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_chat_server.return_value = 'twitch'
         self.mock_ensure.return_value = utils.ENSURE_CORRECT
         self.mock_join.return_value = False
         self.assertIs(
-            broadcaster.come(self.database, 'botgotsthis', self.send), True)
+            await broadcaster.come(self.database, 'botgotsthis', self.send),
+            True)
         self.send.assert_called_once_with(StrContains('in', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -76,14 +78,15 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.mock_chat_server.assert_called_once_with('botgotsthis')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_existing_move_server(self):
+    async def test_existing_move_server(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_chat_server.return_value = 'twitch'
         self.mock_ensure.return_value = utils.ENSURE_REJOIN
         self.mock_join.return_value = False
         self.assertIs(
-            broadcaster.come(self.database, 'botgotsthis', self.send), True)
+            await broadcaster.come(self.database, 'botgotsthis', self.send),
+            True)
         self.send.assert_called_once_with(
             StrContains('Move', 'botgotsthis', 'server'))
         self.database.isChannelBannedReason.assert_called_once_with(
@@ -94,14 +97,15 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.mock_chat_server.assert_called_once_with('botgotsthis')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_existing_not_joined(self):
+    async def test_existing_not_joined(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_chat_server.return_value = 'twitch'
         self.mock_ensure.return_value = utils.ENSURE_NOT_JOINED
         self.mock_join.return_value = False
         self.assertIs(
-            broadcaster.come(self.database, 'botgotsthis', self.send), True)
+            await broadcaster.come(self.database, 'botgotsthis', self.send),
+            True)
         self.send.assert_called_once_with(StrContains('Error'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -111,14 +115,15 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.mock_chat_server.assert_called_once_with('botgotsthis')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_existing_unknown_cluster(self):
+    async def test_existing_unknown_cluster(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_chat_server.return_value = 'twitch'
         self.mock_ensure.return_value = utils.ENSURE_CLUSTER_UNKNOWN
         self.mock_join.return_value = False
         self.assertIs(
-            broadcaster.come(self.database, 'botgotsthis', self.send), True)
+            await broadcaster.come(self.database, 'botgotsthis', self.send),
+            True)
         self.send.assert_called_once_with(StrContains('Error'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -128,13 +133,14 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.mock_chat_server.assert_called_once_with('botgotsthis')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_unknown_cluster(self):
+    async def test_unknown_cluster(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = None
         self.assertIs(
-            broadcaster.come(self.database, 'botgotsthis', self.send), True)
+            await broadcaster.come(self.database, 'botgotsthis', self.send),
+            True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'join', 'server'))
         self.database.isChannelBannedReason.assert_called_once_with(
@@ -145,11 +151,11 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_chat_server.assert_called_once_with('botgotsthis')
 
-    @asynctest.fail_on(unused_loop=False)
-    def test_banned(self):
+    async def test_banned(self):
         self.database.isChannelBannedReason.return_value = ''
         self.assertIs(
-            broadcaster.come(self.database, 'botgotsthis', self.send), True)
+            await broadcaster.come(self.database, 'botgotsthis', self.send),
+            True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'banned'))
         self.database.isChannelBannedReason.assert_called_once_with(
@@ -214,28 +220,26 @@ class TestLibraryBroadcasterEmpty(unittest.TestCase):
         self.channel.clear.assert_not_called()
 
 
-class TestLibraryBroadcasterAutoJoin(unittest.TestCase):
+class TestLibraryBroadcasterAutoJoin(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseBase)
         self.database.isChannelBannedReason.return_value = None
         self.send = Mock(spec=send)
 
-        patcher = patch('source.public.library.broadcaster.auto_join_add',
-                        autospec=True)
+        patcher = patch('source.public.library.broadcaster.auto_join_add')
         self.addCleanup(patcher.stop)
         self.mock_add = patcher.start()
         self.mock_add.return_value = True
 
-        patcher = patch('source.public.library.broadcaster.auto_join_delete',
-                        autospec=True)
+        patcher = patch('source.public.library.broadcaster.auto_join_delete')
         self.addCleanup(patcher.stop)
         self.mock_delete = patcher.start()
         self.mock_delete.return_value = True
 
-    def test(self):
+    async def test(self):
         self.assertIs(
-            broadcaster.auto_join(self.database, 'botgotsthis', self.send,
-                                  Message('!autojoin')),
+            await broadcaster.auto_join(self.database, 'botgotsthis',
+                                        self.send, Message('!autojoin')),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -244,10 +248,10 @@ class TestLibraryBroadcasterAutoJoin(unittest.TestCase):
         self.assertFalse(self.mock_delete.called)
         self.send.assert_not_called()
 
-    def test_add(self):
+    async def test_add(self):
         self.assertIs(
-            broadcaster.auto_join(self.database, 'botgotsthis', self.send,
-                                  Message('!autojoin yes')),
+            await broadcaster.auto_join(self.database, 'botgotsthis',
+                                        self.send, Message('!autojoin yes')),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -256,10 +260,11 @@ class TestLibraryBroadcasterAutoJoin(unittest.TestCase):
         self.assertFalse(self.mock_delete.called)
         self.send.assert_not_called()
 
-    def test_delete(self):
+    async def test_delete(self):
         self.assertIs(
-            broadcaster.auto_join(self.database, 'botgotsthis', self.send,
-                                  Message('!autojoin delete')),
+            await broadcaster.auto_join(
+                self.database, 'botgotsthis', self.send,
+                Message('!autojoin delete')),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -268,11 +273,11 @@ class TestLibraryBroadcasterAutoJoin(unittest.TestCase):
         self.assertFalse(self.mock_add.called)
         self.send.assert_not_called()
 
-    def test_banned(self):
+    async def test_banned(self):
         self.database.isChannelBannedReason.return_value = ''
         self.assertIs(
-            broadcaster.auto_join(self.database, 'botgotsthis', self.send,
-                                  Message('!autojoin')),
+            await broadcaster.auto_join(self.database, 'botgotsthis',
+                                        self.send, Message('!autojoin')),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -280,11 +285,12 @@ class TestLibraryBroadcasterAutoJoin(unittest.TestCase):
         self.assertFalse(self.mock_delete.called)
         self.send.assert_called_once_with(StrContains('banned', 'botgotsthis'))
 
-    def test_banned_delete(self):
+    async def test_banned_delete(self):
         self.database.isChannelBannedReason.return_value = ''
         self.assertIs(
-            broadcaster.auto_join(self.database, 'botgotsthis', self.send,
-                                  Message('!autojoin delete')),
+            await broadcaster.auto_join(
+                self.database, 'botgotsthis', self.send,
+                Message('!autojoin delete')),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -315,13 +321,14 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_ensure = patcher.start()
 
-    def test(self):
+    async def test(self):
         self.mock_join.return_value = True
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = True
         self.database.getAutoJoinsPriority.return_value = 0
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'enable', 'join'))
@@ -335,13 +342,14 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.assertFalse(self.mock_ensure.called)
 
-    def test_existing(self):
+    async def test_existing(self):
         self.mock_join.return_value = True
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = False
         self.database.getAutoJoinsPriority.return_value = 0
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'already'))
@@ -356,14 +364,15 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.assertFalse(self.mock_ensure.called)
 
-    def test_joined(self):
+    async def test_joined(self):
         self.mock_join.return_value = False
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = True
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_ensure.return_value = utils.ENSURE_CORRECT
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'enabled'))
@@ -377,14 +386,15 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_joined_existing(self):
+    async def test_joined_existing(self):
         self.mock_join.return_value = False
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = False
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_ensure.return_value = utils.ENSURE_CORRECT
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'already', 'enable', 'in chat'))
@@ -399,14 +409,15 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_wrong_server(self):
+    async def test_wrong_server(self):
         self.mock_join.return_value = False
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = True
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_ensure.return_value = utils.ENSURE_REJOIN
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'enable'))
@@ -420,14 +431,15 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_wrong_server_existing(self):
+    async def test_wrong_server_existing(self):
         self.mock_join.return_value = False
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = False
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_ensure.return_value = utils.ENSURE_REJOIN
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'already', 'enable', 'move', 'server'))
@@ -442,14 +454,15 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_not_possible_1(self):
+    async def test_not_possible_1(self):
         self.mock_join.return_value = False
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = True
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_ensure.return_value = utils.ENSURE_NOT_JOINED
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(StrContains('botgotsthis', 'enable'))
         self.database.discardAutoJoin.assert_not_called()
@@ -462,14 +475,15 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_not_possible_1_existing(self):
+    async def test_not_possible_1_existing(self):
         self.mock_join.return_value = False
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = False
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_ensure.return_value = utils.ENSURE_NOT_JOINED
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'already', 'enabled', 'in chat'))
@@ -484,14 +498,15 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_not_possible_2(self):
+    async def test_not_possible_2(self):
         self.mock_join.return_value = False
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = True
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_ensure.return_value = utils.ENSURE_CLUSTER_UNKNOWN
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'enabled', 'move', 'server'))
@@ -505,14 +520,15 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_join.assert_called_once_with('botgotsthis', 0, 'twitch')
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
-    def test_not_possible_2_existing(self):
+    async def test_not_possible_2_existing(self):
         self.mock_join.return_value = False
         self.mock_chat_server.return_value = 'twitch'
         self.database.saveAutoJoin.return_value = False
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_ensure.return_value = utils.ENSURE_CLUSTER_UNKNOWN
         self.assertIs(
-            broadcaster.auto_join_add(self.database, 'botgotsthis', self.send),
+            await broadcaster.auto_join_add(self.database, 'botgotsthis',
+                                            self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'enabled', 'move', 'server'))
