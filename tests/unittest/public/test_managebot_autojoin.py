@@ -1,7 +1,11 @@
 import unittest
+
+import asynctest
+
 from datetime import datetime
 from io import StringIO
-from unittest.mock import Mock, patch
+
+from asynctest.mock import Mock, patch
 
 from source.data import Message
 from source.database import AutoJoinChannel, DatabaseBase
@@ -199,7 +203,7 @@ class TestManageBotAutoJoinAutoJoinPriority(unittest.TestCase):
         self.send.assert_called_once_with(StrContains('botgotsthis', 'never'))
 
 
-class TestManageBotAutoJoinReloadServer(unittest.TestCase):
+class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseBase)
         self.send = Mock(spec=send)
@@ -208,7 +212,7 @@ class TestManageBotAutoJoinReloadServer(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_stdout = patcher.start()
 
-        patcher = patch('source.api.twitch.chat_server', autospec=True)
+        patcher = patch('source.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_server = patcher.start()
 
