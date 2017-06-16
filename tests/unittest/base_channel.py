@@ -1,15 +1,18 @@
-import unittest
+import asynctest
+
+from datetime import datetime
+
+from asynctest.mock import MagicMock, Mock
+
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
-from datetime import datetime
 from source.data import ChatCommandArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
 from source.database import DatabaseBase
-from unittest.mock import MagicMock, Mock
 
 
-class TestChannel(unittest.TestCase):
+class TestChannel(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.tags = IrcMessageTags()
