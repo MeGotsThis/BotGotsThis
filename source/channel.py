@@ -1,5 +1,5 @@
-﻿import lists.channel
-import threading
+﻿import asyncio
+import lists.channel
 import time
 from bot import data as botData, utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
@@ -24,18 +24,14 @@ def parse(chat: 'botData.Channel',
     if len(message) == 0:
         return
     
-    name: str = '{channel}-{command}-{time}'.format(
-        channel=chat.channel, command=message.command, time=time.time())
-    params: tuple
-    params = chat, tags, nick, message, timestamp
-    threading.Thread(target=chatCommand, args=params, name=name).start()
+    asyncio.ensure_future(chatCommand(chat, tags, nick, message, timestamp))
     
 
-def chatCommand(chat: 'botData.Channel',
-                tags: Optional[IrcMessageTagsReadOnly],
-                nick: str,
-                message: Message,
-                timestamp: datetime) -> None:
+async def chatCommand(chat: 'botData.Channel',
+                      tags: Optional[IrcMessageTagsReadOnly],
+                      nick: str,
+                      message: Message,
+                      timestamp: datetime) -> None:
     permitted: bool
     manager: bool
     permissions: ChatPermissionSet
@@ -57,7 +53,7 @@ def chatCommand(chat: 'botData.Channel',
                 database, chat, tags, nick, message, permissions,
                 timestamp)
             for command in commandsToProcess(message.command):
-                if command(arguments):
+                if await command(arguments):
                     return
     except:
         extra = 'Channel: {channel}\nMessage: {message}'.format(

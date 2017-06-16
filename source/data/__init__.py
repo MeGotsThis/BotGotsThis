@@ -3,7 +3,8 @@ from .permissions import ChatPermissionSet, WhisperPermissionSet
 from ..database import DatabaseBase
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
-from typing import Any, Callable, Iterable, List, NamedTuple, Optional, Union
+from typing import Any, Awaitable, Callable, Iterable, List, NamedTuple
+from typing import Optional, Union
 
 class ChatCommandArgs(NamedTuple):
     database: DatabaseBase
@@ -56,7 +57,7 @@ class ManageBotArgs(NamedTuple):
     message: Message
 
 
-ChatCommand = Callable[[ChatCommandArgs], bool]
+ChatCommand = Callable[[ChatCommandArgs], Awaitable[bool]]
 
 WhisperCommand = Callable[[WhisperCommandArgs], bool]
 
