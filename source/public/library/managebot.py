@@ -5,12 +5,14 @@ from ...data.message import Message
 from ...data.permissions import ChatPermissionSet, WhisperPermissionSet
 from ...database import DatabaseBase
 
+Permissions = Union[WhisperPermissionSet, ChatPermissionSet]
 
-def manage_bot(database: DatabaseBase,
-               permissions: Union[WhisperPermissionSet, ChatPermissionSet],
-               send: Send,
-               nick: str,
-               message: Message) -> bool:
+
+async def manage_bot(database: DatabaseBase,
+                     permissions: Permissions,
+                     send: Send,
+                     nick: str,
+                     message: Message) -> bool:
     argument: ManageBotArgs
     argument = ManageBotArgs(database, permissions, send, nick, message)
     

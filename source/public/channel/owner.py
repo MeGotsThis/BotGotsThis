@@ -6,14 +6,14 @@ from ...data import ChatCommandArgs
 
 @ownerChannel
 @permission('owner')
-def commandExit(args: ChatCommandArgs) -> bool:
+async def commandExit(args: ChatCommandArgs) -> bool:
     return exit.exit(sendPriority(args.chat, 0))
 
 
 @min_args(3)
 @ownerChannel
 @permission('owner')
-def commandSay(args: ChatCommandArgs) -> bool:
+async def commandSay(args: ChatCommandArgs) -> bool:
     return channel.say(args.database, args.nick, args.message.lower[1],
                        args.message[2:])
 
@@ -21,33 +21,34 @@ def commandSay(args: ChatCommandArgs) -> bool:
 @min_args(2)
 @ownerChannel
 @permission('admin')
-def commandJoin(args: ChatCommandArgs) -> bool:
-    return channel.join(args.database, args.message.lower[1], send(args.chat))
+async def commandJoin(args: ChatCommandArgs) -> bool:
+    return await channel.join(args.database, args.message.lower[1],
+                              send(args.chat))
 
 
 @min_args(2)
 @ownerChannel
 @permission('admin')
-def commandPart(args: ChatCommandArgs) -> bool:
+async def commandPart(args: ChatCommandArgs) -> bool:
     return channel.part(args.message.lower[1], send(args.chat))
 
 
 @ownerChannel
 @permission('admin')
-def commandEmptyAll(args: ChatCommandArgs) -> bool:
+async def commandEmptyAll(args: ChatCommandArgs) -> bool:
     return channel.empty_all(send(args.chat))
 
 
 @min_args(2)
 @ownerChannel
 @permission('admin')
-def commandEmpty(args: ChatCommandArgs) -> bool:
+async def commandEmpty(args: ChatCommandArgs) -> bool:
     return channel.empty(args.message.lower[1], send(args.chat))
 
 
 @min_args(2)
 @ownerChannel
 @permission('manager')
-def commandManageBot(args: ChatCommandArgs) -> bool:
-    return managebot.manage_bot(args.database, args.permissions,
-                                send(args.chat), args.nick, args.message)
+async def commandManageBot(args: ChatCommandArgs) -> bool:
+    return await managebot.manage_bot(args.database, args.permissions,
+                                      send(args.chat), args.nick, args.message)

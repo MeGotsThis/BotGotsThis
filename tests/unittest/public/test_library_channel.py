@@ -39,13 +39,13 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_ensure = patcher.start()
 
-    def test(self):
+    async def test(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = math.inf
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = True
         self.assertIs(
-            channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join(self.database, 'botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('Join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -55,12 +55,12 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.assert_called_with('botgotsthis', math.inf, 'twitch')
         self.assertFalse(self.mock_ensure.called)
 
-    def test_invalid_cluster(self):
+    async def test_invalid_cluster(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = math.inf
         self.mock_chat_server.return_value = ''
         self.assertIs(
-            channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join(self.database, 'botgotsthis', self.send), True)
         self.send.assert_called_once_with(
             StrContains('Unknown', 'server', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
@@ -71,13 +71,13 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.assertFalse(self.mock_join.called)
         self.assertFalse(self.mock_ensure.called)
 
-    def test_auto_join(self):
+    async def test_auto_join(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = 0
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = True
         self.assertIs(
-            channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join(self.database, 'botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('Join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -87,14 +87,14 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.assert_called_with('botgotsthis', 0, 'twitch')
         self.assertFalse(self.mock_ensure.called)
 
-    def test_already_joined(self):
+    async def test_already_joined(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = math.inf
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = False
         self.mock_ensure.return_value = utils.ENSURE_CORRECT
         self.assertIs(
-            channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join(self.database, 'botgotsthis', self.send), True)
         self.send.assert_called_once_with(
             StrContains('Already', 'join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
@@ -105,14 +105,14 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.assert_called_with('botgotsthis', math.inf, 'twitch')
         self.mock_ensure.assert_called_with('botgotsthis', math.inf, 'twitch')
 
-    def test_already_joined_changed_cluster(self):
+    async def test_already_joined_changed_cluster(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = math.inf
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = False
         self.mock_ensure.return_value = utils.ENSURE_REJOIN
         self.assertIs(
-            channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join(self.database, 'botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('botgotsthis', 'server'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -122,14 +122,14 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.assert_called_with('botgotsthis', math.inf, 'twitch')
         self.mock_ensure.assert_called_with('botgotsthis', math.inf, 'twitch')
 
-    def test_already_joined_invalid_1(self):
+    async def test_already_joined_invalid_1(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = math.inf
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = False
         self.mock_ensure.return_value = utils.ENSURE_CLUSTER_UNKNOWN
         self.assertIs(
-            channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join(self.database, 'botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('error', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -139,14 +139,14 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.assert_called_with('botgotsthis', math.inf, 'twitch')
         self.mock_ensure.assert_called_with('botgotsthis', math.inf, 'twitch')
 
-    def test_already_joined_invalid_2(self):
+    async def test_already_joined_invalid_2(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.getAutoJoinsPriority.return_value = math.inf
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = False
         self.mock_ensure.return_value = utils.ENSURE_NOT_JOINED
         self.assertIs(
-            channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join(self.database, 'botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('error', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
