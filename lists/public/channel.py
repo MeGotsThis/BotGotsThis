@@ -26,7 +26,7 @@ commands: Mapping[str, Optional[data.ChatCommand]] = {
     '!part': owner.commandPart,
     '!emptychat': owner.commandEmpty,
     '!emptyall': owner.commandEmptyAll,
-    '!global': custom.commandCommand,
+    '!global': custom.commandGlobal,
     '!say': owner.commandSay,
     '!hello': broadcaster.commandHello,
     '!leave': broadcaster.commandLeave,

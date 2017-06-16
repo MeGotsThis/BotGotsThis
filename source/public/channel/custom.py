@@ -6,11 +6,11 @@ from ..library import chat, custom, timeout
 from ..library.chat import min_args, not_feature, permission, ownerChannel
 from ...data import ChatCommandArgs, CustomCommand, CommandActionTokens
 from datetime import timedelta
-from typing import Callable, Dict, List, Optional
+from typing import Awaitable, Callable, Dict, List, Optional
 
 
 @not_feature('nocustom')
-def customCommands(args: ChatCommandArgs) -> bool:
+async def customCommands(args: ChatCommandArgs) -> bool:
     command: Optional[CustomCommand]
     command = custom.get_command(args.database, args.message.command,
                                  args.chat.channel, args.permissions)
@@ -36,19 +36,19 @@ def customCommands(args: ChatCommandArgs) -> bool:
 
 @ownerChannel
 @permission('admin')
-def commandGlobal(args: ChatCommandArgs) -> bool:
-    return process_command(args, '#global')
+async def commandGlobal(args: ChatCommandArgs) -> bool:
+    return await process_command(args, '#global')
 
 
 @not_feature('nocustom')
 @permission('moderator')
-def commandCommand(args: ChatCommandArgs) -> bool:
-    return process_command(args, args.chat.channel)
+async def commandCommand(args: ChatCommandArgs) -> bool:
+    return await process_command(args, args.chat.channel)
 
 
 @min_args(3)
-def process_command(args: ChatCommandArgs,
-                    broadcaster: str) -> bool:
+async def process_command(args: ChatCommandArgs,
+                          broadcaster: str) -> bool:
     input: Optional[CommandActionTokens] = custom.parse_action_message(
         args.message, broadcaster)
     if input is None:
@@ -69,7 +69,8 @@ def process_command(args: ChatCommandArgs,
                            'ignored'.format(user=args.nick))
             return True
 
-    actions: Dict[str, Callable[[ChatCommandArgs, CommandActionTokens], bool]]
+    actions: Dict[str, Callable[[ChatCommandArgs, CommandActionTokens],
+                                Awaitable[bool]]]
     actions = {
         'add': insert_command,
         'insert': insert_command,
@@ -90,12 +91,12 @@ def process_command(args: ChatCommandArgs,
         'rename': rename_command,
         }
     if input.action in actions:
-        return actions[input.action](args, input)
+        return await actions[input.action](args, input)
     else:
         return False
 
 
-def insert_command(args: ChatCommandArgs,
+async def insert_command(args: ChatCommandArgs,
                    input: CommandActionTokens) -> bool:
     message: str
     if args.database.insertCustomCommand(
@@ -109,8 +110,8 @@ def insert_command(args: ChatCommandArgs,
     return True
 
 
-def update_command(args: ChatCommandArgs,
-                   input: CommandActionTokens) -> bool:
+async def update_command(args: ChatCommandArgs,
+                         input: CommandActionTokens) -> bool:
     message: str
     if args.database.updateCustomCommand(
             input.broadcaster, input.level, input.command, input.text,
@@ -123,8 +124,8 @@ def update_command(args: ChatCommandArgs,
     return True
 
 
-def append_command(args: ChatCommandArgs,
-                   input: CommandActionTokens) -> bool:
+async def append_command(args: ChatCommandArgs,
+                         input: CommandActionTokens) -> bool:
     message: str
     if args.database.appendCustomCommand(input.broadcaster, input.level,
                                          input.command, input.text, args.nick):
@@ -136,8 +137,8 @@ def append_command(args: ChatCommandArgs,
     return True
 
 
-def replace_command(args: ChatCommandArgs,
-                    input: CommandActionTokens) -> bool:
+async def replace_command(args: ChatCommandArgs,
+                          input: CommandActionTokens) -> bool:
     message: str
     if args.database.replaceCustomCommand(
             input.broadcaster, input.level, input.command, input.text,
@@ -150,8 +151,8 @@ def replace_command(args: ChatCommandArgs,
     return True
 
 
-def delete_command(args: ChatCommandArgs,
-                   input: CommandActionTokens) -> bool:
+async def delete_command(args: ChatCommandArgs,
+                         input: CommandActionTokens) -> bool:
     message: str
     if args.database.deleteCustomCommand(input.broadcaster, input.level,
                                          input.command, args.nick):
@@ -164,8 +165,8 @@ def delete_command(args: ChatCommandArgs,
 
 
 @permission('broadcaster')
-def command_property(args: ChatCommandArgs,
-                     input: CommandActionTokens) -> bool:
+async def command_property(args: ChatCommandArgs,
+                           input: CommandActionTokens) -> bool:
     if not input.text:
         return False
     parts: List[Optional[str]] = input.text.split(None, 1)
@@ -191,8 +192,8 @@ def command_property(args: ChatCommandArgs,
     return True
 
 
-def raw_command(args: ChatCommandArgs,
-                input: CommandActionTokens) -> bool:
+async def raw_command(args: ChatCommandArgs,
+                      input: CommandActionTokens) -> bool:
     command: Optional[str]
     command = args.database.getCustomCommand(input.broadcaster, input.level,
                                              input.command)
@@ -206,8 +207,8 @@ def raw_command(args: ChatCommandArgs,
     return True
 
 
-def level_command(args: ChatCommandArgs,
-                  input: CommandActionTokens) -> bool:
+async def level_command(args: ChatCommandArgs,
+                        input: CommandActionTokens) -> bool:
     permission: str = input.text.lower()
     if permission not in custom.permissions:
         message = '{user} -> {inputLevel} is an invalid permission'
@@ -224,8 +225,8 @@ def level_command(args: ChatCommandArgs,
     return True
 
 
-def rename_command(args: ChatCommandArgs,
-                  input: CommandActionTokens) -> bool:
+async def rename_command(args: ChatCommandArgs,
+                         input: CommandActionTokens) -> bool:
     newCommand: str = input.text and input.text.split(None, 1)[0]
     message: str
     if not newCommand:
