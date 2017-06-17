@@ -4,7 +4,7 @@ from ...data import CustomFieldArgs
 import re
 
 
-def fieldParams(args: CustomFieldArgs) -> Optional[str]:
+async def fieldParams(args: CustomFieldArgs) -> Optional[str]:
     with suppress(TypeError):
         match: Match[str]
         match = re.fullmatch(r'(\d+)(-(\d+))?|(\d+)-|-(\d+)', args.field)
