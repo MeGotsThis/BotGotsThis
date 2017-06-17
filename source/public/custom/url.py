@@ -1,26 +1,33 @@
-﻿from contextlib import suppress
-from functools import partial
-from http.client import HTTPResponse
-from typing import BinaryIO, Callable, Iterator, Match, Optional, Union
-from ...data import CustomCommandField, CustomFieldArgs
-import re
-import bot.config
-import lists.custom
+﻿import re
 import urllib.error
 import urllib.request
 
+import aiohttp
 
-def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
+import bot.config
+import lists.custom
+
+from contextlib import suppress
+from functools import partial
+from http.client import HTTPResponse
+from typing import BinaryIO, Callable, Iterator, Match, Optional, Union
+
+from ...data import CustomCommandField, CustomFieldArgs
+
+
+async def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'url':
         replace_func: Callable[[Match[str]], str]
         replace_func = partial(field_replace, args)  # type: ignore
         url: str = re.sub(r'{([^\r\n\t\f {}]+)}', replace_func, args.param)
-        with suppress(urllib.error.URLError):
-            urlTimeout: float = bot.config.customMessageUrlTimeout
-            res: Union[HTTPResponse, BinaryIO]
-            with urllib.request.urlopen(url, timeout=urlTimeout) as res:
-                if isinstance(res, HTTPResponse) and int(res.status) == 200:
-                    data: str = res.read().decode('utf-8')
+        urlTimeout: float = bot.config.customMessageUrlTimeout
+        session: aiohttp.ClientSession
+        response: aiohttp.ClientResponse
+        with suppress(aiohttp.ClientError):
+            async with aiohttp.ClientSession(raise_for_status=True) as session,\
+                    session.get(url, timeout=urlTimeout) as response:
+                if response.status == 200:
+                    data: str = await response.text()
                     data = data.replace('\r\n', ' ')
                     data = data.replace('\n', ' ')
                     data = data.replace('\r', ' ')
@@ -29,7 +36,7 @@ def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
     return None
 
 
-def field_replace(args: CustomFieldArgs, match: Match[str]) -> str:
+async def field_replace(args: CustomFieldArgs, match: Match[str]) -> str:
     newargs: CustomFieldArgs
     newargs = args._replace(field=match.group(1),
                             param=None,
@@ -41,7 +48,7 @@ def field_replace(args: CustomFieldArgs, match: Match[str]) -> str:
     fields = (f for f in lists.custom.fields if f is not fieldUrl)
     field: CustomCommandField
     for field in fields:
-        replacement: Optional[str] = field(newargs)
+        replacement: Optional[str] = await field(newargs)
         if replacement is not None:
             return replacement
     return ''
