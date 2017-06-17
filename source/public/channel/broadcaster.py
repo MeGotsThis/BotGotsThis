@@ -49,7 +49,6 @@ async def commandUptime(args: ChatCommandArgs) -> bool:
             '{channel} is currently not streaming or has not been for a '
             'minute'.format(channel=args.chat.channel))
     else:
-        loop: asyncio.AbstractEventLoop = asyncio.get_event_loop()
         currentTime: Optional[datetime]
         currentTime = await twitch.server_time()
         if currentTime is not None:
