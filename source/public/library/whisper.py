@@ -1,6 +1,6 @@
 from bot import utils
 from functools import partial, wraps
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, cast
 from . import chat
 from ... import data
 
@@ -9,8 +9,7 @@ _AnyDecorator = Callable[..., _AnyCallable]
 
 
 def send(nick: Any) -> data.Send:
-    # TODO: mypy/typeshed fix
-    return partial(utils.whisper, nick)  # type: ignore
+    return cast(data.Send, partial(utils.whisper, nick))
 
 permission = chat.permission
 not_permission = chat.not_permission
