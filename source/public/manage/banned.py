@@ -9,7 +9,7 @@ needReason: List[str] = ['add', 'insert', 'del', 'delete', 'rem', 'remove',
                          'remove']
 
 
-def manageBanned(args: ManageBotArgs) -> bool:
+async def manageBanned(args: ManageBotArgs) -> bool:
     if len(args.message) < 3:
         return False
     if args.message.lower[2] in ['list']:
