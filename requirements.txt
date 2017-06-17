@@ -2,3 +2,4 @@ mypy
 aiohttp
 asynctest
 aiofiles
+aioodbc
