@@ -1,6 +1,6 @@
 import asynctest
 
-from asynctest.mock import Mock, patch
+from asynctest.mock import CoroutineMock, Mock, patch
 
 from source.data import ManageBotArgs
 from source.data.message import Message
@@ -23,7 +23,7 @@ class TestLibraryManageBot(asynctest.TestCase):
         self.database = Mock(spec=DatabaseBase)
         self.permissions = Mock(spec=ChatPermissionSet)
         self.send = Mock(spec=send)
-        self.method = Mock(spec=method, return_value=True)
+        self.method = CoroutineMock(spec=method, return_value=True)
 
         patcher = patch.dict('lists.manage.methods')
         self.addCleanup(patcher.stop)

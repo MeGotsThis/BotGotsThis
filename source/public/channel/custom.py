@@ -25,7 +25,7 @@ async def customCommands(args: ChatCommandArgs) -> bool:
                                  'moderator'):
             return False
         
-        msgs = custom.create_messages(command, args)
+        msgs: List[str] = await custom.create_messages(command, args)
         args.chat.send(msgs)
         if args.permissions.chatModerator:
             timeout.record_timeout(args.database, args.chat, args.nick, msgs,
