@@ -2,8 +2,6 @@ import unittest
 
 import asynctest
 
-import lists.manage
-
 from datetime import datetime
 from io import StringIO
 

@@ -1,5 +1,7 @@
 import asynctest
 
+import lists.manage
+
 from datetime import datetime
 
 from asynctest.mock import MagicMock, Mock
