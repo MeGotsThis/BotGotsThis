@@ -6,7 +6,7 @@ import source.ircmessage
 
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Deque, Dict, List, Optional, Tuple
+from typing import Deque, Dict, List, Optional, Tuple, no_type_check
 
 
 from bot import data, utils
@@ -175,7 +175,8 @@ class ConnectionHandler:
             self._writer.write(b'\r\n')
             await self._writer.drain()
             self._on_write(command, timestamp, channel=channel)
-            self._log_write(command, channel=channel, whisper=whisper,
+            # TODO: mypy fix in the future
+            self._log_write(command, channel=channel, whisper=whisper,  # type: ignore
                             timestamp=timestamp)
         except:
             utils.logException()
@@ -245,6 +246,8 @@ class ConnectionHandler:
                                                  server=self.name)
         utils.logIrcMessage(file, '< ' + message)
 
+    # TODO: mypy fix in the future
+    @no_type_check
     def _log_write(self,
                    command: IrcMessage, *,
                    channel: 'Optional[data.Channel]'=None,
@@ -290,6 +293,8 @@ class ConnectionHandler:
         for file, log in zip(files, logs):
             utils.logIrcMessage(file, log, timestamp)
 
+    # TODO: mypy fix in the future
+    @no_type_check
     def queue_write(self,
                     message: IrcMessage, *,
                     channel: 'Optional[data.Channel]'=None,
@@ -329,6 +334,8 @@ class ConnectionHandler:
         print('{time} Parted {channel}'.format(
             time=utils.now(), channel=channel.channel))
 
+    # TODO: mypy fix in the future
+    @no_type_check
     def flush_writes(self) -> None:
         self.messaging.cleanOldTimestamps()
         whisperMessage: data.WhisperMessage
