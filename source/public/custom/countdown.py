@@ -88,7 +88,7 @@ daysOfWeek: Dict[str, int] = {
     }
 
 
-def fieldCountdown(args: CustomFieldArgs) -> Optional[str]:
+async def fieldCountdown(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'countdown' and args.param is not None:
         timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
         npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
@@ -108,7 +108,7 @@ def fieldCountdown(args: CustomFieldArgs) -> Optional[str]:
     return None
 
 
-def fieldSince(args: CustomFieldArgs) -> Optional[str]:
+async def fieldSince(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'since' and args.param is not None:
         timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
         npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
@@ -128,7 +128,7 @@ def fieldSince(args: CustomFieldArgs) -> Optional[str]:
     return None
 
 
-def fieldNext(args: CustomFieldArgs) -> Optional[str]:
+async def fieldNext(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() in ['next', 'future'] and args.param is not None:
         timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
         npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
@@ -147,7 +147,7 @@ def fieldNext(args: CustomFieldArgs) -> Optional[str]:
     return None
 
 
-def fieldPrevious(args: CustomFieldArgs) -> Optional[str]:
+async def fieldPrevious(args: CustomFieldArgs) -> Optional[str]:
     if (args.field.lower() in ['prev', 'previous', 'past']
             and args.param is not None):
         timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)

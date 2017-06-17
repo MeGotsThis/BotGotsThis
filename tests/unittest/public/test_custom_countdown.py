@@ -1,12 +1,16 @@
 import math
 import unittest
+
 from datetime import datetime, time, timedelta
-from unittest.mock import patch
+
+from asynctest.mock import patch
 
 from source.data import timezones
 from source.data.timedelta import format
-from source.public.custom import countdown
 from tests.unittest.base_custom import TestCustomField
+
+# Needs to be imported last
+from source.public.custom import countdown
 
 
 class TestCustomCountdownParse(unittest.TestCase):
@@ -951,50 +955,50 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
         self.mock_parse.return_value = countdown.NextPastCooldown(None, None,
                                                                   None)
 
-    def test(self):
+    async def test(self):
         self.args = self.args._replace(field='')
-        self.assertIsNone(countdown.fieldCountdown(self.args))
+        self.assertIsNone(await countdown.fieldCountdown(self.args))
         self.assertFalse(self.mock_parse.called)
 
-    def test_none_time(self):
+    async def test_none_time(self):
         self.args = self.args._replace(param=None)
-        self.assertIsNone(countdown.fieldCountdown(self.args))
+        self.assertIsNone(await countdown.fieldCountdown(self.args))
         self.assertFalse(self.mock_parse.called)
 
-    def test_invalid_time(self):
-        self.assertIsNone(countdown.fieldCountdown(self.args))
+    async def test_invalid_time(self):
+        self.assertIsNone(await countdown.fieldCountdown(self.args))
         self.assertTrue(self.mock_parse.called)
 
-    def test_default(self):
+    async def test_default(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(await countdown.fieldCountdown(self.args), 'has passed')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_prefix_suffix(self):
+    async def test_default_prefix_suffix(self):
         self.args = self.args._replace(prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(await countdown.fieldCountdown(self.args), 'has passed')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_default(self):
+    async def test_default_default(self):
         self.args = self.args._replace(default='Kappa')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldCountdown(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_default_prefix_suffix(self):
+    async def test_default_default_prefix_suffix(self):
         self.args = self.args._replace(default='Kappa',
                                        prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1002,71 +1006,71 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldCountdown(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time(self):
+    async def test_time(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args),
+        self.assertEqual(await countdown.fieldCountdown(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_prefix(self):
+    async def test_time_prefix(self):
         self.args = self.args._replace(prefix='[')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args),
+        self.assertEqual(await countdown.fieldCountdown(self.args),
                          '[' + format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_prefix_blank(self):
+    async def test_time_prefix_blank(self):
         self.args = self.args._replace(prefix='')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args),
+        self.assertEqual(await countdown.fieldCountdown(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_suffix(self):
+    async def test_time_suffix(self):
         self.args = self.args._replace(suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args),
+        self.assertEqual(await countdown.fieldCountdown(self.args),
                          format(timedelta(days=1)) + ']')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_suffix_blank(self):
+    async def test_time_suffix_blank(self):
         self.args = self.args._replace(suffix='')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldCountdown(self.args),
+        self.assertEqual(await countdown.fieldCountdown(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_not_cooldown(self):
+    async def test_not_cooldown(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             0)
-        self.assertEqual(countdown.fieldCountdown(self.args),
+        self.assertEqual(await countdown.fieldCountdown(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1076,7 +1080,7 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             1)
-        self.assertEqual(countdown.fieldCountdown(self.args),
+        self.assertEqual(await countdown.fieldCountdown(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1086,18 +1090,19 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             math.inf)
-        self.assertEqual(countdown.fieldCountdown(self.args),
+        self.assertEqual(await countdown.fieldCountdown(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown(self):
+    async def test_cooldown(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -math.inf)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(await countdown.fieldCountdown(self.args),
+                         'has passed')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1106,7 +1111,8 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -1)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(await countdown.fieldCountdown(self.args),
+                         'has passed')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1115,10 +1121,11 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             math.nan)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(await countdown.fieldCountdown(self.args),
+                         'has passed')
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown_prefix_suffix(self):
+    async def test_cooldown_prefix_suffix(self):
         self.args = self.args._replace(prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
@@ -1126,10 +1133,10 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -1)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(await countdown.fieldCountdown(self.args), 'has passed')
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown_default(self):
+    async def test_cooldown_default(self):
         self.args = self.args._replace(default='Kappa')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
@@ -1137,10 +1144,10 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -1)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldCountdown(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown_default_prefix_suffix(self):
+    async def test_cooldown_default_prefix_suffix(self):
         self.args = self.args._replace(default='Kappa',
                                        prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1149,7 +1156,7 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -1)
-        self.assertEqual(countdown.fieldCountdown(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldCountdown(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
 
@@ -1166,50 +1173,50 @@ class TestCustomCountdownFieldSince(TestCustomField):
         self.mock_parse.return_value = countdown.NextPastCooldown(None, None,
                                                                   None)
 
-    def test(self):
+    async def test(self):
         self.args = self.args._replace(field='')
-        self.assertIsNone(countdown.fieldSince(self.args))
+        self.assertIsNone(await countdown.fieldSince(self.args))
         self.assertFalse(self.mock_parse.called)
 
-    def test_none_time(self):
+    async def test_none_time(self):
         self.args = self.args._replace(param=None)
-        self.assertIsNone(countdown.fieldSince(self.args))
+        self.assertIsNone(await countdown.fieldSince(self.args))
         self.assertFalse(self.mock_parse.called)
 
-    def test_invalid_time(self):
-        self.assertIsNone(countdown.fieldSince(self.args))
+    async def test_invalid_time(self):
+        self.assertIsNone(await countdown.fieldSince(self.args))
         self.assertTrue(self.mock_parse.called)
 
-    def test_default(self):
+    async def test_default(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldSince(self.args), 'is coming')
+        self.assertEqual(await countdown.fieldSince(self.args), 'is coming')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_prefix_suffix(self):
+    async def test_default_prefix_suffix(self):
         self.args = self.args._replace(prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldSince(self.args), 'is coming')
+        self.assertEqual(await countdown.fieldSince(self.args), 'is coming')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_default(self):
+    async def test_default_default(self):
         self.args = self.args._replace(default='Kappa')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldSince(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldSince(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_default_prefix_suffix(self):
+    async def test_default_default_prefix_suffix(self):
         self.args = self.args._replace(default='Kappa',
                                        prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1217,71 +1224,71 @@ class TestCustomCountdownFieldSince(TestCustomField):
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldSince(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldSince(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time(self):
+    async def test_time(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_prefix(self):
+    async def test_time_prefix(self):
         self.args = self.args._replace(prefix='[')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          '[' + format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_prefix_blank(self):
+    async def test_time_prefix_blank(self):
         self.args = self.args._replace(prefix='')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_suffix(self):
+    async def test_time_suffix(self):
         self.args = self.args._replace(suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          format(timedelta(days=1)) + ']')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_suffix_blank(self):
+    async def test_time_suffix_blank(self):
         self.args = self.args._replace(suffix='')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_not_cooldown(self):
+    async def test_not_cooldown(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             0)
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1291,11 +1298,11 @@ class TestCustomCountdownFieldSince(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -1)
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          format(timedelta(days=1)))
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
@@ -1303,18 +1310,18 @@ class TestCustomCountdownFieldSince(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -math.inf)
-        self.assertEqual(countdown.fieldSince(self.args),
+        self.assertEqual(await countdown.fieldSince(self.args),
                          format(timedelta(days=1)))
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown(self):
+    async def test_cooldown(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             math.inf)
-        self.assertEqual(countdown.fieldSince(self.args), 'is coming')
+        self.assertEqual(await countdown.fieldSince(self.args), 'is coming')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1323,7 +1330,7 @@ class TestCustomCountdownFieldSince(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             1)
-        self.assertEqual(countdown.fieldSince(self.args), 'is coming')
+        self.assertEqual(await countdown.fieldSince(self.args), 'is coming')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1332,10 +1339,10 @@ class TestCustomCountdownFieldSince(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             math.nan)
-        self.assertEqual(countdown.fieldSince(self.args), 'is coming')
+        self.assertEqual(await countdown.fieldSince(self.args), 'is coming')
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown_prefix_suffix(self):
+    async def test_cooldown_prefix_suffix(self):
         self.args = self.args._replace(prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
@@ -1343,10 +1350,10 @@ class TestCustomCountdownFieldSince(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             1)
-        self.assertEqual(countdown.fieldSince(self.args), 'is coming')
+        self.assertEqual(await countdown.fieldSince(self.args), 'is coming')
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown_default(self):
+    async def test_cooldown_default(self):
         self.args = self.args._replace(default='Kappa')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
@@ -1354,10 +1361,10 @@ class TestCustomCountdownFieldSince(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             1)
-        self.assertEqual(countdown.fieldSince(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldSince(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown_default_prefix_suffix(self):
+    async def test_cooldown_default_prefix_suffix(self):
         self.args = self.args._replace(default='Kappa',
                                        prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1366,7 +1373,7 @@ class TestCustomCountdownFieldSince(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             1)
-        self.assertEqual(countdown.fieldSince(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldSince(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
 
@@ -1383,50 +1390,50 @@ class TestCustomCountdownFieldNext(TestCustomField):
         self.mock_parse.return_value = countdown.NextPastCooldown(None, None,
                                                                   None)
 
-    def test(self):
+    async def test(self):
         self.args = self.args._replace(field='')
-        self.assertIsNone(countdown.fieldNext(self.args))
+        self.assertIsNone(await countdown.fieldNext(self.args))
         self.assertFalse(self.mock_parse.called)
 
-    def test_none_time(self):
+    async def test_none_time(self):
         self.args = self.args._replace(param=None)
-        self.assertIsNone(countdown.fieldNext(self.args))
+        self.assertIsNone(await countdown.fieldNext(self.args))
         self.assertFalse(self.mock_parse.called)
 
-    def test_invalid_time(self):
-        self.assertIsNone(countdown.fieldNext(self.args))
+    async def test_invalid_time(self):
+        self.assertIsNone(await countdown.fieldNext(self.args))
         self.assertTrue(self.mock_parse.called)
 
-    def test_default(self):
+    async def test_default(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldNext(self.args), 'None')
+        self.assertEqual(await countdown.fieldNext(self.args), 'None')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_prefix_suffix(self):
+    async def test_default_prefix_suffix(self):
         self.args = self.args._replace(prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldNext(self.args), 'None')
+        self.assertEqual(await countdown.fieldNext(self.args), 'None')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_default(self):
+    async def test_default_default(self):
         self.args = self.args._replace(default='Kappa')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldNext(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldNext(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_default_prefix_suffix(self):
+    async def test_default_default_prefix_suffix(self):
         self.args = self.args._replace(default='Kappa',
                                        prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1434,85 +1441,85 @@ class TestCustomCountdownFieldNext(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldNext(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldNext(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time(self):
+    async def test_time(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_12_hour(self):
+    async def test_time_12_hour(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), False),
             None,
             None)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 12:00AM UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_future(self):
+    async def test_future(self):
         self.args = self.args._replace(field='future')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_prefix(self):
+    async def test_time_prefix(self):
         self.args = self.args._replace(prefix='[')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '[01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_prefix_blank(self):
+    async def test_time_prefix_blank(self):
         self.args = self.args._replace(prefix='')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_suffix(self):
+    async def test_time_suffix(self):
         self.args = self.args._replace(suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC]')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_suffix_blank(self):
+    async def test_time_suffix_blank(self):
         self.args = self.args._replace(suffix='')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown(self):
+    async def test_cooldown(self):
         self.mock_parse.reset_mock()
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
@@ -1520,7 +1527,7 @@ class TestCustomCountdownFieldNext(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             0)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1530,7 +1537,7 @@ class TestCustomCountdownFieldNext(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             math.inf)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1540,7 +1547,7 @@ class TestCustomCountdownFieldNext(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             1)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1550,7 +1557,7 @@ class TestCustomCountdownFieldNext(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             math.nan)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1560,7 +1567,7 @@ class TestCustomCountdownFieldNext(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -1)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1570,7 +1577,7 @@ class TestCustomCountdownFieldNext(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -math.inf)
-        self.assertEqual(countdown.fieldNext(self.args),
+        self.assertEqual(await countdown.fieldNext(self.args),
                          '01/02/2000 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
@@ -1588,50 +1595,50 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
         self.mock_parse.return_value = countdown.NextPastCooldown(None, None,
                                                                   None)
 
-    def test(self):
+    async def test(self):
         self.args = self.args._replace(field='')
-        self.assertIsNone(countdown.fieldPrevious(self.args))
+        self.assertIsNone(await countdown.fieldPrevious(self.args))
         self.assertFalse(self.mock_parse.called)
 
-    def test_none_time(self):
+    async def test_none_time(self):
         self.args = self.args._replace(param=None)
-        self.assertIsNone(countdown.fieldPrevious(self.args))
+        self.assertIsNone(await countdown.fieldPrevious(self.args))
         self.assertFalse(self.mock_parse.called)
 
-    def test_invalid_time(self):
-        self.assertIsNone(countdown.fieldPrevious(self.args))
+    async def test_invalid_time(self):
+        self.assertIsNone(await countdown.fieldPrevious(self.args))
         self.assertTrue(self.mock_parse.called)
 
-    def test_default(self):
+    async def test_default(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args), 'None')
+        self.assertEqual(await countdown.fieldPrevious(self.args), 'None')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_prefix_suffix(self):
+    async def test_default_prefix_suffix(self):
         self.args = self.args._replace(prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args), 'None')
+        self.assertEqual(await countdown.fieldPrevious(self.args), 'None')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_default(self):
+    async def test_default_default(self):
         self.args = self.args._replace(default='Kappa')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldPrevious(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_default_default_prefix_suffix(self):
+    async def test_default_default_prefix_suffix(self):
         self.args = self.args._replace(default='Kappa',
                                        prefix='[', suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
@@ -1639,96 +1646,96 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
                 datetime(2000, 1, 2, 0, 0, tzinfo=timezones.utc), True),
             None,
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args), 'Kappa')
+        self.assertEqual(await countdown.fieldPrevious(self.args), 'Kappa')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time(self):
+    async def test_time(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_12_hour(self):
+    async def test_time_12_hour(self):
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), False),
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 12:00AM UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_past(self):
+    async def test_past(self):
         self.args = self.args._replace(field='past')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_prev(self):
+    async def test_prev(self):
         self.args = self.args._replace(field='prev')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_prefix(self):
+    async def test_time_prefix(self):
         self.args = self.args._replace(prefix='[')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '[12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_prefix_blank(self):
+    async def test_time_prefix_blank(self):
         self.args = self.args._replace(prefix='')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_suffix(self):
+    async def test_time_suffix(self):
         self.args = self.args._replace(suffix=']')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC]')
         self.assertTrue(self.mock_parse.called)
 
-    def test_time_suffix_blank(self):
+    async def test_time_suffix_blank(self):
         self.args = self.args._replace(suffix='')
         self.mock_parse.return_value = countdown.NextPastCooldown(
             None,
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
 
-    def test_cooldown(self):
+    async def test_cooldown(self):
         self.mock_parse.reset_mock()
         self.mock_parse.return_value = countdown.NextPastCooldown(
             countdown.DateTime(
@@ -1736,7 +1743,7 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             0)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1746,7 +1753,7 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             math.inf)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1756,7 +1763,7 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             1)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1766,7 +1773,7 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             math.nan)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1776,7 +1783,7 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -1)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
         self.mock_parse.reset_mock()
@@ -1786,6 +1793,6 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -math.inf)
-        self.assertEqual(countdown.fieldPrevious(self.args),
+        self.assertEqual(await countdown.fieldPrevious(self.args),
                          '12/31/1999 00:00 UTC')
         self.assertTrue(self.mock_parse.called)
