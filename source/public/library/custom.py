@@ -62,7 +62,7 @@ def get_command(database: DatabaseBase,
     return None
 
 
-def create_messages(command: CustomCommand,
+async def create_messages(command: CustomCommand,
                     args: ChatCommandArgs) -> List[str]:
     textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
     messageParts: List[str] = []
@@ -77,7 +77,7 @@ def create_messages(command: CustomCommand,
                         parts.suffix, parts.default, args.message,
                         args.chat.channel, args.nick, args.permissions,
                         args.timestamp)
-                    string: Optional[str] = convert_field(fieldArgument)
+                    string: Optional[str] = await convert_field(fieldArgument)
                     if string is not None:
                         string = format(string, parts.format, textFormat)
                     else:
@@ -94,7 +94,7 @@ def create_messages(command: CustomCommand,
         messages)
     process: CustomCommandProcess
     for process in lists.custom.postProcess:
-        process(processArgument)
+        await process(processArgument)
     return messages
 
 
@@ -387,10 +387,10 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
     return parsed
 
 
-def convert_field(args: CustomFieldArgs) -> Optional[str]:
+async def convert_field(args: CustomFieldArgs) -> Optional[str]:
     convert: CustomCommandField
     for convert in lists.custom.fields:
-        result: Optional[str] = convert(args)
+        result: Optional[str] = await convert(args)
         if result is not None:
             return result
     return None

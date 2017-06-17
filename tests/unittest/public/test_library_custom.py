@@ -1,8 +1,14 @@
 import unittest
-from bot.data import Channel
-from bot.twitchmessage import IrcMessageTags
+
+import asynctest
+
 from collections import defaultdict
 from datetime import datetime
+
+from asynctest.mock import CoroutineMock, MagicMock, Mock, call, patch
+
+from bot.data import Channel
+from bot.twitchmessage import IrcMessageTags
 from source.data import ChatCommandArgs, CommandActionTokens
 from source.data import CustomCommand, CustomFieldArgs, CustomFieldParts
 from source.data import CustomProcessArgs
@@ -11,7 +17,6 @@ from source.data.permissions import ChatPermissionSet
 from source.database import DatabaseBase
 from source.public.library import custom
 from tests.unittest.mock_class import TypeMatch
-from unittest.mock import MagicMock, Mock, call, patch
 
 
 class TestLibraryCustomGetCommand(unittest.TestCase):
@@ -220,7 +225,7 @@ class TestLibraryCustomGetCommand(unittest.TestCase):
             'botgotsthis', '!kappa')
 
 
-class TestLibraryCustomCreateMessages(unittest.TestCase):
+class TestLibraryCustomCreateMessages(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.tags = IrcMessageTags()
@@ -240,8 +245,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_split = patcher.start()
 
-        patcher = patch('source.public.library.custom.convert_field',
-                        autospec=True)
+        patcher = patch('source.public.library.custom.convert_field')
         self.addCleanup(patcher.stop)
         self.mock_convert = patcher.start()
         self.mock_convert.side_effect = lambda args: args.default
@@ -256,41 +260,42 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
         self.mock_list = patcher.start()
         self.mock_list.postProcess = []
 
-    def test_blank(self):
+    async def test_blank(self):
         self.mock_split.return_value = []
-        self.assertEqual(custom.create_messages(self.command, self.args), [''])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         [''])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.assertFalse(self.mock_convert.called)
         self.assertFalse(self.mock_format.called)
 
-    def test_plain(self):
+    async def test_plain(self):
         self.mock_split.return_value = [
             CustomFieldParts('Kappa', None, None, None, None, None, None, None)
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args), ['Kappa'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.assertFalse(self.mock_convert.called)
         self.assertFalse(self.mock_format.called)
 
-    def test_field(self):
+    async def test_field(self):
         self.mock_split.return_value = [
             CustomFieldParts('', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default', 'original')
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args), ['default'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['default'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
-    def test_plain_plain(self):
+    async def test_plain_plain(self):
         """
         In practice this should not be a scenario but just support it
         anyways
@@ -301,38 +306,36 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
             CustomFieldParts(' KappaPride', None, None, None, None, None, None,
                              None),
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['KappaRoss KappaPride'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['KappaRoss KappaPride'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.assertFalse(self.mock_convert.called)
         self.assertFalse(self.mock_format.called)
 
-    def test_plain_field(self):
+    async def test_plain_field(self):
         self.mock_split.return_value = [
             CustomFieldParts('Kappa ', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default', 'original')
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args), ['Kappa default'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa default'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
-    def test_field_field(self):
+    async def test_field_field(self):
         self.mock_split.return_value = [
             CustomFieldParts('', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default1', 'original'),
             CustomFieldParts('', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default2', 'original'),
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['default1default2'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['default1default2'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
@@ -342,47 +345,45 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
                          [call('default1', 'format', False),
                           call('default2', 'format', False)])
 
-    def test_field_plain(self):
+    async def test_field_plain(self):
         self.mock_split.return_value = [
             CustomFieldParts('', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default', 'original'),
             CustomFieldParts(' Kappa', None, None, None, None, None, None,
                              None)
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args), ['default Kappa'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['default Kappa'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
-    def test_plain_field_plain(self):
+    async def test_plain_field_plain(self):
         self.mock_split.return_value = [
             CustomFieldParts('Kappa ', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default', 'original'),
             CustomFieldParts(' Kappa', None, None, None, None, None, None,
                              None)
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['Kappa default Kappa'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa default Kappa'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
-    def test_plain_field_field(self):
+    async def test_plain_field_field(self):
         self.mock_split.return_value = [
             CustomFieldParts('Kappa ', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default1', 'original'),
             CustomFieldParts('', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default2', 'original'),
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['Kappa default1default2'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa default1default2'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
@@ -392,16 +393,15 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
                          [call('default1', 'format', False),
                           call('default2', 'format', False)])
 
-    def test_field_plain_field(self):
+    async def test_field_plain_field(self):
         self.mock_split.return_value = [
             CustomFieldParts('', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default1', 'original'),
             CustomFieldParts(' Kappa ', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default2', 'original'),
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['default1 Kappa default2'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['default1 Kappa default2'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
@@ -411,7 +411,7 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
                          [call('default1', 'format', False),
                           call('default2', 'format', False)])
 
-    def test_field_field_plain(self):
+    async def test_field_field_plain(self):
         self.mock_split.return_value = [
             CustomFieldParts('', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default1', 'original'),
@@ -420,9 +420,8 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
             CustomFieldParts(' Kappa', None, None, None, None, None, None,
                              None)
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['default1default2 Kappa'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['default1default2 Kappa'])
         self.database.hasFeature.assert_called_once_with(
             'botgotsthis', 'textconvert')
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
@@ -432,61 +431,56 @@ class TestLibraryCustomCreateMessages(unittest.TestCase):
                          [call('default1', 'format', False),
                           call('default2', 'format', False)])
 
-    def test_split_except(self):
+    async def test_split_except(self):
         self.mock_split.side_effect = ValueError
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['Kappa KappaRoss KappaPride'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa KappaRoss KappaPride'])
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.assertFalse(self.mock_convert.called)
         self.assertFalse(self.mock_format.called)
 
-    def test_convert_except(self):
+    async def test_convert_except(self):
         self.mock_convert.side_effect = Exception
         self.mock_split.return_value = [
             CustomFieldParts('Kappa ', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default', 'original')
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['Kappa original'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa original'])
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.assertFalse(self.mock_format.called)
 
-    def test_format_except(self):
+    async def test_format_except(self):
         self.mock_format.side_effect = Exception
         self.mock_split.return_value = [
             CustomFieldParts('Kappa ', 'field', 'format', 'prefix', 'suffix',
                              'param', 'default', 'original')
             ]
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['Kappa original'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa original'])
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.mock_convert.assert_called_once_with(TypeMatch(CustomFieldArgs))
         self.mock_format.assert_called_once_with('default', 'format', False)
 
-    def test_post_process(self):
-        def process(args):
+    async def test_post_process(self):
+        async def process(args):
             args.messages[0] = 'Kappa'
-        mock_process = Mock(spec=process, side_effect=process)
+        mock_process = CoroutineMock(spec=process, side_effect=process)
         self.mock_list.postProcess = [mock_process]
         self.mock_split.return_value = []
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['Kappa'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa'])
         mock_process.assert_called_once_with(TypeMatch(CustomProcessArgs))
 
-    def test_split_except_post_process(self):
-        def process(args):
+    async def test_split_except_post_process(self):
+        async def process(args):
             args.messages[0] = 'Kappa'
-        mock_process = Mock(spec=process, side_effect=process)
+        mock_process = CoroutineMock(spec=process, side_effect=process)
         self.mock_list.postProcess = [mock_process]
         self.mock_split.side_effect = ValueError
-        self.assertEqual(
-            custom.create_messages(self.command, self.args),
-            ['Kappa KappaRoss KappaPride'])
+        self.assertEqual(await custom.create_messages(self.command, self.args),
+                         ['Kappa KappaRoss KappaPride'])
         self.mock_split.assert_called_once_with('Kappa KappaRoss KappaPride')
         self.assertFalse(self.mock_convert.called)
         self.assertFalse(self.mock_format.called)
@@ -959,7 +953,7 @@ class TestLibraryCustomSplitMessage(unittest.TestCase):
         self.assertRaises(ValueError, custom.split_message, '{!}}')
 
 
-class TestLibraryCustomConvertField(unittest.TestCase):
+class TestLibraryCustomConvertField(asynctest.TestCase):
     def setUp(self):
         self.args = CustomFieldArgs('', None, None, None, None, Message(''),
                                     Mock(spec=Channel), 'botgotsthis',
@@ -971,23 +965,23 @@ class TestLibraryCustomConvertField(unittest.TestCase):
         self.mock_list = patcher.start()
         self.mock_list.fields = []
 
-    def test_no_fields(self):
-        self.assertIsNone(custom.convert_field(self.args))
+    async def test_no_fields(self):
+        self.assertIsNone(await custom.convert_field(self.args))
 
-    def test_none(self):
-        def convert(args):
+    async def test_none(self):
+        async def convert(args):
             pass
-        mock_convert = Mock(spec=convert, return_value=None)
+        mock_convert = CoroutineMock(spec=convert, return_value=None)
         self.mock_list.fields = [mock_convert]
-        self.assertIsNone(custom.convert_field(self.args))
+        self.assertIsNone(await custom.convert_field(self.args))
         self.assertEqual(mock_convert.call_count, 1)
 
-    def test(self):
-        def convert(args):
+    async def test(self):
+        async def convert(args):
             pass
-        mock_convert = Mock(spec=convert, return_value='Kappa')
+        mock_convert = CoroutineMock(spec=convert, return_value='Kappa')
         self.mock_list.fields = [mock_convert]
-        self.assertEqual(custom.convert_field(self.args), 'Kappa')
+        self.assertEqual(await custom.convert_field(self.args), 'Kappa')
         self.assertEqual(mock_convert.call_count, 1)
 
 
