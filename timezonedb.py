@@ -14,7 +14,7 @@ response = urllib.request.urlopen('http://timezonedb.com/date.txt')
 tzdate = datetime.date(*[int(i) for i in response.read().decode().split('-')])
 
 with sqlite3.connect(
-    ini['TIMEZONEDB']['timezonedb'], detect_types=True) as connection, \
+    ini['DATABASE']['timezonedb'], detect_types=True) as connection, \
         closing(connection.cursor()) as cursor:
     try:
         cursor.execute('SELECT updated FROM updated')
