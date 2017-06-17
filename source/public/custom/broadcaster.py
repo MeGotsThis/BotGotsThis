@@ -2,7 +2,7 @@
 from ...data import CustomFieldArgs
 
 
-def fieldBroadcaster(args: CustomFieldArgs) -> Optional[str]:
+async def fieldBroadcaster(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() in ['broadcaster', 'streamer']:
         if args.channel:
             return (args.prefix or '') + args.channel + (args.suffix or '')

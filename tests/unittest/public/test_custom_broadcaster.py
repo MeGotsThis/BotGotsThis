@@ -1,5 +1,7 @@
-from source.public.custom import broadcaster
 from tests.unittest.base_custom import TestCustomField
+
+# Needs to be imported last
+from source.public.custom import broadcaster
 
 
 class TestCustomBroadcaster(TestCustomField):
@@ -7,49 +9,49 @@ class TestCustomBroadcaster(TestCustomField):
         super().setUp()
         self.args = self.args._replace(field='broadcaster')
 
-    def test(self):
+    async def test(self):
         self.args = self.args._replace(field='')
-        self.assertIsNone(broadcaster.fieldBroadcaster(self.args))
+        self.assertIsNone(await broadcaster.fieldBroadcaster(self.args))
 
-    def test_broadcaster(self):
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args),
+    async def test_broadcaster(self):
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args),
                          'botgotsthis')
 
-    def test_streamer(self):
+    async def test_streamer(self):
         self.args = self.args._replace(field='streamer')
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args),
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args),
                          'botgotsthis')
 
-    def test_broadcaster_caps(self):
+    async def test_broadcaster_caps(self):
         self.args = self.args._replace(field='BROADCASTER')
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args),
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args),
                          'botgotsthis')
 
-    def test_streamer_caps(self):
+    async def test_streamer_caps(self):
         self.args = self.args._replace(field='STREAMER')
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args),
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args),
                          'botgotsthis')
 
-    def test_default(self):
+    async def test_default(self):
         self.args = self.args._replace(channel='', prefix='[', suffix=']')
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args), '')
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args), '')
 
-    def test_prefix(self):
+    async def test_prefix(self):
         self.args = self.args._replace(prefix='[')
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args),
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args),
                          '[botgotsthis')
 
-    def test_prefix_blank(self):
+    async def test_prefix_blank(self):
         self.args = self.args._replace(prefix='')
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args),
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args),
                          'botgotsthis')
 
-    def test_suffix(self):
+    async def test_suffix(self):
         self.args = self.args._replace(suffix=']')
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args),
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args),
                          'botgotsthis]')
 
-    def test_suffix_blank(self):
+    async def test_suffix_blank(self):
         self.args = self.args._replace(suffix='')
-        self.assertEqual(broadcaster.fieldBroadcaster(self.args),
+        self.assertEqual(await broadcaster.fieldBroadcaster(self.args),
                          'botgotsthis')
