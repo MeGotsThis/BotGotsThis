@@ -9,7 +9,7 @@ from ...database import AutoJoinChannel, DatabaseBase
 from ...data import ManageBotArgs, Send
 
 
-def manageAutoJoin(args: ManageBotArgs) -> bool:
+async def manageAutoJoin(args: ManageBotArgs) -> bool:
     if len(args.message) < 3:
         return False
     if args.message.lower[2] in ['reloadserver']:
@@ -24,7 +24,7 @@ def manageAutoJoin(args: ManageBotArgs) -> bool:
         return True
 
     if args.message.lower[2] in ['add', 'insert', 'join']:
-        return broadcaster.auto_join_add(
+        return await broadcaster.auto_join_add(
             args.database, args.message.lower[3], args.send)
     if args.message.lower[2] in ['del', 'delete', 'rem', 'remove' ,'part']:
         return broadcaster.auto_join_delete(
