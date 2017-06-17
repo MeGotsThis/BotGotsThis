@@ -1,7 +1,14 @@
+import configparser
+import os.path
+
+import aioodbc
+import aiofiles
+
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
+from enum import Enum, auto
 from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
-from typing import Sequence, Union
+from typing import Sequence, Type, Union
 
 class AutoJoinChannel(NamedTuple):
     broadcaster: str
@@ -340,3 +347,70 @@ class DatabaseBase(metaclass=ABCMeta):
                          broadcaster: str,
                          name: str) -> bool:
         return False
+
+
+class Schema(Enum):
+    Main = 'file'
+    OAuth = 'oauth'
+    Timeout = 'timeoutlog'
+    TimeZone = 'timezonedb'
+
+
+class Database:
+    def __init__(self,
+                 connectionString: str,
+                 **kwargs) -> None:
+        self._connectionString: str = connectionString
+        self._connection: Optional[aioodbc.Connection] = None
+
+    @property
+    def connection(self) -> Any:
+        return self._connection
+
+    async def connect(self) -> None:
+        self._connection = await aioodbc.connect(dsn=self._connectionString)
+
+    async def close(self) -> None:
+        if self.connection is not None:
+            await self.connection.close()
+
+    async def __aenter__(self) -> 'Database':
+        self.connect()
+        return self
+
+    async def __aexit__(self, type, value, traceback) -> None:
+        await self.close()
+
+    async def cursor(self) -> None:
+        return await self.connection.cursor()
+
+
+class DatabaseMain(Database):
+    pass
+
+
+class DatabaseOAuth(Database):
+    pass
+
+
+class DatabaseTimeout(Database):
+    pass
+
+
+class DatabaseTimeZone(Database):
+    pass
+
+
+async def get_database(schema: Schema=Schema.Main) -> Database:
+    databases: Dict[Schema, Type[Database]] = {
+        Schema.Main: DatabaseMain,
+        Schema.OAuth: DatabaseOAuth,
+        Schema.Timeout: DatabaseTimeout,
+        Schema.TimeZone: DatabaseTimeZone,
+    }
+    if os.path.isfile('config.ini'):
+        ini: configparser.ConfigParser = configparser.ConfigParser()
+        async with aiofiles.open('config.ini', 'r', encoding='utf-8') as file:
+            ini.read_string(await file.readall())
+        return databases[schema](ini['DATABASE'][schema.value])
+    raise ValueError()
