@@ -1,17 +1,20 @@
-import unittest
+import asynctest
+
 from datetime import datetime
+
+from asynctest.mock import MagicMock, Mock
+
 from source.data import ManageBotArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
 from source.database import DatabaseBase
-from unittest.mock import MagicMock, Mock
 
 
 def send(messages):
     pass
 
 
-class TestManageBot(unittest.TestCase):
+class TestManageBot(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.send = Mock(spec=send)

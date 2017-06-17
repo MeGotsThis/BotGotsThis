@@ -1,11 +1,16 @@
 import unittest
-from unittest.mock import Mock, patch
+
+import lists.manage
+
+from asynctest.mock import Mock, patch
 
 from source.data import Message
 from source.database import DatabaseBase
-from source.public.manage import manager
 from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import StrContains
+
+# Needs to be imported last
+from source.public.manage import manager
 
 
 class TestManageBotManager(TestManageBot):
@@ -14,95 +19,83 @@ class TestManageBotManager(TestManageBot):
         self.permissionSet['owner'] = True
         self.database.isChannelBannedReason.return_value = None
 
-    def test_false(self):
-        self.assertIs(manager.manageManager(self.args), False)
+    async def test_false(self):
+        self.assertIs(await manager.manageManager(self.args), False)
         self.permissionSet['owner'] = False
-        message = Message('!managebot')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)),
-            False)
-        message = Message('!managebot manager')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)),
-            False)
+        args = self.args._replace(message=Message('!managebot'))
+        self.assertIs(await manager.manageManager(args), False)
+        args = self.args._replace(message=Message('!managebot manager'))
+        self.assertIs(await manager.manageManager(args), False)
         message = Message('!managebot manager no_action')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)),
-            False)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), False)
         message = Message('!managebot manager no_action some_user')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)),
-            False)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), False)
         self.permissionSet['owner'] = True
-        message = Message('!managebot')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)),
-            False)
-        message = Message('!managebot manager')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)),
-            False)
+        args = self.args._replace(message=Message('!managebot manager'))
+        self.assertIs(await manager.manageManager(args), False)
+        args = self.args._replace(message=Message('!managebot manager'))
+        self.assertIs(await manager.manageManager(args), False)
         message = Message('!managebot manager no_action')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)),
-            False)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), False)
         message = Message('!managebot manager no_action some_user')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)),
-            False)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), False)
         self.assertFalse(self.send.called)
 
     @patch('source.public.manage.manager.insert_manager')
-    def test_add(self, mock_add):
+    async def test_add(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot manager add botgotsthis')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), True)
         mock_add.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.manager.insert_manager')
-    def test_insert(self, mock_add):
+    async def test_insert(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot manager insert botgotsthis')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), True)
         mock_add.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.manager.delete_manager')
-    def test_delete(self, mock_delete):
+    async def test_delete(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot manager delete botgotsthis')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), True)
         mock_delete.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.manager.delete_manager')
-    def test_del(self, mock_delete):
+    async def test_del(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot manager del botgotsthis')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), True)
         mock_delete.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.manager.delete_manager')
-    def test_remove(self, mock_delete):
+    async def test_remove(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot manager remove botgotsthis')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), True)
         mock_delete.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.manager.delete_manager')
-    def test_rem(self, mock_delete):
+    async def test_rem(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot manager rem botgotsthis')
-        self.assertIs(
-            manager.manageManager(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await manager.manageManager(args), True)
         mock_delete.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
