@@ -1,6 +1,5 @@
 import bot.config
 import bot.globals
-import socket
 from bot.coroutine import connection as connectionM
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
@@ -9,8 +8,6 @@ from typing import Optional, Set, Tuple, TypeVar, Union
 from source.api import bttv, ffz
 from .error import ConnectionReset, LoginUnsuccessful
 from .. import utils
-
-pysocket = socket.socket
 
 
 class ChatMessage(NamedTuple):
