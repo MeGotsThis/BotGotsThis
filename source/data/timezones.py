@@ -206,7 +206,7 @@ if os.path.isfile('config.ini'):
     _ini.read('config.ini')
     _cursor: sqlite3.Cursor
     with sqlite3.connect(
-        _ini['TIMEZONEDB']['timezonedb'], detect_types=True) as _connection, \
+        _ini['DATABASE']['timezonedb'], detect_types=True) as _connection, \
             closing(_connection.cursor()) as _cursor:
         _cursor.execute('''
 SELECT abbreviation, gmt_offset FROM timezone
