@@ -2,7 +2,7 @@
 from ...data import CustomFieldArgs
 
 
-def fieldQuery(args: CustomFieldArgs) -> Optional[str]:
+async def fieldQuery(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'query':
         if len(args.message) > 1:
             prefix: str = args.prefix or ''
