@@ -1,11 +1,16 @@
 import unittest
-from unittest.mock import Mock, patch
+
+import lists.manage
+
+from asynctest.mock import Mock, patch
 
 from source.data import Message
 from source.database import DatabaseBase
-from source.public.manage import banned
 from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import StrContains
+
+# Needs to be imported last
+from source.public.manage import banned
 
 
 class TestManageBotBanned(TestManageBot):
@@ -13,93 +18,87 @@ class TestManageBotBanned(TestManageBot):
         super().setUp()
         self.database.isChannelBannedReason.return_value = None
 
-    def test_false(self):
-        self.assertIs(banned.manageBanned(self.args), False)
-        message = Message('!managebot')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)),
-            False)
-        message = Message('!managebot banned')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)),
-            False)
+    async def test_false(self):
+        self.assertIs(await banned.manageBanned(self.args), False)
+        args = self.args._replace(message=Message('!managebot'))
+        self.assertIs(await banned.manageBanned(args), False)
+        args = self.args._replace(message=Message('!managebot banned'))
+        self.assertIs(await banned.manageBanned(args), False)
         message = Message('!managebot banned no_action')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)),
-            False)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), False)
         self.assertFalse(self.database.isChannelBannedReason.called)
         message = Message('!managebot banned no_action some_channel no_arg')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)),
-            False)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), False)
         self.assertFalse(self.send.called)
 
-    def test_need_reason(self):
+    async def test_need_reason(self):
         message = Message('!managebot banned add botgotsthis')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), True)
         self.send.assert_called_once_with(
             StrContains(self.args.nick, 'Reason', 'specif'))
 
     @patch('source.public.manage.banned.list_banned_channels')
-    def test_list(self, mock_list):
+    async def test_list(self, mock_list):
         mock_list.return_value = True
         message = Message('!managebot banned list')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), True)
         mock_list.assert_called_once_with(self.database, self.send)
 
     @patch('source.public.manage.banned.insert_banned_channel')
-    def test_add(self, mock_add):
+    async def test_add(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot banned add botgotsthis Kappa')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), True)
         mock_add.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.banned.insert_banned_channel')
-    def test_insert(self, mock_add):
+    async def test_insert(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot banned insert botgotsthis Kappa')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), True)
         mock_add.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.banned.delete_banned_channel')
-    def test_delete(self, mock_delete):
+    async def test_delete(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot banned delete botgotsthis Kappa')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), True)
         mock_delete.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.banned.delete_banned_channel')
-    def test_del(self, mock_delete):
+    async def test_del(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot banned del botgotsthis Kappa')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), True)
         mock_delete.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.banned.delete_banned_channel')
-    def test_remove(self, mock_delete):
+    async def test_remove(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot banned remove botgotsthis Kappa')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), True)
         mock_delete.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
     @patch('source.public.manage.banned.delete_banned_channel')
-    def test_rem(self, mock_delete):
+    async def test_rem(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot banned rem botgotsthis Kappa')
-        self.assertIs(
-            banned.manageBanned(self.args._replace(message=message)), True)
+        args = self.args._replace(message=message)
+        self.assertIs(await banned.manageBanned(args), True)
         mock_delete.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
