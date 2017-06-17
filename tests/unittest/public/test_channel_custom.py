@@ -47,8 +47,7 @@ class TestChannelCustomCustomCommand(TestChannel):
         self.mock_command = patcher.start()
         self.mock_command.return_value = self.command
         
-        patcher = patch('source.public.library.custom.create_messages',
-                        autospec=True)
+        patcher = patch('source.public.library.custom.create_messages')
         self.addCleanup(patcher.stop)
         self.mock_messages = patcher.start()
         self.mock_messages.return_value = []

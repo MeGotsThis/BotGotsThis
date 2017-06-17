@@ -19,5 +19,5 @@ async def manage_bot(database: DatabaseBase,
     method: str = message.lower[1]
     if (method in lists.manage.methods
             and lists.manage.methods[method] is not None):
-        return lists.manage.methods[method](argument)
+        return await lists.manage.methods[method](argument)
     return False
