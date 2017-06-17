@@ -1,6 +1,5 @@
-﻿import lists.whisper
-import threading
-import time
+﻿import asyncio
+import lists.whisper
 from bot import utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
@@ -22,18 +21,14 @@ def parse(tags: IrcMessageTagsReadOnly,
     message: Message = Message(rawMessage)
     if len(message) == 0:
         return
-    
-    name: str = '{nick}-{command}-{time}'.format(
-        nick=nick, command=message.command, time=time.time())
-    params: tuple
-    params = tags, nick, message, timestamp
-    threading.Thread(target=whisperCommand, args=params, name=name).start()
-    
 
-def whisperCommand(tags: IrcMessageTagsReadOnly,
-                   nick: str,
-                   message: Message,
-                   timestamp: datetime) -> None:
+    asyncio.ensure_future(whisperCommand(tags, nick, message, timestamp))
+
+
+async def whisperCommand(tags: IrcMessageTagsReadOnly,
+                         nick: str,
+                         message: Message,
+                         timestamp: datetime) -> None:
     manager: bool
     permissions: WhisperPermissionSet
     arguments: data.WhisperCommandArgs
@@ -46,7 +41,7 @@ def whisperCommand(tags: IrcMessageTagsReadOnly,
             arguments = data.WhisperCommandArgs(database, nick, message,
                                                 permissions, timestamp)
             for command in commandsToProcess(message.command):
-                if command(arguments):
+                if await command(arguments):
                     return
     except:
         extra = 'From: {nick}\nMessage: {message}'.format(

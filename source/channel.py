@@ -1,6 +1,5 @@
 ﻿import asyncio
 import lists.channel
-import time
 from bot import data as botData, utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
@@ -25,7 +24,6 @@ def parse(chat: 'botData.Channel',
         return
     
     asyncio.ensure_future(chatCommand(chat, tags, nick, message, timestamp))
-    
 
 async def chatCommand(chat: 'botData.Channel',
                       tags: Optional[IrcMessageTagsReadOnly],
