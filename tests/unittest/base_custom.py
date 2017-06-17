@@ -1,4 +1,7 @@
-import unittest
+import asynctest
+
+from asynctest.mock import MagicMock, Mock
+
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from datetime import datetime
@@ -6,10 +9,9 @@ from source.data import CustomFieldArgs, CustomProcessArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
 from source.database import DatabaseBase
-from unittest.mock import MagicMock, Mock
 
 
-class TestCustomField(unittest.TestCase):
+class TestCustomField(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.permissions = MagicMock(spec=ChatPermissionSet)
@@ -18,7 +20,7 @@ class TestCustomField(unittest.TestCase):
             'botgotsthis', 'botgotsthis', self.permissions, self.now)
 
 
-class TestCustomProcess(unittest.TestCase):
+class TestCustomProcess(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.tags = IrcMessageTags()

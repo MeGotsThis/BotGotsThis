@@ -61,9 +61,9 @@ ChatCommand = Callable[[ChatCommandArgs], Awaitable[bool]]
 
 WhisperCommand = Callable[[WhisperCommandArgs], Awaitable[bool]]
 
-CustomCommandField = Callable[[CustomFieldArgs], Optional[str]]
+CustomCommandField = Callable[[CustomFieldArgs], Awaitable[Optional[str]]]
 
-CustomCommandProcess = Callable[[CustomProcessArgs], None]
+CustomCommandProcess = Callable[[CustomProcessArgs], Awaitable[None]]
 
 ManageBotCommand = Callable[[ManageBotArgs], Awaitable[bool]]
 
