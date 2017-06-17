@@ -2,7 +2,7 @@ from typing import Dict, List, Optional, Union
 from ...data import CustomProcessArgs
 
 
-def propertyMultipleLines(args: CustomProcessArgs) -> None:
+async def propertyMultipleLines(args: CustomProcessArgs) -> None:
     if not args.database.getCustomCommandProperty(
             args.broadcaster, args.level, args.command, 'multiple'):
         return
