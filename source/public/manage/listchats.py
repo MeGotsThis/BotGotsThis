@@ -4,7 +4,7 @@ from ..library import message
 from ...data import ManageBotArgs
 
 
-def manageListChats(args: ManageBotArgs) -> bool:
+async def manageListChats(args: ManageBotArgs) -> bool:
     if bot.globals.channels:
         channels: List[str] = sorted(bot.globals.channels.keys())
         args.send(message.messagesFromItems(channels, 'Twitch Chats: '))
