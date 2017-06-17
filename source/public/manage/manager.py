@@ -7,7 +7,7 @@ from ...database import DatabaseBase
 
 
 @permission('owner')
-def manageManager(args: ManageBotArgs) -> bool:
+async def manageManager(args: ManageBotArgs) -> bool:
     if len(args.message) < 4:
         return False
     user: str = args.message.lower[3]
