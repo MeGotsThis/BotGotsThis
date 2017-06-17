@@ -1,7 +1,5 @@
 import unittest
 
-import lists.manage
-
 from asynctest.mock import Mock, patch
 
 from source.data import Message

@@ -1,5 +1,3 @@
-import lists.manage
-
 from asynctest.mock import patch
 
 from tests.unittest.base_managebot import TestManageBot
