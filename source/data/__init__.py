@@ -1,13 +1,14 @@
 from .message import Message
 from .permissions import ChatPermissionSet, WhisperPermissionSet
-from ..database import DatabaseBase
+from ..database import DatabaseMain
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
 from typing import Any, Awaitable, Callable, Iterable, List, NamedTuple
 from typing import Optional, Union
 
+
 class ChatCommandArgs(NamedTuple):
-    database: DatabaseBase
+    database: DatabaseMain
     chat: Any
     tags: IrcMessageTagsReadOnly
     nick: str
@@ -17,7 +18,7 @@ class ChatCommandArgs(NamedTuple):
 
 
 class WhisperCommandArgs(NamedTuple):
-    database: DatabaseBase
+    database: DatabaseMain
     nick: str
     message: Message
     permissions: WhisperPermissionSet
@@ -38,7 +39,7 @@ class CustomFieldArgs(NamedTuple):
 
 
 class CustomProcessArgs(NamedTuple):
-    database: DatabaseBase
+    database: DatabaseMain
     chat: Any
     tags: IrcMessageTagsReadOnly
     nick: str
@@ -50,7 +51,7 @@ class CustomProcessArgs(NamedTuple):
 
 
 class ManageBotArgs(NamedTuple):
-    database: DatabaseBase
+    database: DatabaseMain
     permissions: Union[WhisperPermissionSet, ChatPermissionSet]
     send: Callable[[Union[str,Iterable[str]]], None]
     nick: str
