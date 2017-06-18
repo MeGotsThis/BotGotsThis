@@ -2,6 +2,7 @@ import configparser
 import os.path
 
 import aioodbc
+import aioodbc.cursor
 import aiofiles
 
 from abc import ABCMeta, abstractmethod
@@ -9,6 +10,8 @@ from datetime import datetime
 from enum import Enum, auto
 from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
 from typing import Sequence, Type, Union
+from typing import AsyncIterator
+
 
 class AutoJoinChannel(NamedTuple):
     broadcaster: str
@@ -375,18 +378,27 @@ class Database:
             await self.connection.close()
 
     async def __aenter__(self) -> 'Database':
-        self.connect()
+        await self.connect()
         return self
 
     async def __aexit__(self, type, value, traceback) -> None:
         await self.close()
 
-    async def cursor(self) -> None:
+    async def cursor(self) -> aioodbc.cursor.Cursor:
         return await self.connection.cursor()
 
 
 class DatabaseMain(Database):
-    pass
+    async def getAutoJoinsChats(self) -> AsyncIterator[AutoJoinChannel]:
+        query: str = '''
+SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            r: tuple
+            await cursor.execute(query)
+            async for r in cursor:
+                yield AutoJoinChannel(*r)
 
 
 class DatabaseOAuth(Database):
@@ -411,6 +423,6 @@ async def get_database(schema: Schema=Schema.Main) -> Database:
     if os.path.isfile('config.ini'):
         ini: configparser.ConfigParser = configparser.ConfigParser()
         async with aiofiles.open('config.ini', 'r', encoding='utf-8') as file:
-            ini.read_string(await file.readall())
+            ini.read_string(await file.read(None))
         return databases[schema](ini['DATABASE'][schema.value])
     raise ValueError()

@@ -10,7 +10,7 @@ from asynctest.mock import Mock, patch
 from source.data import Message
 from source.database import AutoJoinChannel, DatabaseBase
 from tests.unittest.base_managebot import TestManageBot, send
-from tests.unittest.mock_class import StrContains
+from tests.unittest.mock_class import AsyncIterator, StrContains
 
 # Needs to be imported last
 from source.public.manage import autojoin
@@ -223,9 +223,9 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
     async def test_same_server(self):
         now = datetime(2000, 1, 1)
         self.mock_now.return_value = now
-        self.database.getAutoJoinsChats.return_value = [
+        self.database.getAutoJoinsChats.return_value = AsyncIterator([
             AutoJoinChannel('botgotsthis', 0, ''),
-            ]
+            ])
         self.mock_server.return_value = ''
         message = Message('!managebot reload')
         self.assertIs(await autojoin.reload_server(self.database, self.send),
@@ -239,9 +239,9 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
     async def test_server_error(self):
         now = datetime(2000, 1, 1)
         self.mock_now.return_value = now
-        self.database.getAutoJoinsChats.return_value = [
+        self.database.getAutoJoinsChats.return_value = AsyncIterator([
             AutoJoinChannel('botgotsthis', 0, ''),
-            ]
+            ])
         self.mock_server.return_value = None
         message = Message('!managebot reload')
         self.assertIs(await autojoin.reload_server(self.database, self.send),
@@ -255,9 +255,9 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
     async def test_server_different(self):
         now = datetime(2000, 1, 1)
         self.mock_now.return_value = now
-        self.database.getAutoJoinsChats.return_value = [
+        self.database.getAutoJoinsChats.return_value = AsyncIterator([
             AutoJoinChannel('botgotsthis', 0, ''),
-            ]
+            ])
         self.mock_server.return_value = 'twitch'
         message = Message('!managebot reload')
         self.assertIs(await autojoin.reload_server(self.database, self.send),

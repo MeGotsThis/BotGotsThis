@@ -8,13 +8,27 @@ import source.private.autoload as privateAuto
 import source.public.autoload as publicAuto
 from itertools import chain
 from importlib.abc import PathEntryFinder
+from source import database
 from source.database import AutoJoinChannel
-from source.database.factory import getDatabase
-from typing import Generator, List, Iterable, Optional, Tuple
+from typing import Generator, List, Iterable, Optional, Tuple, cast
 from . import data, utils
 from .coroutine import background, connection, join, logging
 
 ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
+
+
+async def initializer() -> None:
+    utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
+    bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
+    if bot.config.owner:
+        utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
+    db: database.Database
+    async with await database.get_database() as db:
+        databaseObj: database.DatabaseMain = cast(database.DatabaseMain, db)
+        autojoin: AutoJoinChannel
+        async for autoJoin in databaseObj.getAutoJoinsChats():
+            utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
+                              autoJoin.cluster)
 
 
 def main(argv: Optional[List[str]]=None) -> int:
@@ -37,17 +51,8 @@ def main(argv: Optional[List[str]]=None) -> int:
         importlib.import_module(modname)
 
     try:
-        utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
-        bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
-        if bot.config.owner:
-            utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
-        with getDatabase() as db:
-            autojoin: AutoJoinChannel
-            for autoJoin in db.getAutoJoinsChats():
-                utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
-                                  autoJoin.cluster)
-
         loop = asyncio.get_event_loop()
+        loop.run_until_complete(initializer())
         coro = asyncio.gather(background.background_tasks(),
                               logging.record_logs(),
                               join.join_manager(),
