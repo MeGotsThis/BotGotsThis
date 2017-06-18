@@ -1,13 +1,16 @@
 ﻿import asyncio
+
 import lists.whisper
+
+from datetime import datetime
+from typing import Iterator, cast
+
 from bot import utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from datetime import datetime
-from typing import Iterator
-from . import data
 from .data.message import Message
 from .data.permissions import WhisperPermissionSet
-from .database import factory
+from . import database
+from . import data
 
 
 # Set up our commands function
@@ -33,12 +36,15 @@ async def whisperCommand(tags: IrcMessageTagsReadOnly,
     permissions: WhisperPermissionSet
     arguments: data.WhisperCommandArgs
     command: data.WhisperCommand
+    db: database.Database
     try:
-        with factory.getDatabase() as database:
-            manager = database.isBotManager(nick)
+        async with await database.get_database() as db:
+            databaseObj: database.DatabaseMain
+            databaseObj = cast(database.DatabaseMain, db)
+            manager = databaseObj.isBotManager(nick)
             permissions = WhisperPermissionSet(tags, nick, manager)
 
-            arguments = data.WhisperCommandArgs(database, nick, message,
+            arguments = data.WhisperCommandArgs(databaseObj, nick, message,
                                                 permissions, timestamp)
             for command in commandsToProcess(message.command):
                 if await command(arguments):

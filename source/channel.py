@@ -1,13 +1,16 @@
 ﻿import asyncio
+
 import lists.channel
+
+from datetime import datetime
+from typing import Iterator, Optional, cast
+
 from bot import data as botData, utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from datetime import datetime
-from typing import Iterator, Optional
-from . import data
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
-from .database import factory
+from . import data
+from . import database
 
 
 # Set up our commands function
@@ -35,20 +38,23 @@ async def chatCommand(chat: 'botData.Channel',
     permissions: ChatPermissionSet
     arguments: data.ChatCommandArgs
     command: data.ChatCommand
+    db: database.Database
     try:
         if tags is not None:
             if 'room-id' in tags:
                 utils.saveTwitchId(chat.channel, str(tags['room-id']), timestamp)
             if 'user-id' in tags:
                 utils.saveTwitchId(nick, str(tags['user-id']), timestamp)
-        with factory.getDatabase() as database:
-            permitted = database.isPermittedUser(chat.channel, nick)
-            manager = database.isBotManager(nick)
+        async with await database.get_database() as db:
+            databaseObj: database.DatabaseMain
+            databaseObj = cast(database.DatabaseMain, db)
+            permitted = databaseObj.isPermittedUser(chat.channel, nick)
+            manager = databaseObj.isBotManager(nick)
             permissions = ChatPermissionSet(tags, nick, chat, permitted,
                                             manager)
 
             arguments = data.ChatCommandArgs(
-                database, chat, tags, nick, message, permissions,
+                databaseObj, chat, tags, nick, message, permissions,
                 timestamp)
             for command in commandsToProcess(message.command):
                 if await command(arguments):
