@@ -3,7 +3,7 @@ from contextlib import suppress
 from typing import Optional
 from ..library import broadcaster
 from ...api import twitch
-from ...database import AutoJoinChannel, DatabaseBase
+from ...database import AutoJoinChannel, DatabaseBase, DatabaseMain
 from ...data import ManageBotArgs, Send
 
 
@@ -50,10 +50,10 @@ def auto_join_priority(database: DatabaseBase,
         return True
 
 
-async def reload_server(database: DatabaseBase,
+async def reload_server(database: DatabaseMain,
                   send: Send) -> bool:
     autojoin: AutoJoinChannel
-    for autojoin in database.getAutoJoinsChats():
+    async for autojoin in database.getAutoJoinsChats():
         cluster: Optional[str] = await twitch.chat_server(autojoin.broadcaster)
         if cluster is not None and autojoin.cluster != cluster:
             database.setAutoJoinServer(autojoin.broadcaster, cluster)
