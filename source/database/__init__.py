@@ -339,33 +339,36 @@ INSERT INTO custom_commands_history
             await self.connection.commit()
             return True
 
-    def deleteCustomCommand(self,
-                            broadcaster: str,
-                            permission: str,
-                            command: str,
-                            user: str):
+    async def deleteCustomCommand(self,
+                                  broadcaster: str,
+                                  permission: str,
+                                  command: str,
+                                  user: str) -> bool:
         query: str = '''
 DELETE FROM custom_commands
-    WHERE broadcaster=? AND permission=? AND command=?'''
+    WHERE broadcaster=? AND permission=? AND command=?
+'''
         history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, permission, command.lower()))
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster, permission,
+                                         command.lower()))
 
-            self.connection.commit()
             if cursor.rowcount == 0:
                 return False
 
             display: Optional[str] = None
             if command.lower() != command:
                 display = command
-            cursor.execute(history, (broadcaster, permission, command.lower(),
-                                     display, 'delete', None, user))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, permission,
+                                           command.lower(), display, 'delete',
+                                           None, user))
+            await self.connection.commit()
             return True
 
     def levelCustomCommand(self,
