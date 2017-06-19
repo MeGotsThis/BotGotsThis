@@ -140,9 +140,9 @@ async def append_command(args: ChatCommandArgs,
 async def replace_command(args: ChatCommandArgs,
                           input: CommandActionTokens) -> bool:
     message: str
-    if args.database.replaceCustomCommand(
-            input.broadcaster, input.level, input.command, input.text,
-            args.nick):
+    successful: bool = await args.database.replaceCustomCommand(
+        input.broadcaster, input.level, input.command, input.text, args.nick)
+    if successful:
         message = '{user} -> {command} was replaced successfully'
     else:
         message = ('{user} -> {command} was not replaced successfully. The '
