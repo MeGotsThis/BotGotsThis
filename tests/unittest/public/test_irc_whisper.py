@@ -9,7 +9,7 @@ from asynctest.mock import MagicMock, Mock, PropertyMock, patch
 from bot.twitchmessage import IrcMessageTags
 from source import whisper
 from source.data import Message
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 
 
 class TestWhisper(asynctest.TestCase):
@@ -44,7 +44,7 @@ class TestWhisper(asynctest.TestCase):
         command2 = Mock(spec=lambda args: False, return_value = True)
         command3 = Mock(spec=lambda args: False, return_value = False)
         mock_commands.return_value = [command1, command2, command3]
-        database = MagicMock(spec=DatabaseBase)
+        database = MagicMock(spec=DatabaseMain)
         database.__exit__.return_value = True
         mock_database.return_value = database
         message = Mock(spec=Message)
@@ -64,7 +64,7 @@ class TestWhisper(asynctest.TestCase):
         # TODO: Fix when asynctest is updated with magic mock
         command = Mock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
-        database = MagicMock(spec=DatabaseBase)
+        database = MagicMock(spec=DatabaseMain)
         database.__exit__.return_value = False
         mock_database.return_value = database
         message = Mock(spec=Message)

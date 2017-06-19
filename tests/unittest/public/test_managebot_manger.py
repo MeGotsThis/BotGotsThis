@@ -3,7 +3,7 @@ import unittest
 from asynctest.mock import Mock, patch
 
 from source.data import Message
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import StrContains
 
@@ -100,7 +100,7 @@ class TestManageBotManager(TestManageBot):
 
 class TestManageBotManagerInsertManager(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
     def test(self):
@@ -138,7 +138,7 @@ class TestManageBotManagerInsertManager(unittest.TestCase):
 
 class TestManageBotManagerDeleteManager(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
     def test(self):

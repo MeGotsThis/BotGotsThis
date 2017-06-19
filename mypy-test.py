@@ -7,6 +7,7 @@ import bot.globals
 
 import source.public.autoload.twitch
 import source.public.autoload.emotes
+import source.public.autoload.repeat
 import source.private.mypy
 
 import bot.main

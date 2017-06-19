@@ -3,7 +3,7 @@ from contextlib import suppress
 from typing import Optional
 from ..library import broadcaster
 from ...api import twitch
-from ...database import AutoJoinChannel, DatabaseBase, DatabaseMain
+from ...database import AutoJoinChannel, DatabaseMain
 from ...data import ManageBotArgs, Send
 
 
@@ -36,7 +36,7 @@ async def manageAutoJoin(args: ManageBotArgs) -> bool:
     return False
 
 
-def auto_join_priority(database: DatabaseBase,
+def auto_join_priority(database: DatabaseMain,
                        channel: str,
                        priority: int,
                        send: Send) -> bool:

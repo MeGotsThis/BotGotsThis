@@ -36,8 +36,7 @@ class TestChannelCustomCustomCommand(TestChannel):
         self.mock_user_cooldown = patcher.start()
         self.mock_user_cooldown.return_value = False
         
-        patcher = patch('source.public.library.timeout.record_timeout',
-                        autospec=True)
+        patcher = patch('source.public.library.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
         
@@ -122,7 +121,7 @@ class TestChannelCustomCustomCommand(TestChannel):
         self.mock_messages.assert_called_once_with(self.command, self.args)
         self.channel.send.assert_called_once_with([])
         self.mock_timeout.assert_called_once_with(
-            self.database, self.channel, 'botgotsthis', [], 'Kappa', 'custom')
+            self.channel, 'botgotsthis', [], 'Kappa', 'custom')
 
 
 class TestChannelCustomCommand(TestChannel):

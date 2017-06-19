@@ -5,7 +5,7 @@ from ...data import CommandActionTokens, CustomCommandField
 from ...data import CustomCommandProcess, CustomFieldParts, CustomProcessArgs
 from ...data.message import Message
 from ...data.permissions import ChatPermissionSet
-from ...database import DatabaseBase
+from ...database import DatabaseMain
 from ..library import textformat
 
 
@@ -44,7 +44,7 @@ permissionsOrder: List[str] = [
     'admin', 'staff', 'manager', 'owner']
 
 
-def get_command(database: DatabaseBase,
+def get_command(database: DatabaseMain,
                 command: str,
                 channel: str,
                 permissions: ChatPermissionSet) -> Optional[CustomCommand]:

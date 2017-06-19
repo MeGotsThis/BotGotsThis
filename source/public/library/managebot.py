@@ -3,12 +3,12 @@ from typing import Union
 from ...data import ManageBotArgs, Send
 from ...data.message import Message
 from ...data.permissions import ChatPermissionSet, WhisperPermissionSet
-from ...database import DatabaseBase
+from ...database import DatabaseMain
 
 Permissions = Union[WhisperPermissionSet, ChatPermissionSet]
 
 
-async def manage_bot(database: DatabaseBase,
+async def manage_bot(database: DatabaseMain,
                      permissions: Permissions,
                      send: Send,
                      nick: str,

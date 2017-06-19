@@ -9,7 +9,7 @@ from bot.twitchmessage import IrcMessageTags
 from source.data import ChatCommandArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 
 
 class TestChannel(asynctest.TestCase):
@@ -19,7 +19,7 @@ class TestChannel(asynctest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.features = []
         self.database.hasFeature.side_effect = lambda c, f: f in self.features
         self.permissionSet = {

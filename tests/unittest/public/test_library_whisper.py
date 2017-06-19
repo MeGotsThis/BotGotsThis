@@ -10,7 +10,7 @@ from bot.twitchmessage import IrcMessageTags
 from source.data import WhisperCommandArgs
 from source.data.message import Message
 from source.data.permissions import WhisperPermissionSet
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 from source.public.library import whisper
 
 
@@ -18,7 +18,7 @@ class TestLibraryWhisper(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.tags = IrcMessageTags()
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.permissions = MagicMock(spec=WhisperPermissionSet)
         self.args = WhisperCommandArgs(self.database, 'botgotsthis',
                                        Message(''), self.permissions, self.now)

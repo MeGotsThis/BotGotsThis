@@ -8,13 +8,13 @@ import bot.config
 
 from datetime import datetime
 from urllib.parse import ParseResult, urlparse
-from typing import Match
+from typing import Match, cast
 
 from bot import data, utils
 from ...api import twitch
 from ...data import ChatCommandArgs
 from ...data.message import Message
-from ...database import factory
+from ... import database
 from ..library import timeout
 from ..library.chat import feature, not_permission, permission
 
@@ -66,7 +66,7 @@ async def check_domain_redirect(chat: 'data.Channel',
                         url, str(response.url), chat=chat, nick=nick,
                         timestamp=timestamp)
                     if isBadRedirect:
-                        handle_different_domains(chat, nick, message)
+                        await handle_different_domains(chat, nick, message)
                         return
             except aiohttp.ClientError:
                 utils.logException(str(message), timestamp)
@@ -95,9 +95,12 @@ def compare_domains(originalUrl: str,
     return False
 
 
-def handle_different_domains(chat: 'data.Channel',
-                             nick: str,
-                             message: Message) -> None:
-    with factory.getDatabase() as database:
-        timeout.timeout_user(database, chat, nick, 'redirectUrl', 1,
-                             str(message), 'Blocked Redirected URL')
+async def handle_different_domains(chat: 'data.Channel',
+                                   nick: str,
+                                   message: Message) -> None:
+    db: database.Database
+    async with await database.get_database() as db:
+        database_: database.DatabaseMain
+        database_ = cast(database.DatabaseMain, db)
+        await timeout.timeout_user(database_, chat, nick, 'redirectUrl', 1,
+                                   str(message), 'Blocked Redirected URL')

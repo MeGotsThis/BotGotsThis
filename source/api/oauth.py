@@ -1,15 +1,16 @@
-﻿from typing import Optional
-from ..database import DatabaseBase, factory
+﻿from typing import Optional, cast
+from .. import database as databaseM
 
 
-def token(broadcaster: str, *,
-          database: Optional[DatabaseBase]=None) -> Optional[str]:
+async def token(broadcaster: str, *,
+          database: Optional[databaseM.DatabaseOAuth]=None) -> Optional[str]:
     if not isinstance(broadcaster, str):
         raise TypeError()
     if database is None:
-        db: DatabaseBase
-        with factory.getDatabase() as db:
-            return token(broadcaster, database=db)
-    if not isinstance(database, DatabaseBase):
+        db: databaseM.Database
+        async with await databaseM.get_database(databaseM.Schema.OAuth) as db:
+            database_ = cast(databaseM.DatabaseOAuth, db)
+            return await token(broadcaster, database=database_)
+    if not isinstance(database, databaseM.DatabaseOAuth):
         raise TypeError()
     return database.getOAuthToken(broadcaster)

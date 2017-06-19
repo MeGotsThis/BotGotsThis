@@ -48,9 +48,9 @@ async def process_pyramid(args: ChatCommandArgs,
         (' '.join((repetition,) * i) for i in range(count, 0, -1))
         )
     if args.permissions.chatModerator:
-        timeout.record_timeout(
-            args.database, args.chat, args.nick,
-            ' '.join((repetition,) * count), str(args.message), 'pyramid')
+        await timeout.record_timeout(
+            args.chat, args.nick, ' '.join((repetition,) * count),
+            str(args.message), 'pyramid')
     args.chat.send(messages, -1)
     return True
 

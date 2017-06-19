@@ -1,6 +1,6 @@
 import unittest
 from source.data.message import Message
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 from source.public.library import feature
 from tests.unittest.mock_class import StrContains
 from unittest.mock import Mock, patch
@@ -12,7 +12,7 @@ def send(messages):
 
 class TestLibraryFeatureFeature(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
         patcher = patch.dict('lists.feature.features')
@@ -95,7 +95,7 @@ class TestLibraryFeatureFeature(unittest.TestCase):
 
 class TestLibraryFeatureAdd(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
         patcher = patch.dict('lists.feature.features')
@@ -130,7 +130,7 @@ class TestLibraryFeatureAdd(unittest.TestCase):
 
 class TestLibraryFeatureRemove(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
         patcher = patch.dict('lists.feature.features')

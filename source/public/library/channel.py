@@ -5,10 +5,10 @@ from typing import Optional, Union
 from . import timeout
 from ...api import twitch
 from ...data import Send
-from ...database import DatabaseBase
+from ...database import DatabaseMain
 
 
-async def join(database: DatabaseBase,
+async def join(database: DatabaseMain,
                channel: str,
                send: Send) -> bool:
     if database.isChannelBannedReason(channel):
@@ -41,13 +41,12 @@ def part(channel: str,
     return True
 
 
-def say(database: DatabaseBase,
-        nick: str,
-        channel: str,
-        message: str) -> bool:
+async def say(nick: str,
+              channel: str,
+              message: str) -> bool:
     if channel in bot.globals.channels:
-        timeout.record_timeout(database, bot.globals.channels[channel], nick,
-                               message, None, 'say')
+        await timeout.record_timeout(bot.globals.channels[channel], nick,
+                                     message, None, 'say')
         bot.globals.channels[channel].send(message)
         return True
     return False

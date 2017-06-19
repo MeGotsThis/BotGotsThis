@@ -17,8 +17,8 @@ async def commandExit(args: WhisperCommandArgs) -> bool:
 
 @permission('manager')
 async def commandSay(args: WhisperCommandArgs) -> bool:
-    return channel.say(args.database, args.nick, args.message.lower[1],
-                       args.message[2:])
+    return await channel.say(args.nick, args.message.lower[1],
+                             args.message[2:])
 
 
 @min_args(2)

@@ -11,7 +11,7 @@ from bot.twitchmessage import IrcMessageTags
 from source.data import ChatCommandArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 from source.public.library import chat
 
 
@@ -21,7 +21,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.tags = IrcMessageTags()
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.args = ChatCommandArgs(self.database, self.channel, self.tags,
                                     'botgotsthis', Message(''),

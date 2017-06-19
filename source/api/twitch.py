@@ -43,8 +43,8 @@ def client_id() -> Optional[str]:
     return None
 
 
-def get_headers(headers: MutableMapping[str, str],
-                channel: Optional[str]) -> MutableMapping[str, str]:
+async def get_headers(headers: MutableMapping[str, str],
+                      channel: Optional[str]) -> MutableMapping[str, str]:
     if 'Accept' not in headers:
         headers['Accept'] = 'application/vnd.twitchtv.v5+json'
     if 'Client-ID' not in headers:
@@ -52,34 +52,10 @@ def get_headers(headers: MutableMapping[str, str],
         if clientId is not None:
             headers['Client-ID'] = clientId
     if channel is not None and 'Authorization' not in headers:
-        token: Optional[str] = oauth.token(channel)
+        token: Optional[str] = await oauth.token(channel)
         if token is not None:
             headers['Authorization'] = 'OAuth ' + token
     return headers
-
-
-def api_call(channel: Optional[str],
-             method: str,
-             uri: str,
-             headers: MutableMapping[str, str]=None,
-             data: Union[str, Mapping[str, str]]=None
-             ) -> Tuple[client.HTTPResponse, bytes]:
-    if headers is None:
-        headers = {}
-    headers = get_headers(headers, channel)
-    connection: client.HTTPConnection
-    connection = client.HTTPSConnection('api.twitch.tv')
-    with closing(connection):
-        dataStr: Optional[str] = None
-        if data is not None:
-            if isinstance(data, Mapping):
-                dataStr = urllib.parse.urlencode(data)
-            else:
-                dataStr = data
-        connection.request(method, uri, dataStr, headers)
-        response: client.HTTPResponse
-        with connection.getresponse() as response:
-            return response, response.read()
 
 
 async def get_call(channel: Optional[str],
@@ -88,7 +64,7 @@ async def get_call(channel: Optional[str],
                    ) -> Tuple[Any, Optional[Dict]]:
     if headers is None:
         headers = {}
-    headers = get_headers(headers, channel)
+    headers = await get_headers(headers, channel)
     async with aiohttp.ClientSession(raise_for_status=True) as session, \
             session.get('https://api.twitch.tv' + uri,
                         headers=headers,
@@ -108,7 +84,7 @@ async def post_call(channel: Optional[str],
                     ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
     if headers is None:
         headers = {}
-    headers = get_headers(headers, channel)
+    headers = await get_headers(headers, channel)
     dataStr: Optional[str] = None
     if data is not None:
         if isinstance(data, Mapping):
@@ -135,7 +111,7 @@ async def put_call(channel: Optional[str],
                     ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
     if headers is None:
         headers = {}
-    headers = get_headers(headers, channel)
+    headers = await get_headers(headers, channel)
     dataStr: Optional[str] = None
     if data is not None:
         if isinstance(data, Mapping):
@@ -162,7 +138,7 @@ async def delete_call(channel: Optional[str],
                       ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
     if headers is None:
         headers = {}
-    headers = get_headers(headers, channel)
+    headers = await get_headers(headers, channel)
     dataStr: Optional[str] = None
     if data is not None:
         if isinstance(data, Mapping):
