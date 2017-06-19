@@ -24,9 +24,8 @@ class TestChannel(asynctest.TestCase):
         self.channel.channel = 'megotsthis'
         self.now = datetime(2000, 1, 1)
 
-    @asynctest.fail_on(unused_loop=False)
     @patch('source.channel.chatCommand')
-    def test_parse(self, mock_chatCommand):
+    async def test_parse(self, mock_chatCommand):
         channel.parse(self.channel, self.tags, 'botgotsthis', 'Kappa',
                       self.now)
         self.assertTrue(mock_chatCommand.called)

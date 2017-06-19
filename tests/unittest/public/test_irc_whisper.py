@@ -1,37 +1,44 @@
 import unittest
-from bot.twitchmessage import IrcMessageTags
+
+import asynctest
+
 from datetime import datetime
+
+from asynctest.mock import MagicMock, Mock, PropertyMock, patch
+
+from bot.twitchmessage import IrcMessageTags
 from source import whisper
 from source.data import Message
 from source.database import DatabaseBase
-from unittest.mock import MagicMock, Mock, PropertyMock, patch
 
 
-class TestWhisper(unittest.TestCase):
+class TestWhisper(asynctest.TestCase):
     def setUp(self):
         self.tags = IrcMessageTags(IrcMessageTags.parseTags(
             'turbo=1;display-name=BotGotsThis;badges=;emotes=;user-id=1;'
             'message-id=1;thread-id=1;user-type=;color=#FFFFFF'))
         self.now = datetime(2000, 1, 1)
 
-    @patch('source.whisper.whisperCommand', autospec=True)
-    def test_parse(self, mock_whisperCommand):
+    @patch('source.whisper.whisperCommand')
+    async def test_parse(self, mock_whisperCommand):
         whisper.parse(self.tags, 'botgotsthis', 'Kappa', self.now)
         self.assertTrue(mock_whisperCommand.called)
 
-    @patch('source.whisper.whisperCommand', autospec=True)
+    @asynctest.fail_on(unused_loop=False)
+    @patch('source.whisper.whisperCommand')
     def test_parse_empty(self, mock_whisperCommand):
         whisper.parse(self.tags, 'botgotsthis', '', self.now)
         self.assertFalse(mock_whisperCommand.called)
 
-    @patch('source.whisper.whisperCommand', autospec=True)
+    @asynctest.fail_on(unused_loop=False)
+    @patch('source.whisper.whisperCommand')
     def test_parse_spaces(self, mock_whisperCommand):
         whisper.parse(self.tags, 'botgotsthis', '  ', self.now)
         self.assertFalse(mock_whisperCommand.called)
 
     @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.whisper.commandsToProcess', autospec=True)
-    def test_whisperCommand(self, mock_commands, mock_database):
+    async def test_whisperCommand(self, mock_commands, mock_database):
         command1 = Mock(spec=lambda args: False, return_value=False)
         command2 = Mock(spec=lambda args: False, return_value = True)
         command3 = Mock(spec=lambda args: False, return_value = False)
@@ -41,7 +48,8 @@ class TestWhisper(unittest.TestCase):
         mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
-        whisper.whisperCommand(self.tags, 'botgotsthis', message, self.now)
+        await whisper.whisperCommand(self.tags, 'botgotsthis', message,
+                                     self.now)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command1.call_count, 1)
         self.assertEqual(command2.call_count, 1)
@@ -50,7 +58,8 @@ class TestWhisper(unittest.TestCase):
     @patch('bot.utils.logException', autospec=True)
     @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.whisper.commandsToProcess', autospec=True)
-    def test_whisperCommand_except(self, mock_commands, mock_database, mock_log):
+    async def test_whisperCommand_except(self, mock_commands, mock_database,
+                                         mock_log):
         command = Mock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
         database = MagicMock(spec=DatabaseBase)
@@ -58,7 +67,8 @@ class TestWhisper(unittest.TestCase):
         mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
-        whisper.whisperCommand(self.tags, 'botgotsthis', message, self.now)
+        await whisper.whisperCommand(self.tags, 'botgotsthis', message,
+                                     self.now)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command.call_count, 1)
         self.assertTrue(mock_log.called)
@@ -66,11 +76,13 @@ class TestWhisper(unittest.TestCase):
     @patch('bot.utils.logException', autospec=True)
     @patch('source.database.factory.getDatabase', autospec=True)
     @patch('source.whisper.commandsToProcess', autospec=True)
-    def test_whisperCommand_database_except(self, mock_commands, mock_database, mock_log):
+    async def test_whisperCommand_database_except(self, mock_commands,
+                                                  mock_database, mock_log):
         mock_database.side_effect = Exception
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
-        whisper.whisperCommand(self.tags, 'botgotsthis', message, self.now)
+        await whisper.whisperCommand(self.tags, 'botgotsthis', message,
+                                     self.now)
         self.assertFalse(mock_commands.called)
         self.assertTrue(mock_log.called)
 
