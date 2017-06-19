@@ -33,7 +33,7 @@ async def commandGame(args: ChatCommandArgs) -> bool:
     if token is None:
         return False
     game: str = args.message.query
-    game = args.database.getFullGameTitle(args.message.lower[1:]) or game
+    game = await args.database.getFullGameTitle(args.message.lower[1:]) or game
     game = game.replace('Pokemon', 'Pokémon').replace('Pokepark', 'Poképark')
     if await twitch.update(args.chat.channel, game=game):
         if game:

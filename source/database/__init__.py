@@ -142,17 +142,18 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
             await self.connection.commit()
             return cursor.rowcount != 0
 
-    def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
+    async def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
         query: str = '''
 SELECT DISTINCT twitchGame
     FROM game_abbreviations
     WHERE abbreviation=?
         OR twitchGame=?
-    ORDER BY twitchGame=? DESC'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (abbreviation, abbreviation, abbreviation,))
-            game: Optional[Tuple[str]] = cursor.fetchone()
+    ORDER BY twitchGame=? DESC
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (abbreviation, ) * 3)
+            game: Optional[Tuple[str]] = await cursor.fetchone()
             return game and game[0]
 
     def getChatCommands(self,
