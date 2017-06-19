@@ -188,37 +188,39 @@ SELECT fullMessage FROM custom_commands
             row: Optional[Tuple[str]] = await cursor.fetchone()
             return row and row[0]
 
-    def insertCustomCommand(self,
-                            broadcaster: str,
-                            permission: str,
-                            command: str,
-                            fullMessage: str,
-                            user: str) -> bool:
+    async def insertCustomCommand(self,
+                                  broadcaster: str,
+                                  permission: str,
+                                  command: str,
+                                  fullMessage: str,
+                                  user: str) -> bool:
         query: str = '''
 INSERT INTO custom_commands
     (broadcaster, permission, command, commandDisplay, fullMessage, creator,
     created, lastEditor, lastUpdated)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)'''
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)
+'''
         history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             try:
                 lower: str = command.lower()
                 display: Optional[str] = None
                 if lower != command:
                     display = command
-                cursor.execute(query, (broadcaster, permission, lower, display,
-                                       fullMessage, user, user))
-            except sqlite3.IntegrityError:
+                await cursor.execute(query, (broadcaster, permission, lower,
+                                             display, fullMessage, user, user))
+            except pyodbc.IntegrityError:
                 return False
 
-            cursor.execute(history, (broadcaster, permission, lower, display,
-                                     'add', fullMessage, user))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, permission, lower,
+                                           display, 'add', fullMessage, user))
+            await self.connection.commit()
             return True
 
     def updateCustomCommand(self,
