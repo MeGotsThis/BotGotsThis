@@ -19,137 +19,137 @@ from source.public.library import custom
 from tests.unittest.mock_class import TypeMatch
 
 
-class TestLibraryCustomGetCommand(unittest.TestCase):
+class TestLibraryCustomGetCommand(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.permissions = defaultdict(lambda: False, {'': True})
 
-    def test_no_commands(self):
+    async def test_no_commands(self):
         self.database.getChatCommands.return_value = {
             'botgotsthis': {}, '#global': {}}
         self.assertIsNone(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions))
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_public_command(self):
+    async def test_public_command(self):
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'': 'Kappa'}, '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', 'botgotsthis', ''))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_subscriber(self):
+    async def test_subscriber(self):
         self.permissions['subscriber'] = True
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'subscriber': 'Kappa'}, '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', 'botgotsthis', 'subscriber'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_moderator(self):
+    async def test_moderator(self):
         self.permissions['moderator'] = True
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'moderator': 'Kappa'}, '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', 'botgotsthis', 'moderator'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_broadcaster(self):
+    async def test_broadcaster(self):
         self.permissions['broadcaster'] = True
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'broadcaster': 'Kappa'}, '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', 'botgotsthis', 'broadcaster'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_globalMod(self):
+    async def test_globalMod(self):
         self.permissions['globalMod'] = True
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'globalMod': 'Kappa'}, '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', 'botgotsthis', 'globalMod'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_admin(self):
+    async def test_admin(self):
         self.permissions['admin'] = True
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'admin': 'Kappa'}, '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', 'botgotsthis', 'admin'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_staff(self):
+    async def test_staff(self):
         self.permissions['staff'] = True
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'staff': 'Kappa'}, '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', 'botgotsthis', 'staff'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_owner(self):
+    async def test_owner(self):
         self.permissions['owner'] = True
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'owner': 'Kappa'}, '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', 'botgotsthis', 'owner'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_global_command(self):
+    async def test_global_command(self):
         self.database.getChatCommands.return_value = {
             'botgotsthis': {}, '#global': {'': 'Kappa'}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('Kappa', '#global', ''))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_public_global_command(self):
+    async def test_public_global_command(self):
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'': 'KappaPride'}, '#global': {'': 'KappaRoss'}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('KappaPride', 'botgotsthis', ''))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_no_access(self):
+    async def test_no_access(self):
         self.database.getChatCommands.return_value = {
             'botgotsthis': {'moderator': 'KappaPride'}, '#global': {}}
         self.assertIsNone(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions))
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_multiple_permissions(self):
+    async def test_multiple_permissions(self):
         self.permissions['turbo'] = True
         self.permissions['subscriber'] = True
         self.permissions['moderator'] = True
@@ -165,13 +165,13 @@ class TestLibraryCustomGetCommand(unittest.TestCase):
                 },
             '#global': {}}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('KappaHD', 'botgotsthis', 'broadcaster'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_multiple_permissions_with_global(self):
+    async def test_multiple_permissions_with_global(self):
         self.permissions['turbo'] = True
         self.permissions['subscriber'] = True
         self.permissions['moderator'] = True
@@ -191,13 +191,13 @@ class TestLibraryCustomGetCommand(unittest.TestCase):
                 'broadcaster': ':)',
             }}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand(':)', '#global', 'broadcaster'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')
 
-    def test_multiple_permissions_with_channel(self):
+    async def test_multiple_permissions_with_channel(self):
         self.permissions['turbo'] = True
         self.permissions['subscriber'] = True
         self.permissions['moderator'] = True
@@ -218,8 +218,8 @@ class TestLibraryCustomGetCommand(unittest.TestCase):
                 'broadcaster': ':)',
             }}
         self.assertEqual(
-            custom.get_command(self.database, '!kappa', 'botgotsthis',
-                               self.permissions),
+            await custom.get_command(self.database, '!kappa', 'botgotsthis',
+                                     self.permissions),
             CustomCommand('KappaHD', 'botgotsthis', 'broadcaster'))
         self.database.getChatCommands.assert_called_once_with(
             'botgotsthis', '!kappa')

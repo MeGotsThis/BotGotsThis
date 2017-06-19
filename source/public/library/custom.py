@@ -44,12 +44,13 @@ permissionsOrder: List[str] = [
     'admin', 'staff', 'manager', 'owner']
 
 
-def get_command(database: DatabaseMain,
-                command: str,
-                channel: str,
-                permissions: ChatPermissionSet) -> Optional[CustomCommand]:
+async def get_command(database: DatabaseMain,
+                      command: str,
+                      channel: str,
+                      permissions: ChatPermissionSet
+                      ) -> Optional[CustomCommand]:
     commands: Dict[str, Dict[str, str]]
-    commands = database.getChatCommands(channel, command)
+    commands = await database.getChatCommands(channel, command)
     permission: str
     broadcaster: str
     message: str

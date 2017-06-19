@@ -40,8 +40,7 @@ class TestChannelCustomCustomCommand(TestChannel):
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
         
-        patcher = patch('source.public.library.custom.get_command',
-                        autospec=True)
+        patcher = patch('source.public.library.custom.get_command')
         self.addCleanup(patcher.stop)
         self.mock_command = patcher.start()
         self.mock_command.return_value = self.command
