@@ -15,7 +15,7 @@ async def come(database: DatabaseMain,
     if database.isChannelBannedReason(channel) is not None:
         send('Chat {channel} is banned from joining'.format(channel=channel))
         return True
-    priority: Union[float, int] = database.getAutoJoinsPriority(channel)
+    priority: Union[float, int] = await database.getAutoJoinsPriority(channel)
     cluster: Optional[str] = await twitch.chat_server(channel)
     joinResult: Optional[bool] = utils.joinChannel(channel, priority, cluster)
     if joinResult is None:
@@ -85,7 +85,7 @@ async def auto_join_add(database: DatabaseMain,
              'server'.format(channel=channel))
         return True
     result: bool = await database.saveAutoJoin(channel, 0, cluster)
-    priority: Union[int, float] = database.getAutoJoinsPriority(channel)
+    priority: Union[int, float] = await database.getAutoJoinsPriority(channel)
     if result is False:
         database.setAutoJoinServer(channel, cluster)
 

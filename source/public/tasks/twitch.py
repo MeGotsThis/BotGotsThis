@@ -115,6 +115,7 @@ async def checkChatServers(timestamp: datetime) -> None:
     db: database.Database
     async with await database.get_database() as db:
         database_: database.DatabaseMain = cast(database.DatabaseMain, db)
-        priority: Union[int, float] = database_.getAutoJoinsPriority(channel)
+        priority: Union[int, float]
+        priority = await database_.getAutoJoinsPriority(channel)
         utils.ensureServer(channel, priority, cluster)
         database_.setAutoJoinServer(channel, cluster)

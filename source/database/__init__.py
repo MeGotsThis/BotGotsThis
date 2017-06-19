@@ -87,12 +87,12 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
             async for r in cursor:
                 yield AutoJoinChannel(*r)
 
-    def getAutoJoinsPriority(self, broadcaster: str) -> Union[int, float]:
+    async def getAutoJoinsPriority(self, broadcaster: str) -> Union[int, float]:
         query: str = '''SELECT priority FROM auto_join WHERE broadcaster=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster,))
-            autoJoinRow: Optional[Tuple[int]] = cursor.fetchone()
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
+            autoJoinRow: Optional[Tuple[int]] = await cursor.fetchone()
             if autoJoinRow is not None:
                 return int(autoJoinRow[0])
             else:
