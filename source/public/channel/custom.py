@@ -127,8 +127,9 @@ async def update_command(args: ChatCommandArgs,
 async def append_command(args: ChatCommandArgs,
                          input: CommandActionTokens) -> bool:
     message: str
-    if args.database.appendCustomCommand(input.broadcaster, input.level,
-                                         input.command, input.text, args.nick):
+    successful: bool = await args.database.appendCustomCommand(
+        input.broadcaster, input.level, input.command, input.text, args.nick)
+    if successful:
         message = '{user} -> {command} was appended successfully'
     else:
         message = ('{user} -> {command} was not appended successfully. The '
