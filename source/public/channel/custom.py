@@ -214,14 +214,16 @@ async def level_command(args: ChatCommandArgs,
     permission: str = input.text.lower()
     if permission not in custom.permissions:
         message = '{user} -> {inputLevel} is an invalid permission'
-    elif args.database.levelCustomCommand(
-            input.broadcaster, input.level, input.command, args.nick,
-            custom.permissions[permission]):
-        message = '{user} -> {command} changed permission successfully'
     else:
-        message = ('{user} -> {command} was not changed successfully. The '
-                   'command might not exist or there is a command with that '
-                   'level existing')
+        successful: bool = await args.database.levelCustomCommand(
+            input.broadcaster, input.level, input.command, args.nick,
+            custom.permissions[permission])
+        if successful:
+            message = '{user} -> {command} changed permission successfully'
+        else:
+            message = ('{user} -> {command} was not changed successfully. The '
+                       'command might not exist or there is a command with '
+                       'that level existing')
     args.chat.send(message.format(user=args.nick, command=input.command,
                                   inputLevel=input.text))
     return True

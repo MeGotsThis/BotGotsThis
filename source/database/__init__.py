@@ -371,39 +371,40 @@ INSERT INTO custom_commands_history
             await self.connection.commit()
             return True
 
-    def levelCustomCommand(self,
-                           broadcaster: str,
-                           permission: str,
-                           command: str,
-                           user: str,
-                           new_permission: str) -> bool:
+    async def levelCustomCommand(self,
+                                 broadcaster: str,
+                                 permission: str,
+                                 command: str,
+                                 user: str,
+                                 new_permission: str) -> bool:
         query: str = '''
 UPDATE custom_commands SET permission=?
-    WHERE broadcaster=? AND permission=? AND command=?'''
+    WHERE broadcaster=? AND permission=? AND command=?
+'''
         history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             try:
-                cursor.execute(query, (new_permission, broadcaster, permission,
-                                       command.lower()))
-            except sqlite3.IntegrityError:
+                await cursor.execute(query, (new_permission, broadcaster,
+                                             permission, command.lower()))
+            except pyodbc.IntegrityError:
                 return False
 
-            self.connection.commit()
             if cursor.rowcount == 0:
                 return False
 
             display: Optional[str] = None
             if command.lower() != command:
                 display = command
-            cursor.execute(history, (broadcaster, new_permission,
-                                     command.lower(), display, 'level',
-                                     permission, user))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, new_permission,
+                                           command.lower(), display, 'level',
+                                           permission, user))
+            await self.connection.commit()
             return True
 
     def renameCustomCommand(self,
