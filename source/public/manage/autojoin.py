@@ -25,7 +25,7 @@ async def manageAutoJoin(args: ManageBotArgs) -> bool:
         return await broadcaster.auto_join_add(
             args.database, args.message.lower[3], args.send)
     if args.message.lower[2] in ['del', 'delete', 'rem', 'remove' ,'part']:
-        return broadcaster.auto_join_delete(
+        return await broadcaster.auto_join_delete(
             args.database, args.message.lower[3], args.send)
     if args.message.lower[2] in ['pri', 'priority']:
         priority: int = 0

@@ -68,7 +68,7 @@ async def auto_join(database: DatabaseMain,
         removeMsgs: List[str] = ['0', 'false', 'no', 'remove', 'rem', 'delete',
                                  'del', 'leave', 'part']
         if message.lower[1] in removeMsgs:
-            return auto_join_delete(database, channel, send)
+            return await auto_join_delete(database, channel, send)
     return await auto_join_add(database, channel, send)
 
 
@@ -118,10 +118,10 @@ async def auto_join_add(database: DatabaseMain,
     return True
 
 
-def auto_join_delete(database: DatabaseMain,
-                     channel: str,
-                     send: Send) -> bool:
-    result: bool = database.discardAutoJoin(channel)
+async def auto_join_delete(database: DatabaseMain,
+                           channel: str,
+                           send: Send) -> bool:
+    result: bool = await database.discardAutoJoin(channel)
     if result:
         send('Auto join for {channel} is now disabled'.format(channel=channel))
     else:
