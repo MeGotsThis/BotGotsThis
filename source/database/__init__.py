@@ -4,6 +4,7 @@ import os.path
 import aioodbc
 import aioodbc.cursor
 import aiofiles
+import pyodbc
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime
@@ -399,6 +400,22 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
             await cursor.execute(query)
             async for r in cursor:
                 yield AutoJoinChannel(*r)
+
+    async def saveAutoJoin(self,
+                           broadcaster: str,
+                           priority: Union[int, float] = 0,
+                           cluster: str = 'aws') -> bool:
+        query: str = '''
+INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            try:
+                cursor.execute(query, (broadcaster, priority, cluster))
+                self.connection.commit()
+                return True
+            except pyodbc.IntegrityError:
+                return False
 
 
 class DatabaseOAuth(Database):

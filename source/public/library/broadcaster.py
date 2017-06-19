@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Union
 from ...api import twitch
 from ...data import Send
 from ...data.message import Message
-from ...database import DatabaseBase
+from ...database import DatabaseBase, DatabaseMain
 
 
 async def come(database: DatabaseBase,
@@ -72,7 +72,7 @@ async def auto_join(database: DatabaseBase,
     return await auto_join_add(database, channel, send)
 
 
-async def auto_join_add(database: DatabaseBase,
+async def auto_join_add(database: DatabaseMain,
                         channel: str,
                         send: Send) -> bool:
     cluster: Optional[str] = await twitch.chat_server(channel)
@@ -84,7 +84,7 @@ async def auto_join_add(database: DatabaseBase,
         send('Auto join for {channel} failed due to unsupported chat '
              'server'.format(channel=channel))
         return True
-    result: bool = database.saveAutoJoin(channel, 0, cluster)
+    result: bool = await database.saveAutoJoin(channel, 0, cluster)
     priority: Union[int, float] = database.getAutoJoinsPriority(channel)
     if result is False:
         database.setAutoJoinServer(channel, cluster)

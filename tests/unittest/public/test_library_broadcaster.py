@@ -9,7 +9,7 @@ from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from source.data.message import Message
-from source.database import DatabaseBase
+from source.database import DatabaseBase, DatabaseMain
 from source.public.library import broadcaster
 from tests.unittest.mock_class import StrContains, TypeMatch
 
@@ -301,7 +301,7 @@ class TestLibraryBroadcasterAutoJoin(asynctest.TestCase):
 
 class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
         patcher = patch('bot.globals', autospec=True)
