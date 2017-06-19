@@ -7,10 +7,9 @@ import aioodbc.cursor
 import aiofiles
 import pyodbc
 
-from abc import ABCMeta, abstractmethod
 from contextlib import closing
 from datetime import datetime
-from enum import Enum, auto
+from enum import Enum
 from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
 from typing import Sequence, Tuple, Type, Union
 from typing import AsyncIterator
@@ -757,14 +756,15 @@ INSERT INTO bot_managers_log
             self.connection.commit()
             return True
 
-    def getAutoRepeatToSend(self) -> Iterable[AutoRepeatMessage]:
+    async def getAutoRepeatToSend(self) -> AsyncIterator[AutoRepeatMessage]:
         query: str = '''
 SELECT broadcaster, name, message FROM auto_repeat
     WHERE datetime(lastSent, '+' || duration || ' minutes')
         <= CURRENT_TIMESTAMP'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            for broadcaster, name, message in cursor.execute(query):
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query)
+            async for broadcaster, name, message in cursor:
                 yield AutoRepeatMessage(broadcaster, name, message)
 
     def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatList]:
