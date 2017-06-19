@@ -155,8 +155,9 @@ async def replace_command(args: ChatCommandArgs,
 async def delete_command(args: ChatCommandArgs,
                          input: CommandActionTokens) -> bool:
     message: str
-    if args.database.deleteCustomCommand(input.broadcaster, input.level,
-                                         input.command, args.nick):
+    successful: bool = await args.database.deleteCustomCommand(
+        input.broadcaster, input.level, input.command, args.nick)
+    if successful:
         message = '{user} -> {command} was removed successfully'
     else:
         message = ('{user} -> {command} was not removed successfully. The '
