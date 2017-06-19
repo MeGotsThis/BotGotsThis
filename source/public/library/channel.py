@@ -14,7 +14,7 @@ async def join(database: DatabaseMain,
     if database.isChannelBannedReason(channel):
         send('Chat ' + channel + ' is banned from joining')
         return True
-    priority: Union[int, float] = database.getAutoJoinsPriority(channel)
+    priority: Union[int, float] = await database.getAutoJoinsPriority(channel)
 
     cluster: Optional[str] = await twitch.chat_server(channel)
     if cluster not in bot.globals.clusters:
