@@ -99,9 +99,9 @@ async def process_command(args: ChatCommandArgs,
 async def insert_command(args: ChatCommandArgs,
                    input: CommandActionTokens) -> bool:
     message: str
-    if args.database.insertCustomCommand(
-            input.broadcaster, input.level, input.command, input.text,
-            args.nick):
+    successful: bool = await args.database.insertCustomCommand(
+        input.broadcaster, input.level, input.command, input.text, args.nick)
+    if successful:
         message = '{user} -> {command} was added successfully'
     else:
         message = ('{user} -> {command} was not added successfully. There '
