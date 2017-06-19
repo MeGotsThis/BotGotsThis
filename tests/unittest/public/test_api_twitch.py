@@ -238,20 +238,20 @@ twitchIdReponse = b'''\
 speedrunCommunityResponse = r'''{"_id":"6e940c4a-c42f-47d2-af83-0a2c7e47c421","owner_id":"23406143","name":"Speedrunning","summary":"Welcome to the Speedrunning Community, we like to play games fast! Connect with fellow speedrun enthusiasts by watching and/or streaming speedruns here!","description":"Welcome to the Speedrunning Community, we like to play games fast! Speedrunners are an extremely diverse and welcoming group that enjoys games of all genres, consoles, and eras! Speedrunners enjoy collaborating to optimize games by finding time saving tricks and glitches, to drive speedrun times as low as possible. Whether you are going for a world record or just trying to learn or improve at a game you will find yourself at home here. Speedrunners often organize online and live speedrunning events that benefit charities or are just for fun. If you enjoy friendly competition you can find it in the form of races and tournaments that are typically open to join. \n\n**Resources:**\n[Speed Runs Live](http://www.speedrunslive.com) race games here.\n[speedrun.com](http://www.speedrun.com)  leaderboards and more.\n[SpeedGaming](http://speedgaming.org) hosts tournaments and events.\n[GamesDoneQuick](http://www.gamesdonequick.com) live marathons for charity.\n[TASVideos.org](http://tasvideos.org)  tool-assisted speedruns, and more.","description_html":"Welcome to the Speedrunning Community, we like to play games fast! Speedrunners are an extremely diverse and welcoming group that enjoys games of all genres, consoles, and eras! Speedrunners enjoy collaborating to optimize games by finding time saving tricks and glitches, to drive speedrun times as low as possible. Whether you are going for a world record or just trying to learn or improve at a game you will find yourself at home here. Speedrunners often organize online and live speedrunning events that benefit charities or are just for fun. If you enjoy friendly competition you can find it in the form of races and tournaments that are typically open to join.\u003cbr\u003e\u003cbr\u003e\u003cstrong\u003eResources:\u003c/strong\u003e\u003cbr\u003e\n\u003ca href=\"http://www.speedrunslive.com\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003eSpeed Runs Live\u003c/a\u003e race games here.\u003cbr\u003e\n\u003ca href=\"http://www.speedrun.com\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003espeedrun.com\u003c/a\u003e  leaderboards and more.\u003cbr\u003e\n\u003ca href=\"http://speedgaming.org\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003eSpeedGaming\u003c/a\u003e hosts tournaments and events.\u003cbr\u003e\n\u003ca href=\"http://www.gamesdonequick.com\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003eGamesDoneQuick\u003c/a\u003e live marathons for charity.\u003cbr\u003e\n\u003ca href=\"http://tasvideos.org\" rel=\"nofollow noreferrer noopener\" target=\"_blank\"\u003eTASVideos.org\u003c/a\u003e  tool-assisted speedruns, and more.\u003cbr\u003e","rules":"Broadcast speedrunning content, where “speedrunning” is defined as completing a video game, or predetermined goal/set of goals within a video game as fast as possible.\n\n- Racing and racing formats including bingo, randomizer, and blind are allowed\n- Individual Level (IL) formats are allowed\n- Learning, routing, and practicing speedruns is allowed.\n- Tool Assisted Speedrunning (TAS) is allowed\n- Non-speedrunning content is not allowed.\n\nHave questions about the rules? Contact moderators listed below:\n\n360chrism\nAuthorblues\nFeasel\nMrcab55\nRomscout\nSinister1 (leader)\nSpikevegeta\nThadarkman78","rules_html":"Broadcast speedrunning content, where “speedrunning” is defined as completing a video game, or predetermined goal/set of goals within a video game as fast as possible.\u003cbr\u003e\u003cbr\u003e\n\u003cul\u003e\n\u003cli\u003eRacing and racing formats including bingo, randomizer, and blind are allowed\u003cbr\u003e\u003c/li\u003e\n\u003cli\u003eIndividual Level (IL) formats are allowed\u003cbr\u003e\u003c/li\u003e\n\u003cli\u003eLearning, routing, and practicing speedruns is allowed.\u003cbr\u003e\u003c/li\u003e\n\u003cli\u003eTool Assisted Speedrunning (TAS) is allowed\u003cbr\u003e\u003c/li\u003e\n\u003cli\u003eNon-speedrunning content is not allowed.\u003cbr\u003e\n\u003cbr\u003e\u003c/li\u003e\n\u003c/ul\u003e\nHave questions about the rules? Contact moderators listed below:\u003cbr\u003e\u003cbr\u003e360chrism\u003cbr\u003e\nAuthorblues\u003cbr\u003e\nFeasel\u003cbr\u003e\nMrcab55\u003cbr\u003e\nRomscout\u003cbr\u003e\nSinister1 (leader)\u003cbr\u003e\nSpikevegeta\u003cbr\u003e\nThadarkman78\u003cbr\u003e","language":"EN","avatar_image_url":"https://static-cdn.jtvnw.net/twitch-community-images-production/6e940c4a-c42f-47d2-af83-0a2c7e47c421/43b0ac6d-ee00-4292-b6e8-cfab0f81e53f.png","cover_image_url":""}'''.encode()
 
 
-class TestApiTwitchApiHeaders(unittest.TestCase):
+class TestApiTwitchApiHeaders(asynctest.TestCase):
     def setUp(self):
         patcher = patch('source.api.twitch.client_id')
         self.addCleanup(patcher.stop)
         self.mock_clientid = patcher.start()
         self.mock_clientid.return_value = '0123456789abcdef'
 
-        patcher = patch('source.api.oauth.token', autospec=True)
+        patcher = patch('source.api.oauth.token')
         self.addCleanup(patcher.stop)
         self.mock_token = patcher.start()
         self.mock_token.return_value = 'abcdef0123456789'
 
-    def test_get_headers(self):
-        headers = twitch.get_headers({}, 'botgotsthis')
+    async def test_get_headers(self):
+        headers = await twitch.get_headers({}, 'botgotsthis')
         self.mock_clientid.assert_called_once_with()
         self.mock_token.assert_called_once_with('botgotsthis')
         self.assertEqual(headers,
@@ -259,8 +259,8 @@ class TestApiTwitchApiHeaders(unittest.TestCase):
                           'Client-ID': '0123456789abcdef',
                           'Authorization': 'OAuth abcdef0123456789'})
 
-    def test_get_headers_no_channel(self):
-        headers = twitch.get_headers({}, None)
+    async def test_get_headers_no_channel(self):
+        headers = await twitch.get_headers({}, None)
         self.mock_clientid.assert_called_once_with()
         self.assertFalse(self.mock_token.called)
         self.assertEqual(headers,
@@ -278,25 +278,6 @@ class TestApiTwitchApiCalls(unittest.TestCase):
         patcher = patch('http.client.HTTPSConnection', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_httpconnection = patcher.start()
-
-    def test_api_call(self):
-        twitch.api_call('botgotsthis', 'GET', '/kraken/',
-                        data={'bot': 'BotGotsThis'})
-        self.mock_headers.assert_called_once_with({}, 'botgotsthis')
-
-    def test_api_call_channel_none(self):
-        twitch.api_call(None, 'GET', '/kraken/', data={'bot': 'BotGotsThis'})
-        self.mock_headers.assert_called_once_with({}, None)
-
-    def test_api_call_data_none(self):
-        twitch.api_call(None, 'GET', '/kraken/')
-        self.mock_headers.assert_called_once_with({}, None)
-
-    def test_api_call_header(self):
-        headers = {'Kappa': 'megotsthis'}
-        twitch.api_call('botgotsthis', 'GET', '/kraken/', headers=headers)
-        self.mock_headers.assert_called_once_with({'Kappa': 'megotsthis'},
-                                                  'botgotsthis')
 
     async def fail_test_get_call(self):
         # TODO: Fix when asynctest is updated with magic mock
@@ -400,11 +381,6 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_async_response = Mock(spec=aiohttp.ClientResponse)
         self.mock_response = Mock(spec=HTTPResponse)
 
-        patcher = patch('source.api.twitch.api_call')
-        self.addCleanup(patcher.stop)
-        self.mock_api_call = patcher.start()
-        self.mock_api_call.return_value = [self.mock_response, b'']
-
         patcher = patch('source.api.twitch.get_call')
         self.addCleanup(patcher.stop)
         self.mock_get_call = patcher.start()
@@ -452,7 +428,7 @@ class TestApiTwitch(asynctest.TestCase):
 
     async def test_server_time_except(self):
         exception = aiohttp.ClientResponseError(None, None)
-        self.mock_api_call.side_effect = exception
+        self.mock_get_call.side_effect = exception
         self.assertIsNone(await twitch.server_time())
 
     async def test_twitch_emotes(self):
@@ -484,7 +460,7 @@ class TestApiTwitch(asynctest.TestCase):
             None, StrContains('/kraken/chat/emoticon_images?emotesets='))
 
     async def test_twitch_emotes_except(self):
-        self.mock_api_call.side_effect = ConnectionError
+        self.mock_get_call.side_effect = asyncio.TimeoutError
         self.assertIsNone(await twitch.twitch_emotes())
         self.mock_get_call.assert_called_once_with(
             None, StrContains('/kraken/chat/emoticon_images?emotesets='))
@@ -632,7 +608,7 @@ class TestApiTwitch(asynctest.TestCase):
         self.assertTrue(self.mock_get_call.called)
 
     async def test_properties_exception(self):
-        self.mock_api_call.side_effect = HTTPException
+        self.mock_get_call.side_effect = asyncio.TimeoutError
         self.assertIsNone(await twitch.channel_properties('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
         self.assertTrue(self.mock_get_call.called)

@@ -3,7 +3,7 @@ import unittest
 from asynctest.mock import Mock, patch
 
 from source.data import Message
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import StrContains
 
@@ -103,7 +103,7 @@ class TestManageBotBanned(TestManageBot):
 
 class TestManageBotBannedListBannedChannels(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
     def test(self):
@@ -136,7 +136,7 @@ class TestManageBotBannedListBannedChannels(unittest.TestCase):
 
 class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
         patcher = patch('bot.utils.partChannel', autospec=True)
@@ -221,7 +221,7 @@ class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
 
 class TestManageBotBannedDeleteBannedChannel(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
     def test(self):

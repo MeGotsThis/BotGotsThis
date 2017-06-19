@@ -14,8 +14,8 @@ async def commandExit(args: ChatCommandArgs) -> bool:
 @ownerChannel
 @permission('owner')
 async def commandSay(args: ChatCommandArgs) -> bool:
-    return channel.say(args.database, args.nick, args.message.lower[1],
-                       args.message[2:])
+    return await channel.say(args.nick, args.message.lower[1],
+                             args.message[2:])
 
 
 @min_args(2)

@@ -1,9 +1,6 @@
-﻿import bot.config
-from bot import utils
-from typing import Iterable, List, Optional
-from ..library.chat import permission
+﻿from ..library.chat import permission
 from ...data import ManageBotArgs, Send
-from ...database import DatabaseBase
+from ...database import DatabaseMain
 
 
 @permission('owner')
@@ -19,7 +16,7 @@ async def manageManager(args: ManageBotArgs) -> bool:
 
 
 def insert_manager(user: str,
-                   database: DatabaseBase,
+                   database: DatabaseMain,
                    send: Send) -> bool:
     if database.isBotManager(user):
         send('{user} is already a manager'.format(user=user))
@@ -34,7 +31,7 @@ def insert_manager(user: str,
 
 
 def delete_manager(user: str,
-                   database: DatabaseBase,
+                   database: DatabaseMain,
                    send: Send) -> bool:
     if not database.isBotManager(user):
         send('{user} is already not a manager'.format(user=user))

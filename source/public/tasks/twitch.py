@@ -4,9 +4,9 @@ import copy
 import random
 from bot import data, utils
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, cast
 from ...api import twitch
-from ...database import factory
+from ... import database
 
 
 async def checkTwitchIds(timestamp: datetime) -> None:
@@ -110,9 +110,11 @@ async def checkChatServers(timestamp: datetime) -> None:
     if cluster is None:
         return
     if (cluster in bot.globals.clusters
-            and bot.globals.clusters[cluster] is channels[channel].socket):
+            and bot.globals.clusters[cluster] is channels[channel].connection):
         return
-    with factory.getDatabase() as db:
-        priority: Union[int, float] = db.getAutoJoinsPriority(channel)
+    db: database.Database
+    async with await database.get_database() as db:
+        database_: database.DatabaseMain = cast(database.DatabaseMain, db)
+        priority: Union[int, float] = database_.getAutoJoinsPriority(channel)
         utils.ensureServer(channel, priority, cluster)
-        db.setAutoJoinServer(channel, cluster)
+        database_.setAutoJoinServer(channel, cluster)

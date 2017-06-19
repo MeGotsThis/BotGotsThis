@@ -29,8 +29,7 @@ class TestChannelOwner(TestChannel):
         self.permissionSet['owner'] = True
         args = self.args._replace(message=Message('!say MeGotsThis Kappa'))
         self.assertIs(await owner.commandSay(args), True)
-        mock_say.assert_called_once_with(self.database, 'botgotsthis',
-                                         'megotsthis', 'Kappa')
+        mock_say.assert_called_once_with('botgotsthis', 'megotsthis', 'Kappa')
 
     @patch('source.public.library.channel.join')
     async def test_join(self, mock_join):

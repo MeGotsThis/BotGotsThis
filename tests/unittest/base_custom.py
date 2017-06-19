@@ -8,7 +8,7 @@ from datetime import datetime
 from source.data import CustomFieldArgs, CustomProcessArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 
 
 class TestCustomField(asynctest.TestCase):
@@ -26,7 +26,7 @@ class TestCustomProcess(asynctest.TestCase):
         self.tags = IrcMessageTags()
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.permissionSet = {
             'owner': False,
             'inOwnerChannel': False,

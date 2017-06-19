@@ -29,7 +29,7 @@ class TestWhisperOwner(TestWhisper):
         mock_exit.assert_called_once_with(
             PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('source.public.library.channel.say', autospec=True)
+    @patch('source.public.library.channel.say')
     async def test_say(self, mock_say):
         self.assertIs(await owner.commandSay(self.args), False)
         self.assertFalse(mock_say.called)
@@ -38,8 +38,7 @@ class TestWhisperOwner(TestWhisper):
         self.permissionSet['manager'] = True
         args = self.args._replace(message=Message('!say MeGotsThis Kappa'))
         self.assertIs(await owner.commandSay(args), True)
-        mock_say.assert_called_once_with(self.database, 'botgotsthis',
-                                         'megotsthis', 'Kappa')
+        mock_say.assert_called_once_with('botgotsthis', 'megotsthis', 'Kappa')
 
     @patch('source.public.library.channel.join')
     async def test_join(self, mock_join):

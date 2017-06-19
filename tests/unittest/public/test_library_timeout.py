@@ -1,16 +1,17 @@
-import unittest
+import asynctest
 from bot.data import Channel
 from datetime import datetime, timedelta
-from source.database import DatabaseBase
+from source.database import DatabaseMain, DatabaseTimeout
 from source.public.library import timeout
-from tests.unittest.mock_class import StrContains, TypeMatch
-from unittest.mock import Mock, call, patch
+from tests.unittest.mock_class import TypeMatch
+from asynctest.mock import Mock, call, patch
 
 
-class TestLibraryTimeoutUser(unittest.TestCase):
+# TODO: Fix when asynctest is updated with magic mock
+class TestLibraryTimeoutUser:#(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.database.getChatProperties.return_value = {
             'timeoutLength0': 60,
             'timeoutLength1': 3600,
@@ -34,9 +35,9 @@ class TestLibraryTimeoutUser(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_now = patcher.start()
 
-    def test(self):
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest')
+    async def test(self):
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -53,9 +54,9 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 60, None, None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_reason(self):
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest', reason='Kappa')
+    async def test_reason(self):
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest', reason='Kappa')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -73,9 +74,9 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 60, None,
             'Kappa')
 
-    def test_message(self):
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest', message='Kappa')
+    async def test_message(self):
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest', message='Kappa')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -93,9 +94,9 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_base_level_1(self):
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest', base_level=1)
+    async def test_base_level_1(self):
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest', base_level=1)
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -113,9 +114,9 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             'botgotsthis', 'megotsthis', None, 'unittest', 1, 3600, None, None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_base_level_2(self):
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest', base_level=2)
+    async def test_base_level_2(self):
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest', base_level=2)
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -134,9 +135,9 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_base_level_3(self):
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest', base_level=3)
+    async def test_base_level_3(self):
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest', base_level=3)
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -155,9 +156,9 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_base_level_negative(self):
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest', base_level=-1)
+    async def test_base_level_negative(self):
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest', base_level=-1)
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -174,14 +175,14 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 60, None, None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_override(self):
+    async def test_override(self):
         self.database.getChatProperties.return_value = {
             'timeoutLength0': 1,
             'timeoutLength1': 1,
             'timeoutLength2': 1,
             }
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest')
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -198,14 +199,14 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 1, None, None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_ban(self):
+    async def test_ban(self):
         self.database.getChatProperties.return_value = {
             'timeoutLength0': 0,
             'timeoutLength1': 0,
             'timeoutLength2': 0,
             }
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest')
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -222,14 +223,14 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 0, None, None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_repeat_0(self):
+    async def test_repeat_0(self):
         self.channel.sessionData['timeouts'] = {
             'unittest': {
                 'megotsthis': (self.now - timedelta(seconds=1), 0)
                 }
             }
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest')
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -247,14 +248,14 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             'botgotsthis', 'megotsthis', None, 'unittest', 1, 3600, None, None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_repeat_1(self):
+    async def test_repeat_1(self):
         self.channel.sessionData['timeouts'] = {
             'unittest': {
                 'megotsthis': (self.now - timedelta(seconds=1), 1)
                 }
             }
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest')
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -273,14 +274,14 @@ class TestLibraryTimeoutUser(unittest.TestCase):
             None)
         self.assertFalse(self.mock_whisper.called)
 
-    def test_repeat_2(self):
+    async def test_repeat_2(self):
         self.channel.sessionData['timeouts'] = {
             'unittest': {
                 'megotsthis': (self.now - timedelta(seconds=1), 2)
                 }
             }
-        timeout.timeout_user(self.database, self.channel, 'megotsthis',
-                             'unittest')
+        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+                                   'unittest')
         self.database.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
@@ -300,120 +301,121 @@ class TestLibraryTimeoutUser(unittest.TestCase):
         self.assertFalse(self.mock_whisper.called)
 
 
-class TestLibraryTimeoutRecord(unittest.TestCase):
+# TODO: Fix when asynctest is updated with magic mock
+class TestLibraryTimeoutRecord:#(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseTimeout)
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
 
-    def test(self):
-        timeout.record_timeout(
-            self.database, self.channel, None, 'Kappa', 'Kappa', 'unittest')
+    async def test(self):
+        await timeout.record_timeout(
+            self.channel, None, 'Kappa', 'Kappa', 'unittest')
         self.assertFalse(self.database.recordTimeout.called)
 
-    def test_timeout(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_timeout(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '.timeout megotsthis', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, None, 'Kappa',
             None)
 
-    def test_timeout_length(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_timeout_length(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '.timeout megotsthis 1', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, 1, 'Kappa',
             None)
 
-    def test_timeout_length_reason(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_timeout_length_reason(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '.timeout megotsthis 1 :P', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, 1, 'Kappa',
             ':P')
 
-    def test_slash_timeout(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_slash_timeout(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '/timeout megotsthis', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, None, 'Kappa',
             None)
 
-    def test_slash_timeout_length(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_slash_timeout_length(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '/timeout megotsthis 1', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, 1, 'Kappa',
             None)
 
-    def test_slash_timeout_length_reason(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_slash_timeout_length_reason(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '/timeout megotsthis 1 :P', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, 1, 'Kappa',
             ':P')
 
-    def test_ban(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_ban(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '.ban megotsthis', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, 0, 'Kappa',
             None)
 
-    def test_ban_reason(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_ban_reason(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '.ban megotsthis :P', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, 0, 'Kappa',
             ':P')
 
-    def test_slash_ban(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_slash_ban(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '/ban megotsthis', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, 0, 'Kappa',
             None)
 
-    def test_slash_ban_reason(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_slash_ban_reason(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '/ban megotsthis :P', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', None, 0, 'Kappa',
             ':P')
 
-    def test_bad(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_bad(self):
+        await timeout.record_timeout(
+            self.channel, None,
             '.ban', 'Kappa', 'unittest')
-        timeout.record_timeout(
+        await timeout.record_timeout(
             self.database, self.channel, None,
             '.timeout', 'Kappa', 'unittest')
-        timeout.record_timeout(
+        await timeout.record_timeout(
             self.database, self.channel, None,
             '.timeout megotsthis abc', 'Kappa', 'unittest')
         self.assertFalse(self.database.recordTimeout.called)
 
-    def test_who(self):
-        timeout.record_timeout(
-            self.database, self.channel, 'mebotsthis',
+    async def test_who(self):
+        await timeout.record_timeout(
+            self.channel, 'mebotsthis',
             '.timeout megotsthis', 'Kappa', 'unittest')
         self.database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', 'mebotsthis', 'unittest', None, None,
             'Kappa', None)
 
-    def test_multiple(self):
-        timeout.record_timeout(
-            self.database, self.channel, None,
+    async def test_multiple(self):
+        await timeout.record_timeout(
+            self.channel, None,
             ['.timeout megotsthis 1', '.ban megotsthis'],
             'Kappa', 'unittest')
         self.assertEqual(

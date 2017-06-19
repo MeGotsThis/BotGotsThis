@@ -3,18 +3,17 @@ from bot import data, utils
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timedelta
-from typing import Dict, Iterable, Mapping, List, Optional
-from typing import Union
-from ...database import DatabaseBase
+from typing import Dict, Iterable, Mapping, List, Optional, Union, cast
+from ... import database
 
 
-def timeout_user(database: DatabaseBase,
-                 chat: 'data.Channel',
-                 user: str,
-                 module: str,
-                 base_level: int=0,
-                 message: Optional[str]=None,
-                 reason: Optional[str]=None):
+async def timeout_user(database_: database.DatabaseMain,
+                       chat: 'data.Channel',
+                       user: str,
+                       module: str,
+                       base_level: int=0,
+                       message: Optional[str]=None,
+                       reason: Optional[str]=None):
     properties: List[str]
     defaults: Dict[str, int]
     chatProp: Mapping[str, int]
@@ -24,8 +23,8 @@ def timeout_user(database: DatabaseBase,
                 'timeoutLength1': bot.config.moderatorDefaultTimeout[1],
                 'timeoutLength2': bot.config.moderatorDefaultTimeout[2],
                 }
-    chatProp = database.getChatProperties(chat.channel, properties, defaults,
-                                          int)
+    chatProp = database_.getChatProperties(chat.channel, properties, defaults,
+                                           int)
     timeouts = [chatProp['timeoutLength0'],
                 chatProp['timeoutLength1'],
                 chatProp['timeoutLength2'],]
@@ -52,16 +51,19 @@ def timeout_user(database: DatabaseBase,
     else:
         chat.send(
             '.ban {user} {reason}'.format(user=user, reason=reason or ''), 0)
-    database.recordTimeout(chat.channel, user, None, module, level, length,
-                           message, reason)
+
+    db: database.Database
+    async with await database.get_database() as db:
+        db_: database.DatabaseTimeout = cast(database.DatabaseTimeout, db)
+        db_.recordTimeout(chat.channel, user, None, module, level, length,
+                          message, reason)
 
 
-def record_timeout(database: DatabaseBase,
-                   chat: 'data.Channel',
-                   user: Optional[str],
-                   messages: Union[str, Iterable[str]],
-                   source_message: Optional[str],
-                   module: str):
+async def record_timeout(chat: 'data.Channel',
+                         user: Optional[str],
+                         messages: Union[str, Iterable[str]],
+                         source_message: Optional[str],
+                         module: str):
     if isinstance(messages, str):
         messages = messages,
     message: str
@@ -89,5 +91,9 @@ def record_timeout(database: DatabaseBase,
                     if len(parts) >= 4:
                         reason = parts[3]
         if who is not None:
-            database.recordTimeout(chat.channel, who, user, module, None,
-                                   length, source_message, reason)
+            db: database.Database
+            async with await database.get_database() as db:
+                db_: database.DatabaseTimeout
+                db_ = cast(database.DatabaseTimeout, db)
+                db_.recordTimeout(chat.channel, who, user, module, None,
+                                  length, source_message, reason)

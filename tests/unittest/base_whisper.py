@@ -5,11 +5,10 @@ from datetime import datetime
 from asynctest.mock import MagicMock, Mock
 
 from bot.data import Channel
-from bot.twitchmessage import IrcMessageTags
 from source.data import WhisperCommandArgs
 from source.data.message import Message
 from source.data.permissions import WhisperPermissionSet
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 
 
 class TestWhisper(asynctest.TestCase):
@@ -18,7 +17,7 @@ class TestWhisper(asynctest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.permissionSet = {
             'owner': False,
             'manager': False,

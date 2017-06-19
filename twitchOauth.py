@@ -1,11 +1,12 @@
 ﻿from source.api import twitch
-from source.database.factory import getDatabase
+from source import database
 import urllib.parse
 import configparser
 import json
 
 ini = configparser.ConfigParser()
 ini.read('twitchApi.ini')
+
 
 try:
     returnUrl = input('Return URL -> ')
@@ -42,7 +43,7 @@ try:
                 if response.status == 200:
                     tokenInfo = json.loads(data.decode('utf-8'))
                     
-                    with getDatabase() as db:
+                    with database.get_database(database.Schema.OAuth) as db:
                         db.saveBroadcasterToken(
                             tokenInfo['token']['user_name'].lower(), token)
                     print(

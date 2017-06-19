@@ -2,7 +2,7 @@
 from typing import Set
 from ...data import Send
 from ...data.message import Message
-from ...database import DatabaseBase
+from ...database import DatabaseMain
 
 enable: Set[str] = {
     '',
@@ -17,7 +17,7 @@ disable: Set[str] = {
     }
 
 
-def feature(database: DatabaseBase,
+def feature(database: DatabaseMain,
             channel: str,
             message: Message,
             send: Send) -> bool:
@@ -38,7 +38,7 @@ def feature(database: DatabaseBase,
     return True
 
 
-def feature_add(database: DatabaseBase,
+def feature_add(database: DatabaseMain,
                 channel: str,
                 feature_: str,
                 send: Send) -> bool:
@@ -55,7 +55,7 @@ def feature_add(database: DatabaseBase,
     return True
 
 
-def feature_remove(database: DatabaseBase,
+def feature_remove(database: DatabaseMain,
                    channel: str,
                    feature_: str,
                    send: Send) -> bool:

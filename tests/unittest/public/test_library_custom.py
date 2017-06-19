@@ -14,14 +14,14 @@ from source.data import CustomCommand, CustomFieldArgs, CustomFieldParts
 from source.data import CustomProcessArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 from source.public.library import custom
 from tests.unittest.mock_class import TypeMatch
 
 
 class TestLibraryCustomGetCommand(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.permissions = defaultdict(lambda: False, {'': True})
 
     def test_no_commands(self):
@@ -231,7 +231,7 @@ class TestLibraryCustomCreateMessages(asynctest.TestCase):
         self.tags = IrcMessageTags()
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.database.hasFeature.return_value = False
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.command = CustomCommand('Kappa KappaRoss KappaPride',

@@ -1,16 +1,18 @@
 ﻿import bot.globals
 
-from typing import Optional
+from typing import Optional, cast
 
 from ..library.chat import min_args, permission_not_feature, permission
 from ...api import oauth, twitch
 from ...data import ChatCommandArgs
+from ... import database
 
 
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 async def commandStatus(args: ChatCommandArgs) -> bool:
-    if oauth.token(args.chat.channel, database=args.database) is None:
+    token: Optional[str] = await oauth.token(args.chat.channel)
+    if token is None:
         return False
     msg: str
     if await twitch.update(args.chat.channel, status=args.message.query):
@@ -27,7 +29,8 @@ async def commandStatus(args: ChatCommandArgs) -> bool:
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 async def commandGame(args: ChatCommandArgs) -> bool:
-    if oauth.token(args.chat.channel, database=args.database) is None:
+    token: Optional[str] = await oauth.token(args.chat.channel)
+    if token is None:
         return False
     game: str = args.message.query
     game = args.database.getFullGameTitle(args.message.lower[1:]) or game
@@ -46,7 +49,8 @@ async def commandGame(args: ChatCommandArgs) -> bool:
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 async def commandRawGame(args: ChatCommandArgs) -> bool:
-    if oauth.token(args.chat.channel, database=args.database) is None:
+    token: Optional[str] = await oauth.token(args.chat.channel)
+    if token is None:
         return False
     if await twitch.update(args.chat.channel, game=args.message.query):
         if args.message.query:
@@ -62,7 +66,8 @@ async def commandRawGame(args: ChatCommandArgs) -> bool:
 @permission_not_feature(('broadcaster', None),
                         ('moderator', 'gamestatusbroadcaster'))
 async def commandCommunity(args: ChatCommandArgs) -> bool:
-    if oauth.token(args.chat.channel, database=args.database) is None:
+    token: Optional[str] = await oauth.token(args.chat.channel)
+    if token is None:
         return False
     community: Optional[str] = None
     if len(args.message) >= 2:
@@ -94,9 +99,12 @@ async def commandPurge(args: ChatCommandArgs) -> bool:
     args.chat.send(
         '.timeout {user} 1 {reason}'.format(
             user=args.message[1], reason=reason))
-    args.database.recordTimeout(
-        args.chat.channel, args.message.lower[1], args.nick, 'purge', None, 1,
-        str(args.message), reason if reason else None)
+    db_: database.Database
+    async with await database.get_database(database.Schema.Timeout) as db_:
+        db: database.DatabaseTimeout = cast(database.DatabaseTimeout, db_)
+        db.recordTimeout(
+            args.chat.channel, args.message.lower[1], args.nick, 'purge', None,
+            1, str(args.message), reason if reason else None)
     return True
 
 

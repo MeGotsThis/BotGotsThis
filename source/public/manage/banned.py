@@ -3,7 +3,7 @@ from bot import utils
 from typing import Iterable, List, Optional
 from ..library import message
 from ...data import ManageBotArgs, Send
-from ...database import DatabaseBase
+from ...database import DatabaseMain
 
 needReason: List[str] = ['add', 'insert', 'del', 'delete', 'rem', 'remove',
                          'remove']
@@ -30,7 +30,7 @@ async def manageBanned(args: ManageBotArgs) -> bool:
     return False
 
 
-def list_banned_channels(database: DatabaseBase,
+def list_banned_channels(database: DatabaseMain,
                          send: Send) -> bool:
     bannedChannels: Iterable[str] = database.listBannedChannels()
     if bannedChannels:
@@ -43,7 +43,7 @@ def list_banned_channels(database: DatabaseBase,
 def insert_banned_channel(channel: str,
                           reason: str,
                           nick: str,
-                          database: DatabaseBase,
+                          database: DatabaseMain,
                           send: Send) -> bool:
     if channel == bot.config.botnick:
         send('Cannot ban the bot itself')
@@ -70,7 +70,7 @@ def insert_banned_channel(channel: str,
 def delete_banned_channel(channel: str,
                           reason: str,
                           nick: str,
-                          database: DatabaseBase,
+                          database: DatabaseMain,
                           send: Send) -> bool:
     isBannedOrReason: Optional[str] = database.isChannelBannedReason(channel)
     if isBannedOrReason is None:

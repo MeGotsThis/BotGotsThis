@@ -5,7 +5,7 @@ from asynctest.mock import CoroutineMock, Mock, patch
 from source.data import ManageBotArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 from source.public.library import managebot
 from tests.unittest.mock_class import TypeMatch
 
@@ -20,7 +20,7 @@ def method(args):
 
 class TestLibraryManageBot(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.permissions = Mock(spec=ChatPermissionSet)
         self.send = Mock(spec=send)
         self.method = CoroutineMock(spec=method, return_value=True)

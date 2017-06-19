@@ -28,8 +28,8 @@ async def customCommands(args: ChatCommandArgs) -> bool:
         msgs: List[str] = await custom.create_messages(command, args)
         args.chat.send(msgs)
         if args.permissions.chatModerator:
-            timeout.record_timeout(args.database, args.chat, args.nick, msgs,
-                                   str(args.message), 'custom')
+            await timeout.record_timeout(args.chat, args.nick, msgs,
+                                         str(args.message), 'custom')
         return True
     return False
 

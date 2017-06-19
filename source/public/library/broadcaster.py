@@ -6,10 +6,10 @@ from typing import Dict, List, Optional, Union
 from ...api import twitch
 from ...data import Send
 from ...data.message import Message
-from ...database import DatabaseBase, DatabaseMain
+from ...database import DatabaseMain
 
 
-async def come(database: DatabaseBase,
+async def come(database: DatabaseMain,
                channel: str,
                send: Send) -> bool:
     if database.isChannelBannedReason(channel) is not None:
@@ -55,7 +55,7 @@ def empty(channel: str,
     return True
 
 
-async def auto_join(database: DatabaseBase,
+async def auto_join(database: DatabaseMain,
                     channel: str,
                     send: Send,
                     message: Message) -> bool:
@@ -118,7 +118,7 @@ async def auto_join_add(database: DatabaseMain,
     return True
 
 
-def auto_join_delete(database: DatabaseBase,
+def auto_join_delete(database: DatabaseMain,
                      channel: str,
                      send: Send) -> bool:
     result: bool = database.discardAutoJoin(channel)
@@ -130,7 +130,7 @@ def auto_join_delete(database: DatabaseBase,
     return True
 
 
-def set_timeout_level(database: DatabaseBase,
+def set_timeout_level(database: DatabaseMain,
                       channel: str,
                       send: Send,
                       message: Message) -> bool:

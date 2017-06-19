@@ -39,10 +39,8 @@ def key(module: str) -> Tuple[int, str]:
         return 0, module
     if module == 'source.database':
         return 1, module
-    if module == 'source.database.factory':
-        return 9, module
     if module.startswith('source.database.'):
-        return 8, module
+        return 9, module
 
     if is_submodule(module, 'source.api'):
         return 10, module

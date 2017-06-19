@@ -8,7 +8,7 @@ from asynctest.mock import Mock, patch
 from bot import utils
 from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 from source.public.library import channel
 from tests.unittest.mock_class import StrContains
 
@@ -19,7 +19,7 @@ def send(messages):
 
 class TestLibraryChannelJoin(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
         patcher = patch('bot.globals', autospec=True)
@@ -181,9 +181,8 @@ class TestLibraryChannelPart(unittest.TestCase):
         self.assertFalse(self.mock_part.called)
 
 
-class TestLibraryChannelSay(unittest.TestCase):
+class TestLibraryChannelSay(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
         self.channel = Mock(spec=Channel)
 
         patcher = patch('bot.globals', autospec=True)
@@ -191,22 +190,21 @@ class TestLibraryChannelSay(unittest.TestCase):
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}
 
-        patcher = patch('source.public.library.timeout.record_timeout',
-                        autospec=True)
+        patcher = patch('source.public.library.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_record = patcher.start()
 
-    def test(self):
+    async def test(self):
         self.assertIs(
-            channel.say(self.database, 'megotsthis', 'botgotsthis', 'Kappa'),
+            await channel.say('megotsthis', 'botgotsthis', 'Kappa'),
             True)
         self.mock_record.assert_called_once_with(
-            self.database, self.channel, 'megotsthis', 'Kappa', None, 'say')
+            self.channel, 'megotsthis', 'Kappa', None, 'say')
         self.channel.send.assert_called_once_with('Kappa')
 
-    def test_not_existing(self):
+    async def test_not_existing(self):
         self.assertIs(
-            channel.say(self.database, 'botgotsthis', 'megotsthis', 'Kappa'),
+            await channel.say('botgotsthis', 'megotsthis', 'Kappa'),
             False)
         self.assertFalse(self.mock_record.called)
         self.channel.send.assert_not_called()

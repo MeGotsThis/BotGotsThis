@@ -9,7 +9,7 @@ from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from source.data.message import Message
-from source.database import DatabaseBase, DatabaseMain
+from source.database import DatabaseMain
 from source.public.library import broadcaster
 from tests.unittest.mock_class import StrContains, TypeMatch
 
@@ -21,7 +21,7 @@ def send(messages):
 class TestLibraryBroadcasterCome(asynctest.TestCase):
     def setUp(self):
         self.tags = IrcMessageTags()
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
         patcher = patch('bot.globals', autospec=True)
@@ -222,7 +222,7 @@ class TestLibraryBroadcasterEmpty(unittest.TestCase):
 
 class TestLibraryBroadcasterAutoJoin(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.database.isChannelBannedReason.return_value = None
         self.send = Mock(spec=send)
 
@@ -546,7 +546,7 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
 
 class TestLibraryBroadcasterAutoJoinDelete(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
     def test(self):
@@ -572,7 +572,7 @@ class TestLibraryBroadcasterAutoJoinDelete(unittest.TestCase):
 
 class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseBase)
+        self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
         patcher = patch('bot.config', autospec=True)

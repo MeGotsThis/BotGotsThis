@@ -144,8 +144,7 @@ class TestChannelWallProcess(TestChannel):
         self.addCleanup(patcher.stop)
         self.mock_cooldown = patcher.start()
 
-        patcher = patch('source.public.library.timeout.record_timeout',
-                        autospec=True)
+        patcher = patch('source.public.library.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 
@@ -194,7 +193,7 @@ class TestChannelWallProcess(TestChannel):
             IterableMatch('Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.mock_timeout.assert_called_once_with(
-            self.database, self.channel, 'botgotsthis', 'Kappa',
+            self.channel, 'botgotsthis', 'Kappa',
             str(self.args.message), 'wall')
 
     async def test_broadcaster_limit(self):

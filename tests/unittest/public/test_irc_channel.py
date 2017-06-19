@@ -11,7 +11,7 @@ from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from source import channel
 from source.data import Message
-from source.database import DatabaseBase
+from source.database import DatabaseMain
 
 
 class TestChannel(asynctest.TestCase):
@@ -44,7 +44,7 @@ class TestChannel(asynctest.TestCase):
 
     @patch('bot.utils.logException', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
-    @patch('source.database.factory.getDatabase', autospec=True)
+    @patch('source.database.get_database', autospec=True)
     @patch('source.channel.commandsToProcess', autospec=True)
     async def fail_test_chatCommand(self, mock_commands, mock_database, mock_save,
                                mock_log):
@@ -52,7 +52,7 @@ class TestChannel(asynctest.TestCase):
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
         mock_commands.return_value = [command1, command2, command3]
-        database = MagicMock(spec=DatabaseBase)
+        database = MagicMock(spec=DatabaseMain)
         database.__enter__.return_value = database
         database.isPermittedUser.return_value = False
         database.isBotManager.return_value = False
@@ -80,7 +80,7 @@ class TestChannel(asynctest.TestCase):
         # TODO: Fix when asynctest is updated with magic mock
         command = Mock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
-        database = MagicMock(spec=DatabaseBase)
+        database = MagicMock(spec=DatabaseMain)
         database.__enter__.return_value = database
         database.isPermittedUser.return_value = False
         database.isBotManager.return_value = False
@@ -121,7 +121,7 @@ class TestChannel(asynctest.TestCase):
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
         mock_commands.return_value = [command1, command2, command3]
-        database = MagicMock(spec=DatabaseBase)
+        database = MagicMock(spec=DatabaseMain)
         database.__enter__.return_value = database
         database.isPermittedUser.return_value = False
         database.isBotManager.return_value = False
