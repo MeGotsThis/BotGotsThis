@@ -135,7 +135,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('source.public.manage.autojoin.auto_join_priority', autospec=True)
+    @patch('source.public.manage.autojoin.auto_join_priority')
     async def test_priority(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis')
@@ -144,7 +144,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('source.public.manage.autojoin.auto_join_priority', autospec=True)
+    @patch('source.public.manage.autojoin.auto_join_priority')
     async def test_pri(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin pri botgotsthis')
@@ -153,7 +153,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('source.public.manage.autojoin.auto_join_priority', autospec=True)
+    @patch('source.public.manage.autojoin.auto_join_priority')
     async def test_priority_gibberish(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis abc')
@@ -162,7 +162,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('source.public.manage.autojoin.auto_join_priority', autospec=True)
+    @patch('source.public.manage.autojoin.auto_join_priority')
     async def test_priority_integer(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis 1')
@@ -172,27 +172,27 @@ class TestManageBotAutoJoin(TestManageBot):
                                               self.send)
 
 
-class TestManageBotAutoJoinAutoJoinPriority(unittest.TestCase):
+class TestManageBotAutoJoinAutoJoinPriority(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-    def test(self):
+    async def test(self):
         self.database.setAutoJoinPriority.return_value = True
         self.assertIs(
-            autojoin.auto_join_priority(self.database, 'botgotsthis', 0,
-                                        self.send),
+            await autojoin.auto_join_priority(self.database, 'botgotsthis', 0,
+                                              self.send),
             True)
         self.database.setAutoJoinPriority.assert_called_once_with(
             'botgotsthis', 0)
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'priority', '0'))
 
-    def test_not_existing(self):
+    async def test_not_existing(self):
         self.database.setAutoJoinPriority.return_value = False
         self.assertIs(
-            autojoin.auto_join_priority(self.database, 'botgotsthis', 0,
-                                        self.send),
+            await autojoin.auto_join_priority(self.database, 'botgotsthis', 0,
+                                              self.send),
             True)
         self.database.setAutoJoinPriority.assert_called_once_with(
             'botgotsthis', 0)
