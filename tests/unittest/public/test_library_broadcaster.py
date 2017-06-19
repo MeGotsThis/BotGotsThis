@@ -544,26 +544,26 @@ class TestLibraryBroadcasterAutoJoinAdd(asynctest.TestCase):
         self.mock_ensure.assert_called_once_with('botgotsthis', 0, 'twitch')
 
 
-class TestLibraryBroadcasterAutoJoinDelete(unittest.TestCase):
+class TestLibraryBroadcasterAutoJoinDelete(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-    def test(self):
+    async def test(self):
         self.database.discardAutoJoin.return_value = True
         self.assertIs(
-            broadcaster.auto_join_delete(self.database, 'botgotsthis',
-                                         self.send),
+            await broadcaster.auto_join_delete(self.database, 'botgotsthis',
+                                               self.send),
             True)
         self.database.discardAutoJoin.assert_called_once_with('botgotsthis')
         self.send.assert_called_once_with(
             StrContains('botgotsthis', 'disable'))
 
-    def test_not_existing(self):
+    async def test_not_existing(self):
         self.database.discardAutoJoin.return_value = False
         self.assertIs(
-            broadcaster.auto_join_delete(self.database, 'botgotsthis',
-                                         self.send),
+            await broadcaster.auto_join_delete(self.database, 'botgotsthis',
+                                               self.send),
             True)
         self.database.discardAutoJoin.assert_called_once_with('botgotsthis')
         self.send.assert_called_once_with(

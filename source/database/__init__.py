@@ -114,12 +114,12 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
             except pyodbc.IntegrityError:
                 return False
 
-    def discardAutoJoin(self, broadcaster: str) -> bool:
+    async def discardAutoJoin(self, broadcaster: str) -> bool:
         query: str = '''DELETE FROM auto_join WHERE broadcaster=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster,))
-            self.connection.commit()
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
+            await self.connection.commit()
             return cursor.rowcount != 0
 
     def setAutoJoinPriority(self,
