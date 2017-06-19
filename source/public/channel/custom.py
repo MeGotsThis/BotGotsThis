@@ -235,15 +235,17 @@ async def rename_command(args: ChatCommandArgs,
     message: str
     if not newCommand:
         message = '{user} -> Please specify a command to rename to'
-    elif args.database.renameCustomCommand(
-            input.broadcaster, input.level, input.command, args.nick,
-            newCommand):
-        message = ('{user} -> {command} was renamed to successfully to '
-                   '{newcommand}')
     else:
-        message = ('{user} -> {command} was not renamed successfully to '
-                   '{newcommand}. The command might not exist or there is a '
-                   'command already existing')
+        successful: bool = await args.database.renameCustomCommand(
+            input.broadcaster, input.level, input.command, args.nick,
+            newCommand)
+        if successful:
+            message = ('{user} -> {command} was renamed to successfully to '
+                       '{newcommand}')
+        else:
+            message = ('{user} -> {command} was not renamed successfully to '
+                       '{newcommand}. The command might not exist or there is '
+                       'a command already existing')
     args.chat.send(message.format(user=args.nick, command=input.command,
                                   newcommand=newCommand))
     return True
