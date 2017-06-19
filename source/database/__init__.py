@@ -223,36 +223,40 @@ INSERT INTO custom_commands_history
             await self.connection.commit()
             return True
 
-    def updateCustomCommand(self,
-                            broadcaster: str,
-                            permission: str,
-                            command: str,
-                            fullMessage: str,
-                            user: str) -> bool:
+    async def updateCustomCommand(self,
+                                  broadcaster: str,
+                                  permission: str,
+                                  command: str,
+                                  fullMessage: str,
+                                  user: str) -> bool:
         query: str = '''
 UPDATE custom_commands
     SET commandDisplay=?, fullMessage=?, lastEditor=?,
         lastUpdated=CURRENT_TIMESTAMP
-    WHERE broadcaster=? AND permission=? AND command=?'''
+    WHERE broadcaster=? AND permission=? AND command=?
+'''
         history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             display: Optional[str] = None
             if command.lower() != command:
                 display = command
-            cursor.execute(query, (display, fullMessage, user, broadcaster,
-                                   permission, command.lower()))
+            await cursor.execute(query, (display, fullMessage, user,
+                                         broadcaster, permission,
+                                         command.lower()))
             self.connection.commit()
             if cursor.rowcount == 0:
                 return False
 
-            cursor.execute(history, (broadcaster, permission, command.lower(),
-                                     display, 'edit', fullMessage, user))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, permission,
+                                           command.lower(), display, 'edit',
+                                           fullMessage, user))
+            await self.connection.commit()
             return True
 
     def replaceCustomCommand(self,
