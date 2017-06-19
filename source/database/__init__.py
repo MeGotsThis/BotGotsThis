@@ -407,40 +407,41 @@ INSERT INTO custom_commands_history
             await self.connection.commit()
             return True
 
-    def renameCustomCommand(self,
-                           broadcaster: str,
-                           permission: str,
-                           command: str,
-                           user: str,
-                           new_command: str) -> bool:
+    async def renameCustomCommand(self,
+                                  broadcaster: str,
+                                  permission: str,
+                                  command: str,
+                                  user: str,
+                                  new_command: str) -> bool:
         query: str = '''
 UPDATE custom_commands SET command=?, commandDisplay=?
-    WHERE broadcaster=? AND permission=? AND command=?'''
+    WHERE broadcaster=? AND permission=? AND command=?
+'''
         history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
     creator, created)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             display: Optional[str] = None
             if new_command.lower() != new_command:
                 display = new_command
             try:
-                cursor.execute(query, (new_command.lower(), display,
-                                       broadcaster, permission,
-                                       command.lower()))
-            except sqlite3.IntegrityError:
+                await cursor.execute(query, (new_command.lower(), display,
+                                             broadcaster, permission,
+                                             command.lower()))
+            except pyodbc.IntegrityError:
                 return False
 
-            self.connection.commit()
             if cursor.rowcount == 0:
                 return False
 
-            cursor.execute(history, (broadcaster, permission,
-                                     new_command.lower(), display, 'rename',
-                                     command.lower(), user))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, permission,
+                                           new_command.lower(), display,
+                                           'rename', command.lower(), user))
+            await self.connection.commit()
             return True
 
     def getCustomCommandProperty(
