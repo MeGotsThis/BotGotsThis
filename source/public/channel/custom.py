@@ -195,8 +195,8 @@ async def command_property(args: ChatCommandArgs,
 async def raw_command(args: ChatCommandArgs,
                       input: CommandActionTokens) -> bool:
     command: Optional[str]
-    command = args.database.getCustomCommand(input.broadcaster, input.level,
-                                             input.command)
+    command = await args.database.getCustomCommand(
+        input.broadcaster, input.level, input.command)
     message: str
     if command is None:
         message = '{user} -> {command} does not exist'

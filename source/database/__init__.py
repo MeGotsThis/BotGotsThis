@@ -173,17 +173,19 @@ SELECT broadcaster, permission, fullMessage
                 commands[row[0]][row[1]] = row[2]
             return commands
 
-    def getCustomCommand(self,
-                         broadcaster: str,
-                         permission: str,
-                         command: str) -> Optional[str]:
+    async def getCustomCommand(self,
+                               broadcaster: str,
+                               permission: str,
+                               command: str) -> Optional[str]:
         find: str = '''
 SELECT fullMessage FROM custom_commands
-    WHERE broadcaster=? AND permission=? AND command=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(find, (broadcaster, permission, command.lower()))
-            row: Optional[Tuple[str]] = cursor.fetchone()
+    WHERE broadcaster=? AND permission=? AND command=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(find, (broadcaster, permission,
+                                        command.lower()))
+            row: Optional[Tuple[str]] = await cursor.fetchone()
             return row and row[0]
 
     def insertCustomCommand(self,
