@@ -132,14 +132,14 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
             await self.connection.commit()
             return cursor.rowcount != 0
 
-    def setAutoJoinServer(self,
-                          broadcaster: str,
-                          cluster: str = 'aws') -> bool:
+    async def setAutoJoinServer(self,
+                                broadcaster: str,
+                                cluster: str = 'aws') -> bool:
         query: str = '''UPDATE auto_join SET cluster=? WHERE broadcaster=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (cluster, broadcaster))
-            self.connection.commit()
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (cluster, broadcaster))
+            await self.connection.commit()
             return cursor.rowcount != 0
 
     def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
