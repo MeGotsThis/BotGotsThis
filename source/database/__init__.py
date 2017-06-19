@@ -156,20 +156,21 @@ SELECT DISTINCT twitchGame
             game: Optional[Tuple[str]] = await cursor.fetchone()
             return game and game[0]
 
-    def getChatCommands(self,
-                        broadcaster: str,
-                        command: str) -> Dict[str, Dict[str, str]]:
+    async def getChatCommands(self,
+                              broadcaster: str,
+                              command: str) -> Dict[str, Dict[str, str]]:
         query: str = '''
 SELECT broadcaster, permission, fullMessage
-    FROM custom_commands WHERE broadcaster IN (?, \'#global\') AND command=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    FROM custom_commands WHERE broadcaster IN (?, \'#global\') AND command=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             commands: Dict[str, Dict[str, str]]
             commands = {broadcaster: {}, '#global': {}}
             row: Optional[Tuple[str, str, str]]
-            for row in cursor.execute(query, (broadcaster, command)):
+            await cursor.execute(query, (broadcaster, command))
+            async for row in cursor:
                 commands[row[0]][row[1]] = row[2]
-            cursor.close()
             return commands
 
     def getCustomCommand(self,

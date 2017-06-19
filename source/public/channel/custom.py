@@ -12,8 +12,8 @@ from typing import Awaitable, Callable, Dict, List, Optional
 @not_feature('nocustom')
 async def customCommands(args: ChatCommandArgs) -> bool:
     command: Optional[CustomCommand]
-    command = custom.get_command(args.database, args.message.command,
-                                 args.chat.channel, args.permissions)
+    command = await custom.get_command(args.database, args.message.command,
+                                       args.chat.channel, args.permissions)
     if command is not None:
         cooldown: timedelta
         cooldown = timedelta(seconds=bot.config.customMessageCooldown)
