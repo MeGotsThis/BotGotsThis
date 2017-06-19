@@ -31,16 +31,16 @@ async def manageAutoJoin(args: ManageBotArgs) -> bool:
         priority: int = 0
         with suppress(ValueError, IndexError):
             priority = int(args.message[4])
-        return auto_join_priority(
+        return await auto_join_priority(
             args.database, args.message.lower[3], priority, args.send)
     return False
 
 
-def auto_join_priority(database: DatabaseMain,
-                       channel: str,
-                       priority: int,
-                       send: Send) -> bool:
-        result: bool = database.setAutoJoinPriority(channel, priority)
+async def auto_join_priority(database: DatabaseMain,
+                             channel: str,
+                             priority: int,
+                             send: Send) -> bool:
+        result: bool = await database.setAutoJoinPriority(channel, priority)
         if result:
             send('Auto join for {channel} is set to priority '
                  '{priority}'.format(channel=channel, priority=priority))

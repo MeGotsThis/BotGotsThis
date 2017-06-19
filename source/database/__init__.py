@@ -122,14 +122,14 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
             await self.connection.commit()
             return cursor.rowcount != 0
 
-    def setAutoJoinPriority(self,
-                            broadcaster: str,
-                            priority: Union[int, float]) -> bool:
+    async def setAutoJoinPriority(self,
+                                  broadcaster: str,
+                                  priority: Union[int, float]) -> bool:
         query: str = '''UPDATE auto_join SET priority=? WHERE broadcaster=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (priority, broadcaster))
-            self.connection.commit()
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (priority, broadcaster))
+            await self.connection.commit()
             return cursor.rowcount != 0
 
     def setAutoJoinServer(self,
