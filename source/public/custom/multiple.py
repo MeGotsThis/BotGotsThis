@@ -8,11 +8,10 @@ async def propertyMultipleLines(args: CustomProcessArgs) -> None:
         return
 
     value: Optional[Union[str, Dict[str, str]]]
-    value = args.database.getCustomCommandProperty(
-        args.broadcaster, args.level, args.command, 'delimiter'
-        )
+    value = await args.database.getCustomCommandProperty(
+        args.broadcaster, args.level, args.command, 'delimiter')
     delimiter: str = (value if isinstance(value, str) else '') or '&&'
-    
+
     msgs: List[str] = args.messages[:]
     args.messages.clear()
     msg: str

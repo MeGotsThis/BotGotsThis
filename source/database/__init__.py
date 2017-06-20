@@ -444,37 +444,42 @@ INSERT INTO custom_commands_history
             await self.connection.commit()
             return True
 
-    def getCustomCommandProperty(
+    async def getCustomCommandProperty(
             self,
             broadcaster: str,
             permission: str,
             command: str,
-            property: Optional[CommandProperty]=None) -> Optional[CommandReturn]:
+            property: Optional[CommandProperty]=None
+            ) -> Optional[CommandReturn]:
         query: str
-        cursor: sqlite3.Cursor
+        cursor: aioodbc.cursor.Cursor
         p: str
         v: str
         params: tuple
         values: Dict[str, str]
-        with closing(self.connection.cursor()) as cursor:
+        async with await self.cursor() as cursor:
             if property is None:
                 query = '''
 SELECT property, value FROM custom_command_properties
-    WHERE broadcaster=? AND permission=? AND command=?'''
+    WHERE broadcaster=? AND permission=? AND command=?
+'''
                 values = {}
                 params = (broadcaster, permission, command.lower())
-                for p, v in cursor.execute(query, params):
+                await cursor.execute(query, params)
+                async for p, v in cursor:
                     values[p] = v
                 return values
             elif isinstance(property, list):
                 query = '''
 SELECT property, value FROM custom_command_properties
     WHERE broadcaster=? AND permission=? AND command=?
-        AND property IN (%s)''' % ','.join('?' * len(property))
+        AND property IN (%s)
+''' % ','.join('?' * len(property))
                 values = {}
                 params = (broadcaster, permission, command.lower(),
                                  ) + tuple(property)
-                for p, v in cursor.execute(query, params):
+                await cursor.execute(query, params)
+                async for p, v in cursor:
                     values[p] = v
                 for p in property:
                     if p not in values:
@@ -483,10 +488,11 @@ SELECT property, value FROM custom_command_properties
             else:
                 query = '''
 SELECT value FROM custom_command_properties 
-    WHERE broadcaster=? AND permission=? AND command=? AND property=?'''
-                cursor.execute(query, (broadcaster, permission,
-                                       command.lower(), property))
-                row: Optional[Tuple[str]] = cursor.fetchone()
+    WHERE broadcaster=? AND permission=? AND command=? AND property=?
+'''
+                await cursor.execute(query, (broadcaster, permission,
+                                             command.lower(), property))
+                row: Optional[Tuple[str]] = await cursor.fetchone()
                 return row and row[0]
 
     def processCustomCommandProperty(self,
