@@ -44,7 +44,7 @@ async def feature_add(database: DatabaseMain,
                       send: Send) -> bool:
     hasFeature: bool = await database.hasFeature(channel, feature_)
     if not hasFeature:
-        database.addFeature(channel, feature_)
+        await database.addFeature(channel, feature_)
 
     msg: str
     if hasFeature:
