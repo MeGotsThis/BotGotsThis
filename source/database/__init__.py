@@ -775,26 +775,28 @@ SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?
             await cursor.execute(query, (broadcaster, user,))
             return bool(await cursor.fetchone())
 
-    def addPermittedUser(self,
-                         broadcaster: str,
-                         user: str,
-                         moderator: str) -> bool:
+    async def addPermittedUser(self,
+                               broadcaster: str,
+                               user: str,
+                               moderator: str) -> bool:
         query: str = '''
-INSERT INTO permitted_users (broadcaster, twitchUser) VALUES (?, ?)'''
+INSERT INTO permitted_users (broadcaster, twitchUser) VALUES (?, ?)
+'''
         history: str = '''
 INSERT INTO permitted_users_log
     (broadcaster, twitchUser, moderator, created, actionLog)
-    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             try:
-                cursor.execute(query, (broadcaster, user))
-                self.connection.commit()
-            except sqlite3.IntegrityError:
+                await cursor.execute(query, (broadcaster, user))
+            except pyodbc.IntegrityError:
                 return False
 
-            cursor.execute(history, (broadcaster, user, moderator, 'add'))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, user, moderator,
+                                           'add'))
+            await self.connection.commit()
             return True
 
     def removePermittedUser(self,
