@@ -799,25 +799,27 @@ INSERT INTO permitted_users_log
             await self.connection.commit()
             return True
 
-    def removePermittedUser(self,
-                            broadcaster: str,
-                            user: str,
-                            moderator: str) -> bool:
+    async def removePermittedUser(self,
+                                  broadcaster: str,
+                                  user: str,
+                                  moderator: str) -> bool:
         query: str = '''
-DELETE FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''
+DELETE FROM permitted_users WHERE broadcaster=? AND twitchUser=?
+'''
         history: str = '''
 INSERT INTO permitted_users_log
     (broadcaster, twitchUser, moderator, created, actionLog)
-    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, user))
-            self.connection.commit()
+    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster, user))
             if cursor.rowcount == 0:
                 return False
 
-            cursor.execute(history, (broadcaster, user, moderator, 'remove'))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, user, moderator,
+                                           'remove'))
+            await self.connection.commit()
             return True
 
     def isBotManager(self, user: str) -> bool:
