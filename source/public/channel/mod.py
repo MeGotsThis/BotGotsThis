@@ -112,8 +112,10 @@ async def commandPurge(args: ChatCommandArgs) -> bool:
 @min_args(2)
 async def commandPermit(args: ChatCommandArgs) -> bool:
     user: str = args.message.lower[1]
+    permitted: bool
+    permitted = await args.database.isPermittedUser(args.chat.channel, user)
     msg: str
-    if args.database.isPermittedUser(args.chat.channel, user):
+    if permitted:
         if args.database.removePermittedUser(args.chat.channel, user,
                                              args.nick):
             msg = '{mod} -> {user} is now unpermitted in {channel}'

@@ -764,15 +764,16 @@ REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)
             await self.connection.commit()
             return cursor.rowcount != 0
 
-    def isPermittedUser(self,
-                        broadcaster: str,
-                        user: str) -> bool:
+    async def isPermittedUser(self,
+                              broadcaster: str,
+                              user: str) -> bool:
         query: str = '''
-SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, user,))
-            return bool(cursor.fetchone())
+SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster, user,))
+            return bool(await cursor.fetchone())
 
     def addPermittedUser(self,
                          broadcaster: str,
