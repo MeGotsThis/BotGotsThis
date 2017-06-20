@@ -61,7 +61,7 @@ async def feature_remove(database: DatabaseMain,
                          send: Send) -> bool:
     hasFeature: bool = await database.hasFeature(channel, feature_)
     if hasFeature:
-        database.removeFeature(channel, feature_)
+        await database.removeFeature(channel, feature_)
 
     msg: str
     if hasFeature:

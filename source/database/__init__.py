@@ -552,15 +552,16 @@ INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)
             except pyodbc.IntegrityError:
                 return False
 
-    def removeFeature(self,
-                      broadcaster: str,
-                      feature: str) -> bool:
+    async def removeFeature(self,
+                            broadcaster: str,
+                            feature: str) -> bool:
         query: str = '''
-DELETE FROM chat_features WHERE broadcaster=? AND feature=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, feature))
-            self.connection.commit()
+DELETE FROM chat_features WHERE broadcaster=? AND feature=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster, feature))
+            await self.connection.commit()
             return cursor.rowcount != 0
 
     def listBannedChannels(self) -> Iterable[str]:
