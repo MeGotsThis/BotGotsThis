@@ -1,16 +1,16 @@
-import unittest
+import asynctest
 from source.data.message import Message
 from source.database import DatabaseMain
 from source.public.library import feature
 from tests.unittest.mock_class import StrContains
-from unittest.mock import Mock, patch
+from asynctest.mock import Mock, patch
 
 
 def send(messages):
     pass
 
 
-class TestLibraryFeatureFeature(unittest.TestCase):
+class TestLibraryFeatureFeature(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
@@ -21,79 +21,79 @@ class TestLibraryFeatureFeature(unittest.TestCase):
         feature.lists.feature.features['feature'] = 'Feature'
         feature.lists.feature.features['none'] = None
 
-        patcher = patch('source.public.library.feature.feature_add',
-                        autospec=True)
+        patcher = patch('source.public.library.feature.feature_add')
         self.addCleanup(patcher.stop)
         self.mock_add = patcher.start()
 
-        patcher = patch('source.public.library.feature.feature_remove',
-                        autospec=True)
+        patcher = patch('source.public.library.feature.feature_remove')
         self.addCleanup(patcher.stop)
         self.mock_remove = patcher.start()
 
-    def test(self):
+    async def test(self):
         self.mock_add.return_value = True
         self.assertIs(
-            feature.feature(self.database, 'botgotsthis',
-                            Message('!feature feature'), self.send),
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature feature'), self.send),
             True)
         self.assertFalse(self.send.called)
         self.mock_add.assert_called_once_with(
             self.database, 'botgotsthis', 'feature', self.send)
         self.assertFalse(self.mock_remove.called)
 
-    def test_add(self):
+    async def test_add(self):
         self.mock_add.return_value = True
         self.assertIs(
-            feature.feature(self.database, 'botgotsthis',
-                            Message('!feature feature yes'), self.send),
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature feature yes'), self.send),
             True)
         self.assertFalse(self.send.called)
         self.mock_add.assert_called_once_with(
             self.database, 'botgotsthis', 'feature', self.send)
         self.assertFalse(self.mock_remove.called)
 
-    def test_remove(self):
+    async def test_remove(self):
         self.mock_remove.return_value = True
         self.assertIs(
-            feature.feature(self.database, 'botgotsthis',
-                            Message('!feature feature no'), self.send),
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature feature no'), self.send),
             True)
         self.assertFalse(self.send.called)
         self.mock_remove.assert_called_once_with(
             self.database, 'botgotsthis', 'feature', self.send)
         self.assertFalse(self.mock_add.called)
 
-    def test_not_existing_feature(self):
+    async def test_not_existing_feature(self):
         self.assertIs(
-            feature.feature(self.database, 'botgotsthis',
-                            Message('!feature does_not_exist'), self.send),
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature does_not_exist'),
+                                  self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('feature', 'does_not_exist'))
         self.assertFalse(self.mock_add.called)
         self.assertFalse(self.mock_remove.called)
 
-    def test_feature_none(self):
+    async def test_feature_none(self):
         self.assertIs(
-            feature.feature(self.database, 'botgotsthis',
-                            Message('!feature none'), self.send),
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature none'), self.send),
             True)
         self.send.assert_called_once_with(StrContains('feature', 'none'))
         self.assertFalse(self.mock_add.called)
         self.assertFalse(self.mock_remove.called)
 
-    def test_bad_param(self):
+    async def test_bad_param(self):
         self.assertIs(
-            feature.feature(self.database, 'botgotsthis',
-                            Message('!feature feature Kappa'), self.send),
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature feature Kappa'),
+                                  self.send),
             True)
         self.send.assert_called_once_with(StrContains('parameter', 'kappa'))
         self.assertFalse(self.mock_add.called)
         self.assertFalse(self.mock_remove.called)
 
 
-class TestLibraryFeatureAdd(unittest.TestCase):
+class TestLibraryFeatureAdd(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
@@ -103,11 +103,11 @@ class TestLibraryFeatureAdd(unittest.TestCase):
         patcher.start()
         feature.lists.feature.features['feature'] = 'Feature'
 
-    def test(self):
+    async def test(self):
         self.database.hasFeature.return_value = False
         self.assertIs(
-            feature.feature_add(self.database, 'botgotsthis', 'feature',
-                                self.send),
+            await feature.feature_add(self.database, 'botgotsthis', 'feature',
+                                      self.send),
             True)
         self.send.assert_called_once_with(StrContains('Feature', 'enable'))
         self.database.hasFeature.assert_called_once_with(
@@ -115,11 +115,11 @@ class TestLibraryFeatureAdd(unittest.TestCase):
         self.database.addFeature.assert_called_once_with(
             'botgotsthis', 'feature')
 
-    def test_existing(self):
+    async def test_existing(self):
         self.database.hasFeature.return_value = True
         self.assertIs(
-            feature.feature_add(self.database, 'botgotsthis', 'feature',
-                                self.send),
+            await feature.feature_add(self.database, 'botgotsthis', 'feature',
+                                      self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('Feature', 'already', 'enable'))
@@ -128,7 +128,7 @@ class TestLibraryFeatureAdd(unittest.TestCase):
         self.assertFalse(self.database.addFeature.called)
 
 
-class TestLibraryFeatureRemove(unittest.TestCase):
+class TestLibraryFeatureRemove(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
@@ -138,11 +138,11 @@ class TestLibraryFeatureRemove(unittest.TestCase):
         patcher.start()
         feature.lists.feature.features['feature'] = 'Feature'
 
-    def test(self):
+    async def test(self):
         self.database.hasFeature.return_value = True
         self.assertIs(
-            feature.feature_remove(self.database, 'botgotsthis', 'feature',
-                                   self.send),
+            await feature.feature_remove(self.database, 'botgotsthis',
+                                         'feature', self.send),
             True)
         self.send.assert_called_once_with(StrContains('Feature', 'disable'))
         self.database.hasFeature.assert_called_once_with(
@@ -150,11 +150,11 @@ class TestLibraryFeatureRemove(unittest.TestCase):
         self.database.removeFeature.assert_called_once_with(
             'botgotsthis', 'feature')
 
-    def test_existing(self):
+    async def test_existing(self):
         self.database.hasFeature.return_value = False
         self.assertIs(
-            feature.feature_remove(self.database, 'botgotsthis', 'feature',
-                                   self.send),
+            await feature.feature_remove(self.database, 'botgotsthis',
+                                         'feature', self.send),
             True)
         self.send.assert_called_once_with(
             StrContains('Feature', 'not', 'enable'))

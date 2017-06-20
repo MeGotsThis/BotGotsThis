@@ -5,5 +5,5 @@ from ...data import WhisperCommandArgs
 
 @min_args(2)
 async def commandFeature(args: WhisperCommandArgs) -> bool:
-    return feature.feature(args.database, args.nick, args.message,
-                           send(args.nick))
+    return await feature.feature(args.database, args.nick, args.message,
+                                 send(args.nick))

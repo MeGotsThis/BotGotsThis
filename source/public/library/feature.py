@@ -17,10 +17,10 @@ disable: Set[str] = {
     }
 
 
-def feature(database: DatabaseMain,
-            channel: str,
-            message: Message,
-            send: Send) -> bool:
+async def feature(database: DatabaseMain,
+                  channel: str,
+                  message: Message,
+                  send: Send) -> bool:
     action: str = message.lower[2] if len(message) >= 3 else ''
 
     feature_: str = message.lower[1]
@@ -30,19 +30,19 @@ def feature(database: DatabaseMain,
         return True
 
     if action in enable:
-        return feature_add(database, channel, feature_, send)
+        return await feature_add(database, channel, feature_, send)
     if action in disable:
-        return feature_remove(database, channel, feature_, send)
+        return await feature_remove(database, channel, feature_, send)
 
     send('Unrecognized second parameter: ' + action)
     return True
 
 
-def feature_add(database: DatabaseMain,
-                channel: str,
-                feature_: str,
-                send: Send) -> bool:
-    hasFeature: bool = database.hasFeature(channel, feature_)
+async def feature_add(database: DatabaseMain,
+                      channel: str,
+                      feature_: str,
+                      send: Send) -> bool:
+    hasFeature: bool = await database.hasFeature(channel, feature_)
     if not hasFeature:
         database.addFeature(channel, feature_)
 
@@ -55,11 +55,11 @@ def feature_add(database: DatabaseMain,
     return True
 
 
-def feature_remove(database: DatabaseMain,
-                   channel: str,
-                   feature_: str,
-                   send: Send) -> bool:
-    hasFeature: bool = database.hasFeature(channel, feature_)
+async def feature_remove(database: DatabaseMain,
+                         channel: str,
+                         feature_: str,
+                         send: Send) -> bool:
+    hasFeature: bool = await database.hasFeature(channel, feature_)
     if hasFeature:
         database.removeFeature(channel, feature_)
 

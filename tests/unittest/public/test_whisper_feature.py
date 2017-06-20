@@ -10,7 +10,7 @@ from source.public.whisper import feature
 
 
 class TestWhisperFeature(TestWhisper):
-    @patch('source.public.library.feature.feature', autospec=True)
+    @patch('source.public.library.feature.feature')
     async def test_feature(self, mock_feature):
         self.assertIs(await feature.commandFeature(self.args), False)
         self.assertFalse(mock_feature.called)
