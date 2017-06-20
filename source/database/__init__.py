@@ -742,24 +742,26 @@ SELECT property, value FROM chat_properties
                     values[property] = value
             return values
 
-    def setChatProperty(self,
-                        broadcaster: str,
-                        property: str,
-                        value: Optional[str]=None) -> bool:
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    async def setChatProperty(self,
+                              broadcaster: str,
+                              property: str,
+                              value: Optional[str]=None) -> bool:
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             query: str
             params: tuple
             if value is None:
                 query = '''
-DELETE FROM chat_properties WHERE broadcaster=? AND property=?'''
+DELETE FROM chat_properties WHERE broadcaster=? AND property=?
+'''
                 params = broadcaster, property,
             else:
                 query = '''
-REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)'''
+REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)
+'''
                 params = broadcaster, property, value,
-            cursor.execute(query, params)
-            self.connection.commit()
+            await cursor.execute(query, params)
+            await self.connection.commit()
             return cursor.rowcount != 0
 
     def isPermittedUser(self,

@@ -570,7 +570,7 @@ class TestLibraryBroadcasterAutoJoinDelete(asynctest.TestCase):
             StrContains('botgotsthis', 'never'))
 
 
-class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
+class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
@@ -580,9 +580,9 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.mock_config = patcher.start()
         self.mock_config.moderatorDefaultTimeout = [60, 600, 0]
 
-    def test_1(self):
+    async def test_1(self):
         self.assertIs(
-            broadcaster.set_timeout_level(
+            await broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-1 1')),
             True)
@@ -591,9 +591,9 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('timeout', '1st', '1 second'))
 
-    def test_1_default(self):
+    async def test_1_default(self):
         self.assertIs(
-            broadcaster.set_timeout_level(
+            await broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-1')),
             True)
@@ -602,9 +602,9 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('timeout', '1st', 'default'))
 
-    def test_2(self):
+    async def test_2(self):
         self.assertIs(
-            broadcaster.set_timeout_level(
+            await broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-2 3600')),
             True)
@@ -613,9 +613,9 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('timeout', '2nd', '3600 seconds'))
 
-    def test_2_default(self):
+    async def test_2_default(self):
         self.assertIs(
-            broadcaster.set_timeout_level(
+            await broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-2')),
             True)
@@ -624,9 +624,9 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('timeout', '2nd', 'default'))
 
-    def test_3(self):
+    async def test_3(self):
         self.assertIs(
-            broadcaster.set_timeout_level(
+            await broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-3 0')),
             True)
@@ -635,9 +635,9 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('timeout', '3rd', 'ban'))
 
-    def test_3_default(self):
+    async def test_3_default(self):
         self.assertIs(
-            broadcaster.set_timeout_level(
+            await broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-3')),
             True)
@@ -646,18 +646,18 @@ class TestLibraryBroadcasterSetTimeOutLevel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('timeout', '3rd', 'default'))
 
-    def test_0(self):
+    async def test_0(self):
         self.assertIs(
-            broadcaster.set_timeout_level(
+            await broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-0')),
             False)
         self.database.setChatProperty.assert_not_called()
         self.send.assert_not_called()
 
-    def test_4(self):
+    async def test_4(self):
         self.assertIs(
-            broadcaster.set_timeout_level(
+            await broadcaster.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-4')),
             False)

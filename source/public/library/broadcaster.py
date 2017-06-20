@@ -134,7 +134,7 @@ async def auto_join_delete(database: DatabaseMain,
     return True
 
 
-def set_timeout_level(database: DatabaseMain,
+async def set_timeout_level(database: DatabaseMain,
                       channel: str,
                       send: Send,
                       message: Message) -> bool:
@@ -159,7 +159,7 @@ def set_timeout_level(database: DatabaseMain,
     timeout: int = bot.config.moderatorDefaultTimeout[int(k) - 1]
     default: str = '{} seconds'.format(timeout) if timeout else 'Banned'
     saveValue: Optional[str] = str(value) if value is not None else None
-    database.setChatProperty(channel, propertyDict[k], saveValue)
+    await database.setChatProperty(channel, propertyDict[k], saveValue)
     msg: str
     if value is None:
         msg = ('Setting the timeout length for {ordinal} offense to defaulted '
