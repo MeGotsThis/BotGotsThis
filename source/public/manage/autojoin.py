@@ -43,14 +43,14 @@ async def auto_join_priority(database: DatabaseMain,
                              channel: str,
                              priority: int,
                              send: Send) -> bool:
-        result: bool = await database.setAutoJoinPriority(channel, priority)
-        if result:
-            send('Auto join for {channel} is set to priority '
-                 '{priority}'.format(channel=channel, priority=priority))
-        else:
-            send('Auto join for {channel} was never '
-                 'enabled'.format(channel=channel))
-        return True
+    result: bool = await database.setAutoJoinPriority(channel, priority)
+    if result:
+        send('Auto join for {channel} is set to priority '
+             '{priority}'.format(channel=channel, priority=priority))
+    else:
+        send('Auto join for {channel} was never '
+             'enabled'.format(channel=channel))
+    return True
 
 
 async def reload_server(database: DatabaseMain,
