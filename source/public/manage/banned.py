@@ -22,11 +22,11 @@ async def manageBanned(args: ManageBotArgs) -> bool:
         return False
     channel: str = args.message.lower[3]
     if args.message.lower[2] in ['add', 'insert']:
-        return insert_banned_channel(channel, args.message[4:], args.nick,
-                                     args.database, args.send)
+        return await insert_banned_channel(channel, args.message[4:],
+                                           args.nick, args.database, args.send)
     if args.message.lower[2] in ['del', 'delete', 'rem', 'remove']:
-        return delete_banned_channel(channel, args.message[4:], args.nick,
-                                     args.database, args.send)
+        return await delete_banned_channel(channel, args.message[4:],
+                                           args.nick, args.database, args.send)
     return False
 
 
@@ -42,18 +42,19 @@ async def list_banned_channels(database: DatabaseMain,
     return True
 
 
-def insert_banned_channel(channel: str,
-                          reason: str,
-                          nick: str,
-                          database: DatabaseMain,
-                          send: Send) -> bool:
+async def insert_banned_channel(channel: str,
+                                reason: str,
+                                nick: str,
+                                database: DatabaseMain,
+                                send: Send) -> bool:
     if channel == bot.config.botnick:
         send('Cannot ban the bot itself')
         return True
-    isBannedOrReason: Optional[str] = database.isChannelBannedReason(channel)
-    if isBannedOrReason is not None:
+    bannedWithReason: Optional[str]
+    bannedWithReason = await database.isChannelBannedReason(channel)
+    if bannedWithReason is not None:
         send('{channel} is already banned for: {reason}'.format(
-            channel=channel, reason=isBannedOrReason))
+            channel=channel, reason=bannedWithReason))
         return True
     result: bool = database.addBannedChannel(channel, reason, nick)
     if result:
@@ -69,13 +70,14 @@ def insert_banned_channel(channel: str,
     return True
 
 
-def delete_banned_channel(channel: str,
-                          reason: str,
-                          nick: str,
-                          database: DatabaseMain,
-                          send: Send) -> bool:
-    isBannedOrReason: Optional[str] = database.isChannelBannedReason(channel)
-    if isBannedOrReason is None:
+async def delete_banned_channel(channel: str,
+                                reason: str,
+                                nick: str,
+                                database: DatabaseMain,
+                                send: Send) -> bool:
+    bannedWithReason: Optional[str]
+    bannedWithReason = await database.isChannelBannedReason(channel)
+    if bannedWithReason is None:
         send('{channel} is not banned'.format(channel=channel))
         return True
     result: bool = database.removeBannedChannel(channel, reason, nick)

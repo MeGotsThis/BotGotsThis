@@ -573,13 +573,14 @@ DELETE FROM chat_features WHERE broadcaster=? AND feature=?
             async for broadcaster, in cursor:
                 yield broadcaster
 
-    def isChannelBannedReason(self, broadcaster: str) -> Optional[str]:
+    async def isChannelBannedReason(self, broadcaster: str) -> Optional[str]:
         query: str = '''
-SELECT reason FROM banned_channels WHERE broadcaster=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster,))
-            row: Optional[Tuple[str]] = cursor.fetchone()
+SELECT reason FROM banned_channels WHERE broadcaster=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
+            row: Optional[Tuple[str]] = await cursor.fetchone()
             return row and row[0]
 
     def addBannedChannel(self,

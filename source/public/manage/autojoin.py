@@ -16,7 +16,10 @@ async def manageAutoJoin(args: ManageBotArgs) -> bool:
     if len(args.message) < 4:
         return False
 
-    if args.database.isChannelBannedReason(args.message.lower[3]) is not None:
+    bannedWithReason: Optional[str]
+    bannedWithReason = await args.database.isChannelBannedReason(
+        args.message.lower[3])
+    if bannedWithReason is not None:
         args.send('Chat {channel} is banned from joining'.format(
             channel=args.message.lower[3]))
         return True
