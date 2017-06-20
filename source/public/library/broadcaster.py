@@ -12,7 +12,9 @@ from ...database import DatabaseMain
 async def come(database: DatabaseMain,
                channel: str,
                send: Send) -> bool:
-    if database.isChannelBannedReason(channel) is not None:
+    bannedWithReason: Optional[str]
+    bannedWithReason = await database.isChannelBannedReason(channel)
+    if bannedWithReason is not None:
         send('Chat {channel} is banned from joining'.format(channel=channel))
         return True
     priority: Union[float, int] = await database.getAutoJoinsPriority(channel)
@@ -59,7 +61,9 @@ async def auto_join(database: DatabaseMain,
                     channel: str,
                     send: Send,
                     message: Message) -> bool:
-    if database.isChannelBannedReason(channel) is not None:
+    bannedWithReason: Optional[str]
+    bannedWithReason = await database.isChannelBannedReason(channel)
+    if bannedWithReason is not None:
         send('Chat {channel} is banned from '
              'joining'.format(channel=channel))
         return True

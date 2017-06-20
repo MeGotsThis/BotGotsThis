@@ -11,7 +11,9 @@ from ...database import DatabaseMain
 async def join(database: DatabaseMain,
                channel: str,
                send: Send) -> bool:
-    if database.isChannelBannedReason(channel):
+    bannedWithReason: Optional[str]
+    bannedWithReason = await database.isChannelBannedReason(channel)
+    if bannedWithReason is not None:
         send('Chat ' + channel + ' is banned from joining')
         return True
     priority: Union[int, float] = await database.getAutoJoinsPriority(channel)

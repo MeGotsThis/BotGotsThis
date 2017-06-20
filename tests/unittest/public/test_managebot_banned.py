@@ -137,7 +137,7 @@ class TestManageBotBannedListBannedChannels(asynctest.TestCase):
         self.send.assert_called_once_with('')
 
 
-class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
+class TestManageBotBannedInsertBannedChannel(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
@@ -151,12 +151,13 @@ class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
         self.mock_config = patcher.start()
         self.mock_config.botnick = 'botgotsthis'
 
-    def test(self):
+    async def test(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.addBannedChannel.return_value = True
         self.assertIs(
-            banned.insert_banned_channel('megotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.insert_banned_channel(
+                'megotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'megotsthis')
@@ -166,11 +167,12 @@ class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
         self.mock_part.assert_called_once_with('megotsthis')
         self.send.assert_called_once_with(StrContains('megotsthis', 'ban'))
 
-    def test_banned(self):
+    async def test_banned(self):
         self.database.isChannelBannedReason.return_value = 'DansGame'
         self.assertIs(
-            banned.insert_banned_channel('megotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.insert_banned_channel(
+                'megotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'megotsthis')
@@ -180,11 +182,12 @@ class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('megotsthis', 'ban', 'DansGame'))
 
-    def test_banned_blank(self):
+    async def test_banned_blank(self):
         self.database.isChannelBannedReason.return_value = ''
         self.assertIs(
-            banned.insert_banned_channel('megotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.insert_banned_channel(
+                'megotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'megotsthis')
@@ -193,12 +196,13 @@ class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
         self.assertFalse(self.mock_part.called)
         self.send.assert_called_once_with(StrContains('megotsthis', 'ban'))
 
-    def test_database_error(self):
+    async def test_database_error(self):
         self.database.isChannelBannedReason.return_value = None
         self.database.addBannedChannel.return_value = False
         self.assertIs(
-            banned.insert_banned_channel('megotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.insert_banned_channel(
+                'megotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'megotsthis')
@@ -209,11 +213,12 @@ class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('megotsthis', 'not', 'ban'))
 
-    def test_bot(self):
+    async def test_bot(self):
         self.database.isChannelBannedReason.return_value = 'Kappa'
         self.assertIs(
-            banned.insert_banned_channel('botgotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.insert_banned_channel(
+                'botgotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.assertFalse(self.database.isChannelBannedReason.called)
         self.assertFalse(self.database.addBannedChannel.called)
@@ -222,17 +227,18 @@ class TestManageBotBannedInsertBannedChannel(unittest.TestCase):
         self.send.assert_called_once_with(StrContains('not', 'ban', 'bot'))
 
 
-class TestManageBotBannedDeleteBannedChannel(unittest.TestCase):
+class TestManageBotBannedDeleteBannedChannel(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-    def test(self):
+    async def test(self):
         self.database.isChannelBannedReason.return_value = 'Kappa'
         self.database.removeBannedChannel.return_value = True
         self.assertIs(
-            banned.delete_banned_channel('megotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.delete_banned_channel(
+                'megotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'megotsthis')
@@ -240,12 +246,13 @@ class TestManageBotBannedDeleteBannedChannel(unittest.TestCase):
             'megotsthis', 'Kappa', 'botgotsthis')
         self.send.assert_called_once_with(StrContains('megotsthis', 'unban'))
 
-    def test_blank(self):
+    async def test_blank(self):
         self.database.isChannelBannedReason.return_value = ''
         self.database.removeBannedChannel.return_value = True
         self.assertIs(
-            banned.delete_banned_channel('megotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.delete_banned_channel(
+                'megotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'megotsthis')
@@ -253,11 +260,12 @@ class TestManageBotBannedDeleteBannedChannel(unittest.TestCase):
             'megotsthis', 'Kappa', 'botgotsthis')
         self.send.assert_called_once_with(StrContains('megotsthis', 'unban'))
 
-    def test_not_banned(self):
+    async def test_not_banned(self):
         self.database.isChannelBannedReason.return_value = None
         self.assertIs(
-            banned.delete_banned_channel('megotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.delete_banned_channel(
+                'megotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'megotsthis')
@@ -265,12 +273,13 @@ class TestManageBotBannedDeleteBannedChannel(unittest.TestCase):
         self.send.assert_called_once_with(
             StrContains('megotsthis', 'not', 'ban'))
 
-    def test_database_error(self):
+    async def test_database_error(self):
         self.database.isChannelBannedReason.return_value = 'Kappa'
         self.database.removeBannedChannel.return_value = False
         self.assertIs(
-            banned.delete_banned_channel('megotsthis', 'Kappa', 'botgotsthis',
-                                         self.database, self.send),
+            await banned.delete_banned_channel(
+                'megotsthis', 'Kappa', 'botgotsthis', self.database,
+                self.send),
             True)
         self.database.isChannelBannedReason.assert_called_once_with(
             'megotsthis')
