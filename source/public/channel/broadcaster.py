@@ -37,8 +37,8 @@ async def commandAutoJoin(args: ChatCommandArgs) -> bool:
 
 @permission('broadcaster')
 async def commandSetTimeoutLevel(args: ChatCommandArgs) -> bool:
-    broadcaster.set_timeout_level(args.database, args.chat.channel,
-                                  send(args.chat), args.message)
+    await broadcaster.set_timeout_level(args.database, args.chat.channel,
+                                        send(args.chat), args.message)
     return True
 
 
