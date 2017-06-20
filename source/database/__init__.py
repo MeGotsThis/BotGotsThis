@@ -608,25 +608,27 @@ INSERT INTO banned_channels_log
             await self.connection.commit()
             return True
 
-    def removeBannedChannel(self,
-                            broadcaster: str,
-                            reason: str,
-                            nick: str) -> bool:
+    async def removeBannedChannel(self,
+                                  broadcaster: str,
+                                  reason: str,
+                                  nick: str) -> bool:
         query: str = '''
-DELETE FROM banned_channels WHERE broadcaster=?'''
+DELETE FROM banned_channels WHERE broadcaster=?
+'''
         history: str = '''
 INSERT INTO banned_channels_log
     (broadcaster, currentTime, reason, who, actionLog) 
-    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster,))
-            self.connection.commit()
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
             if cursor.rowcount == 0:
                 return False
 
-            cursor.execute(history, (broadcaster, reason, nick, 'remove'))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, reason, nick,
+                                           'remove'))
+            await self.connection.commit()
             return True
 
     def getChatProperty(self,

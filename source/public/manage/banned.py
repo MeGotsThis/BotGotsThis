@@ -80,7 +80,7 @@ async def delete_banned_channel(channel: str,
     if bannedWithReason is None:
         send('{channel} is not banned'.format(channel=channel))
         return True
-    result: bool = database.removeBannedChannel(channel, reason, nick)
+    result: bool = await database.removeBannedChannel(channel, reason, nick)
 
     msg: str
     if result:
