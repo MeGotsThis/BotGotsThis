@@ -13,7 +13,7 @@ async def manageBanned(args: ManageBotArgs) -> bool:
     if len(args.message) < 3:
         return False
     if args.message.lower[2] in ['list']:
-        return list_banned_channels(args.database, args.send)
+        return await list_banned_channels(args.database, args.send)
     
     if len(args.message) < 5:
         if args.message.lower[2] in needReason:
@@ -30,9 +30,11 @@ async def manageBanned(args: ManageBotArgs) -> bool:
     return False
 
 
-def list_banned_channels(database: DatabaseMain,
+async def list_banned_channels(database: DatabaseMain,
                          send: Send) -> bool:
-    bannedChannels: Iterable[str] = database.listBannedChannels()
+    bannedChannels: Iterable[str]
+    bannedChannels = [channel async for channel
+                      in database.listBannedChannels()]
     if bannedChannels:
         send(message.messagesFromItems(bannedChannels, 'Banned Channels: '))
     else:

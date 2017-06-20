@@ -1,11 +1,13 @@
 import unittest
 
+import asynctest
+
 from asynctest.mock import Mock, patch
 
 from source.data import Message
 from source.database import DatabaseMain
 from tests.unittest.base_managebot import TestManageBot, send
-from tests.unittest.mock_class import StrContains
+from tests.unittest.mock_class import StrContains, AsyncIterator
 
 # Needs to be imported last
 from source.public.manage import banned
@@ -101,34 +103,35 @@ class TestManageBotBanned(TestManageBot):
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
 
-class TestManageBotBannedListBannedChannels(unittest.TestCase):
+class TestManageBotBannedListBannedChannels(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-    def test(self):
-        self.database.listBannedChannels.return_value = []
+    async def test(self):
+        self.database.listBannedChannels.return_value = AsyncIterator([])
         self.assertIs(
-            banned.list_banned_channels(self.database, self.send), True)
+            await banned.list_banned_channels(self.database, self.send), True)
         self.send.assert_called_once_with(StrContains('no'))
 
     @patch('source.public.library.message.messagesFromItems', autospec=True)
-    def test_one(self, mock_messages):
-        self.database.listBannedChannels.return_value = ['botgotsthis']
+    async def test_one(self, mock_messages):
+        self.database.listBannedChannels.return_value = AsyncIterator(
+            ['botgotsthis'])
         mock_messages.return_value = ''
         self.assertIs(
-            banned.list_banned_channels(self.database, self.send), True)
+            await banned.list_banned_channels(self.database, self.send), True)
         mock_messages.assert_called_once_with(['botgotsthis'],
                                               StrContains('Banned'))
         self.send.assert_called_once_with('')
 
     @patch('source.public.library.message.messagesFromItems', autospec=True)
-    def test_many(self, mock_messages):
-        self.database.listBannedChannels.return_value = ['botgotsthis',
-                                                         'megotsthis']
+    async def test_many(self, mock_messages):
+        self.database.listBannedChannels.return_value = AsyncIterator(
+            ['botgotsthis', 'megotsthis'])
         mock_messages.return_value = ''
         self.assertIs(
-            banned.list_banned_channels(self.database, self.send), True)
+            await banned.list_banned_channels(self.database, self.send), True)
         mock_messages.assert_called_once_with(['botgotsthis', 'megotsthis'],
                                               StrContains('Banned'))
         self.send.assert_called_once_with('')

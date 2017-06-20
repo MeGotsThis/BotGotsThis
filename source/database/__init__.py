@@ -564,12 +564,13 @@ DELETE FROM chat_features WHERE broadcaster=? AND feature=?
             await self.connection.commit()
             return cursor.rowcount != 0
 
-    def listBannedChannels(self) -> Iterable[str]:
+    async def listBannedChannels(self) -> AsyncIterator[str]:
         query: str = '''SELECT broadcaster FROM banned_channels'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query)
             broadcaster: str
-            for broadcaster, in cursor.execute(query):
+            async for broadcaster, in cursor:
                 yield broadcaster
 
     def isChannelBannedReason(self, broadcaster: str) -> Optional[str]:
