@@ -583,28 +583,29 @@ SELECT reason FROM banned_channels WHERE broadcaster=?
             row: Optional[Tuple[str]] = await cursor.fetchone()
             return row and row[0]
 
-    def addBannedChannel(self,
-                         broadcaster: str,
-                         reason: str,
-                         nick: str) -> bool:
+    async def addBannedChannel(self,
+                               broadcaster: str,
+                               reason: str,
+                               nick: str) -> bool:
         query: str = '''
 INSERT INTO banned_channels 
     (broadcaster, currentTime, reason, who)
-    VALUES (?, CURRENT_TIMESTAMP, ?, ?)'''
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?)
+'''
         history: str = '''
 INSERT INTO banned_channels_log
     (broadcaster, currentTime, reason, who, actionLog) 
-    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             try:
-                cursor.execute(query, (broadcaster, reason, nick))
-                self.connection.commit()
-            except sqlite3.IntegrityError:
+                await cursor.execute(query, (broadcaster, reason, nick))
+            except pyodbc.IntegrityError:
                 return False
 
-            cursor.execute(history, (broadcaster, reason, nick, 'add'))
-            self.connection.commit()
+            await cursor.execute(history, (broadcaster, reason, nick, 'add'))
+            await self.connection.commit()
             return True
 
     def removeBannedChannel(self,

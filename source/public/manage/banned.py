@@ -56,7 +56,7 @@ async def insert_banned_channel(channel: str,
         send('{channel} is already banned for: {reason}'.format(
             channel=channel, reason=bannedWithReason))
         return True
-    result: bool = database.addBannedChannel(channel, reason, nick)
+    result: bool = await database.addBannedChannel(channel, reason, nick)
     if result:
         database.discardAutoJoin(channel)
         utils.partChannel(channel)
