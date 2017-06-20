@@ -122,7 +122,9 @@ async def commandPermit(args: ChatCommandArgs) -> bool:
         else:
             msg = '{mod} -> Error'
     else:
-        if args.database.addPermittedUser(args.chat.channel, user, args.nick):
+        successful: bool = await args.database.addPermittedUser(
+            args.chat.channel, user, args.nick)
+        if successful:
             msg = '{mod} -> {user} is now unpermitted in {channel}'
         else:
             msg = '{mod} -> Error'
