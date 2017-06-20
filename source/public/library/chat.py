@@ -59,7 +59,9 @@ def feature(featureKey: str):
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            if not args.database.hasFeature(args.chat.channel, featureKey):
+            hasFeature: bool = await args.database.hasFeature(
+                args.chat.channel, featureKey)
+            if not hasFeature:
                 return False
             return await func(args, *pargs, **kwargs)
         return chatCommand
@@ -71,7 +73,9 @@ def not_feature(featureKey: str):
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
                         *pargs, **kwargs) -> Any:
-            if args.database.hasFeature(args.chat.channel, featureKey):
+            hasFeature: bool = await args.database.hasFeature(
+                args.chat.channel, featureKey)
+            if hasFeature:
                 return False
             return await func(args, *pargs, **kwargs)
         return chatCommand
@@ -86,10 +90,10 @@ def permission_feature(*levelFeatures: Tuple[str, str]):
             level: str
             featureKey: str
             for level, featureKey in levelFeatures:
-                hasPermission = level is None or args.permissions[level]
-                hasFeature = (featureKey is None
-                              or args.database.hasFeature(args.chat.channel,
-                                                          featureKey))
+                hasPermission: bool = level is None or args.permissions[level]
+                hasFeature: bool = (featureKey is None
+                                    or await args.database.hasFeature(
+                                        args.chat.channel, featureKey))
                 if hasPermission and hasFeature:
                     break
             else:
@@ -107,10 +111,10 @@ def permission_not_feature(*levelFeatures: Tuple[str, str]):
             level: str
             featureKey: str
             for level, featureKey in levelFeatures:
-                hasPermission = level is None or args.permissions[level]
-                hasFeature = (featureKey is None
-                              or not args.database.hasFeature(
-                                  args.chat.channel, featureKey))
+                hasPermission: bool = level is None or args.permissions[level]
+                hasFeature: bool = (featureKey is None
+                                    or not await args.database.hasFeature(
+                                        args.chat.channel, featureKey))
                 if hasPermission and hasFeature:
                     break
             else:

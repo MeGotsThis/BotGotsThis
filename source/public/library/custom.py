@@ -65,7 +65,9 @@ async def get_command(database: DatabaseMain,
 
 async def create_messages(command: CustomCommand,
                     args: ChatCommandArgs) -> List[str]:
-    textFormat = args.database.hasFeature(args.chat.channel, 'textconvert')
+    textFormat: bool
+    textFormat = await args.database.hasFeature(args.chat.channel,
+                                                'textconvert')
     messageParts: List[str] = []
     try:
         parts: CustomFieldParts

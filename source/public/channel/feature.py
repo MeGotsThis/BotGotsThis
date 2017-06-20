@@ -6,5 +6,5 @@ from ...data import ChatCommandArgs
 @permission('broadcaster')
 @min_args(2)
 async def commandFeature(args: ChatCommandArgs) -> bool:
-    return feature.feature(args.database, args.chat.channel, args.message,
-                           send(args.chat))
+    return await feature.feature(args.database, args.chat.channel,
+                                 args.message, send(args.chat))
