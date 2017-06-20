@@ -495,30 +495,33 @@ SELECT value FROM custom_command_properties
                 row: Optional[Tuple[str]] = await cursor.fetchone()
                 return row and row[0]
 
-    def processCustomCommandProperty(self,
-                                     broadcaster: str,
-                                     permission: str,
-                                     command: str,
-                                     property: str,
-                                     value: Optional[str]=None) -> bool:
+    async def processCustomCommandProperty(self,
+                                           broadcaster: str,
+                                           permission: str,
+                                           command: str,
+                                           property: str,
+                                           value: Optional[str]=None) -> bool:
         query: str
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             try:
                 if value is None:
                     query = '''
 DELETE FROM custom_command_properties
-    WHERE broadcaster=? AND permission=? AND command=? AND property=?'''
-                    cursor.execute(query, (broadcaster, permission,
-                                           command.lower(), property))
+    WHERE broadcaster=? AND permission=? AND command=? AND property=?
+'''
+                    await cursor.execute(query, (broadcaster, permission,
+                                                 command.lower(), property))
                 else:
                     query = '''
 REPLACE INTO custom_command_properties
     (broadcaster, permission, command, property, value)
-    VALUES (?, ?, ?, ?, ?)'''
-                    cursor.execute(query, (broadcaster, permission,
-                                           command.lower(), property, value))
-                self.connection.commit()
+    VALUES (?, ?, ?, ?, ?)
+'''
+                    await cursor.execute(query, (broadcaster, permission,
+                                                 command.lower(), property,
+                                                 value))
+                await self.connection.commit()
                 return cursor.rowcount != 0
             except sqlite3.IntegrityError:
                 return False

@@ -179,7 +179,7 @@ async def command_property(args: ChatCommandArgs,
         args.chat.send("{user} -> The property '{property}' does not "
                        'exist'.format(user=args.nick, property=property))
         return True
-    if args.database.processCustomCommandProperty(
+    if await args.database.processCustomCommandProperty(
             input.broadcaster, input.level, input.command, property,
             value):
         if value is None:
