@@ -23,8 +23,8 @@ async def timeout_user(database_: database.DatabaseMain,
                 'timeoutLength1': bot.config.moderatorDefaultTimeout[1],
                 'timeoutLength2': bot.config.moderatorDefaultTimeout[2],
                 }
-    chatProp = database_.getChatProperties(chat.channel, properties, defaults,
-                                           int)
+    chatProp = await database_.getChatProperties(chat.channel, properties,
+                                                 defaults, int)
     timeouts = [chatProp['timeoutLength0'],
                 chatProp['timeoutLength1'],
                 chatProp['timeoutLength2'],]
