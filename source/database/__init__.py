@@ -543,7 +543,7 @@ SELECT 1 FROM chat_features WHERE broadcaster=? AND feature=?
         query: str = '''
 INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)
 '''
-        cursor: sqlite3.Cursor
+        cursor: aioodbc.cursor.Cursor
         with closing(self.connection.cursor()) as cursor:
             try:
                 await cursor.execute(query, (broadcaster, feature))
