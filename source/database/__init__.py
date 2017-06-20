@@ -12,7 +12,10 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
 from typing import Sequence, Tuple, Type, Union
-from typing import AsyncIterator
+from typing import AsyncIterator, TypeVar, overload
+
+T = TypeVar('T')
+S = TypeVar('S')
 
 
 class AutoJoinChannel(NamedTuple):
@@ -631,17 +634,34 @@ INSERT INTO banned_channels_log
             await self.connection.commit()
             return True
 
-    def getChatProperty(self,
-                        broadcaster: str,
-                        property: str,
-                        default: Any=None,
-                        parse: Optional[Callable[[str], Any]]=None) -> Any:
+    @overload
+    async def getChatProperty(self,
+                              broadcaster: str,
+                              property: str) -> Optional[str]: ...
+    @overload
+    async def getChatProperty(self,
+                              broadcaster: str,
+                              property: str,
+                              default: T
+                              ) -> Union[str, T]: ...
+    @overload
+    async def getChatProperty(self,
+                              broadcaster: str,
+                              property: str,
+                              default: T,
+                              parse: Callable[[str], S]
+                              ) -> Union[T, S]: ...
+    async def getChatProperty(self,
+                              broadcaster,
+                              property,
+                              default=None,
+                              parse=None):
         query: str = '''
 SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, property,))
-            row: Optional[Tuple[str]] = cursor.fetchone()
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster, property,))
+            row: Optional[Tuple[str]] = await cursor.fetchone()
             if row is None:
                 return default
             if parse is not None:
