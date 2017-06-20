@@ -537,18 +537,19 @@ SELECT 1 FROM chat_features WHERE broadcaster=? AND feature=?
             await cursor.execute(query, (broadcaster, feature))
             return await cursor.fetchone() is not None
 
-    def addFeature(self,
-                   broadcaster: str,
-                   feature: str) -> bool:
+    async def addFeature(self,
+                         broadcaster: str,
+                         feature: str) -> bool:
         query: str = '''
-INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)'''
+INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)
+'''
         cursor: sqlite3.Cursor
         with closing(self.connection.cursor()) as cursor:
             try:
-                cursor.execute(query, (broadcaster, feature))
-                self.connection.commit()
+                await cursor.execute(query, (broadcaster, feature))
+                await self.connection.commit()
                 return True
-            except sqlite3.IntegrityError:
+            except pyodbc.IntegrityError:
                 return False
 
     def removeFeature(self,
