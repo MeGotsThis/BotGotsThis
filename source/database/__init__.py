@@ -668,23 +668,66 @@ SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''
                 return parse(row[0])
             return row[0]
 
-    def getChatProperties(self,
-                          broadcaster: str,
-                          properties: Sequence[str],
-                          default: Any=None,
-                          parse: Any=None) -> Mapping[str, Any]:
+    @overload
+    async def getChatProperties(self,
+                                broadcaster: str,
+                                properties: Sequence[str]
+                                ) -> Mapping[str, Optional[str]]: ...
+    @overload
+    async def getChatProperties(self,
+                                broadcaster: str,
+                                properties: Sequence[str],
+                                default: T
+                                ) -> Mapping[str, Union[str, T]]: ...
+    @overload
+    async def getChatProperties(self,
+                                broadcaster: str,
+                                properties: Sequence[str],
+                                default: Mapping[str, T]
+                                ) -> Mapping[str, Union[str, T]]: ...
+    @overload
+    async def getChatProperties(self,
+                                broadcaster: str,
+                                properties: Sequence[str],
+                                default: T,
+                                parse: Mapping[str, Callable[[str], S]]
+                                ) -> Mapping[str, Union[str, T, S]]: ...
+    @overload
+    async def getChatProperties(self,
+                                broadcaster: str,
+                                properties: Sequence[str],
+                                default: T,
+                                parse: Callable[[str], S]
+                                ) -> Mapping[str, Union[T, S]]: ...
+    @overload
+    async def getChatProperties(self,
+                                broadcaster: str,
+                                properties: Sequence[str],
+                                default: Mapping[str, T],
+                                parse: Mapping[str, Callable[[str], S]]
+                                ) -> Mapping[str, Union[str, T, S]]: ...
+    @overload
+    async def getChatProperties(self,
+                                broadcaster: str,
+                                properties: Sequence[str],
+                                default: Mapping[str, T],
+                                parse: Callable[[str], S]
+                                ) -> Mapping[str, Union[T, S]]: ...
+    async def getChatProperties(self, broadcaster, properties, default=None,
+                                parse=None):
         query: str = '''
 SELECT property, value FROM chat_properties
     WHERE broadcaster=? AND property IN (%s)
 ''' % ','.join('?' * len(properties))
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             values: Dict[str, Any] = {}
             params = (broadcaster,) + tuple(properties)
-            for property, value in cursor.execute(query, params):
+            await cursor.execute(query, params)
+            async for property, value in cursor:
                 if isinstance(parse, dict) and property in parse:
                     value = parse[property](value)
-                if isinstance(parse, Callable):  # type: ignore
+                if callable(parse):
                     value = parse(value)
                 values[property] = value
             for property in properties:
