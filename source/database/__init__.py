@@ -942,15 +942,15 @@ VALUES (?, ?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''
             await self.connection.commit()
             return cursor.rowcount != 0
 
-    def removeAutoRepeat(self,
-                         broadcaster: str,
-                         name: str) -> bool:
+    async def removeAutoRepeat(self,
+                               broadcaster: str,
+                               name: str) -> bool:
         query: str = '''
 DELETE FROM auto_repeat WHERE broadcaster=? AND name=?'''
-        cursor: sqlite3.Cursor
+        cursor: aioodbc.cursor.Cursor
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, name))
-            self.connection.commit()
+            await cursor.execute(query, (broadcaster, name))
+            await self.connection.commit()
             return cursor.rowcount != 0
 
 
