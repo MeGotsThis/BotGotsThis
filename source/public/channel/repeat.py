@@ -66,7 +66,7 @@ async def process_auto_repeat(args: ChatCommandArgs,
                                             message=repeat.message))
         return True
     elif secondArg == 'clear':
-        args.database.clearAutoRepeat(args.chat.channel)
+        await args.database.clearAutoRepeat(args.chat.channel)
         return True
     elif secondArg == 'off':
         pass

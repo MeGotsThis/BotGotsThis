@@ -898,12 +898,12 @@ SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
                 name, message, count, duration, last = row
                 yield AutoRepeatList(name, message, count, duration, last)
 
-    def clearAutoRepeat(self, broadcaster: str) -> bool:
+    async def clearAutoRepeat(self, broadcaster: str) -> bool:
         query: str = '''DELETE FROM auto_repeat WHERE broadcaster=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster,))
-            self.connection.commit()
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
+            await self.connection.commit()
             return cursor.rowcount != 0
 
     def sentAutoRepeat(self,
