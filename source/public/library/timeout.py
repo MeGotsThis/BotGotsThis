@@ -55,8 +55,8 @@ async def timeout_user(database_: database.DatabaseMain,
     db: database.Database
     async with await database.get_database() as db:
         db_: database.DatabaseTimeout = cast(database.DatabaseTimeout, db)
-        db_.recordTimeout(chat.channel, user, None, module, level, length,
-                          message, reason)
+        await db_.recordTimeout(chat.channel, user, None, module, level,
+                                length, message, reason)
 
 
 async def record_timeout(chat: 'data.Channel',
@@ -95,5 +95,5 @@ async def record_timeout(chat: 'data.Channel',
             async with await database.get_database() as db:
                 db_: database.DatabaseTimeout
                 db_ = cast(database.DatabaseTimeout, db)
-                db_.recordTimeout(chat.channel, who, user, module, None,
-                                  length, source_message, reason)
+                await db_.recordTimeout(chat.channel, who, user, module, None,
+                                        length, source_message, reason)
