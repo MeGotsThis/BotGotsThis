@@ -849,22 +849,23 @@ INSERT INTO bot_managers_log
             await self.connection.commit()
             return True
 
-    def removeBotManager(self, user: str) -> bool:
+    async def removeBotManager(self, user: str) -> bool:
         query: str = '''
-DELETE FROM bot_managers WHERE twitchUser=?'''
+DELETE FROM bot_managers WHERE twitchUser=?
+'''
         history: str = '''
 INSERT INTO bot_managers_log
     (twitchUser, created, actionLog)
-    VALUES (?, CURRENT_TIMESTAMP, ?)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (user,))
-            self.connection.commit()
+    VALUES (?, CURRENT_TIMESTAMP, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (user,))
             if cursor.rowcount == 0:
                 return False
 
-            cursor.execute(history, (user, 'remove'))
-            self.connection.commit()
+            await cursor.execute(history, (user, 'remove'))
+            await self.connection.commit()
             return True
 
     async def getAutoRepeatToSend(self) -> AsyncIterator[AutoRepeatMessage]:

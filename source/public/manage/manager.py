@@ -39,8 +39,9 @@ async def delete_manager(user: str,
     if not manager:
         send('{user} is already not a manager'.format(user=user))
         return True
+    successful: bool = await database.removeBotManager(user)
     msg: str
-    if database.removeBotManager(user):
+    if successful:
         msg = '{user} has been removed as a manager'
     else:
         msg = '{user} could not be removed as a manager. Error has occured.'
