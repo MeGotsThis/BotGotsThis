@@ -80,6 +80,6 @@ async def process_auto_repeat(args: ChatCommandArgs,
         args.database.removeAutoRepeat(args.chat.channel, name)
         return True
 
-    args.database.setAutoRepeat(args.chat.channel, name, message, count,
-                                minutesDuration)
+    await args.database.setAutoRepeat(args.chat.channel, name, message, count,
+                                      minutesDuration)
     return True
