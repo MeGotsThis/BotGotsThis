@@ -1,5 +1,7 @@
 import unittest
 
+import asynctest
+
 from asynctest.mock import Mock, patch
 
 from source.data import Message
@@ -98,37 +100,40 @@ class TestManageBotManager(TestManageBot):
             'botgotsthis', self.database, self.send)
 
 
-class TestManageBotManagerInsertManager(unittest.TestCase):
+class TestManageBotManagerInsertManager(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-    def test(self):
+    async def test(self):
         self.database.isBotManager.return_value = False
         self.database.addBotManager.return_value = True
         self.assertIs(
-            manager.insert_manager('megotsthis', self.database, self.send),
+            await manager.insert_manager('megotsthis', self.database,
+                                         self.send),
             True)
         self.database.isBotManager.assert_called_once_with('megotsthis')
         self.database.addBotManager.assert_called_once_with('megotsthis')
         self.send.assert_called_once_with(
             StrContains('megotsthis', 'manager'))
 
-    def test_manager(self):
+    async def test_manager(self):
         self.database.isBotManager.return_value = True
         self.assertIs(
-            manager.insert_manager('megotsthis', self.database, self.send),
+            await manager.insert_manager('megotsthis', self.database,
+                                         self.send),
             True)
         self.database.isBotManager.assert_called_once_with('megotsthis')
         self.assertFalse(self.database.addBotManager.called)
         self.send.assert_called_once_with(
             StrContains('megotsthis', 'already', 'manager'))
 
-    def test_database_error(self):
+    async def test_database_error(self):
         self.database.isBotManager.return_value = False
         self.database.addBotManager.return_value = False
         self.assertIs(
-            manager.insert_manager('megotsthis', self.database, self.send),
+            await manager.insert_manager('megotsthis', self.database,
+                                         self.send),
             True)
         self.database.isBotManager.assert_called_once_with('megotsthis')
         self.database.addBotManager.assert_called_once_with('megotsthis')
@@ -136,37 +141,40 @@ class TestManageBotManagerInsertManager(unittest.TestCase):
             StrContains('megotsthis', 'not', 'add', 'manager', 'Error'))
 
 
-class TestManageBotManagerDeleteManager(unittest.TestCase):
+class TestManageBotManagerDeleteManager(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-    def test(self):
+    async def test(self):
         self.database.isBotManager.return_value = True
         self.database.removeBotManager.return_value = True
         self.assertIs(
-            manager.delete_manager('megotsthis', self.database, self.send),
+            await manager.delete_manager('megotsthis', self.database,
+                                         self.send),
             True)
         self.database.isBotManager.assert_called_once_with('megotsthis')
         self.database.removeBotManager.assert_called_once_with('megotsthis')
         self.send.assert_called_once_with(
             StrContains('megotsthis', 'remove', 'manager'))
 
-    def test_not_manager(self):
+    async def test_not_manager(self):
         self.database.isBotManager.return_value = False
         self.assertIs(
-            manager.delete_manager('megotsthis', self.database, self.send),
+            await manager.delete_manager('megotsthis', self.database,
+                                         self.send),
             True)
         self.database.isBotManager.assert_called_once_with('megotsthis')
         self.assertFalse(self.database.removeBotManager.called)
         self.send.assert_called_once_with(
             StrContains('megotsthis', 'not', 'manager'))
 
-    def test_database_error(self):
+    async def test_database_error(self):
         self.database.isBotManager.return_value = True
         self.database.removeBotManager.return_value = False
         self.assertIs(
-            manager.delete_manager('megotsthis', self.database, self.send),
+            await manager.delete_manager('megotsthis', self.database,
+                                         self.send),
             True)
         self.database.isBotManager.assert_called_once_with('megotsthis')
         self.database.removeBotManager.assert_called_once_with('megotsthis')

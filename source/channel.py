@@ -49,7 +49,7 @@ async def chatCommand(chat: 'botData.Channel',
             databaseObj: database.DatabaseMain
             databaseObj = cast(database.DatabaseMain, db)
             permitted = await databaseObj.isPermittedUser(chat.channel, nick)
-            manager = databaseObj.isBotManager(nick)
+            manager = await databaseObj.isBotManager(nick)
             permissions = ChatPermissionSet(tags, nick, chat, permitted,
                                             manager)
 
