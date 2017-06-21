@@ -963,15 +963,16 @@ class DatabaseOAuth(Database):
             token: Optional[Tuple[str]] = await cursor.fetchone()
             return token and token[0]
 
-    def saveBroadcasterToken(self,
-                             broadcaster: str,
-                             token: str) -> None:
+    async def saveBroadcasterToken(self,
+                                   broadcaster: str,
+                                   token: str) -> None:
         query: str = '''
-REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)'''
-        cursor: sqlite3.Cursor
+REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, token))
-            self.connection.commit()
+            await cursor.execute(query, (broadcaster, token))
+            await self.connection.commit()
 
 
 class DatabaseTimeout(Database):
