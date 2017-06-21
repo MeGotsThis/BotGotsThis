@@ -822,12 +822,12 @@ INSERT INTO permitted_users_log
             await self.connection.commit()
             return True
 
-    def isBotManager(self, user: str) -> bool:
+    async def isBotManager(self, user: str) -> bool:
         query: str = '''SELECT 1 FROM bot_managers WHERE twitchUser=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (user,))
-            return bool(cursor.fetchone())
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (user,))
+            return bool(await cursor.fetchone())
 
     def addBotManager(self, user: str) -> bool:
         query: str = '''

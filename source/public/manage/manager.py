@@ -9,16 +9,17 @@ async def manageManager(args: ManageBotArgs) -> bool:
         return False
     user: str = args.message.lower[3]
     if args.message.lower[2] in ['add', 'insert']:
-        return insert_manager(user, args.database, args.send)
+        return await insert_manager(user, args.database, args.send)
     if args.message.lower[2] in ['del', 'delete', 'rem', 'remove']:
-        return delete_manager(user, args.database, args.send)
+        return await delete_manager(user, args.database, args.send)
     return False
 
 
-def insert_manager(user: str,
-                   database: DatabaseMain,
-                   send: Send) -> bool:
-    if database.isBotManager(user):
+async def insert_manager(user: str,
+                         database: DatabaseMain,
+                         send: Send) -> bool:
+    manager: bool = await database.isBotManager(user)
+    if manager:
         send('{user} is already a manager'.format(user=user))
         return True
     msg: str
@@ -30,10 +31,11 @@ def insert_manager(user: str,
     return True
 
 
-def delete_manager(user: str,
-                   database: DatabaseMain,
-                   send: Send) -> bool:
-    if not database.isBotManager(user):
+async def delete_manager(user: str,
+                         database: DatabaseMain,
+                         send: Send) -> bool:
+    manager: bool = await database.isBotManager(user)
+    if not manager:
         send('{user} is already not a manager'.format(user=user))
         return True
     msg: str
