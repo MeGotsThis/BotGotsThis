@@ -879,14 +879,17 @@ SELECT broadcaster, name, message FROM auto_repeat
             async for broadcaster, name, message in cursor:
                 yield AutoRepeatMessage(broadcaster, name, message)
 
-    def listAutoRepeat(self, broadcaster: str) -> Iterable[AutoRepeatList]:
+    async def listAutoRepeat(self, broadcaster: str
+                             ) -> AsyncIterator[AutoRepeatList]:
         query: str = '''
 SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
-    WHERE broadcaster=?'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    WHERE broadcaster=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
             row: tuple
-            for row in cursor.execute(query, (broadcaster,)):
+            async for row in cursor:
                 name: str
                 message: str
                 count: Optional[int]

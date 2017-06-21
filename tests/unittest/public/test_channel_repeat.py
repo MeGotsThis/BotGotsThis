@@ -3,7 +3,7 @@ from asynctest.mock import call, patch
 from source.data.message import Message
 from source.database import AutoRepeatList
 from tests.unittest.base_channel import TestChannel
-from tests.unittest.mock_class import StrContains
+from tests.unittest.mock_class import AsyncIterator, StrContains
 
 # Needs to be imported last
 from source.public.channel import repeat
@@ -117,10 +117,10 @@ class TestChannelRepeat(TestChannel):
 
     async def test_process_list(self):
         self.args = self.args._replace(message=Message('!autorepeat list'))
-        self.database.listAutoRepeat.return_value = [
+        self.database.listAutoRepeat.return_value = AsyncIterator([
             AutoRepeatList('Kappa', 'Keepo', None, 1, self.now),
             AutoRepeatList(':)', ':(', None, 5, self.now),
-            ]
+            ])
         self.assertIs(await repeat.process_auto_repeat(self.args, 1), True)
         self.database.listAutoRepeat.assert_called_once_with(
             self.channel.channel)
@@ -134,7 +134,7 @@ class TestChannelRepeat(TestChannel):
 
     async def test_process_list_empty(self):
         self.args = self.args._replace(message=Message('!autorepeat list'))
-        self.database.listAutoRepeat.return_value = []
+        self.database.listAutoRepeat.return_value = AsyncIterator([])
         self.assertIs(await repeat.process_auto_repeat(self.args, 1), True)
         self.database.listAutoRepeat.assert_called_once_with(
             self.channel.channel)
@@ -244,10 +244,10 @@ class TestChannelRepeat(TestChannel):
     async def test_process_name_list(self):
         self.args = self.args._replace(
             message=Message('!autorepeat name=kappa list'))
-        self.database.listAutoRepeat.return_value = [
+        self.database.listAutoRepeat.return_value = AsyncIterator([
             AutoRepeatList('Kappa', 'Keepo', None, 1, self.now),
             AutoRepeatList(':)', ':(', None, 5, self.now),
-            ]
+            ])
         self.assertIs(await repeat.process_auto_repeat(self.args, 1), True)
         self.database.listAutoRepeat.assert_called_once_with(
             self.channel.channel)
@@ -262,7 +262,7 @@ class TestChannelRepeat(TestChannel):
     async def test_process_name_list_empty(self):
         self.args = self.args._replace(
             message=Message('!autorepeat name=kappa list'))
-        self.database.listAutoRepeat.return_value = []
+        self.database.listAutoRepeat.return_value = AsyncIterator([])
         self.assertIs(await repeat.process_auto_repeat(self.args, 1), True)
         self.database.listAutoRepeat.assert_called_once_with(
             self.channel.channel)

@@ -50,7 +50,8 @@ async def process_auto_repeat(args: ChatCommandArgs,
 
     if secondArg == 'list':
         repeats: List[AutoRepeatList]
-        repeats = list(args.database.listAutoRepeat(args.chat.channel))
+        repeats = [repeat async for repeat
+                   in args.database.listAutoRepeat(args.chat.channel)]
         if not repeats:
             args.chat.send('No Active Auto Repeats')
         else:
