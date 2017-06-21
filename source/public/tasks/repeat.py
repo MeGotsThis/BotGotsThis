@@ -19,7 +19,7 @@ async def autoRepeatMessage(timestamp: datetime) -> None:
             message: str
             broadcaster, name, message = row
             if broadcaster in bot.globals.channels:
-                database_.sentAutoRepeat(broadcaster, name)
+                await database_.sentAutoRepeat(broadcaster, name)
                 channel: data.Channel = bot.globals.channels[broadcaster]
                 channel.send(message)
                 if channel.isMod:

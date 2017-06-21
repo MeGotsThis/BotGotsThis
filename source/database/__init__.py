@@ -906,22 +906,23 @@ SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
             await self.connection.commit()
             return cursor.rowcount != 0
 
-    def sentAutoRepeat(self,
-                       broadcaster: str,
-                       name: str) -> bool:
+    async def sentAutoRepeat(self,
+                             broadcaster: str,
+                             name: str) -> bool:
         query: str = '''
 UPDATE auto_repeat SET numLeft=numLeft-1, lastSent=CURRENT_TIMESTAMP
-    WHERE broadcaster=? AND name=?'''
+    WHERE broadcaster=? AND name=?
+'''
         delete: str = '''
 DELETE FROM auto_repeat
-    WHERE broadcaster=? AND name=? AND numLeft IS NOT NULL AND numLeft<=0'''
-        cursor: sqlite3.Cursor
+    WHERE broadcaster=? AND name=? AND numLeft IS NOT NULL AND numLeft<=0
+'''
+        cursor: aioodbc.cursor.Cursor
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, name))
-            self.connection.commit()
+            await cursor.execute(query, (broadcaster, name))
             ret: bool = cursor.rowcount != 0
-            cursor.execute(delete, (broadcaster, name))
-            self.connection.commit()
+            await cursor.execute(delete, (broadcaster, name))
+            await self.connection.commit()
             return ret
 
     def setAutoRepeat(self,
