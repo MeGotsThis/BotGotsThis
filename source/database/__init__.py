@@ -955,12 +955,12 @@ DELETE FROM auto_repeat WHERE broadcaster=? AND name=?'''
 
 
 class DatabaseOAuth(Database):
-    def getOAuthToken(self, broadcaster: str) -> Optional[str]:
+    async def getOAuthToken(self, broadcaster: str) -> Optional[str]:
         query: str = 'SELECT token FROM oauth.oauth_tokens WHERE broadcaster=?'
-        cursor: sqlite3.Cursor
+        cursor: aioodbc.cursor.Cursor
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster,))
-            token: Optional[Tuple[str]] = cursor.fetchone()
+            await cursor.execute(query, (broadcaster,))
+            token: Optional[Tuple[str]] = await cursor.fetchone()
             return token and token[0]
 
     def saveBroadcasterToken(self,

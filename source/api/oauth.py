@@ -13,4 +13,4 @@ async def token(broadcaster: str, *,
             return await token(broadcaster, database=database_)
     if not isinstance(database, databaseM.DatabaseOAuth):
         raise TypeError()
-    return database.getOAuthToken(broadcaster)
+    return await database.getOAuthToken(broadcaster)
