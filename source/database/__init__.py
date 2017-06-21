@@ -829,23 +829,24 @@ INSERT INTO permitted_users_log
             await cursor.execute(query, (user,))
             return bool(await cursor.fetchone())
 
-    def addBotManager(self, user: str) -> bool:
+    async def addBotManager(self, user: str) -> bool:
         query: str = '''
-INSERT INTO bot_managers (twitchUser) VALUES (?)'''
+INSERT INTO bot_managers (twitchUser) VALUES (?)
+'''
         history: str = '''
 INSERT INTO bot_managers_log
     (twitchUser, created, actionLog)
-    VALUES (?, CURRENT_TIMESTAMP, ?)'''
-        cursor: sqlite3.Cursor
-        with closing(self.connection.cursor()) as cursor:
+    VALUES (?, CURRENT_TIMESTAMP, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
             try:
-                cursor.execute(query, (user,))
-                self.connection.commit()
-            except sqlite3.IntegrityError:
+                await cursor.execute(query, (user,))
+            except pyodbc.IntegrityError:
                 return False
 
-            cursor.execute(history, (user, 'add'))
-            self.connection.commit()
+            await cursor.execute(history, (user, 'add'))
+            await self.connection.commit()
             return True
 
     def removeBotManager(self, user: str) -> bool:
