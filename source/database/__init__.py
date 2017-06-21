@@ -925,20 +925,21 @@ DELETE FROM auto_repeat
             await self.connection.commit()
             return ret
 
-    def setAutoRepeat(self,
-                      broadcaster: str,
-                      name: str,
-                      message: str,
-                      count: Optional[int],
-                      minutes: float) -> bool:
+    async def setAutoRepeat(self,
+                            broadcaster: str,
+                            name: str,
+                            message: str,
+                            count: Optional[int],
+                            minutes: float) -> bool:
         query: str = '''
-REPLACE INTO auto_repeat (broadcaster, name, message, duration, lastSent)
-VALUES (?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''
-        cursor: sqlite3.Cursor
+REPLACE INTO auto_repeat
+    (broadcaster, name, message, numLeft, duration, lastSent)
+VALUES (?, ?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''
+        cursor: aioodbc.cursor.Cursor
         with closing(self.connection.cursor()) as cursor:
-            cursor.execute(query, (broadcaster, name, message, minutes,
-                                   minutes))
-            self.connection.commit()
+            await cursor.execute(query, (broadcaster, name, message, count,
+                                         minutes, minutes))
+            await self.connection.commit()
             return cursor.rowcount != 0
 
     def removeAutoRepeat(self,
