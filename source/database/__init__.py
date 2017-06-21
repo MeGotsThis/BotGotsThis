@@ -1,6 +1,5 @@
 import configparser
 import os.path
-import sqlite3
 
 import aioodbc
 import aioodbc.cursor
@@ -526,7 +525,7 @@ REPLACE INTO custom_command_properties
                                                  value))
                 await self.connection.commit()
                 return cursor.rowcount != 0
-            except sqlite3.IntegrityError:
+            except pyodbc.IntegrityError:
                 return False
 
     async def hasFeature(self,
