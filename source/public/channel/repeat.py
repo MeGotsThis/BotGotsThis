@@ -77,7 +77,7 @@ async def process_auto_repeat(args: ChatCommandArgs,
             return False
 
     if minutesDuration <= 0 or count == 0 or not message:
-        args.database.removeAutoRepeat(args.chat.channel, name)
+        await args.database.removeAutoRepeat(args.chat.channel, name)
         return True
 
     await args.database.setAutoRepeat(args.chat.channel, name, message, count,
