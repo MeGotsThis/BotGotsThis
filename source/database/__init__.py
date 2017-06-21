@@ -976,27 +976,29 @@ REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)
 
 
 class DatabaseTimeout(Database):
-    def recordTimeout(self,
-                      broadcaster: str,
-                      user: str,
-                      fromUser: Optional[str],
-                      module: str,
-                      level: Optional[int],
-                      length: Optional[int],
-                      message: Optional[str],
-                      reason: Optional[str]) -> bool:
+    async def recordTimeout(self,
+                            broadcaster: str,
+                            user: str,
+                            fromUser: Optional[str],
+                            module: str,
+                            level: Optional[int],
+                            length: Optional[int],
+                            message: Optional[str],
+                            reason: Optional[str]) -> bool:
         query: str = '''
 INSERT INTO timeout.timeout_logs 
     (broadcaster, twitchUser, fromUser, module, level, length, message, reason)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)'''
-        cursor: sqlite3.Cursor
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+'''
+        cursor: aioodbc.cursor.Cursor
         with closing(self.connection.cursor()) as cursor:
             try:
-                cursor.execute(query, (broadcaster, user, fromUser, module,
-                                       level, length, message, reason))
-                self.connection.commit()
+                await cursor.execute(query, (broadcaster, user, fromUser,
+                                             module, level, length, message,
+                                             reason))
+                await self.connection.commit()
                 return True
-            except sqlite3.IntegrityError:
+            except pyodbc.IntegrityError:
                 return False
 
 
