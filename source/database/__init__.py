@@ -9,9 +9,8 @@ import pyodbc
 from contextlib import closing
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, Iterable, Mapping, NamedTuple, Optional
-from typing import Sequence, Tuple, Type, Union
-from typing import AsyncIterator, TypeVar, overload
+from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple
+from typing import Optional, Sequence, Tuple, Type, TypeVar, Union, overload
 
 T = TypeVar('T')
 S = TypeVar('S')
