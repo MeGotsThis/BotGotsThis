@@ -22,8 +22,9 @@ async def insert_manager(user: str,
     if manager:
         send('{user} is already a manager'.format(user=user))
         return True
+    successful: bool = await database.addBotManager(user)
     msg: str
-    if database.addBotManager(user):
+    if successful:
         msg = '{user} is now a manager'
     else:
         msg = '{user} could not be added as a manager. Error has occured.'
