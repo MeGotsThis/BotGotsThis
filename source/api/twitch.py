@@ -217,8 +217,7 @@ async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
     return None
 
 
-async def chat_server(chat:Optional[str]) -> Optional[str]:
-    return None
+async def chat_server(chat: str) -> Optional[str]:
     session: aiohttp.ClientSession
     response: aiohttp.ClientResponse
     async with aiohttp.ClientSession() as session, \
