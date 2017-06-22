@@ -450,49 +450,50 @@ class TestsIrcMessage(unittest.TestCase):
         self.assertRaises(ValueError, IrcMessage.parse, '001 :\n')
 
     def test_parse_command(self):
-        self.assertEquals(IrcMessage.parse('RECONNECT'),
-                          ParsedMessage(None, None, 'RECONNECT',
-                                        IrcMessageParams()))
+        self.assertEqual(IrcMessage.parse('RECONNECT'),
+                         ParsedMessage(None, None, 'RECONNECT',
+                                       IrcMessageParams()))
 
     def test_parse_command_int(self):
-        self.assertEquals(IrcMessage.parse('001'),
-                          ParsedMessage(None, None, 1, IrcMessageParams()))
+        self.assertEqual(IrcMessage.parse('001'),
+                         ParsedMessage(None, None, 1, IrcMessageParams()))
 
     def test_parse_command_params_middle(self):
-        self.assertEquals(IrcMessage.parse('PART #botgotsthis'),
-                          ParsedMessage(None, None, 'PART',
-                                        IrcMessageParams('#botgotsthis')))
+        self.assertEqual(IrcMessage.parse('PART #botgotsthis'),
+                         ParsedMessage(None, None, 'PART',
+                                       IrcMessageParams('#botgotsthis')))
 
     def test_parse_prefix_command_params_middle(self):
-        self.assertEquals(IrcMessage.parse(':bot_gots_this!123botgotsthis@botgotsthis.tmi.twitch.tv JOIN #botgotsthis'),
-                          ParsedMessage(None,
-                                        IrcMessagePrefix(nick='bot_gots_this',
-                                                         user='123botgotsthis',
-                                                         host='botgotsthis.tmi.twitch.tv'),
-                                        'JOIN',
-                                        IrcMessageParams('#botgotsthis')))
+        self.assertEqual(
+            IrcMessage.parse(':bot_gots_this!123botgotsthis@botgotsthis.tmi.twitch.tv JOIN #botgotsthis'),
+            ParsedMessage(None,
+                          IrcMessagePrefix(nick='bot_gots_this',
+                                           user='123botgotsthis',
+                                           host='botgotsthis.tmi.twitch.tv'),
+                          'JOIN',
+                          IrcMessageParams('#botgotsthis')))
 
     def test_parse_prefix_servername_command_params_middle_trailing(self):
-        self.assertEquals(IrcMessage.parse(':tmi.twitch.tv PONG tmi.twitch.tv :botgotsthis'),
-                          ParsedMessage(None,
-                                        IrcMessagePrefix(servername='tmi.twitch.tv'),
-                                        'PONG',
-                                        IrcMessageParams('tmi.twitch.tv',
-                                                         'botgotsthis')))
+        self.assertEqual(
+            IrcMessage.parse(':tmi.twitch.tv PONG tmi.twitch.tv :botgotsthis'),
+            ParsedMessage(None,
+                          IrcMessagePrefix(servername='tmi.twitch.tv'),
+                          'PONG',
+                          IrcMessageParams('tmi.twitch.tv', 'botgotsthis')))
 
     def test_parse_empty_trailing(self):
-        self.assertEquals(IrcMessage.parse('TEST middle empty trail :'),
-                          ParsedMessage(None, None, 'TEST',
-                                        IrcMessageParams('middle empty trail', '')))
+        self.assertEqual(IrcMessage.parse('TEST middle empty trail :'),
+                         ParsedMessage(None, None, 'TEST',
+                                       IrcMessageParams('middle empty trail', '')))
 
 
     def test_parse_empty_middle(self):
-        self.assertEquals(IrcMessage.parse('TEST :empty middle'),
-                          ParsedMessage(None, None, 'TEST',
-                                        IrcMessageParams(None, 'empty middle')))
+        self.assertEqual(IrcMessage.parse('TEST :empty middle'),
+                         ParsedMessage(None, None, 'TEST',
+                                       IrcMessageParams(None, 'empty middle')))
 
     def test_parse_multiple_spaces(self):
-        self.assertEquals(
+        self.assertEqual(
             IrcMessage.parse(
                 '@multiple=spaces  :will!be@used  HERE  to  test :if  this  passes'),
             ParsedMessage(

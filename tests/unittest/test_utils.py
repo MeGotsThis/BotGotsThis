@@ -335,9 +335,9 @@ class TestUtils(unittest.TestCase):
             StrContains('exception'),
             StrContains('2000', '01', 'Exception', __file__,
                         'test_logException', 'raise Exception'))
-        self.assertEquals(mock_stderr.getvalue(),
-                          StrContains('2000', '1', 'Exception', __file__,
-                                      'test_logException', 'raise Exception'))
+        self.assertEqual(mock_stderr.getvalue(),
+                         StrContains('2000', '1', 'Exception', __file__,
+                                     'test_logException', 'raise Exception'))
 
     @patch('sys.stderr', new_callable=StringIO)
     @patch('bot.coroutine.logging', autospec=True)
@@ -356,7 +356,7 @@ class TestUtils(unittest.TestCase):
             StrContains('exception'),
             StrContains('2000', '1', 'Exception', __file__,
                         'test_logException', 'raise Exception'))
-        self.assertEquals(mock_stderr.getvalue(), '')
+        self.assertEqual(mock_stderr.getvalue(), '')
 
     @patch('bot.coroutine.logging', autospec=True)
     @patch('bot.config', autospec=True)

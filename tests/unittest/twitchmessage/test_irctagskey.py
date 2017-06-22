@@ -191,19 +191,19 @@ class TestsIrcTagsKey(unittest.TestCase):
         self.assertRaises(ValueError, IrcMessageTagsKey.parse, '.a.a./')
 
     def test_parse(self):
-        self.assertEquals(IrcMessageTagsKey.parse(''), ParsedKeyVendor('', None))
+        self.assertEqual(IrcMessageTagsKey.parse(''), ParsedKeyVendor('', None))
 
     def test_parse_key(self):
-        self.assertEquals(IrcMessageTagsKey.parse('Kreygasm'),
-                          ParsedKeyVendor('Kreygasm', None))
+        self.assertEqual(IrcMessageTagsKey.parse('Kreygasm'),
+                         ParsedKeyVendor('Kreygasm', None))
 
     def test_parse_key_vendor(self):
-        self.assertEquals(IrcMessageTagsKey.parse('PogChamp/Kreygasm'),
-                          ParsedKeyVendor('Kreygasm', 'PogChamp'))
+        self.assertEqual(IrcMessageTagsKey.parse('PogChamp/Kreygasm'),
+                         ParsedKeyVendor('Kreygasm', 'PogChamp'))
 
     def test_parse_key_venor_domain(self):
-        self.assertEquals(IrcMessageTagsKey.parse('PogChamp/Kreygasm'),
-                          ParsedKeyVendor('Kreygasm', 'PogChamp'))
+        self.assertEqual(IrcMessageTagsKey.parse('PogChamp/Kreygasm'),
+                         ParsedKeyVendor('Kreygasm', 'PogChamp'))
 
     def test_from_str_vendor(self):
         key = IrcMessageTagsKey.fromKeyVendor('DansGame/')
