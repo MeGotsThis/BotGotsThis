@@ -44,19 +44,19 @@ class TestChannel(asynctest.TestCase):
 
     @patch('bot.utils.logException', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
-    @patch('source.database.get_database', autospec=True)
+    @patch('source.database.get_database')
     @patch('source.channel.commandsToProcess', autospec=True)
-    async def fail_test_chatCommand(self, mock_commands, mock_database, mock_save,
+    async def test_chatCommand(self, mock_commands, mock_database, mock_save,
                                mock_log):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
         mock_commands.return_value = [command1, command2, command3]
         database = MagicMock(spec=DatabaseMain)
-        database.__enter__.return_value = database
+        database.__aenter__.return_value = database
         database.isPermittedUser.return_value = False
         database.isBotManager.return_value = False
-        database.__exit__.return_value = True
+        database.__aexit__.return_value = True
         mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
@@ -75,16 +75,15 @@ class TestChannel(asynctest.TestCase):
     @patch('bot.utils.logException', autospec=True)
     @patch('source.database.get_database')
     @patch('source.channel.commandsToProcess', autospec=True)
-    async def fail_test_chatCommand_except(self, mock_commands, mock_database,
+    async def test_chatCommand_except(self, mock_commands, mock_database,
                                       mock_log):
-        # TODO: Fix when asynctest is updated with magic mock
-        command = Mock(spec=lambda args: False, side_effect=Exception)
+        command = CoroutineMock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
         database = MagicMock(spec=DatabaseMain)
-        database.__enter__.return_value = database
+        database.__aenter__.return_value = database
         database.isPermittedUser.return_value = False
         database.isBotManager.return_value = False
-        database.__exit__.return_value = False
+        database.__aexit__.return_value = False
         mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
@@ -99,9 +98,8 @@ class TestChannel(asynctest.TestCase):
     @patch('bot.utils.logException', autospec=True)
     @patch('source.database.get_database')
     @patch('source.channel.commandsToProcess', autospec=True)
-    async def fail_test_chatCommand_database_except(self, mock_commands,
+    async def test_chatCommand_database_except(self, mock_commands,
                                                mock_database, mock_log):
-        # TODO: Fix when asynctest is updated with magic mock
         mock_database.side_effect = Exception
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
@@ -114,18 +112,17 @@ class TestChannel(asynctest.TestCase):
     @patch('bot.utils.saveTwitchId', autospec=True)
     @patch('source.database.get_database')
     @patch('source.channel.commandsToProcess', autospec=True)
-    async def fail_test_chatCommand_no_tags(self, mock_commands, mock_database,
+    async def test_chatCommand_no_tags(self, mock_commands, mock_database,
                                        mock_save, mock_log):
-        # TODO: Fix when asynctest is updated with magic mock
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
         mock_commands.return_value = [command1, command2, command3]
         database = MagicMock(spec=DatabaseMain)
-        database.__enter__.return_value = database
+        database.__aenter__.return_value = database
         database.isPermittedUser.return_value = False
         database.isBotManager.return_value = False
-        database.__exit__.return_value = True
+        database.__aexit__.return_value = True
         mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
