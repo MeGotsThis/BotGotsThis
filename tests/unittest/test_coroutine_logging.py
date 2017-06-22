@@ -4,7 +4,7 @@ import bot.coroutine.logging
 
 from collections import deque
 
-from asynctest.mock import mock_open, patch
+from asynctest.mock import CoroutineMock, MagicMock, patch
 
 
 class TestLogging(asynctest.TestCase):
@@ -19,10 +19,15 @@ class TestLogging(asynctest.TestCase):
         bot.coroutine.logging.log('log', 'Kappa')
         self.assertEqual(bot.coroutine.logging._queue[0], ('log', 'Kappa'))
 
-    @patch('aiofiles.open', new_callable=mock_open)
-    async def fail_test_runTasks(self, mockopen):
-        # TODO: Fix when asynctest is updated with magic mock
+    @patch('aiofiles.open')
+    async def test_process_log(self, mockopen):
+        file_mock = MagicMock()
+        file_mock.__aenter__ = CoroutineMock()
+        file_mock.__aenter__.return_value = file_mock
+        file_mock.__aexit__ = CoroutineMock()
+        file_mock.__aexit__.return_value = True
+        mockopen.return_value = file_mock
         bot.coroutine.logging._queue = deque([('log', 'Kappa')])
         await bot.coroutine.logging._process_log()
         self.assertTrue(mockopen.called)
-        self.assertTrue(mockopen().write.called)
+        self.assertTrue(file_mock.write.called)
