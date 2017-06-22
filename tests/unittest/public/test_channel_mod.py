@@ -1,6 +1,7 @@
-from asynctest.mock import patch
+from asynctest.mock import MagicMock, patch
 
 from source.data.message import Message
+from source.database import DatabaseTimeout
 from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import StrContains
 
@@ -192,29 +193,35 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Game', 'fail'))
 
-    async def fail_test_purge(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    @patch('source.database.get_database')
+    async def test_purge(self, mock_database):
+        database = MagicMock(spec=DatabaseTimeout)
+        mock_database.return_value = database
+        database.__aenter__.return_value = database
         self.assertIs(await mod.commandPurge(self.args), False)
         self.assertFalse(self.channel.send.called)
-        self.assertFalse(self.database.recordTimeout.called)
+        self.assertFalse(database.recordTimeout.called)
         self.permissionSet['moderator'] = True
         self.permissionSet['chatModerator'] = True
         args = self.args._replace(message=Message('!purge MeGotsThis'))
         self.assertIs(await mod.commandPurge(args), True)
         self.channel.send.assert_called_once_with('.timeout MeGotsThis 1 ')
-        self.database.recordTimeout.assert_called_once_with(
+        database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', 'botgotsthis', 'purge', None, 1,
             '!purge MeGotsThis', None)
 
-    async def fail_test_purge_reason(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    @patch('source.database.get_database')
+    async def test_purge_reason(self, mock_database):
+        database = MagicMock(spec=DatabaseTimeout)
+        mock_database.return_value = database
+        database.__aenter__.return_value = database
         self.permissionSet['moderator'] = True
         self.permissionSet['chatModerator'] = True
         args = self.args._replace(message=Message('!purge MeGotsThis Kappa'))
         self.assertIs(await mod.commandPurge(args), True)
         self.channel.send.assert_called_once_with(
             '.timeout MeGotsThis 1 Kappa')
-        self.database.recordTimeout.assert_called_once_with(
+        database.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', 'botgotsthis', 'purge', None, 1,
             '!purge MeGotsThis Kappa', 'Kappa')
 

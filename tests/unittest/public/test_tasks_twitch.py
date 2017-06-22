@@ -1,5 +1,3 @@
-import unittest
-
 import asynctest
 
 from bot.coroutine.connection import ConnectionHandler
@@ -286,8 +284,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         mock_save.assert_called_once_with('BotGotsThis', '1', self.now)
 
 
-# TODO: Fix when asynctest is updated with magic mock
-class TestTasksTwitchChatServer:#(TestTasksTwitchBase):
+class TestTasksTwitchChatServer(TestTasksTwitchBase):
     def setUp(self):
         super().setUp()
 
@@ -298,14 +295,15 @@ class TestTasksTwitchChatServer:#(TestTasksTwitchBase):
         type(self.channel).serverCheck = self.check_property
 
         self.socket_property = PropertyMock(return_value=self.connection1)
-        type(self.channel).socket = self.socket_property
+        type(self.channel).connection = self.socket_property
 
         patcher = patch('source.database.get_database')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
 
         self.database = MagicMock(spec=DatabaseMain)
-        self.mock_database.return_value.__enter__.return_value = self.database
+        self.mock_database.return_value = self.database
+        self.database.__aenter__.return_value = self.database
 
         patcher = patch('source.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
