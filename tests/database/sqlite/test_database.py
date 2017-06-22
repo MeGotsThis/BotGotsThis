@@ -1,47 +1,53 @@
-import unittest
+import platform
+
+import asynctest
+
 from collections.abc import Sequence
-from source.database.sqlite import SQLiteDatabase
+
+from source.database import DatabaseMain
 
 
-class TestSqlite(unittest.TestCase):
-    def setUp(self):
-        self.ini = {
-            'file': ':memory:',
-            'oauth': ':memory:',
-            'timeoutlog': ':memory:',
-            }
-        self.database = SQLiteDatabase(self.ini)
-        self.database.connect()
-        self.cursor = self.database.connection.cursor()
+class TestSqlite(asynctest.TestCase):
+    async def setUp(self):
+        if platform.system() == 'Windows':
+            self.connectionString = '''\
+Driver=SQLite3 ODBC Driver;Database=:memory:;FKSupport=true;'''
+        else:
+            self.connectionString = '''\
+Driver=SQLite3;Data Source=:memory:;Version=3;New=True;'''
+        self.database = DatabaseMain(self.connectionString)
+        await self.database.connect()
+        self.cursor = await self.database.cursor()
 
-    def tearDown(self):
-        self.cursor.close()
-        self.database.close()
+    async def tearDown(self):
+        await self.cursor.close()
+        await self.database.close()
 
-    def execute(self, query, params=(), *, commit=True):
+    async def execute(self, query, params=(), *, commit=True):
         if isinstance(query, str):
-            self.cursor.execute(query, params)
+            await self.cursor.execute(query, params)
         elif isinstance(query, Sequence):
             for q, p in zip(query, params if params else ((),) * len(query)):
-                self.cursor.execute(q, p)
+                await self.cursor.execute(q, p)
         else:
             raise TypeError()
         if commit:
-            self.database.connection.commit()
+            await self.database.connection.commit()
 
-    def executemany(self, query, params=(), *, commit=True):
-        self.cursor.executemany(query, params)
+    async def executemany(self, query, params=(), *, commit=True):
+        await self.cursor.executemany(query, params)
         if commit:
-            self.database.connection.commit()
+            await self.database.connection.commit()
 
-    def value(self, query, params=()):
-        self.cursor.execute(query, params)
-        return (self.cursor.fetchone() or [None])[0]
+    async def value(self, query, params=()):
+        await self.cursor.execute(query, params)
+        return (await self.cursor.fetchone() or [None])[0]
 
-    def row(self, query, params=()):
-        self.cursor.execute(query, params)
-        return self.cursor.fetchone()
+    async def row(self, query, params=()):
+        await self.cursor.execute(query, params)
+        row = await self.cursor.fetchone()
+        return row and tuple(row)
 
-    def rows(self, query, params=()):
-        self.cursor.execute(query, params)
-        return self.cursor.fetchall()
+    async def rows(self, query, params=()):
+        await self.cursor.execute(query, params)
+        return [tuple(r) for r in await self.cursor.fetchall()]

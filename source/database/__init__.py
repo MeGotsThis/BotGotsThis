@@ -109,10 +109,10 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             try:
-                cursor.execute(query, (broadcaster, priority, cluster))
-                self.connection.commit()
+                await cursor.execute(query, (broadcaster, priority, cluster))
+                await self.connection.commit()
                 return True
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
     async def discardAutoJoin(self, broadcaster: str) -> bool:
@@ -216,7 +216,7 @@ INSERT INTO custom_commands_history
                     display = command
                 await cursor.execute(query, (broadcaster, permission, lower,
                                              display, fullMessage, user, user))
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
             await cursor.execute(history, (broadcaster, permission, lower,
@@ -393,7 +393,7 @@ INSERT INTO custom_commands_history
             try:
                 await cursor.execute(query, (new_permission, broadcaster,
                                              permission, command.lower()))
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
             if cursor.rowcount == 0:
@@ -433,7 +433,7 @@ INSERT INTO custom_commands_history
                 await cursor.execute(query, (new_command.lower(), display,
                                              broadcaster, permission,
                                              command.lower()))
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
             if cursor.rowcount == 0:
@@ -524,7 +524,7 @@ REPLACE INTO custom_command_properties
                                                  value))
                 await self.connection.commit()
                 return cursor.rowcount != 0
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
     async def hasFeature(self,
@@ -545,12 +545,12 @@ SELECT 1 FROM chat_features WHERE broadcaster=? AND feature=?
 INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)
 '''
         cursor: aioodbc.cursor.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        async with await self.cursor() as cursor:
             try:
                 await cursor.execute(query, (broadcaster, feature))
                 await self.connection.commit()
                 return True
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
     async def removeFeature(self,
@@ -602,7 +602,7 @@ INSERT INTO banned_channels_log
         async with await self.cursor() as cursor:
             try:
                 await cursor.execute(query, (broadcaster, reason, nick))
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
             await cursor.execute(history, (broadcaster, reason, nick, 'add'))
@@ -789,7 +789,7 @@ INSERT INTO permitted_users_log
         async with await self.cursor() as cursor:
             try:
                 await cursor.execute(query, (broadcaster, user))
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
             await cursor.execute(history, (broadcaster, user, moderator,
@@ -840,7 +840,7 @@ INSERT INTO bot_managers_log
         async with await self.cursor() as cursor:
             try:
                 await cursor.execute(query, (user,))
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
             await cursor.execute(history, (user, 'add'))
@@ -916,7 +916,7 @@ DELETE FROM auto_repeat
     WHERE broadcaster=? AND name=? AND numLeft IS NOT NULL AND numLeft<=0
 '''
         cursor: aioodbc.cursor.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, name))
             ret: bool = cursor.rowcount != 0
             await cursor.execute(delete, (broadcaster, name))
@@ -934,7 +934,7 @@ REPLACE INTO auto_repeat
     (broadcaster, name, message, numLeft, duration, lastSent)
 VALUES (?, ?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''
         cursor: aioodbc.cursor.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, name, message, count,
                                          minutes, minutes))
             await self.connection.commit()
@@ -946,7 +946,7 @@ VALUES (?, ?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''
         query: str = '''
 DELETE FROM auto_repeat WHERE broadcaster=? AND name=?'''
         cursor: aioodbc.cursor.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, name))
             await self.connection.commit()
             return cursor.rowcount != 0
@@ -954,9 +954,9 @@ DELETE FROM auto_repeat WHERE broadcaster=? AND name=?'''
 
 class DatabaseOAuth(Database):
     async def getOAuthToken(self, broadcaster: str) -> Optional[str]:
-        query: str = 'SELECT token FROM oauth.oauth_tokens WHERE broadcaster=?'
+        query: str = 'SELECT token FROM oauth_tokens WHERE broadcaster=?'
         cursor: aioodbc.cursor.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster,))
             token: Optional[Tuple[str]] = await cursor.fetchone()
             return token and token[0]
@@ -965,10 +965,10 @@ class DatabaseOAuth(Database):
                                    broadcaster: str,
                                    token: str) -> None:
         query: str = '''
-REPLACE INTO oauth.oauth_tokens (broadcaster, token) VALUES (?, ?)
+REPLACE INTO oauth_tokens (broadcaster, token) VALUES (?, ?)
 '''
         cursor: aioodbc.cursor.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, token))
             await self.connection.commit()
 
@@ -984,19 +984,19 @@ class DatabaseTimeout(Database):
                             message: Optional[str],
                             reason: Optional[str]) -> bool:
         query: str = '''
-INSERT INTO timeout.timeout_logs 
+INSERT INTO timeout_logs 
     (broadcaster, twitchUser, fromUser, module, level, length, message, reason)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 '''
         cursor: aioodbc.cursor.Cursor
-        with closing(self.connection.cursor()) as cursor:
+        async with await self.cursor() as cursor:
             try:
                 await cursor.execute(query, (broadcaster, user, fromUser,
                                              module, level, length, message,
                                              reason))
                 await self.connection.commit()
                 return True
-            except pyodbc.IntegrityError:
+            except pyodbc.Error:
                 return False
 
 
