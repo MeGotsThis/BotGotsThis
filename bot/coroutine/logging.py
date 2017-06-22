@@ -34,5 +34,6 @@ async def _process_log() -> None:
     filename: str
     log: str
     filename, log = _queue.popleft()
-    async with aiofiles.open(filename, 'a', encoding='utf-8') as file:
+    file = aiofiles.open(filename, 'a', encoding='utf-8')
+    async with file:
         await file.write(log)
