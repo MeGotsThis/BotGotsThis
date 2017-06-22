@@ -65,8 +65,8 @@ class TestJoinManager(unittest.TestCase):
     @patch.object(ConnectionHandler, 'isConnected', new_callable=PropertyMock)
     def test_connected_channels(self, mock_isConnected):
         mock_isConnected.return_value = True
-        self.assertEquals(bot.coroutine.join._connected_channels(),
-                          {'botgotsthis': self.channel})
+        self.assertEqual(bot.coroutine.join._connected_channels(),
+                         {'botgotsthis': self.channel})
 
     @patch.object(ConnectionHandler, 'isConnected', new_callable=PropertyMock)
     def test_connected_channels_not_connected(self, mock_isConnected):
@@ -82,8 +82,8 @@ class TestJoinManager(unittest.TestCase):
         s.channels = {'megotsthis': c}
         self.mock_globals.clusters['mock'] = s
         mock_isConnected.return_value = True
-        self.assertEquals(bot.coroutine.join._connected_channels(),
-                          {'botgotsthis': self.channel})
+        self.assertEqual(bot.coroutine.join._connected_channels(),
+                         {'botgotsthis': self.channel})
 
     @patch('bot.utils.now', autospec=True)
     def test_connected(self, mock_now):
