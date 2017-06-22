@@ -268,112 +268,274 @@ class TestApiTwitchApiHeaders(asynctest.TestCase):
                           'Client-ID': '0123456789abcdef'})
 
 
-class TestApiTwitchApiCalls(unittest.TestCase):
+class TestApiTwitchApiCalls(asynctest.TestCase):
     def setUp(self):
         patcher = patch('source.api.twitch.get_headers')
         self.addCleanup(patcher.stop)
         self.mock_headers = patcher.start()
         self.mock_headers.return_value = {}
 
-        patcher = patch('http.client.HTTPSConnection', autospec=True)
+        self.mock_session = MagicMock(spec=aiohttp.ClientSession)
+        self.mock_session.__aenter__.return_value = self.mock_session
+        self.mock_session.__aexit__.return_value = False
+
+        patcher = patch('aiohttp.ClientSession')
         self.addCleanup(patcher.stop)
-        self.mock_httpconnection = patcher.start()
+        self.mock_clientsession = patcher.start()
+        self.mock_clientsession.return_value = self.mock_session
 
-    async def fail_test_get_call(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        await twitch.get_call('botgotsthis', '/kraken/')
+        self.mock_response = MagicMock(spec=aiohttp.ClientResponse)
+        self.mock_response.__aenter__.return_value = self.mock_response
+        self.mock_response.__aexit__.return_value = False
+        self.mock_response.status = 200
+        self.mock_response.json.return_value = {}
+
+    async def test_get_call(self):
+        self.mock_session.get.return_value = self.mock_response
+        self.assertEqual(await twitch.get_call('botgotsthis', '/kraken/'),
+                         (self.mock_response, {}))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.get.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_get_call_channel_none(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        await twitch.get_call(None, '/kraken/')
+    async def test_get_call_channel_none(self):
+        self.mock_session.get.return_value = self.mock_response
+        self.assertEqual(await twitch.get_call(None, '/kraken/'),
+                         (self.mock_response, {}))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.get.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, None)
 
-    async def fail_test_api_call_header(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_get_call_header(self):
         headers = {'Kappa': 'megotsthis'}
-        await twitch.get_call('botgotsthis', '/kraken/', headers=headers)
+        self.mock_session.get.return_value = self.mock_response
+        self.assertEqual(
+            await twitch.get_call('botgotsthis', '/kraken/', headers=headers),
+            (self.mock_response, {}))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.get.called)
+        self.assertTrue(self.mock_response.json.called)
+        self.mock_headers.assert_called_once_with({'Kappa': 'megotsthis'},
+                                                  'botgotsthis')
+
+    async def test_get_call_204(self):
+        self.mock_session.get.return_value = self.mock_response
+        self.mock_response.json.side_effect = ValueError
+        self.mock_response.status = 204
+        self.assertEqual(
+            await twitch.get_call('botgotsthis', '/kraken/'),
+            (self.mock_response, None))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.get.called)
+        self.assertFalse(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_post_call(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        await twitch.post_call('botgotsthis', '/kraken/')
+    async def test_get_call_except(self):
+        self.mock_session.get.return_value = self.mock_response
+        excp = aiohttp.ClientResponseError(None, None)
+        self.mock_response.json.side_effect = excp
+        self.assertEqual(
+            await twitch.get_call('botgotsthis', '/kraken/'),
+            (self.mock_response, None))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.get.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_post_call_channel_none(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_post_call(self):
+        self.mock_session.post.return_value = self.mock_response
+        self.assertEqual(await twitch.post_call('botgotsthis', '/kraken/'),
+                         (self.mock_response, {}))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.post.called)
+        self.assertTrue(self.mock_response.json.called)
+        self.mock_headers.assert_called_once_with({}, 'botgotsthis')
+
+    async def test_post_call_channel_none(self):
+        self.mock_session.post.return_value = self.mock_response
         await twitch.post_call(None, '/kraken/')
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.post.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, None)
 
-    async def fail_test_post_call_header(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_post_call_header(self):
+        self.mock_session.post.return_value = self.mock_response
         headers = {'Kappa': 'megotsthis'}
         await twitch.post_call('botgotsthis', '/kraken/', data=headers)
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.post.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_post_call_data(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_post_call_data(self):
+        self.mock_session.post.return_value = self.mock_response
         data = {'bot': 'BotGotsThis'}
         await twitch.post_call('botgotsthis', '/kraken/', data=data)
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.post.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_put_call(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        await twitch.post_call('botgotsthis', '/kraken/')
+    async def test_post_call_204(self):
+        self.mock_session.post.return_value = self.mock_response
+        self.mock_response.json.side_effect = ValueError
+        self.mock_response.status = 204
+        self.assertEqual(
+            await twitch.post_call('botgotsthis', '/kraken/'),
+            (self.mock_response, None))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.post.called)
+        self.assertFalse(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_put_call_channel_none(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        await twitch.post_call(None, '/kraken/')
+    async def test_post_call_except(self):
+        self.mock_session.post.return_value = self.mock_response
+        excp = aiohttp.ClientResponseError(None, None)
+        self.mock_response.json.side_effect = excp
+        self.assertEqual(
+            await twitch.post_call('botgotsthis', '/kraken/'),
+            (self.mock_response, None))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.post.called)
+        self.assertTrue(self.mock_response.json.called)
+        self.mock_headers.assert_called_once_with({}, 'botgotsthis')
+
+    async def test_put_call(self):
+        self.mock_session.put.return_value = self.mock_response
+        self.assertEqual(await twitch.put_call('botgotsthis', '/kraken/'),
+                         (self.mock_response, {}))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.put.called)
+        self.assertTrue(self.mock_response.json.called)
+        self.mock_headers.assert_called_once_with({}, 'botgotsthis')
+
+    async def test_put_call_channel_none(self):
+        self.mock_session.put.return_value = self.mock_response
+        await twitch.put_call(None, '/kraken/')
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.put.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, None)
 
-    async def fail_test_put_call_header(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_put_call_header(self):
+        self.mock_session.put.return_value = self.mock_response
         headers = {'Kappa': 'megotsthis'}
-        await twitch.post_call('botgotsthis', '/kraken/', data=headers)
+        await twitch.put_call('botgotsthis', '/kraken/', data=headers)
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.put.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_put_call_data(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_put_call_data(self):
+        self.mock_session.put.return_value = self.mock_response
         data = {'bot': 'BotGotsThis'}
-        await twitch.post_call('botgotsthis', '/kraken/', data=data)
+        await twitch.put_call('botgotsthis', '/kraken/', data=data)
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.put.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_delete_call(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        await twitch.post_call('botgotsthis', '/kraken/')
+    async def test_put_call_204(self):
+        self.mock_session.put.return_value = self.mock_response
+        self.mock_response.json.side_effect = ValueError
+        self.mock_response.status = 204
+        self.assertEqual(
+            await twitch.put_call('botgotsthis', '/kraken/'),
+            (self.mock_response, None))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.put.called)
+        self.assertFalse(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_delete_call_channel_none(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        await twitch.post_call(None, '/kraken/')
+    async def test_put_call_except(self):
+        self.mock_session.put.return_value = self.mock_response
+        excp = aiohttp.ClientResponseError(None, None)
+        self.mock_response.json.side_effect = excp
+        self.assertEqual(
+            await twitch.put_call('botgotsthis', '/kraken/'),
+            (self.mock_response, None))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.put.called)
+        self.assertTrue(self.mock_response.json.called)
+        self.mock_headers.assert_called_once_with({}, 'botgotsthis')
+
+    async def test_delete_call(self):
+        self.mock_session.delete.return_value = self.mock_response
+        self.assertEqual(await twitch.delete_call('botgotsthis', '/kraken/'),
+                         (self.mock_response, {}))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.delete.called)
+        self.assertTrue(self.mock_response.json.called)
+        self.mock_headers.assert_called_once_with({}, 'botgotsthis')
+
+    async def test_delete_call_channel_none(self):
+        self.mock_session.delete.return_value = self.mock_response
+        await twitch.delete_call(None, '/kraken/')
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.delete.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, None)
 
-    async def fail_test_delete_call_header(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_delete_call_header(self):
+        self.mock_session.delete.return_value = self.mock_response
         headers = {'Kappa': 'megotsthis'}
-        await twitch.post_call('botgotsthis', '/kraken/', data=headers)
+        await twitch.delete_call('botgotsthis', '/kraken/', data=headers)
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.delete.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_delete_call_data(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_delete_call_data(self):
+        self.mock_session.delete.return_value = self.mock_response
         data = {'bot': 'BotGotsThis'}
-        await twitch.post_call('botgotsthis', '/kraken/', data=data)
+        await twitch.delete_call('botgotsthis', '/kraken/', data=data)
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.delete.called)
+        self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_chat_server(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        mock = MagicMock()
-        self.mock_httpconnection.return_value.getresponse.return_value = mock
-        mock.__enter__.return_value.read.return_value = chatServers
-        self.assertEqual(twitch.chat_server('botgotsthis'), 'aws')
+    async def test_delete_call_204(self):
+        self.mock_session.delete.return_value = self.mock_response
+        self.mock_response.json.side_effect = ValueError
+        self.mock_response.status = 204
+        self.assertEqual(
+            await twitch.delete_call('botgotsthis', '/kraken/'),
+            (self.mock_response, None))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.delete.called)
+        self.assertFalse(self.mock_response.json.called)
+        self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def fail_test_chat_server_except(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        mock = MagicMock()
-        self.mock_httpconnection.return_value.getresponse.return_value = mock
-        mock.__enter__.return_value.read.return_value = b''
-        self.assertIsNone(twitch.chat_server('botgotsthis'))
+    async def test_delete_call_except(self):
+        self.mock_session.delete.return_value = self.mock_response
+        excp = aiohttp.ClientResponseError(None, None)
+        self.mock_response.json.side_effect = excp
+        self.assertEqual(
+            await twitch.delete_call('botgotsthis', '/kraken/'),
+            (self.mock_response, None))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.delete.called)
+        self.assertTrue(self.mock_response.json.called)
+        self.mock_headers.assert_called_once_with({}, 'botgotsthis')
+
+    async def test_chat_server(self):
+        self.mock_session.get.return_value = self.mock_response
+        self.mock_response.json.return_value = json.loads(chatServers.decode())
+        self.assertEqual(await twitch.chat_server('botgotsthis'), 'aws')
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.get.called)
+        self.assertTrue(self.mock_response.json.called)
+
+    async def test_chat_server_except(self):
+        self.mock_session.get.return_value = self.mock_response
+        self.mock_response.json.side_effect = ValueError
+        self.assertIsNone(await twitch.chat_server('botgotsthis'))
+        self.assertTrue(self.mock_clientsession.called)
+        self.assertTrue(self.mock_session.get.called)
+        self.assertTrue(self.mock_response.json.called)
 
 
 class TestApiTwitch(asynctest.TestCase):

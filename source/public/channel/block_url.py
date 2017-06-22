@@ -68,7 +68,9 @@ async def check_domain_redirect(chat: 'data.Channel',
                     if isBadRedirect:
                         await handle_different_domains(chat, nick, message)
                         return
-            except aiohttp.ClientError:
+            except aiohttp.ClientConnectorError:
+                pass
+            except:
                 utils.logException(str(message), timestamp)
 
 

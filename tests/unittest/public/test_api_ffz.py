@@ -1,7 +1,9 @@
 import asynctest
-from http.client import HTTPResponse
+import json
+
+import aiohttp
+
 from source.api import ffz
-from urllib.error import HTTPError, URLError
 from asynctest.mock import MagicMock, Mock, patch
 
 globalEmotes = b'''{
@@ -115,58 +117,51 @@ broadcasterEmotes = b'''{
 
 
 class TestApiFfz(asynctest.TestCase):
-    @patch('urllib.request.urlopen', autospec=True)
-    async def fail_test_globalEmotes(self, mock_urlopen):
-        # TODO: Fix when asynctest is updated with magic mock
-        mockResponse = MagicMock(spec=HTTPResponse)
-        mock_urlopen.return_value = mockResponse
-        mockResponse.__enter__.return_value = mockResponse
-        mockResponse.status = 200
-        mockResponse.read = Mock(spec=HTTPResponse.read)
-        mockResponse.read.return_value = globalEmotes
+    def setUp(self):
+        self.mock_response = MagicMock(spec=aiohttp.ClientResponse)
+        self.mock_response.__aenter__.return_value = self.mock_response
+        self.mock_response.__aexit__.return_value = False
+        self.mock_response.status = 200
+        self.mock_response.json.return_value = {}
+
+        self.mock_session = MagicMock(spec=aiohttp.ClientSession)
+        self.mock_session.__aenter__.return_value = self.mock_session
+        self.mock_session.__aexit__.return_value = False
+        self.mock_session.get.return_value = self.mock_response
+
+        patcher = patch('aiohttp.ClientSession')
+        self.addCleanup(patcher.stop)
+        self.mock_clientsession = patcher.start()
+        self.mock_clientsession.return_value = self.mock_session
+
+    async def test_globalEmotes(self):
+        data = json.loads(globalEmotes.decode())
+        self.mock_response.json.return_value = data
         self.assertEqual(await ffz.getGlobalEmotes(), {3: 'BeanieHipster'})
 
-    @patch('urllib.request.urlopen')
-    async def fail_test_globalEmotes_404(self, mock_urlopen):
-        # TODO: Fix when asynctest is updated with magic mock
-        mockResponse = MagicMock(spec=HTTPResponse)
-        mock_urlopen.return_value = mockResponse
-        mockResponse.__enter__.side_effect = HTTPError(None, 404, None, None, None)
+    async def test_globalEmotes_404(self):
+        exception = aiohttp.ClientResponseError(None, None, code=404)
+        self.mock_session.get.side_effect = exception
         self.assertEqual(await ffz.getGlobalEmotes(), {})
 
-    @patch('urllib.request.urlopen')
-    async def fail_test_globalEmotes_error(self, mock_urlopen):
-        # TODO: Fix when asynctest is updated with magic mock
-        mockResponse = MagicMock(spec=HTTPResponse)
-        mock_urlopen.return_value = mockResponse
-        mockResponse.__enter__.side_effect = URLError(None)
+    async def fail_test_globalEmotes_error(self):
+        exception = aiohttp.ClientResponseError(None, None)
+        self.mock_session.get.side_effect = exception
         self.assertIsNone(await ffz.getGlobalEmotes())
 
-    @patch('urllib.request.urlopen')
-    async def fail_test_broadcasterEmotes(self, mock_urlopen):
-        # TODO: Fix when asynctest is updated with magic mock
-        mockResponse = MagicMock(spec=HTTPResponse)
-        mock_urlopen.return_value = mockResponse
-        mockResponse.__enter__.return_value = mockResponse
-        mockResponse.status = 200
-        mockResponse.read = Mock(spec=HTTPResponse.read)
-        mockResponse.read.return_value = broadcasterEmotes
+    async def test_broadcasterEmotes(self):
+        data = json.loads(broadcasterEmotes.decode())
+        self.mock_response.json.return_value = data
         self.assertEqual(await ffz.getBroadcasterEmotes('pokemonspeedrunstv'),
                          {18146: 'KevinSquirtle'})
 
-    @patch('urllib.request.urlopen')
-    async def fail_test_broadcasterEmotes_404(self, mock_urlopen):
-        # TODO: Fix when asynctest is updated with magic mock
-        mockResponse = MagicMock(spec=HTTPResponse)
-        mock_urlopen.return_value = mockResponse
-        mockResponse.__enter__.side_effect = HTTPError(None, 404, None, None, None)
+    async def test_broadcasterEmotes_404(self):
+        exception = aiohttp.ClientResponseError(None, None, code=404)
+        self.mock_session.get.side_effect = exception
         self.assertEqual(await ffz.getBroadcasterEmotes('pokemonspeedrunstv'),
                          {})
 
-    @patch('urllib.request.urlopen')
-    async def fail_test_broadcasterEmotes_error(self, mock_urlopen):
-        # TODO: Fix when asynctest is updated with magic mock
-        mockResponse = MagicMock(spec=HTTPResponse)
-        mock_urlopen.return_value = mockResponse
-        mockResponse.__enter__.side_effect = URLError(None)
+    async def test_broadcasterEmotes_error(self):
+        exception = aiohttp.ClientResponseError(None, None)
+        self.mock_session.get.side_effect = exception
         self.assertIsNone(await ffz.getBroadcasterEmotes('pokemonspeedrunstv'))

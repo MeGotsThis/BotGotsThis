@@ -1,13 +1,13 @@
 import socket
 import unittest
-import urllib.error
 
+import aiohttp
 import asynctest
+import yarl
 
 from datetime import datetime
-from urllib.request import Request
 
-from asynctest.mock import Mock, call, patch
+from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
 from source.data.message import Message
@@ -77,10 +77,24 @@ class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.mock_compare.return_value = False
 
         patcher = patch(
-            'source.public.channel.block_url.handle_different_domains',
-            autospec=True)
+            'source.public.channel.block_url.handle_different_domains')
         self.addCleanup(patcher.stop)
         self.mock_handle = patcher.start()
+
+        self.mock_response = MagicMock(spec=aiohttp.ClientResponse)
+        self.mock_response.__aenter__.return_value = self.mock_response
+        self.mock_response.__aexit__.return_value = False
+        self.mock_response.status = 200
+
+        self.mock_session = MagicMock(spec=aiohttp.ClientSession)
+        self.mock_session.__aenter__.return_value = self.mock_session
+        self.mock_session.__aexit__.return_value = False
+        self.mock_session.get.return_value = self.mock_response
+
+        patcher = patch('aiohttp.ClientSession')
+        self.addCleanup(patcher.stop)
+        self.mock_clientsession = patcher.start()
+        self.mock_clientsession.return_value = self.mock_session
 
     async def test_followers(self):
         self.mock_followers.return_value = 1
@@ -90,23 +104,25 @@ class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.mock_followers.assert_called_once_with('botgotsthis')
         self.assertFalse(self.mock_log.called)
         self.assertFalse(self.mock_except.called)
-        #self.assertFalse(self.mock_request.called)
+        self.assertFalse(self.mock_clientsession.called)
+        self.assertFalse(self.mock_session.get.called)
         self.assertFalse(self.mock_compare.called)
         self.assertFalse(self.mock_handle.called)
 
-    async def fail_test(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test(self):
         self.mock_followers.return_value = 0
         self.mock_compare.return_value = True
         message = Message('twitch.tv')
-        self.response.url = 'http://megotsthis.com'
+        self.mock_response.url = yarl.URL('http://megotsthis.com')
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
-        self.mock_request.assert_called_once_with(TypeMatch(Request))
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
+            'http://twitch.tv', headers=TypeMatch(dict))
         self.mock_compare.assert_called_once_with(
             'http://twitch.tv', 'http://megotsthis.com',
             chat=self.channel, nick='megotsthis', timestamp=self.now)
@@ -114,126 +130,72 @@ class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
             self.channel, 'megotsthis', message)
         self.assertFalse(self.mock_except.called)
 
-    async def fail_test_same_domain(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_same_domain(self):
         self.mock_followers.return_value = 0
         message = Message('twitch.tv')
-        self.response.url = 'http://twitch.tv'
+        self.mock_response.url = yarl.URL('http://twitch.tv')
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
-        self.mock_request.assert_called_once_with(TypeMatch(Request))
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
+            'http://twitch.tv', headers=TypeMatch(dict))
         self.mock_compare.assert_called_once_with(
             'http://twitch.tv', 'http://twitch.tv',
             chat=self.channel, nick='megotsthis', timestamp=self.now)
         self.assertFalse(self.mock_handle.called)
         self.assertFalse(self.mock_except.called)
 
-    async def fail_test_404_error(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_no_dns(self):
         self.mock_followers.return_value = 0
         message = Message('twitch.tv')
-        self.mock_request.side_effect = urllib.error.HTTPError(
-            'http://twitch.tv', 404, None, {}, 0)
-        self.response.url = 'http://twitch.tv'
+        self.mock_session.get.side_effect = aiohttp.ClientConnectorError
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
-        self.mock_request.assert_called_once_with(TypeMatch(Request))
-        self.mock_compare.assert_called_once_with(
-            'http://twitch.tv', 'http://twitch.tv',
-            chat=self.channel, nick='megotsthis', timestamp=self.now)
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
+            'http://twitch.tv', headers=TypeMatch(dict))
         self.assertFalse(self.mock_handle.called)
-        self.assertFalse(self.mock_except.called)
-
-    async def fail_test_502_error(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        self.mock_followers.return_value = 0
-        message = Message('twitch.tv')
-        self.mock_request.side_effect = urllib.error.HTTPError(
-            'http://twitch.tv', 502, None, {}, 0)
-        self.response.url = 'http://twitch.tv'
-        await block_url.check_domain_redirect(self.channel, 'megotsthis',
-                                              message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
-        self.mock_log.assert_called_once_with(
-            StrContains('botgotsthis', 'blockurl'),
-            StrContains('megotsthis', str(message)), self.now)
-        self.mock_request.assert_called_once_with(TypeMatch(Request))
-        self.mock_compare.assert_called_once_with(
-            'http://twitch.tv', 'http://twitch.tv',
-            chat=self.channel, nick='megotsthis', timestamp=self.now)
-        self.assertFalse(self.mock_handle.called)
-        self.assertFalse(self.mock_except.called)
-
-    async def fail_test_urlerror_no_dns(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        self.mock_followers.return_value = 0
-        message = Message('twitch.tv')
-        self.mock_request.side_effect = urllib.error.URLError(
-            OSError(socket.EAI_NONAME, 'no name'))
-        await block_url.check_domain_redirect(self.channel, 'megotsthis',
-                                              message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
-        self.mock_log.assert_called_once_with(
-            StrContains('botgotsthis', 'blockurl'),
-            StrContains('megotsthis', str(message)), self.now)
-        self.mock_request.assert_called_once_with(TypeMatch(Request))
         self.assertFalse(self.mock_compare.called)
         self.assertFalse(self.mock_except.called)
 
-    async def fail_test_urlerror_other(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_exception(self):
         self.mock_followers.return_value = 0
         message = Message('twitch.tv')
-        self.mock_request.side_effect = urllib.error.URLError('error')
+        self.mock_session.get.side_effect = Exception
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
-        self.mock_request.assert_called_once_with(TypeMatch(Request))
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
+            'http://twitch.tv', headers=TypeMatch(dict))
+        self.assertFalse(self.mock_handle.called)
+        self.assertFalse(self.mock_compare.called)
         self.mock_except.assert_called_once_with(StrContains(str(message)),
                                                  TypeMatch(datetime))
-        self.assertFalse(self.mock_handle.called)
-        self.assertFalse(self.mock_compare.called)
 
-    async def fail_test_exception(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        self.mock_followers.return_value = 0
-        message = Message('twitch.tv')
-        self.mock_request.side_effect = Exception
-        await block_url.check_domain_redirect(self.channel, 'megotsthis',
-                                              message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
-        self.mock_log.assert_called_once_with(
-            StrContains('botgotsthis', 'blockurl'),
-            StrContains('megotsthis', str(message)), self.now)
-        self.mock_request.assert_called_once_with(TypeMatch(Request))
-        self.mock_except.assert_called_once_with(StrContains(str(message)),
-                                                 TypeMatch(datetime))
-        self.assertFalse(self.mock_handle.called)
-        self.assertFalse(self.mock_compare.called)
-
-    async def fail_test_multiple(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_multiple(self):
         self.mock_followers.return_value = 0
         message = Message('https://twitch.tv megotsthis.com')
-        self.response.url = 'http://twitch.tv'
+        self.mock_response.url = yarl.URL('http://twitch.tv')
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
-        self.assertEqual(self.mock_request.call_count, 2)
+        self.assertEqual(self.mock_clientsession.call_count, 1)
+        self.assertEqual(self.mock_session.get.call_count, 2)
         self.mock_compare.assert_has_calls([
             call('https://twitch.tv', 'http://twitch.tv',
                  chat=self.channel, nick='megotsthis', timestamp=self.now),
@@ -243,19 +205,19 @@ class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.assertFalse(self.mock_handle.called)
         self.assertFalse(self.mock_except.called)
 
-    async def fail_test_multiple_first_match(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_multiple_first_match(self):
         self.mock_followers.return_value = 0
         self.mock_compare.side_effect = [True, False]
         message = Message('https://twitch.tv megotsthis.com')
-        self.response.url = 'http://twitch.tv'
+        self.mock_response.url = yarl.URL('http://twitch.tv')
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
-        self.mock_request.assert_called_once_with(TypeMatch(Request))
+        self.assertEqual(self.mock_clientsession.call_count, 1)
+        self.assertEqual(self.mock_session.get.call_count, 1)
         self.mock_compare.assert_called_once_with(
             'https://twitch.tv', 'http://twitch.tv',
             chat=self.channel, nick='megotsthis', timestamp=self.now)
@@ -263,20 +225,19 @@ class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
             self.channel, 'megotsthis', message)
         self.assertFalse(self.mock_except.called)
 
-    async def fail_test_multiple_exception(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_multiple_exception(self):
         self.mock_followers.return_value = 0
         message = Message('twitch.tv megotsthis.com twitch.tv')
-        self.response.url = 'http://twitch.tv'
-        self.mock_request.return_value.__enter__.side_effect = [
-            Exception, self.response, Exception]
+        self.mock_response.url = yarl.URL('http://twitch.tv')
+        self.mock_session.get.side_effect = [
+            Exception, self.mock_response, Exception]
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
         self.mock_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
-        self.assertEqual(self.mock_request.call_count, 3)
+        self.assertEqual(self.mock_session.get.call_count, 3)
         self.mock_compare.assert_called_once_with(
             'http://megotsthis.com', 'http://twitch.tv',
             chat=self.channel, nick='megotsthis', timestamp=self.now)
@@ -362,29 +323,30 @@ class TestChannelBlockUrlCompareDomain(unittest.TestCase):
         self.assertFalse(self.mock_log.called)
 
 
-class TestChannelBlockUrlHandleDifferentDomain(unittest.TestCase):
+class TestChannelBlockUrlHandleDifferentDomain(asynctest.TestCase):
     def setUp(self):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.channel.ircChannel = '#botgotsthis'
-        self.database = Mock(spec=DatabaseMain)
         self.message = Message('')
         self.now = datetime(2000, 1, 1)
 
-        patcher = patch('source.database.get_database', autospec=True)
+        self.database = MagicMock(spec=DatabaseMain)
+        self.database.__aenter__.return_value = self.database
+        self.database.__aexit__.return_value = False
+
+        patcher = patch('source.database.get_database')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
-        self.mock_database.return_value.__enter__.return_value = self.database
+        self.mock_database.return_value = self.database
 
-        patcher = patch('source.public.library.timeout.timeout_user',
-                        autospec=True)
+        patcher = patch('source.public.library.timeout.timeout_user')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 
-    def fail_test(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        block_url.handle_different_domains(self.channel, 'megotsthis',
-                                           self.message)
+    async def test(self):
+        await block_url.handle_different_domains(self.channel, 'megotsthis',
+                                                 self.message)
         self.mock_database.assert_called_once_with()
         self.mock_timeout.assert_called_once_with(
             self.database, self.channel, 'megotsthis', 'redirectUrl', 1, '',

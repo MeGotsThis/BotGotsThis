@@ -1,6 +1,5 @@
-﻿import re
-import urllib.error
-import urllib.request
+﻿import asyncio
+import re
 
 import aiohttp
 
@@ -8,18 +7,22 @@ import bot.config
 import lists.custom
 
 from contextlib import suppress
-from functools import partial
-from http.client import HTTPResponse
-from typing import BinaryIO, Callable, Iterator, Match, Optional, Union
+from typing import Iterator, Match, List, Optional
 
 from ...data import CustomCommandField, CustomFieldArgs
 
 
 async def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'url':
-        replace_func: Callable[[Match[str]], str]
-        replace_func = partial(field_replace, args)  # type: ignore
-        url: str = re.sub(r'{([^\r\n\t\f {}]+)}', replace_func, args.param)
+        url: str = args.param
+        match: Match[str]
+        matches: List[Match[str]] = list(re.finditer(r'{([^\r\n\t\f {}]+)}',
+                                                     args.param))
+        for match in reversed(matches):
+            s: int
+            e: int
+            s, e = match.span()
+            url = url[:s] + await field_replace(args, match) + url[e:]
         urlTimeout: float = bot.config.customMessageUrlTimeout
         session: aiohttp.ClientSession
         response: aiohttp.ClientResponse

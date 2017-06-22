@@ -1,6 +1,8 @@
 import re
 
-from asynctest.mock import CoroutineMock, Mock, patch
+import aiohttp
+
+from asynctest.mock import CoroutineMock, MagicMock, patch
 
 from source.data.message import Message
 from tests.unittest.base_custom import TestCustomField
@@ -22,75 +24,102 @@ class TestCustomUrl(TestCustomField):
         self.mock_config = patcher.start()
         self.mock_config.customMessageUrlTimeout = 1
 
+        self.mock_response = MagicMock(spec=aiohttp.ClientResponse)
+        self.mock_response.__aenter__.return_value = self.mock_response
+        self.mock_response.__aexit__.return_value = False
+        self.mock_response.status = 200
+        self.mock_response.text.return_value = 'Kappa'
+
+        self.mock_session = MagicMock(spec=aiohttp.ClientSession)
+        self.mock_session.__aenter__.return_value = self.mock_session
+        self.mock_session.__aexit__.return_value = False
+        self.mock_session.get.return_value = self.mock_response
+
+        patcher = patch('aiohttp.ClientSession')
+        self.addCleanup(patcher.stop)
+        self.mock_clientsession = patcher.start()
+        self.mock_clientsession.return_value = self.mock_session
+
     async def test(self):
-        # TODO: Fix when asynctest is updated with magic mock
         self.args = self.args._replace(field='')
         self.assertIsNone(await url.fieldUrl(self.args))
+        self.assertFalse(self.mock_clientsession.called)
+        self.assertFalse(self.mock_session.get.called)
+        self.assertFalse(self.mock_session.get.called)
 
-    async def fail_test_url(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+    async def test_url(self):
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
-    async def fail_test_caps(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_caps(self):
         self.args = self.args._replace(field='URL')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
-    async def fail_test_default(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_default(self):
         self.args = self.args._replace(prefix='[', suffix=']')
-        self.request.status = 404
-        self.assertEqual(url.fieldUrl(self.args), '')
-        self.mock_urlopen.assert_called_once_with(
+        self.mock_response.status = 404
+        self.assertEqual(await url.fieldUrl(self.args), '')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
-    async def fail_test_exception(self):
-        # TODO: Fix when asynctest is updated with magic mock
-        self.mock_urlopen.side_effect = Exception
-        self.assertEqual(url.fieldUrl(self.args), '')
-        self.mock_urlopen.assert_called_once_with(
+    async def test_exception(self):
+        self.mock_session.get.side_effect = aiohttp.ClientError
+        self.assertEqual(await url.fieldUrl(self.args), '')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
-    async def fail_test_prefix(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_prefix(self):
         self.args = self.args._replace(prefix='[')
-        self.assertEqual(url.fieldUrl(self.args), '[Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), '[Kappa')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
-    async def fail_test_prefix_blank(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_prefix_blank(self):
         self.args = self.args._replace(prefix='')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
-    async def fail_test_suffix(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_suffix(self):
         self.args = self.args._replace(suffix=']')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa]')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa]')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
-    async def fail_test_suffix_blank(self):
-        # TODO: Fix when asynctest is updated with magic mock
+    async def test_suffix_blank(self):
         self.args = self.args._replace(suffix='')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
     @patch('source.public.custom.url.field_replace')
-    async def fail_test_field(self, mock_replace):
-        # TODO: Fix when asynctest is updated with magic mock
-        mock_replace.return_value = 'PogChamp'
-        self.args = self.args._replace(param='http://localhost/{query}')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
-            'http://localhost/PogChamp', timeout=1)
+    async def test_field(self, mock_replace):
+        mock_replace.side_effect = ['PogChamp', 'FrankerZ']
+        self.args = self.args._replace(param='http://localhost/{user}/{query}')
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
+            'http://localhost/FrankerZ/PogChamp', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
 
 
 class TestFieldReplace(TestCustomField):
