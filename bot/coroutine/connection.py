@@ -175,8 +175,7 @@ class ConnectionHandler:
             self._writer.write(b'\r\n')
             await self._writer.drain()
             self._on_write(command, timestamp, channel=channel)
-            # TODO: mypy fix in the future
-            self._log_write(command, channel=channel, whisper=whisper,  # type: ignore
+            self._log_write(command, channel=channel, whisper=whisper,
                             timestamp=timestamp)
         except:
             utils.logException()

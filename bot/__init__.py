@@ -155,4 +155,4 @@ class BotConfig:
             self.twitchClientId = str(ini['twitch']['twitchClientID'])
 
 
-config = BotConfig()
+config: BotConfig = BotConfig()
