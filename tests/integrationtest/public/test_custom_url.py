@@ -1,5 +1,6 @@
-from http.client import HTTPResponse
-from unittest.mock import Mock, patch
+import aiohttp
+
+from asynctest.mock import MagicMock, patch
 
 from tests.unittest.base_custom import TestCustomField
 from source.data.message import Message
@@ -14,48 +15,55 @@ class TestCustomUrl(TestCustomField):
                                        message=Message('a query'),
                                        param='http://localhost/')
 
-        patcher = patch('source.public.custom.url.urllib.request.urlopen',
-                        autospec=True)
+        self.mock_response = MagicMock(spec=aiohttp.ClientResponse)
+        self.mock_response.__aenter__.return_value = self.mock_response
+        self.mock_response.__aexit__.return_value = False
+        self.mock_response.status = 200
+        self.mock_response.text.return_value = 'Kappa'
+
+        self.mock_session = MagicMock(spec=aiohttp.ClientSession)
+        self.mock_session.__aenter__.return_value = self.mock_session
+        self.mock_session.__aexit__.return_value = False
+        self.mock_session.get.return_value = self.mock_response
+
+        patcher = patch('aiohttp.ClientSession')
         self.addCleanup(patcher.stop)
-        self.mock_urlopen = patcher.start()
-        self.request = Mock(spec=HTTPResponse)
-        self.mock_urlopen.return_value.__enter__.return_value = self.request
-        self.request.status = 200
-        self.request.read.return_value = b'Kappa'
+        self.mock_clientsession = patcher.start()
+        self.mock_clientsession.return_value = self.mock_session
 
         patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.customMessageUrlTimeout = 1
 
-    def test_query(self):
+    async def test_query(self):
         self.args = self.args._replace(param='http://localhost/{query}')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/query', timeout=1)
 
-    def test_user(self):
+    async def test_user(self):
         self.args = self.args._replace(param='http://localhost/{user}',
                                        nick='megotsthis')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/megotsthis', timeout=1)
 
-    def test_nick(self):
+    async def test_nick(self):
         self.args = self.args._replace(param='http://localhost/{nick}',
                                        nick='megotsthis')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/megotsthis', timeout=1)
 
-    def test_broadcaster(self):
+    async def test_broadcaster(self):
         self.args = self.args._replace(param='http://localhost/{broadcaster}')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/botgotsthis', timeout=1)
 
-    def test_streamer(self):
+    async def test_streamer(self):
         self.args = self.args._replace(param='http://localhost/{streamer}')
-        self.assertEqual(url.fieldUrl(self.args), 'Kappa')
-        self.mock_urlopen.assert_called_once_with(
+        self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
+        self.mock_session.get.assert_called_once_with(
             'http://localhost/botgotsthis', timeout=1)
