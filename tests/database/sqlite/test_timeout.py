@@ -1,7 +1,7 @@
 from datetime import datetime
-from source.database import DatabaseTimeout
 from tests.database.sqlite.test_database import TestSqlite
 from tests.unittest.mock_class import TypeMatch
+from source.database import DatabaseTimeout
 
 
 class TestSqliteTimeout(TestSqlite):

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from source.database import AutoRepeatList, AutoRepeatMessage
 from tests.database.sqlite.test_database import TestSqlite
+from source.database import AutoRepeatList, AutoRepeatMessage
 
 
 class TestSqliteAutoRepeat(TestSqlite):

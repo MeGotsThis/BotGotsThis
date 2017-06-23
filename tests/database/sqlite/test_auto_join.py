@@ -1,6 +1,6 @@
 import math
-from source.database import AutoJoinChannel
 from tests.database.sqlite.test_database import TestSqlite
+from source.database import AutoJoinChannel
 
 
 class TestSqliteAutoJoin(TestSqlite):
