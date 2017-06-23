@@ -49,6 +49,11 @@ main =
 oauth = 
 timeout = 
 timezone = 
+
+[twitch]
+twitchClientID = 
+twitchSecret = 
+redirectUri = 
 '''
 
 
@@ -75,7 +80,7 @@ class TestConfigReader(asynctest.TestCase):
     async def test_now(self):
         config = bot.BotConfig()
         await config.read_config()
-        self.assertEqual(self.file_mock.read.call_count, 3)
+        self.assertEqual(self.file_mock.read.call_count, 4)
         self.assertIsInstance(config.botnick, str)
         self.assertIsInstance(config.password, str)
         self.assertIsInstance(config.owner, str)

@@ -33,21 +33,12 @@ class TwitchCommunity(NamedTuple):
     name: Optional[str]
 
 
-def client_id() -> Optional[str]:
-    if os.path.isfile('twitchApi.ini'):
-        ini = configparser.ConfigParser()
-        ini.read('twitchApi.ini')
-        if 'twitch' in ini and 'twitchClientID' in ini['twitch']:
-            return ini['twitch']['twitchClientID']
-    return None
-
-
 async def get_headers(headers: MutableMapping[str, str],
                       channel: Optional[str]) -> MutableMapping[str, str]:
     if 'Accept' not in headers:
         headers['Accept'] = 'application/vnd.twitchtv.v5+json'
     if 'Client-ID' not in headers:
-        clientId: Optional[str] = client_id()
+        clientId: Optional[str] = bot.config.twitchClientId
         if clientId is not None:
             headers['Client-ID'] = clientId
     if channel is not None and 'Authorization' not in headers:
