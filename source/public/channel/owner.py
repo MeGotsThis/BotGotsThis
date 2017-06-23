@@ -7,7 +7,7 @@ from ...data import ChatCommandArgs
 @ownerChannel
 @permission('owner')
 async def commandExit(args: ChatCommandArgs) -> bool:
-    return exit.exit(sendPriority(args.chat, 0))
+    return await exit.exit(sendPriority(args.chat, 0))
 
 
 @min_args(3)

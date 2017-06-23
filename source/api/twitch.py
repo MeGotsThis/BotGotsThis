@@ -303,7 +303,7 @@ async def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
         online: Dict[str, TwitchStatus] = {}
         _handle_streams(streamsData['streams'], online)
         for offset in range(100, streamsData['_total'], 100):
-            time.sleep(0.05)
+            await asyncio.sleep(0.05)
             offsetUri: str = uri + '&offset=' + str(offset)
             response, streamsData = await get_call(None, offsetUri)
             if response.status != 200:

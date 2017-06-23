@@ -166,7 +166,7 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.assertFalse(self.mock_chat_server.called)
 
 
-class TestLibraryBroadcasterLeave(unittest.TestCase):
+class TestLibraryBroadcasterLeave(asynctest.TestCase):
     def setUp(self):
         patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
@@ -175,7 +175,7 @@ class TestLibraryBroadcasterLeave(unittest.TestCase):
 
         self.send = Mock(spec=send)
 
-        patcher = patch('time.sleep', autospec=True)
+        patcher = patch('asyncio.sleep')
         self.addCleanup(patcher.stop)
         self.mock_sleep = patcher.start()
 
@@ -184,14 +184,14 @@ class TestLibraryBroadcasterLeave(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_part = patcher.start()
 
-    def test(self):
-        self.assertIs(broadcaster.leave('megotsthis', self.send), True)
+    async def test(self):
+        self.assertIs(await broadcaster.leave('megotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('megotsthis', 'Bye'))
         self.mock_sleep.assert_called_once_with(TypeMatch(float))
         self.mock_part.assert_called_once_with('megotsthis')
 
-    def test_bot(self):
-        self.assertIs(broadcaster.leave('botgotsthis', self.send), False)
+    async def test_bot(self):
+        self.assertIs(await broadcaster.leave('botgotsthis', self.send), False)
         self.send.assert_not_called()
         self.assertFalse(self.mock_sleep.called)
         self.assertFalse(self.mock_part.called)

@@ -12,7 +12,7 @@ async def commandHello(args: WhisperCommandArgs) -> bool:
 
 @permission('owner')
 async def commandExit(args: WhisperCommandArgs) -> bool:
-    return exit.exit(send(args.nick))
+    return await exit.exit(send(args.nick))
 
 
 @permission('manager')

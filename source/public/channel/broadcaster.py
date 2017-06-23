@@ -21,7 +21,7 @@ async def commandCome(args: ChatCommandArgs) -> bool:
 
 @permission('broadcaster')
 async def commandLeave(args: ChatCommandArgs) -> bool:
-    return broadcaster.leave(args.chat.channel, send(args.chat))
+    return await broadcaster.leave(args.chat.channel, send(args.chat))
 
 
 @permission('broadcaster')
