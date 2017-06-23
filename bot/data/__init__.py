@@ -38,7 +38,7 @@ class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
                  *args,
                  **kwargs) -> None:
         if default_factory is not None:
-            if not isinstance(default_factory, Callable):  # type: ignore
+            if not callable(default_factory):
                 raise TypeError('first argument must be callable')
         OrderedDict.__init__(self, *args, **kwargs)
         self.default_factory: Optional[Callable[[], _VT]] = default_factory

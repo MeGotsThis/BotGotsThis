@@ -13,7 +13,7 @@ class Task:
     def __init__(self,
                  task: Callable[[datetime], Awaitable[None]],
                  interval: timedelta) -> None:
-        if not isinstance(task, Callable):  # type: ignore
+        if not callable(task):
             raise TypeError()
         if not isinstance(interval, timedelta):
             raise TypeError()

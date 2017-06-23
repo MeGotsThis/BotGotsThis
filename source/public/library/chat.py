@@ -1,7 +1,7 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
 from functools import partial, wraps
-from typing import Any, Callable, Iterable, Optional, Tuple, Union
+from typing import Any, Callable, Optional, Tuple, Union, cast
 from ... import data
 
 _AnyArgs = Union[data.ChatCommandArgs, data.WhisperCommandArgs,
@@ -16,8 +16,7 @@ def send(chat: Any) -> data.Send:
 
 def sendPriority(chat: Any,
                  priority: int) -> data.Send:
-    # TODO: mypy/typeshed fix
-    return partial(chat.send, priority=priority)  # type: ignore
+    return cast(data.Send, partial(chat.send, priority=priority))
 
 
 def permission(level: str) -> _AnyDecorator:
