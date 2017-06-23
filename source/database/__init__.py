@@ -1038,7 +1038,7 @@ SELECT zone_id, zone_name FROM zone ORDER BY zone_id
                 async for row in cursor:
                     yield row[0], row[1]
 
-    async def zone_transitions(self) -> List[Tuple[int, str, int, int]]:
+    async def zone_transitions(self) -> List[tuple]:
         query: str = '''
 SELECT zone_id, abbreviation, time_start, gmt_offset 
     FROM timezone
