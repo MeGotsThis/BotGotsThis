@@ -45,10 +45,10 @@ ircLogFolder = ircLogs
 exceptionLog = exception.log
 
 [DATABASE]
-file =
+main =
 oauth = 
-timeoutlog = 
-timezonedb = 
+timeout = 
+timezone = 
 '''
 
 
@@ -75,7 +75,7 @@ class TestConfigReader(asynctest.TestCase):
     async def test_now(self):
         config = bot.BotConfig()
         await config.read_config()
-        self.assertEqual(self.file_mock.read.call_count, 2)
+        self.assertEqual(self.file_mock.read.call_count, 3)
         self.assertIsInstance(config.botnick, str)
         self.assertIsInstance(config.password, str)
         self.assertIsInstance(config.owner, str)
@@ -96,8 +96,16 @@ class TestConfigReader(asynctest.TestCase):
         self.assertIsInstance(config.spamModeratorCooldown, float)
         self.assertIsInstance(config.warningDuration, float)
         self.assertIsInstance(config.moderatorDefaultTimeout, list)
+        self.assertIsInstance(config.moderatorDefaultTimeout[0], int)
+        self.assertIsInstance(config.moderatorDefaultTimeout[1], int)
+        self.assertIsInstance(config.moderatorDefaultTimeout[2], int)
         self.assertIsInstance(config.joinLimit, int)
         self.assertIsInstance(config.joinPerSecond, float)
         self.assertIsInstance(config.httpTimeout, float)
         self.assertIsInstance(config.ircLogFolder, str)
         self.assertIsInstance(config.exceptionLog, str)
+        self.assertIsInstance(config.database, dict)
+        self.assertIsInstance(config.database['main'], str)
+        self.assertIsInstance(config.database['oauth'], str)
+        self.assertIsInstance(config.database['timeout'], str)
+        self.assertIsInstance(config.database['timezone'], str)

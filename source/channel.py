@@ -45,7 +45,7 @@ async def chatCommand(chat: 'botData.Channel',
                 utils.saveTwitchId(chat.channel, str(tags['room-id']), timestamp)
             if 'user-id' in tags:
                 utils.saveTwitchId(nick, str(tags['user-id']), timestamp)
-        async with await database.get_database() as db:
+        async with database.get_database() as db:
             databaseObj: database.DatabaseMain
             databaseObj = cast(database.DatabaseMain, db)
             permitted = await databaseObj.isPermittedUser(chat.channel, nick)

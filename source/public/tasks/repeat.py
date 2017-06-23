@@ -10,7 +10,7 @@ from ... import database
 
 async def autoRepeatMessage(timestamp: datetime) -> None:
     db: database.Database
-    async with await database.get_database() as db:
+    async with database.get_database() as db:
         database_: database.DatabaseMain = cast(database.DatabaseMain, db)
         row: Tuple[str, str, str]
         async for row in database_.getAutoRepeatToSend():

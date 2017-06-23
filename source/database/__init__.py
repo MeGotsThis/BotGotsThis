@@ -1,12 +1,11 @@
-import configparser
 import os.path
 
 import aioodbc
 import aioodbc.cursor
-import aiofiles
 import pyodbc
 
-from contextlib import closing
+import bot
+
 from datetime import datetime
 from enum import Enum
 from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple
@@ -41,10 +40,10 @@ CommandReturn = Union[str, Dict[str, str]]
 
 
 class Schema(Enum):
-    Main = 'file'
+    Main = 'main'
     OAuth = 'oauth'
-    Timeout = 'timeoutlog'
-    TimeZone = 'timezonedb'
+    Timeout = 'timeout'
+    TimeZone = 'timezone'
 
 
 class Database:
@@ -1004,16 +1003,13 @@ class DatabaseTimeZone(Database):
     pass
 
 
-async def get_database(schema: Schema=Schema.Main) -> Database:
+def get_database(schema: Schema=Schema.Main) -> Database:
     databases: Dict[Schema, Type[Database]] = {
         Schema.Main: DatabaseMain,
         Schema.OAuth: DatabaseOAuth,
         Schema.Timeout: DatabaseTimeout,
         Schema.TimeZone: DatabaseTimeZone,
     }
-    if os.path.isfile('config.ini'):
-        ini: configparser.ConfigParser = configparser.ConfigParser()
-        async with aiofiles.open('config.ini', 'r', encoding='utf-8') as file:
-            ini.read_string(await file.read(None))
-        return databases[schema](ini['DATABASE'][schema.value])
+    if schema in databases and schema.value in bot.config.database:
+        return databases[schema](bot.config.database[schema.value])
     raise ValueError()
