@@ -18,7 +18,7 @@ class TestWhisperBroadcaster(TestWhisper):
             self.database, 'botgotsthis',
             PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('source.public.library.broadcaster.leave', autospec=True)
+    @patch('source.public.library.broadcaster.leave')
     async def test_leave(self, mock_leave):
         mock_leave.return_value = True
         self.assertIs(await broadcaster.commandLeave(self.args), True)

@@ -8,7 +8,7 @@ async def commandCome(args: WhisperCommandArgs) -> bool:
 
 
 async def commandLeave(args: WhisperCommandArgs) -> bool:
-    return broadcaster.leave(args.nick, send(args.nick))
+    return await broadcaster.leave(args.nick, send(args.nick))
 
 
 async def commandEmpty(args: WhisperCommandArgs) -> bool:

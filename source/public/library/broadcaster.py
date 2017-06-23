@@ -1,6 +1,6 @@
-﻿import bot
+﻿import asyncio
+import bot
 import bot.globals
-import time
 from bot import utils
 from typing import Dict, List, Optional, Union
 from ...api import twitch
@@ -37,12 +37,12 @@ async def come(database: DatabaseMain,
     return True
 
 
-def leave(channel: str,
-          send: Send) -> bool:
+async def leave(channel: str,
+                send: Send) -> bool:
     if channel == bot.config.botnick:
         return False
     send('Bye {channel}'.format(channel=channel))
-    time.sleep(1.0)
+    await asyncio.sleep(1.0)
     utils.partChannel(channel)
     return True
 

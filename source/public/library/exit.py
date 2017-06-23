@@ -1,12 +1,15 @@
-﻿import bot.globals
-import time
+﻿import asyncio
+
+import bot.globals
+
 from bot import utils
+
 from ...data import Send
 
 
-def exit(send: Send) -> bool:
+async def exit(send: Send) -> bool:
     send('Goodbye Keepo')
-    time.sleep(0.5)
+    await asyncio.sleep(0.5)
     channel: str
     for channel in set(bot.globals.channels.keys()):
         utils.partChannel(channel)

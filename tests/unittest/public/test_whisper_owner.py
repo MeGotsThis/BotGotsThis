@@ -18,7 +18,7 @@ class TestWhisperOwner(TestWhisper):
         mock_whisper.assert_called_once_with(
             'botgotsthis', StrContains('Hello', '!'))
 
-    @patch('source.public.library.exit.exit', autospec=True)
+    @patch('source.public.library.exit.exit')
     async def test_exit(self, mock_exit):
         self.assertIs(await owner.commandExit(self.args), False)
         self.assertFalse(mock_exit.called)

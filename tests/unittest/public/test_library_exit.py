@@ -1,15 +1,15 @@
-import unittest
+import asynctest
 from bot.data import Channel
 from source.public.library import exit
 from tests.unittest.mock_class import StrContains, TypeMatch
-from unittest.mock import Mock, patch
+from asynctest.mock import Mock, patch
 
 
 def send(messages):
     pass
 
 
-class TestLibraryExitExit(unittest.TestCase):
+class TestLibraryExitExit(asynctest.TestCase):
     def setUp(self):
         self.channel = Mock(spec=Channel)
         self.send = Mock(spec=send)
@@ -24,12 +24,12 @@ class TestLibraryExitExit(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_part = patcher.start()
 
-        patcher = patch('time.sleep', autospec=True)
+        patcher = patch('asyncio.sleep')
         self.addCleanup(patcher.stop)
         self.mock_sleep = patcher.start()
 
-    def test(self):
-        self.assertIs(exit.exit(self.send), True)
+    async def test(self):
+        self.assertIs(await exit.exit(self.send), True)
         self.assertIs(self.mock_globals.running, False)
         self.send.assert_called_once_with(StrContains('Goodbye'))
         self.mock_part.assert_called_once_with('botgotsthis')
