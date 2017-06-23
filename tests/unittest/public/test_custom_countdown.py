@@ -1,7 +1,9 @@
 import math
 import unittest
 
-from datetime import datetime, time, timedelta
+import bot
+
+from datetime import datetime, time, timedelta, tzinfo
 
 from asynctest.mock import patch
 
@@ -14,6 +16,30 @@ from source.public.custom import countdown
 
 
 class TestCustomCountdownParse(unittest.TestCase):
+    def setUp(self):
+        class TimeZone(tzinfo):
+            def __init__(self, offset):
+                self.offset = offset
+            def utcoffset(self, dt):
+                return timedelta(seconds=self.offset)
+            def dst(self, dt):
+                return timedelta()
+
+        patcher = patch('source.data.timezones',
+                        autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_timezones = patcher.start()
+        self.mock_timezones.abbreviations = {
+            'utc': TimeZone(0),
+            'utc-00:00': TimeZone(0),
+            'utc+00:00': TimeZone(0),
+            'utc-12:00': TimeZone(0),
+            'utc+12:00': TimeZone(0),
+            'utc-08:00': TimeZone(-8 * 3600),
+            'utc+08:00': TimeZone(8 * 3600)
+        }
+        self.mock_timezones.utc = TimeZone(0)
+
     def test(self):
         self.assertIsNone(countdown.parse_date_string(''))
 
@@ -133,7 +159,8 @@ class TestCustomCountdownParse(unittest.TestCase):
         self.assertEqual(
             countdown.parse_date_string('12:00AM UTC+12:00'),
             countdown.DateTimeInstance(
-                time(0, 0, 0, 0, timezones.abbreviations['utc+12:00']),
+                time(0, 0, 0, 0,
+                     self.mock_timezones.abbreviations['utc+12:00']),
                 None, None, False))
         self.assertIsNone(countdown.parse_date_string('0:00 ABC'))
 
@@ -216,7 +243,8 @@ class TestCustomCountdownParse(unittest.TestCase):
         self.assertEqual(
             countdown.parse_date_string('8:00PM UTC-08:00'),
             countdown.DateTimeInstance(
-                time(20, 0, 0, 0, timezones.abbreviations['utc-08:00']),
+                time(20, 0, 0, 0,
+                     self.mock_timezones.abbreviations['utc-08:00']),
                 None, None, False))
 
     def test_month_day_time_of_day(self):
@@ -280,6 +308,21 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
 
+        class TimeZone(tzinfo):
+            def __init__(self, offset):
+                self.offset = offset
+            def utcoffset(self, dt):
+                return timedelta(seconds=self.offset)
+            def dst(self, dt):
+                return timedelta()
+
+        patcher = patch('source.data.timezones', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_timezones = patcher.start()
+        self.mock_timezones.abbreviations = {'utc-08:00': TimeZone(-8 * 3600),
+                                             'utc+08:00': TimeZone(8 * 3600)}
+        self.mock_timezones.utc = TimeZone(0)
+
     def test_time_of_day(self):
         self.assertEqual(
             countdown.next_datetime(self.now, time(0, 0, 0, 0, timezones.utc),
@@ -340,7 +383,8 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
         self.assertEqual(
             countdown.next_datetime(
                 self.now,
-                time(20, 0, 0, 0, timezones.abbreviations['utc-08:00']),
+                time(20, 0, 0, 0,
+                     self.mock_timezones.abbreviations['utc-08:00']),
                 countdown.FRIDAY, None, True),
             countdown.DateTime(datetime(2000, 1, 1, 4, 0, 0, 0,
                                         timezones.utc),
@@ -348,7 +392,8 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
         self.assertEqual(
             countdown.next_datetime(
                 self.now,
-                time(4, 0, 0, 0, timezones.abbreviations['utc+08:00']),
+                time(4, 0, 0, 0,
+                     self.mock_timezones.abbreviations['utc+08:00']),
                 countdown.SUNDAY, None, True),
             countdown.DateTime(datetime(2000, 1, 1, 20, 0, 0, 0,
                                         timezones.utc),
@@ -382,6 +427,21 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
 class TestCustomCountdownPastDatetime(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
+
+        class TimeZone(tzinfo):
+            def __init__(self, offset):
+                self.offset = offset
+            def utcoffset(self, dt):
+                return timedelta(seconds=self.offset)
+            def dst(self, dt):
+                return timedelta()
+
+        patcher = patch('source.data.timezones', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_timezones = patcher.start()
+        self.mock_timezones.abbreviations = {'utc-08:00': TimeZone(-8 * 3600),
+                                             'utc+08:00': TimeZone(8 * 3600)}
+        self.mock_timezones.utc = TimeZone(0)
 
     def test_time_of_day(self):
         self.assertEqual(
@@ -451,7 +511,8 @@ class TestCustomCountdownPastDatetime(unittest.TestCase):
         self.assertEqual(
             countdown.past_datetime(
                 self.now,
-                time(20, 0, 0, 0, timezones.abbreviations['utc-08:00']),
+                time(20, 0, 0, 0,
+                     self.mock_timezones.abbreviations['utc-08:00']),
                 countdown.SATURDAY, None, True),
             countdown.DateTime(datetime(1999, 12, 26, 4, 0, 0, 0,
                                         timezones.utc),
@@ -459,7 +520,8 @@ class TestCustomCountdownPastDatetime(unittest.TestCase):
         self.assertEqual(
             countdown.past_datetime(
                 self.now,
-                time(4, 0, 0, 0, timezones.abbreviations['utc+08:00']),
+                time(4, 0, 0, 0,
+                     self.mock_timezones.abbreviations['utc+08:00']),
                 countdown.SATURDAY, None, True),
             countdown.DateTime(datetime(1999, 12, 31, 20, 0, 0, 0,
                                         timezones.utc),

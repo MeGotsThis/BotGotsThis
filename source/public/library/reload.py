@@ -1,7 +1,8 @@
-﻿import sys
+﻿import bot
+import sys
 import importlib
 from typing import Iterator, Tuple
-from ...data import Send
+from ...data import Send, timezones
 
 
 def reloadable(module: str) -> bool:
@@ -98,19 +99,20 @@ async def full_reload(send: Send) -> bool:
     send('Reloading')
     
     await reload_config(send)
-    reload_commands(send)
+    await reload_commands(send)
 
     send('Complete')
     return True
 
 
-def reload_commands(send: Send) -> bool:
+async def reload_commands(send: Send) -> bool:
     send('Reloading Commands')
 
     modules: Iterator[str] = (m for m in sys.modules.keys() if reloadable(m))
     moduleString: str
     for moduleString in sorted(modules, key=key):
         importlib.reload(sys.modules[moduleString])
+    await timezones.load_timezones()
     
     send('Complete Reloading')
     return True
@@ -121,7 +123,6 @@ async def reload_config(send: Send) -> bool:
     
     importlib.reload(sys.modules['bot.config'])
     importlib.reload(sys.modules['bot.config.reader'])
-    import bot
     bot.config = bot.BotConfig()
     await bot.config.read_config()
 

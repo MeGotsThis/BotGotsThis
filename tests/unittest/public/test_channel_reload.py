@@ -19,7 +19,7 @@ class TestChannelReload(TestChannel):
         mock_reload.assert_called_once_with(
             PartialMatch(self.channel.send, priority=0))
 
-    @patch('source.public.library.reload.reload_commands', autospec=True)
+    @patch('source.public.library.reload.reload_commands')
     async def test_reload_commands(self, mock_reload):
         self.assertIs(await reload.commandReloadCommands(self.args), False)
         self.assertFalse(mock_reload.called)
