@@ -13,7 +13,7 @@ from datetime import date, datetime, time, timedelta
 from typing import Dict, List, Match, NamedTuple, Optional, Sequence, Union
 from ...data import CustomFieldArgs
 from ...data.timedelta import format as format_timedelta
-from ... import data
+from ...data import timezones
 import math
 import re
 
@@ -90,7 +90,7 @@ daysOfWeek: Dict[str, int] = {
 
 async def fieldCountdown(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'countdown' and args.param is not None:
-        timestamp: datetime = args.timestamp.replace(tzinfo=data.timezones.utc)
+        timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
         npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
         next: Optional[DateTime]
         past: Optional[DateTime]
@@ -110,7 +110,7 @@ async def fieldCountdown(args: CustomFieldArgs) -> Optional[str]:
 
 async def fieldSince(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() == 'since' and args.param is not None:
-        timestamp: datetime = args.timestamp.replace(tzinfo=data.timezones.utc)
+        timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
         npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
         next: Optional[DateTime]
         past: Optional[DateTime]
@@ -130,7 +130,7 @@ async def fieldSince(args: CustomFieldArgs) -> Optional[str]:
 
 async def fieldNext(args: CustomFieldArgs) -> Optional[str]:
     if args.field.lower() in ['next', 'future'] and args.param is not None:
-        timestamp: datetime = args.timestamp.replace(tzinfo=data.timezones.utc)
+        timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
         npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
         next: Optional[DateTime]
         past: Optional[DateTime]
@@ -150,7 +150,7 @@ async def fieldNext(args: CustomFieldArgs) -> Optional[str]:
 async def fieldPrevious(args: CustomFieldArgs) -> Optional[str]:
     if (args.field.lower() in ['prev', 'previous', 'past']
             and args.param is not None):
-        timestamp: datetime = args.timestamp.replace(tzinfo=data.timezones.utc)
+        timestamp: datetime = args.timestamp.replace(tzinfo=timezones.utc)
         npc: NextPastCooldown = parse_next_past_cooldown(args.param, timestamp)
         next: Optional[DateTime]
         past: Optional[DateTime]
@@ -198,13 +198,13 @@ def parse_date_string(string: str) -> Optional[DateTimeInstance]:
         is24Hour = False
     else:
         return None
-    timezone: data.timezones.BaseTimeZone
+    timezone: timezones.BaseTimeZone
     if g[13] is not None:
-        if g[13].lower() not in data.timezones.abbreviations:
+        if g[13].lower() not in timezones.abbreviations:
             return None
-        timezone = data.timezones.abbreviations[g[13].lower()]
+        timezone = timezones.abbreviations[g[13].lower()]
     else:
-        timezone = data.timezones.utc
+        timezone = timezones.utc
     timeOfDay: time = time(hour, minute, seconds, microseconds, timezone)
     dayofweek: Optional[int] = None
     date_: Optional[Date] = None

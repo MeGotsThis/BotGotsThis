@@ -25,7 +25,7 @@ class TestCustomCountdownParse(unittest.TestCase):
             def dst(self, dt):
                 return timedelta()
 
-        patcher = patch('source.data.timezones',
+        patcher = patch('source.public.custom.countdown.timezones',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_timezones = patcher.start()
