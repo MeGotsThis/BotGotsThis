@@ -1,4 +1,4 @@
-import bot.config
+import bot
 from collections import deque
 from typing import Generator, Iterable, Optional
 

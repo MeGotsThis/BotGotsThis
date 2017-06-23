@@ -1,4 +1,4 @@
-﻿import bot.config
+﻿import bot
 import lists.custom
 import textwrap
 from bot import utils

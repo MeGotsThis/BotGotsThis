@@ -4,9 +4,8 @@ from datetime import datetime, timedelta
 from types import TracebackType
 from typing import Any, Dict, Iterable, List, Optional, Type, Tuple, Union
 from source.api import twitch
-import asyncio
 import builtins
-import bot.config
+import bot
 import bot.globals
 import bot.coroutine.logging
 import os.path

@@ -9,7 +9,7 @@ from source.public.whisper import reload
 
 
 class TestWhisperReload(TestWhisper):
-    @patch('source.public.library.reload.full_reload', autospec=True)
+    @patch('source.public.library.reload.full_reload')
     async def test_reload(self, mock_reload):
         self.assertIs(await reload.commandReload(self.args), False)
         self.assertFalse(mock_reload.called)
@@ -29,7 +29,7 @@ class TestWhisperReload(TestWhisper):
         mock_reload.assert_called_once_with(
             PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('source.public.library.reload.reload_config', autospec=True)
+    @patch('source.public.library.reload.reload_config')
     async def test_reload_config(self, mock_reload):
         self.assertIs(await reload.commandReloadConfig(self.args), False)
         self.assertFalse(mock_reload.called)

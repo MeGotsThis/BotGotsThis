@@ -1,6 +1,6 @@
 import asyncio
 
-import bot.config
+import bot
 import bot.globals
 import source.ircmessage
 

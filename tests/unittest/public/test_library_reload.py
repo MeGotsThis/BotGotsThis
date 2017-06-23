@@ -1,7 +1,13 @@
 import sys
 import unittest
+
+import asynctest
+
+import bot.globals
+
+from asynctest.mock import Mock, patch
+
 from source.public.library import reload
-from unittest.mock import Mock, patch
 
 
 def send(messages):
@@ -123,21 +129,21 @@ class TestLibraryReloadKey(unittest.TestCase):
                             (first, second))
 
 
-class TestLibraryReload(unittest.TestCase):
+class TestLibraryReload(asynctest.TestCase):
     def setUp(self):
         self.send = Mock(spec=send)
 
-    @patch('source.public.library.reload.reload_config', autospec=True)
+    @patch('source.public.library.reload.reload_config')
     @patch('source.public.library.reload.reload_commands', autospec=True)
-    def test_full_reload(self, mock_reload_command, mock_reload_config):
-        self.assertIs(reload.full_reload(self.send), True)
+    async def test_full_reload(self, mock_reload_command, mock_reload_config):
+        self.assertIs(await reload.full_reload(self.send), True)
         self.assertEqual(self.send.call_count, 2)
         mock_reload_config.assert_called_once_with(self.send)
         mock_reload_command.assert_called_once_with(self.send)
 
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
-    def test_reload_commands(self, mock_reload):
+    async def test_reload_commands(self, mock_reload):
         module = Mock()
         sys.modules = {'source': module}
         self.assertIs(reload.reload_commands(self.send), True)
@@ -146,9 +152,12 @@ class TestLibraryReload(unittest.TestCase):
 
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
-    def test_reload_config(self, mock_reload):
+    #@patch('bot.BotConfig')
+    async def test_reload_config(self, mock_reload):
         module = Mock()
-        sys.modules = {'bot.config': module}
-        self.assertIs(reload.reload_config(self.send), True)
+        sys.modules = {'bot.config': module, 'bot.config.reader': module}
+        self.assertIs(await reload.reload_config(self.send), True)
         self.assertEqual(self.send.call_count, 2)
-        mock_reload.assert_called_once_with(module)
+        self.assertEqual(mock_reload.call_count, 2)
+        # mock_config.assert_called_once_with()
+        # mock_config.return_value.read_config.assert_called_once_with()

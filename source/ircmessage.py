@@ -1,4 +1,4 @@
-﻿import bot.config
+﻿import bot
 from bot import data, utils
 from bot.coroutine import connection
 from bot.twitchmessage import IrcMessage, IrcMessageTagsReadOnly

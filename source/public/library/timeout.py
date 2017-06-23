@@ -1,4 +1,4 @@
-import bot.config
+import bot
 from bot import data, utils
 from collections import defaultdict
 from contextlib import suppress

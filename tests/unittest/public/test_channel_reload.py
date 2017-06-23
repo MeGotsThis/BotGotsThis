@@ -8,7 +8,7 @@ from source.public.channel import reload
 
 
 class TestChannelReload(TestChannel):
-    @patch('source.public.library.reload.full_reload', autospec=True)
+    @patch('source.public.library.reload.full_reload')
     async def test_reload(self, mock_reload):
         self.assertIs(await reload.commandReload(self.args), False)
         self.assertFalse(mock_reload.called)
@@ -30,7 +30,7 @@ class TestChannelReload(TestChannel):
         mock_reload.assert_called_once_with(
             PartialMatch(self.channel.send, priority=0))
 
-    @patch('source.public.library.reload.reload_config', autospec=True)
+    @patch('source.public.library.reload.reload_config')
     async def test_reload_config(self, mock_reload):
         self.assertIs(await reload.commandReloadConfig(self.args), False)
         self.assertFalse(mock_reload.called)
