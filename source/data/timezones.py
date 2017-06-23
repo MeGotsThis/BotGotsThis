@@ -1,10 +1,11 @@
-﻿from abc import ABCMeta, abstractmethod
-from contextlib import closing
+﻿from bot import utils
+
+from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta, tzinfo
-from typing import Dict, List, NamedTuple, Optional, Sequence
-import configparser
-import os
-import sqlite3
+from typing import Dict, List, NamedTuple, Optional, Sequence, cast
+
+from source import database
+
 
 class Transition(NamedTuple):
     start: int  # in unix timestamp
@@ -113,135 +114,122 @@ class TimeZone(BaseTimeZone):
         delta: int = transistion.offset - self._transitions[0].offset
         return timedelta(minutes=delta // 60)
 
+
 utc: BasicTimeZone = BasicTimeZone(0, 'UTC')
 unixEpoch: datetime = datetime(1970, 1, 1, 0, 0, 0, 0)
 
-timezones: List[BaseTimeZone] = [
-    utc,
-    BasicTimeZone(0, 'UTC±00:00'),
-    BasicTimeZone(0, 'UTC+00:00'),
-    BasicTimeZone(60, 'UTC+01:00'),
-    BasicTimeZone(120, 'UTC+02:00'),
-    BasicTimeZone(180, 'UTC+03:00'),
-    BasicTimeZone(240, 'UTC+04:00'),
-    BasicTimeZone(300, 'UTC+05:00'),
-    BasicTimeZone(360, 'UTC+06:00'),
-    BasicTimeZone(420, 'UTC+07:00'),
-    BasicTimeZone(480, 'UTC+08:00'),
-    BasicTimeZone(540, 'UTC+09:00'),
-    BasicTimeZone(600, 'UTC+10:00'),
-    BasicTimeZone(660, 'UTC+11:00'),
-    BasicTimeZone(720, 'UTC+12:00'),
-    BasicTimeZone(-0, 'UTC-00:00'),
-    BasicTimeZone(-60, 'UTC-01:00'),
-    BasicTimeZone(-120, 'UTC-02:00'),
-    BasicTimeZone(-180, 'UTC-03:00'),
-    BasicTimeZone(-240, 'UTC-04:00'),
-    BasicTimeZone(-300, 'UTC-05:00'),
-    BasicTimeZone(-360, 'UTC-06:00'),
-    BasicTimeZone(-420, 'UTC-07:00'),
-    BasicTimeZone(-480, 'UTC-08:00'),
-    BasicTimeZone(-540, 'UTC-09:00'),
-    BasicTimeZone(-600, 'UTC-10:00'),
-    BasicTimeZone(-660, 'UTC-11:00'),
-    BasicTimeZone(-720, 'UTC-12:00'),
-    BasicTimeZone(0, 'UTC±0000'),
-    BasicTimeZone(0, 'UTC+0000'),
-    BasicTimeZone(60, 'UTC+0100'),
-    BasicTimeZone(120, 'UTC+0200'),
-    BasicTimeZone(180, 'UTC+0300'),
-    BasicTimeZone(240, 'UTC+0400'),
-    BasicTimeZone(300, 'UTC+0500'),
-    BasicTimeZone(360, 'UTC+0600'),
-    BasicTimeZone(420, 'UTC+0700'),
-    BasicTimeZone(480, 'UTC+0800'),
-    BasicTimeZone(540, 'UTC+0900'),
-    BasicTimeZone(600, 'UTC+1000'),
-    BasicTimeZone(660, 'UTC+1100'),
-    BasicTimeZone(720, 'UTC+1200'),
-    BasicTimeZone(-0, 'UTC-0000'),
-    BasicTimeZone(-60, 'UTC-0100'),
-    BasicTimeZone(-120, 'UTC-0200'),
-    BasicTimeZone(-180, 'UTC-0300'),
-    BasicTimeZone(-240, 'UTC-0400'),
-    BasicTimeZone(-300, 'UTC-0500'),
-    BasicTimeZone(-360, 'UTC-0600'),
-    BasicTimeZone(-420, 'UTC-0700'),
-    BasicTimeZone(-480, 'UTC-0800'),
-    BasicTimeZone(-540, 'UTC-0900'),
-    BasicTimeZone(-600, 'UTC-1000'),
-    BasicTimeZone(-660, 'UTC-1100'),
-    BasicTimeZone(-720, 'UTC-1200'),
-    BasicTimeZone(0, 'UTC±00'),
-    BasicTimeZone(0, 'UTC+00'),
-    BasicTimeZone(60, 'UTC+01'),
-    BasicTimeZone(120, 'UTC+02'),
-    BasicTimeZone(180, 'UTC+03'),
-    BasicTimeZone(240, 'UTC+04'),
-    BasicTimeZone(300, 'UTC+05'),
-    BasicTimeZone(360, 'UTC+06'),
-    BasicTimeZone(420, 'UTC+07'),
-    BasicTimeZone(480, 'UTC+08'),
-    BasicTimeZone(540, 'UTC+09'),
-    BasicTimeZone(600, 'UTC+10'),
-    BasicTimeZone(660, 'UTC+11'),
-    BasicTimeZone(720, 'UTC+12'),
-    BasicTimeZone(-0, 'UTC-00'),
-    BasicTimeZone(-60, 'UTC-01'),
-    BasicTimeZone(-120, 'UTC-02'),
-    BasicTimeZone(-180, 'UTC-03'),
-    BasicTimeZone(-240, 'UTC-04'),
-    BasicTimeZone(-300, 'UTC-05'),
-    BasicTimeZone(-360, 'UTC-06'),
-    BasicTimeZone(-420, 'UTC-07'),
-    BasicTimeZone(-480, 'UTC-08'),
-    BasicTimeZone(-540, 'UTC-09'),
-    BasicTimeZone(-600, 'UTC-10'),
-    BasicTimeZone(-660, 'UTC-11'),
-    BasicTimeZone(-720, 'UTC-12'),
+timezones: List[BaseTimeZone] = []
+
+abbreviations: Dict[str, BaseTimeZone] = {}
+
+
+async def load_timezones():
+    global timezones, abbreviations
+    print('{time} Loading Time Zones'.format(time=utils.now()))
+    timezones = [
+        utc,
+        BasicTimeZone(0, 'UTC±00:00'),
+        BasicTimeZone(0, 'UTC+00:00'),
+        BasicTimeZone(60, 'UTC+01:00'),
+        BasicTimeZone(120, 'UTC+02:00'),
+        BasicTimeZone(180, 'UTC+03:00'),
+        BasicTimeZone(240, 'UTC+04:00'),
+        BasicTimeZone(300, 'UTC+05:00'),
+        BasicTimeZone(360, 'UTC+06:00'),
+        BasicTimeZone(420, 'UTC+07:00'),
+        BasicTimeZone(480, 'UTC+08:00'),
+        BasicTimeZone(540, 'UTC+09:00'),
+        BasicTimeZone(600, 'UTC+10:00'),
+        BasicTimeZone(660, 'UTC+11:00'),
+        BasicTimeZone(720, 'UTC+12:00'),
+        BasicTimeZone(-0, 'UTC-00:00'),
+        BasicTimeZone(-60, 'UTC-01:00'),
+        BasicTimeZone(-120, 'UTC-02:00'),
+        BasicTimeZone(-180, 'UTC-03:00'),
+        BasicTimeZone(-240, 'UTC-04:00'),
+        BasicTimeZone(-300, 'UTC-05:00'),
+        BasicTimeZone(-360, 'UTC-06:00'),
+        BasicTimeZone(-420, 'UTC-07:00'),
+        BasicTimeZone(-480, 'UTC-08:00'),
+        BasicTimeZone(-540, 'UTC-09:00'),
+        BasicTimeZone(-600, 'UTC-10:00'),
+        BasicTimeZone(-660, 'UTC-11:00'),
+        BasicTimeZone(-720, 'UTC-12:00'),
+        BasicTimeZone(0, 'UTC±0000'),
+        BasicTimeZone(0, 'UTC+0000'),
+        BasicTimeZone(60, 'UTC+0100'),
+        BasicTimeZone(120, 'UTC+0200'),
+        BasicTimeZone(180, 'UTC+0300'),
+        BasicTimeZone(240, 'UTC+0400'),
+        BasicTimeZone(300, 'UTC+0500'),
+        BasicTimeZone(360, 'UTC+0600'),
+        BasicTimeZone(420, 'UTC+0700'),
+        BasicTimeZone(480, 'UTC+0800'),
+        BasicTimeZone(540, 'UTC+0900'),
+        BasicTimeZone(600, 'UTC+1000'),
+        BasicTimeZone(660, 'UTC+1100'),
+        BasicTimeZone(720, 'UTC+1200'),
+        BasicTimeZone(-0, 'UTC-0000'),
+        BasicTimeZone(-60, 'UTC-0100'),
+        BasicTimeZone(-120, 'UTC-0200'),
+        BasicTimeZone(-180, 'UTC-0300'),
+        BasicTimeZone(-240, 'UTC-0400'),
+        BasicTimeZone(-300, 'UTC-0500'),
+        BasicTimeZone(-360, 'UTC-0600'),
+        BasicTimeZone(-420, 'UTC-0700'),
+        BasicTimeZone(-480, 'UTC-0800'),
+        BasicTimeZone(-540, 'UTC-0900'),
+        BasicTimeZone(-600, 'UTC-1000'),
+        BasicTimeZone(-660, 'UTC-1100'),
+        BasicTimeZone(-720, 'UTC-1200'),
+        BasicTimeZone(0, 'UTC±00'),
+        BasicTimeZone(0, 'UTC+00'),
+        BasicTimeZone(60, 'UTC+01'),
+        BasicTimeZone(120, 'UTC+02'),
+        BasicTimeZone(180, 'UTC+03'),
+        BasicTimeZone(240, 'UTC+04'),
+        BasicTimeZone(300, 'UTC+05'),
+        BasicTimeZone(360, 'UTC+06'),
+        BasicTimeZone(420, 'UTC+07'),
+        BasicTimeZone(480, 'UTC+08'),
+        BasicTimeZone(540, 'UTC+09'),
+        BasicTimeZone(600, 'UTC+10'),
+        BasicTimeZone(660, 'UTC+11'),
+        BasicTimeZone(720, 'UTC+12'),
+        BasicTimeZone(-0, 'UTC-00'),
+        BasicTimeZone(-60, 'UTC-01'),
+        BasicTimeZone(-120, 'UTC-02'),
+        BasicTimeZone(-180, 'UTC-03'),
+        BasicTimeZone(-240, 'UTC-04'),
+        BasicTimeZone(-300, 'UTC-05'),
+        BasicTimeZone(-360, 'UTC-06'),
+        BasicTimeZone(-420, 'UTC-07'),
+        BasicTimeZone(-480, 'UTC-08'),
+        BasicTimeZone(-540, 'UTC-09'),
+        BasicTimeZone(-600, 'UTC-10'),
+        BasicTimeZone(-660, 'UTC-11'),
+        BasicTimeZone(-720, 'UTC-12'),
     ]
 
-if os.path.isfile('config.ini'):
-    _ini: configparser.ConfigParser = configparser.ConfigParser()
-    _ini.read('config.ini')
-    _cursor: sqlite3.Cursor
-    with sqlite3.connect(
-        _ini['DATABASE']['timezonedb'], detect_types=True) as _connection, \
-            closing(_connection.cursor()) as _cursor:
-        _cursor.execute('''
-SELECT abbreviation, gmt_offset FROM timezone
-    WHERE time_start >= 2114380800
-    AND abbreviation NOT IN ('CST', 'CDT', 'AMT', 'AST', 'GST', 'IST',
-                             'KST', 'BST', 'UTC')
-    GROUP BY abbreviation
-UNION ALL SELECT abbreviation, gmt_offset FROM timezone
-    WHERE time_start=2147483647 AND
-    zone_id IN (382, 75, 294, 281, 190, 211, 159)''')
-        # For the abbreviation conflicts of: CST, CDT, AMT, AST, GST, IST, KST,
-        # BST
-        # I have choosen: America/Chicago, America/Boa_Vista,
-        # America/Puerto_Rico, Asia/Muscat, Asia/Jerusalem, Asia/Seoul,
-        #  Europe/London
-        _row: tuple
-        for _row in _cursor:
-            timezones.append(BasicTimeZone(_row[1] // 60, _row[0]))
-        _zones: Dict[int, str] = {}
-        _transitions: Dict[int, List[Transition]] = {}
-        _cursor.execute('SELECT zone_id, zone_name FROM zone ORDER BY zone_id')
-        for _row in _cursor:
-            _zones[_row[0]] = _row[1]
-            _transitions[_row[0]] = []
-        _cursor.execute('SELECT zone_id, abbreviation, time_start, gmt_offset '
-                        "FROM timezone WHERE abbreviation != 'UTC' "
-                        'ORDER BY zone_id, time_start')
-        for _row in _cursor:
-            _transitions[_row[0]].append(Transition(_row[2], _row[1], _row[3]))
-        _z: int
-        for _z in _zones:
-            timezones.append(TimeZone(_zones[_z], _transitions[_z]))
-    del _ini, _connection, _cursor, _row, _z, _zones, _transitions
+    _db: database.Database
+    db: database.DatabaseTimeZone
+    async with database.get_database(database.Schema.TimeZone) as _db:
+        db = cast(database.DatabaseTimeZone, _db)
+        row: tuple
+        async for row in db.timezone_names():
+            timezones.append(BasicTimeZone(row[1] // 60, row[0]))
 
-abbreviations: Dict[str, BaseTimeZone]
-abbreviations = {tz.zone().lower(): tz for tz in timezones}
+        zones: Dict[int, str] = {}
+        transitions: Dict[int, List[Transition]] = {}
+        async for row in db.zones():
+            zones[row[0]] = row[1]
+            transitions[row[0]] = []
 
-del closing, configparser, os, sqlite3, tzinfo
+        for row in await db.zone_transitions():
+            transitions[row[0]].append(Transition(row[2], row[1], row[3]))
+        z: int
+        for z in zones:
+            timezones.append(TimeZone(zones[z], transitions[z]))
+        abbreviations = {tz.zone().lower(): tz for tz in timezones}
+
+    print('{time} Loaded Time Zones'.format(time=utils.now()))

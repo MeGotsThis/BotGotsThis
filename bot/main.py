@@ -9,6 +9,7 @@ import source.public.autoload as publicAuto
 from itertools import chain
 from importlib.abc import PathEntryFinder
 from source import database
+from source.data import timezones
 from source.database import AutoJoinChannel
 from typing import Generator, List, Iterable, Optional, Tuple, cast
 from . import data, utils
@@ -43,7 +44,7 @@ async def initializer() -> None:
     if bot.config.owner:
         utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
     db: database.Database
-    async with await database.get_database() as db:
+    async with database.get_database() as db:
         databaseObj: database.DatabaseMain = cast(database.DatabaseMain, db)
         autojoin: AutoJoinChannel
         async for autoJoin in databaseObj.getAutoJoinsChats():
@@ -56,11 +57,12 @@ def main(argv: Optional[List[str]]=None) -> int:
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(initializer())
-        coro = asyncio.gather(background.background_tasks(),
-                              logging.record_logs(),
-                              join.join_manager(),
-                              *[c.run_connection() for c
-                                in bot.globals.clusters.values()])
+        coro = asyncio.gather(
+            timezones.load_timezones(),
+            background.background_tasks(),
+            logging.record_logs(),
+            join.join_manager(),
+            *[c.run_connection() for c in bot.globals.clusters.values()])
         loop.run_until_complete(coro)
         loop.close()
         return 0

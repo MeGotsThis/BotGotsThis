@@ -8,8 +8,9 @@ import bot
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple
-from typing import Optional, Sequence, Tuple, Type, TypeVar, Union, overload
+from typing import Any, AsyncIterator, Callable, Dict, List, Mapping
+from typing import NamedTuple, Optional, Sequence, Tuple, Type, TypeVar, Union
+from typing import overload
 
 T = TypeVar('T')
 S = TypeVar('S')
@@ -1000,7 +1001,54 @@ INSERT INTO timeout_logs
 
 
 class DatabaseTimeZone(Database):
-    pass
+    async def timezone_names(self) -> AsyncIterator[Tuple[str, int]]:
+        '''
+        For the abbreviation conflicts of: CST, CDT, AMT, AST, GST, IST,
+        KST, BST
+        I have choosen: America/Chicago, America/Boa_Vista,
+        America/Puerto_Rico, Asia/Muscat, Asia/Jerusalem, Asia/Seoul,
+        Europe/London
+        '''
+        query: str = '''
+SELECT abbreviation, gmt_offset
+    FROM timezone
+    WHERE time_start >= 2114380800
+        AND abbreviation NOT IN ('CST', 'CDT', 'AMT', 'AST', 'GST', 'IST',
+                                 'KST', 'BST', 'UTC')
+    GROUP BY abbreviation
+UNION ALL
+SELECT abbreviation, gmt_offset
+    FROM timezone
+    WHERE time_start=2147483647
+        AND zone_id IN (382, 75, 294, 281, 190, 211, 159)
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query)
+            async for row in cursor:
+                yield row[0], row[1]
+
+    async def zones(self) -> AsyncIterator[Tuple[str, int]]:
+            query: str = '''
+SELECT zone_id, zone_name FROM zone ORDER BY zone_id
+'''
+            cursor: aioodbc.cursor.Cursor
+            async with await self.cursor() as cursor:
+                await cursor.execute(query)
+                async for row in cursor:
+                    yield row[0], row[1]
+
+    async def zone_transitions(self) -> List[Tuple[int, str, int, int]]:
+        query: str = '''
+SELECT zone_id, abbreviation, time_start, gmt_offset 
+    FROM timezone
+    WHERE abbreviation != 'UTC' 
+    ORDER BY zone_id, time_start
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query)
+            return [tuple(row) for row in await cursor.fetchall()]
 
 
 def get_database(schema: Schema=Schema.Main) -> Database:

@@ -19,7 +19,7 @@ class TestWhisperReload(TestWhisper):
         mock_reload.assert_called_once_with(
             PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('source.public.library.reload.reload_commands', autospec=True)
+    @patch('source.public.library.reload.reload_commands')
     async def test_reload_commands(self, mock_reload):
         self.assertIs(await reload.commandReloadCommands(self.args), False)
         self.assertFalse(mock_reload.called)

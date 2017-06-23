@@ -10,7 +10,7 @@ async def commandReload(args: WhisperCommandArgs) -> bool:
 
 @permission('manager')
 async def commandReloadCommands(args: WhisperCommandArgs) -> bool:
-    return reload.reload_commands(send(args.nick))
+    return await reload.reload_commands(send(args.nick))
 
 
 @permission('owner')

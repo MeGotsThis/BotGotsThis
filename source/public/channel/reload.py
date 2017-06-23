@@ -12,7 +12,7 @@ async def commandReload(args: ChatCommandArgs) -> bool:
 @ownerChannel
 @permission('manager')
 async def commandReloadCommands(args: ChatCommandArgs) -> bool:
-    return reload.reload_commands(sendPriority(args.chat, 0))
+    return await reload.reload_commands(sendPriority(args.chat, 0))
 
 
 @ownerChannel

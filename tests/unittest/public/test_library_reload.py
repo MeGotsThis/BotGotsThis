@@ -5,7 +5,7 @@ import asynctest
 
 import bot.globals
 
-from asynctest.mock import Mock, patch
+from asynctest.mock import CoroutineMock, Mock, patch
 
 from source.public.library import reload
 
@@ -134,7 +134,7 @@ class TestLibraryReload(asynctest.TestCase):
         self.send = Mock(spec=send)
 
     @patch('source.public.library.reload.reload_config')
-    @patch('source.public.library.reload.reload_commands', autospec=True)
+    @patch('source.public.library.reload.reload_commands')
     async def test_full_reload(self, mock_reload_command, mock_reload_config):
         self.assertIs(await reload.full_reload(self.send), True)
         self.assertEqual(self.send.call_count, 2)
@@ -143,21 +143,24 @@ class TestLibraryReload(asynctest.TestCase):
 
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
-    async def test_reload_commands(self, mock_reload):
+    @patch('source.data.timezones.load_timezones')
+    async def test_reload_commands(self, mock_load_timezones, mock_reload):
         module = Mock()
         sys.modules = {'source': module}
-        self.assertIs(reload.reload_commands(self.send), True)
+        self.assertIs(await reload.reload_commands(self.send), True)
         self.assertEqual(self.send.call_count, 2)
         mock_reload.assert_called_once_with(module)
+        mock_load_timezones.assert_called_once_with()
 
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
-    #@patch('bot.BotConfig')
-    async def test_reload_config(self, mock_reload):
+    @patch('source.public.library.reload.bot')
+    async def test_reload_config(self, mock_bot, mock_reload):
         module = Mock()
+        mock_bot.BotConfig.return_value.read_config = CoroutineMock()
         sys.modules = {'bot.config': module, 'bot.config.reader': module}
         self.assertIs(await reload.reload_config(self.send), True)
         self.assertEqual(self.send.call_count, 2)
         self.assertEqual(mock_reload.call_count, 2)
-        # mock_config.assert_called_once_with()
-        # mock_config.return_value.read_config.assert_called_once_with()
+        mock_bot.BotConfig.assert_called_once_with()
+        mock_bot.BotConfig.return_value.read_config.assert_called_once_with()
