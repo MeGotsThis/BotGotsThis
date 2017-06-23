@@ -135,9 +135,9 @@ async def auto_join_delete(database: DatabaseMain,
 
 
 async def set_timeout_level(database: DatabaseMain,
-                      channel: str,
-                      send: Send,
-                      message: Message) -> bool:
+                            channel: str,
+                            send: Send,
+                            message: Message) -> bool:
     propertyDict: Dict[str, str] = {
         '1': 'timeoutLength0',
         '2': 'timeoutLength1',

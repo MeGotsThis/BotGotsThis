@@ -3,7 +3,8 @@ from .. import database as databaseM
 
 
 async def token(broadcaster: str, *,
-          database: Optional[databaseM.DatabaseOAuth]=None) -> Optional[str]:
+                database: Optional[databaseM.DatabaseOAuth]=None
+                ) -> Optional[str]:
     if not isinstance(broadcaster, str):
         raise TypeError()
     if database is None:
