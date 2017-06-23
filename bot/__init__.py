@@ -4,7 +4,7 @@ import os
 
 import aiofiles
 
-from typing import List
+from typing import Dict, List
 
 
 class BotConfig:
@@ -40,6 +40,13 @@ class BotConfig:
 
         self.joinLimit: int = 50
         self.joinPerSecond: float = 15
+
+        self.database: Dict[str, str] = {
+            'main': '',
+            'oauth': '',
+            'timeout': '',
+            'timezone': '',
+        }
 
         self.ircLogFolder: str = ''
         self.exceptionLog: str = ''
@@ -125,6 +132,17 @@ class BotConfig:
             if self.ircLogFolder:
                 if not os.path.isdir(self.ircLogFolder):
                     os.mkdir(self.ircLogFolder)
+
+        if os.path.isfile('database.ini'):
+            ini = configparser.ConfigParser()
+            async with aiofiles.open('database.ini', 'r',
+                                     encoding='utf-8') as file:
+                ini.read_string(await file.read(None))
+
+            self.database['main'] = str(ini['DATABASE']['main'])
+            self.database['oauth'] = str(ini['DATABASE']['oauth'])
+            self.database['timeout'] = str(ini['DATABASE']['timeout'])
+            self.database['timezone'] = str(ini['DATABASE']['timezone'])
 
 
 config = BotConfig()

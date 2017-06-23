@@ -113,7 +113,7 @@ async def checkChatServers(timestamp: datetime) -> None:
             and bot.globals.clusters[cluster] is channels[channel].connection):
         return
     db: database.Database
-    async with await database.get_database() as db:
+    async with database.get_database() as db:
         database_: database.DatabaseMain = cast(database.DatabaseMain, db)
         priority: Union[int, float]
         priority = await database_.getAutoJoinsPriority(channel)

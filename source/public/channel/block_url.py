@@ -101,7 +101,7 @@ async def handle_different_domains(chat: 'data.Channel',
                                    nick: str,
                                    message: Message) -> None:
     db: database.Database
-    async with await database.get_database() as db:
+    async with database.get_database() as db:
         database_: database.DatabaseMain
         database_ = cast(database.DatabaseMain, db)
         await timeout.timeout_user(database_, chat, nick, 'redirectUrl', 1,

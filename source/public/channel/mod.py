@@ -100,7 +100,7 @@ async def commandPurge(args: ChatCommandArgs) -> bool:
         '.timeout {user} 1 {reason}'.format(
             user=args.message[1], reason=reason))
     db_: database.Database
-    async with await database.get_database(database.Schema.Timeout) as db_:
+    async with database.get_database(database.Schema.Timeout) as db_:
         db: database.DatabaseTimeout = cast(database.DatabaseTimeout, db_)
         await db.recordTimeout(
             args.chat.channel, args.message.lower[1], args.nick, 'purge', None,
