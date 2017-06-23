@@ -240,10 +240,10 @@ speedrunCommunityResponse = r'''{"_id":"6e940c4a-c42f-47d2-af83-0a2c7e47c421","o
 
 class TestApiTwitchApiHeaders(asynctest.TestCase):
     def setUp(self):
-        patcher = patch('source.api.twitch.client_id')
+        patcher = patch('bot.config')
         self.addCleanup(patcher.stop)
-        self.mock_clientid = patcher.start()
-        self.mock_clientid.return_value = '0123456789abcdef'
+        self.mock_config = patcher.start()
+        self.mock_config.twitchClientId = '0123456789abcdef'
 
         patcher = patch('source.api.oauth.token')
         self.addCleanup(patcher.stop)
@@ -252,7 +252,6 @@ class TestApiTwitchApiHeaders(asynctest.TestCase):
 
     async def test_get_headers(self):
         headers = await twitch.get_headers({}, 'botgotsthis')
-        self.mock_clientid.assert_called_once_with()
         self.mock_token.assert_called_once_with('botgotsthis')
         self.assertEqual(headers,
                          {'Accept': 'application/vnd.twitchtv.v5+json',
@@ -261,7 +260,6 @@ class TestApiTwitchApiHeaders(asynctest.TestCase):
 
     async def test_get_headers_no_channel(self):
         headers = await twitch.get_headers({}, None)
-        self.mock_clientid.assert_called_once_with()
         self.assertFalse(self.mock_token.called)
         self.assertEqual(headers,
                          {'Accept': 'application/vnd.twitchtv.v5+json',

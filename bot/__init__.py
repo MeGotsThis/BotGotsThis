@@ -48,6 +48,8 @@ class BotConfig:
             'timezone': '',
         }
 
+        self.twitchClientId: str = ''
+
         self.ircLogFolder: str = ''
         self.exceptionLog: str = ''
 
@@ -143,6 +145,14 @@ class BotConfig:
             self.database['oauth'] = str(ini['DATABASE']['oauth'])
             self.database['timeout'] = str(ini['DATABASE']['timeout'])
             self.database['timezone'] = str(ini['DATABASE']['timezone'])
+
+        if os.path.isfile('twitchApi.ini'):
+            ini = configparser.ConfigParser()
+            async with aiofiles.open('twitchApi.ini', 'r',
+                                     encoding='utf-8') as file:
+                ini.read_string(await file.read(None))
+
+            self.twitchClientId = str(ini['twitch']['twitchClientID'])
 
 
 config = BotConfig()
