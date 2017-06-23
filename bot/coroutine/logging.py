@@ -16,7 +16,7 @@ async def record_logs():
     name = 'File Logger'
     print('{time} Starting {name}'.format(time=utils.now(), name=name))
     try:
-        while bot.globals.running:
+        while bot.globals.running or _queue:
             if _queue:
                 await _process_log()
             await asyncio.sleep(0)
