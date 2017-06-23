@@ -1,5 +1,5 @@
-from source.database import DatabaseOAuth
 from tests.database.sqlite.test_database import TestSqlite
+from source.database import DatabaseOAuth
 
 
 class TestSqliteOAuth(TestSqlite):

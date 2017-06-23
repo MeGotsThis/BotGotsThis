@@ -2,6 +2,8 @@ import platform
 
 import asynctest
 
+import bot
+
 from collections.abc import Sequence
 
 from source.database import DatabaseMain

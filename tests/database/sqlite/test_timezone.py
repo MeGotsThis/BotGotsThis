@@ -1,5 +1,5 @@
-from source.database import DatabaseTimeZone
 from tests.database.sqlite.test_database import TestSqlite
+from source.database import DatabaseTimeZone
 
 
 class TestSqliteTimeout(TestSqlite):
