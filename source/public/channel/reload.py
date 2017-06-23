@@ -6,7 +6,7 @@ from ...data import ChatCommandArgs
 @ownerChannel
 @permission('owner')
 async def commandReload(args: ChatCommandArgs) -> bool:
-    return reload.full_reload(sendPriority(args.chat, 0))
+    return await reload.full_reload(sendPriority(args.chat, 0))
 
 
 @ownerChannel
@@ -18,4 +18,4 @@ async def commandReloadCommands(args: ChatCommandArgs) -> bool:
 @ownerChannel
 @permission('owner')
 async def commandReloadConfig(args: ChatCommandArgs) -> bool:
-    return reload.reload_config(sendPriority(args.chat, 0))
+    return await reload.reload_config(sendPriority(args.chat, 0))

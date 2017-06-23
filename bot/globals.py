@@ -1,5 +1,4 @@
-﻿import bot.config
-from . import data
+﻿from . import data
 from .coroutine import connection
 from datetime import datetime
 from typing import Any, Dict, Optional, List
@@ -21,7 +20,7 @@ twitchIdCache: Dict[str, datetime] = {}
 twitchCommunity: Dict[str, Optional[str]] = {}
 twitchCommunityId: Dict[str, str] = {}
 twitchCommunityCache: Dict[str, datetime] = {}
-displayName: str = bot.config.botnick
+displayName: str = ''
 isTwitchAdmin: bool = False
 isTwitchStaff: bool = False
 isGlobalMod: bool = False

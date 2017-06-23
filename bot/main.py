@@ -1,6 +1,6 @@
 ﻿# Import some necessary libraries.
 import asyncio
-import bot.config
+import bot
 import bot.globals
 import importlib
 import pkgutil
@@ -18,21 +18,9 @@ ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 
 
 async def initializer() -> None:
-    utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
-    bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
-    if bot.config.owner:
-        utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
-    db: database.Database
-    async with await database.get_database() as db:
-        databaseObj: database.DatabaseMain = cast(database.DatabaseMain, db)
-        autojoin: AutoJoinChannel
-        async for autoJoin in databaseObj.getAutoJoinsChats():
-            utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
-                              autoJoin.cluster)
+    await bot.config.read_config()
+    bot.globals.displayName = bot.config.botnick
 
-
-def main(argv: Optional[List[str]]=None) -> int:
-    print('{time} Starting'.format(time=utils.now()))
     bot.globals.running = True
 
     bot.globals.clusters['aws'] = connection.ConnectionHandler(
@@ -50,6 +38,21 @@ def main(argv: Optional[List[str]]=None) -> int:
     for importer, modname, ispkg in chain(*_modulesList):
         importlib.import_module(modname)
 
+    utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
+    bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
+    if bot.config.owner:
+        utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
+    db: database.Database
+    async with await database.get_database() as db:
+        databaseObj: database.DatabaseMain = cast(database.DatabaseMain, db)
+        autojoin: AutoJoinChannel
+        async for autoJoin in databaseObj.getAutoJoinsChats():
+            utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
+                              autoJoin.cluster)
+
+
+def main(argv: Optional[List[str]]=None) -> int:
+    print('{time} Starting'.format(time=utils.now()))
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(initializer())

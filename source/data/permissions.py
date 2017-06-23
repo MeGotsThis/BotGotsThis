@@ -1,4 +1,4 @@
-import bot.config
+import bot
 # from bot import data  -- https://github.com/python/mypy/issues/1701
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from typing import Any, Optional, Set

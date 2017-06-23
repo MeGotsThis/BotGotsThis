@@ -1,4 +1,4 @@
-﻿import bot.config
+﻿import bot
 import bot.globals
 from bot import utils
 from typing import Optional, Union

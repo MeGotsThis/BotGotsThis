@@ -1,4 +1,4 @@
-﻿import bot.config
+﻿import bot
 from bot import data
 from typing import Optional
 

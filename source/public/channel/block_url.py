@@ -3,7 +3,7 @@ import re
 
 import aiohttp
 
-import bot.config
+import bot
 
 
 from datetime import datetime

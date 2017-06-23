@@ -1,5 +1,4 @@
-﻿from bot import config
-from source.api import oauth
+﻿from source.api import oauth
 from contextlib import closing, suppress
 from datetime import datetime, timedelta
 from http import client
@@ -7,11 +6,11 @@ from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
 import aiohttp
 import asyncio
+import bot
 import bot.globals
 import bot.utils
 import configparser
 import email.utils
-import json
 import os.path
 import time
 import urllib.parse
@@ -68,7 +67,7 @@ async def get_call(channel: Optional[str],
     async with aiohttp.ClientSession(raise_for_status=True) as session, \
             session.get('https://api.twitch.tv' + uri,
                         headers=headers,
-                        timeout=config.httpTimeout) as response:
+                        timeout=bot.config.httpTimeout) as response:
         if response.status == 204:
             return response, None
         try:
@@ -95,7 +94,7 @@ async def post_call(channel: Optional[str],
             session.post('https://api.twitch.tv' + uri,
                          headers=headers,
                          data=dataStr,
-                         timeout=config.httpTimeout) as response:
+                         timeout=bot.config.httpTimeout) as response:
         if response.status == 204:
             return response, None
         try:
@@ -122,7 +121,7 @@ async def put_call(channel: Optional[str],
             session.put('https://api.twitch.tv' + uri,
                         headers=headers,
                         data=dataStr,
-                        timeout=config.httpTimeout) as response:
+                        timeout=bot.config.httpTimeout) as response:
         if response.status == 204:
             return response, None
         try:
@@ -149,7 +148,7 @@ async def delete_call(channel: Optional[str],
             session.delete('https://api.twitch.tv' + uri,
                            headers=headers,
                            data=dataStr,
-                           timeout=config.httpTimeout) as response:
+                           timeout=bot.config.httpTimeout) as response:
         if response.status == 204:
             return response, None
         try:
@@ -222,7 +221,7 @@ async def chat_server(chat: str) -> Optional[str]:
     response: aiohttp.ClientResponse
     async with aiohttp.ClientSession() as session, \
             session.get('https://tmi.twitch.tv/servers?channel=' + chat,
-                        timeout=config.httpTimeout) as response:
+                        timeout=bot.config.httpTimeout) as response:
         with suppress(ValueError, aiohttp.ClientResponseError):
             jData: dict = await response.json()
             return str(jData['cluster'])

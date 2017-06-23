@@ -1,4 +1,4 @@
-﻿import bot.config
+﻿import bot
 from ..library import chat, timeout
 from ..library.chat import min_args, permission_feature
 from ...data import ChatCommandArgs

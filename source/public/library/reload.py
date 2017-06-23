@@ -94,10 +94,10 @@ def key(module: str) -> Tuple[int, str]:
     return 50, module
 
 
-def full_reload(send: Send) -> bool:
+async def full_reload(send: Send) -> bool:
     send('Reloading')
     
-    reload_config(send)
+    await reload_config(send)
     reload_commands(send)
 
     send('Complete')
@@ -116,10 +116,14 @@ def reload_commands(send: Send) -> bool:
     return True
 
 
-def reload_config(send: Send) -> bool:
+async def reload_config(send: Send) -> bool:
     send('Reloading Config')
     
     importlib.reload(sys.modules['bot.config'])
-    
+    importlib.reload(sys.modules['bot.config.reader'])
+    import bot
+    bot.config = bot.BotConfig()
+    await bot.config.read_config()
+
     send('Complete Reloading')
     return True

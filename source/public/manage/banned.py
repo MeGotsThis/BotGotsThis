@@ -1,4 +1,4 @@
-﻿import bot.config
+﻿import bot
 from bot import utils
 from typing import Iterable, List, Optional
 from ..library import message
