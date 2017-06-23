@@ -11,8 +11,8 @@ from importlib.abc import PathEntryFinder
 from source import database
 from source.data import timezones
 from source.database import AutoJoinChannel
-from typing import Generator, List, Iterable, Optional, Tuple, cast
-from . import data, utils
+from typing import Awaitable, Generator, List, Iterable, Optional, Tuple, cast
+from . import utils
 from .coroutine import background, connection, join, logging
 
 ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
@@ -57,13 +57,15 @@ def main(argv: Optional[List[str]]=None) -> int:
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(initializer())
-        coro = asyncio.gather(
+        coro: Awaitable = asyncio.gather(
             timezones.load_timezones(),
             background.background_tasks(),
             logging.record_logs(),
             join.join_manager(),
             *[c.run_connection() for c in bot.globals.clusters.values()])
         loop.run_until_complete(coro)
+        if asyncio.Task.all_tasks():
+            asyncio.wait_for(asyncio.gather(*asyncio.Task.all_tasks()), 10)
         loop.close()
         return 0
     except:
