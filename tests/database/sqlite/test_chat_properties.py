@@ -59,7 +59,7 @@ CREATE TABLE chat_properties (
 
     async def test_get_properties_one(self):
         await self.execute('INSERT INTO chat_properties VALUES (?, ?, ?)',
-                     ('botgotsthis', 'kappa', 'Kappa'))
+                           ('botgotsthis', 'kappa', 'Kappa'))
         self.assertEqual(
             await self.database.getChatProperties(
                 'botgotsthis', ['kappa', 'kappahd']),
@@ -141,7 +141,7 @@ CREATE TABLE chat_properties (
 
     async def test_set_property_existing(self):
         await self.execute('INSERT INTO chat_properties VALUES (?, ?, ?)',
-                     ('botgotsthis', 'kappa', 'Kappa'))
+                           ('botgotsthis', 'kappa', 'Kappa'))
         self.assertIs(await self.database.setChatProperty('botgotsthis',
                                                           'kappa'),
                       True)

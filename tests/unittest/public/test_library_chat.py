@@ -1,5 +1,3 @@
-import unittest
-
 import asynctest
 
 from datetime import datetime, timedelta
@@ -404,7 +402,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIn('', sessionData)
         self.assertIn('botgotsthis', sessionData[''])
         self.assertEqual(sessionData['']['botgotsthis'], self.now)
-        
+
     @asynctest.fail_on(unused_loop=False)
     def test_in_user_cooldown_existing(self):
         sessionData = {'': {'botgotsthis': self.now - timedelta(hours=1)}}

@@ -721,13 +721,15 @@ class TestLibraryCustomSplitMessage(unittest.TestCase):
             custom.split_message('{}Kappa'),
             [CustomFieldParts('', '', None, None, None, None, None, '{}'),
              CustomFieldParts('Kappa', None, None, None, None, None, None,
-                              None),])
+                              None),
+             ])
 
     def test_field_field(self):
         self.assertEqual(
             custom.split_message('{}{}'),
             [CustomFieldParts('', '', None, None, None, None, None, '{}'),
-             CustomFieldParts('', '', None, None, None, None, None, '{}'),])
+             CustomFieldParts('', '', None, None, None, None, None, '{}'),
+             ])
 
     def test_plain_field_plain_field_plain(self):
         self.assertEqual(
@@ -735,7 +737,8 @@ class TestLibraryCustomSplitMessage(unittest.TestCase):
             [CustomFieldParts('Kappa', '', None, None, None, None, None, '{}'),
              CustomFieldParts('Kappa', '', None, None, None, None, None, '{}'),
              CustomFieldParts('Kappa', None, None, None, None, None, None,
-                              None),])
+                              None),
+             ])
 
     def test_plain_escape(self):
         self.assertEqual(

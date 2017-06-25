@@ -63,7 +63,6 @@ class TestConnectionHandler(unittest.TestCase):
         self.connection._on_write(message, now, channel=self.channel)
         self.assertEqual(self.connection.lastSentPing, now)
 
-
     @patch.object(connection.ConnectionHandler, 'queue_write', autospec=True)
     @patch('bot.utils.now', autospec=True)
     def test_ping(self, mock_now, mock_queue_write):
@@ -248,7 +247,7 @@ class TestConnectionHandler(unittest.TestCase):
     @patch('bot.coroutine.join.on_part', autospec=True)
     @patch.object(connection.ConnectionHandler, 'queue_write', autospec=True)
     def test_part_channel_contains(self, mock_queue_write, mock_on_part,
-                                  mock_stdout):
+                                   mock_stdout):
         self.connection._channels[self.channel.channel] = self.channel
         self.connection.part_channel(self.channel)
         self.assertNotIn(self.channel.channel, self.connection._channels)
@@ -263,7 +262,7 @@ class TestConnectionHandler(unittest.TestCase):
     @patch.object(MessagingQueue, 'popWhisper', autospec=True)
     @patch.object(connection.ConnectionHandler, 'queue_write', autospec=True)
     def test_flush_writes(self, mock_queue_write, mock_popWhisper,
-                           mock_popChat, mock_globals):
+                          mock_popChat, mock_globals):
         mock_globals.groupChannel = self.channel
         mock_popWhisper.side_effect = [
             WhisperMessage('botgotsthis', 'Kappa'),
@@ -483,8 +482,8 @@ class TestConnectionConnected(asynctest.TestCase):
         await self.connection.write(message, channel=self.channel,
                                     whisper=self.whisper)
         mock_log_write.assert_called_once_with(
-            self.connection, message, channel=self.channel, whisper=self.whisper,
-            timestamp=self.now)
+            self.connection, message, channel=self.channel,
+            whisper=self.whisper, timestamp=self.now)
         self.mock_writer.write.assert_any_call(b'001')
         self.mock_writer.write.assert_any_call(b'\r\n')
         self.mock_writer.drain.assert_called_once_with()
@@ -514,7 +513,8 @@ class TestConnectionConnected(asynctest.TestCase):
         self.mock_reader.readuntil.return_value = b'001\r\n'
         await self.connection.read()
         self.mock_reader.readuntil.assert_called_once_with(b'\r\n')
-        mock_parseMessage.assert_called_once_with(self.connection, '001', self.now)
+        mock_parseMessage.assert_called_once_with(
+            self.connection, '001', self.now)
         self.assertTrue(mock_log_read.called)
         self.assertFalse(mock_logException.called)
         self.assertTrue(mock_globals.running)

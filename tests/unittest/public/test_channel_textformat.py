@@ -79,7 +79,8 @@ class TestChannelTextFormat(TestChannel):
         self.channel.send.assert_called_once_with('𝐾𝑎𝑝𝑝𝑎')
 
     async def test_serif_bold_italic(self):
-        self.assertIs(await textformat.commandSerifBoldItalic(self.args), False)
+        self.assertIs(await textformat.commandSerifBoldItalic(self.args),
+                      False)
         message = Message('!convert Kappa')
         self.permissionSet['moderator'] = True
         self.features.append('textconvert')
@@ -115,7 +116,8 @@ class TestChannelTextFormat(TestChannel):
         self.channel.send.assert_called_once_with('𝘒𝘢𝘱𝘱𝘢')
 
     async def test_sanserif_bold_italic(self):
-        self.assertIs(await textformat.commandSanSerifBoldItalic(self.args), False)
+        self.assertIs(await textformat.commandSanSerifBoldItalic(self.args),
+                      False)
         message = Message('!convert Kappa')
         self.permissionSet['moderator'] = True
         self.features.append('textconvert')

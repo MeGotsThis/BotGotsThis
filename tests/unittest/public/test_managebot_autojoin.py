@@ -1,5 +1,3 @@
-import unittest
-
 import asynctest
 
 from datetime import datetime
@@ -227,7 +225,6 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
             AutoJoinChannel('botgotsthis', 0, ''),
             ])
         self.mock_server.return_value = ''
-        message = Message('!managebot reload')
         self.assertIs(await autojoin.reload_server(self.database, self.send),
                       True)
         self.database.getAutoJoinsChats.assert_called_once_with()
@@ -243,7 +240,6 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
             AutoJoinChannel('botgotsthis', 0, ''),
             ])
         self.mock_server.return_value = None
-        message = Message('!managebot reload')
         self.assertIs(await autojoin.reload_server(self.database, self.send),
                       True)
         self.database.getAutoJoinsChats.assert_called_once_with()
@@ -259,7 +255,6 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
             AutoJoinChannel('botgotsthis', 0, ''),
             ])
         self.mock_server.return_value = 'twitch'
-        message = Message('!managebot reload')
         self.assertIs(await autojoin.reload_server(self.database, self.send),
                       True)
         self.database.getAutoJoinsChats.assert_called_once_with()

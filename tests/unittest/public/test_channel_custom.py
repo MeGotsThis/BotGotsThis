@@ -2,12 +2,12 @@ from datetime import timedelta
 
 from asynctest.mock import patch
 
-from source.data import CustomCommand, CommandActionTokens
-from source.data.message import Message
 from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import IterableMatch, StrContains
 
 # Needs to be imported last
+from source.data import CustomCommand, CommandActionTokens
+from source.data.message import Message
 from source.public.channel import custom
 
 
@@ -18,38 +18,38 @@ class TestChannelCustomCustomCommand(TestChannel):
         self.permissions.moderator = True
         self.permissions.chatModerator = False
         self.command = CustomCommand('Kappa', '#global', '')
-        
+
         patcher = patch('bot.config', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_config = patcher.start()
         self.mock_config.customMessageCooldown = 5
         self.mock_config.customMessageUserCooldown = 30
-        
+
         patcher = patch('source.public.library.chat.inCooldown', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_channel_cooldown = patcher.start()
         self.mock_channel_cooldown.return_value = False
-        
+
         patcher = patch('source.public.library.chat.in_user_cooldown',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_user_cooldown = patcher.start()
         self.mock_user_cooldown.return_value = False
-        
+
         patcher = patch('source.public.library.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
-        
+
         patcher = patch('source.public.library.custom.get_command')
         self.addCleanup(patcher.stop)
         self.mock_command = patcher.start()
         self.mock_command.return_value = self.command
-        
+
         patcher = patch('source.public.library.custom.create_messages')
         self.addCleanup(patcher.stop)
         self.mock_messages = patcher.start()
         self.mock_messages.return_value = []
-        
+
     async def test_nocustom(self):
         self.features.append('nocustom')
         self.assertIs(await custom.customCommands(self.args), False)
@@ -126,11 +126,11 @@ class TestChannelCustomCustomCommand(TestChannel):
 class TestChannelCustomCommand(TestChannel):
     def setUp(self):
         super().setUp()
-        
+
         patcher = patch('source.public.channel.custom.process_command')
         self.addCleanup(patcher.stop)
         self.mock_process = patcher.start()
-        
+
     async def test_command(self):
         self.assertIs(await custom.commandCommand(self.args), False)
         self.features.append('nocustom')
@@ -158,7 +158,7 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.message = Message('!commmand test !someCommand')
         self.args = self.args._replace(message=self.message)
         self.broadcaster = '#global'
-        
+
         patcher = patch('source.public.library.custom.parse_action_message',
                         autospec=True)
         self.addCleanup(patcher.stop)
@@ -180,7 +180,7 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.mock_input.assert_called_once_with(self.message, self.broadcaster)
         self.assertFalse(self.channel.send.called)
 
-    async def test_level(self):
+    async def test_level_access(self):
         self.mock_input.return_value = CommandActionTokens(
             'test', self.broadcaster, None, 'Kappa', '')
         self.assertIs(
@@ -346,7 +346,7 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.mock_input.assert_called_once_with(self.message, self.broadcaster)
         mock_delete.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
-        
+
     @patch('source.public.channel.custom.command_property')
     async def test_property(self, mock_property):
         mock_property.return_value = True

@@ -205,11 +205,13 @@ class TestChannel(unittest.TestCase):
     def test_part(self):
         self.channel.part()
         self.connection.part_channel.assert_called_once_with(self.channel)
-        self.connection.messaging.clearChat.assert_called_once_with(self.channel)
+        self.connection.messaging.clearChat.assert_called_once_with(
+            self.channel)
 
     def test_clear(self):
         self.channel.clear()
-        self.connection.messaging.clearChat.assert_called_once_with(self.channel)
+        self.connection.messaging.clearChat.assert_called_once_with(
+            self.channel)
 
     def test_send(self):
         self.channel.send('Kappa')
@@ -294,7 +296,7 @@ class TestChannelAsync(asynctest.TestCase):
 
     @patch('bot.utils.now', autospec=True)
     @patch('source.api.bttv.getBroadcasterEmotes')
-    async def test_updateFfzEmotes_error(self, mock_getBttvEmotes, mock_now):
+    async def test_updateBttvEmotes_error(self, mock_getBttvEmotes, mock_now):
         now = datetime(2000, 1, 1)
         emotes = {'': 'BetterTwitch.Tv'}
         self.channel._bttvEmotes = emotes

@@ -19,15 +19,15 @@ CREATE TABLE auto_join (
 
     async def test_chat(self):
         await self.execute("INSERT INTO auto_join VALUES (?, ?, ?)",
-                     ('botgotsthis', 0, 'main'))
+                           ('botgotsthis', 0, 'main'))
         self.assertEqual([c async for c in self.database.getAutoJoinsChats()],
                          [AutoJoinChannel('botgotsthis', 0, 'main')])
 
     async def test_chats(self):
         await self.executemany("INSERT INTO auto_join VALUES (?, ?, ?)",
-                         [('botgotsthis', 0, 'main'),
-                          ('megotsthis', -1, 'twitch'),
-                          ('mebotsthis', 1, 'aws')])
+                               [('botgotsthis', 0, 'main'),
+                                ('megotsthis', -1, 'twitch'),
+                                ('mebotsthis', 1, 'aws')])
         self.assertEqual([c async for c in self.database.getAutoJoinsChats()],
                          [AutoJoinChannel('megotsthis', -1, 'twitch'),
                           AutoJoinChannel('botgotsthis', 0, 'main'),
@@ -62,7 +62,7 @@ CREATE TABLE auto_join (
 
     async def test_discard(self):
         await self.execute("INSERT INTO auto_join VALUES (?, ?, ?)",
-                     ('botgotsthis', 0, 'main'))
+                           ('botgotsthis', 0, 'main'))
         self.assertIs(await self.database.discardAutoJoin('botgotsthis'), True)
         self.assertIsNone(await self.row('SELECT * FROM auto_join'))
 
@@ -73,7 +73,7 @@ CREATE TABLE auto_join (
 
     async def test_save_priority(self):
         await self.execute("INSERT INTO auto_join VALUES (?, ?, ?)",
-                     ('botgotsthis', 0, 'main'))
+                           ('botgotsthis', 0, 'main'))
         self.assertIs(
             await self.database.setAutoJoinPriority('botgotsthis', -1),
             True)
@@ -88,7 +88,7 @@ CREATE TABLE auto_join (
 
     async def test_save_server(self):
         await self.execute("INSERT INTO auto_join VALUES (?, ?, ?)",
-                     ('botgotsthis', 0, 'main'))
+                           ('botgotsthis', 0, 'main'))
         self.assertIs(
             await self.database.setAutoJoinServer('botgotsthis', 'twitch'),
             True)

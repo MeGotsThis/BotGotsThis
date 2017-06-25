@@ -154,7 +154,6 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
 
     @patch('source.api.twitch.active_streams')
     async def test_streams_offline(self, mock_active):
-        streamed = datetime(1999, 1, 1)
         mock_active.return_value = {}
         await twitch.checkStreamsAndChannel(self.now)
         self.assertTrue(mock_active.called)

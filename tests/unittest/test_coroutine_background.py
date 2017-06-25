@@ -6,7 +6,7 @@ import bot.coroutine.background
 
 from datetime import datetime, timedelta
 
-from asynctest.mock import CoroutineMock, Mock, patch
+from asynctest.mock import CoroutineMock, patch
 
 from bot.coroutine.background import Task
 

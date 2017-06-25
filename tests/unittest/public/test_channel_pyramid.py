@@ -114,7 +114,8 @@ class TestChannelProcessPyramid(TestChannel):
     async def test(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 0), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 0),
+                      True)
         self.channel.send.assert_called_once_with(IterableMatch(), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
@@ -122,7 +123,8 @@ class TestChannelProcessPyramid(TestChannel):
     async def test_1(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 1), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 1),
+                      True)
         self.channel.send.assert_called_once_with(IterableMatch('Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
@@ -130,7 +132,8 @@ class TestChannelProcessPyramid(TestChannel):
     async def test_2(self):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2),
+                      True)
         self.channel.send.assert_called_once_with(
             IterableMatch('Kappa', 'Kappa Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
@@ -140,7 +143,8 @@ class TestChannelProcessPyramid(TestChannel):
         self.mock_config.messageLimit = 300
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 5), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 5),
+                      True)
         self.channel.send.assert_called_once_with(
             IterableMatch('Kappa',
                           'Kappa Kappa',
@@ -159,7 +163,8 @@ class TestChannelProcessPyramid(TestChannel):
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
         self.permissions.chatModerator = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2),
+                      True)
         self.channel.send.assert_called_once_with(
             IterableMatch('Kappa', 'Kappa Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
@@ -170,7 +175,8 @@ class TestChannelProcessPyramid(TestChannel):
     async def test_broadcaster_limit(self):
         self.mock_config.messageLimit = 10000
         self.permissions.broadcaster = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa ', 100), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa ', 100),
+                      True)
         self.channel.send.assert_called_once_with(
             IterableMatch(*([StrContains()] * (20 + 20 - 1))), -1)
         self.assertFalse(self.mock_cooldown.called)
@@ -179,7 +185,8 @@ class TestChannelProcessPyramid(TestChannel):
     async def test_moderator_limit(self):
         self.mock_config.messageLimit = 100
         self.mock_cooldown.return_value = False
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2),
+                      True)
         self.channel.send.assert_called_once_with(
             IterableMatch('Kappa', 'Kappa Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_timeout.called)
@@ -189,7 +196,8 @@ class TestChannelProcessPyramid(TestChannel):
     async def test_moderator_cooldown(self):
         self.mock_config.messageLimit = 100
         self.mock_cooldown.return_value = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2), False)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2),
+                      False)
         self.assertFalse(self.channel.send.called)
         self.assertFalse(self.mock_timeout.called)
         self.mock_cooldown.assert_called_once_with(
@@ -199,7 +207,8 @@ class TestChannelProcessPyramid(TestChannel):
         self.mock_config.messageLimit = 10
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2),
+                      True)
         self.channel.send.assert_called_once_with(IterableMatch('Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.mock_timeout.called)
@@ -208,7 +217,8 @@ class TestChannelProcessPyramid(TestChannel):
         self.mock_config.messageLimit = 11
         self.permissions.broadcaster = True
         self.permissions.globalModerator = True
-        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2), True)
+        self.assertIs(await pyramid.process_pyramid(self.args, 'Kappa', 2),
+                      True)
         self.channel.send.assert_called_once_with(
             IterableMatch('Kappa', 'Kappa Kappa', 'Kappa'), -1)
         self.assertFalse(self.mock_cooldown.called)

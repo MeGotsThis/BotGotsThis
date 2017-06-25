@@ -1,6 +1,6 @@
 import unittest
 from bot.twitchmessage import IrcMessage, IrcMessageParams, IrcMessagePrefix
-from bot.twitchmessage import IrcMessageTagsKey, IrcMessageTagsReadOnly
+from bot.twitchmessage import IrcMessageTagsReadOnly
 from bot.twitchmessage._ircmessage import ParsedMessage
 
 
@@ -118,17 +118,19 @@ class TestsIrcMessage(unittest.TestCase):
         self.assertEqual(message.command, 'PRIVMSG')
         self.assertIs(message.params.middle, '#botgotsthis')
         self.assertIs(message.params.trailing, 'Hello World')
-        self.assertEqual(message,
-                         IrcMessage(command='PRIVMSG',
-                                    params=IrcMessageParams('#botgotsthis',
-                                                            'Hello World')))
+        self.assertEqual(
+            message,
+            IrcMessage(command='PRIVMSG',
+                       params=IrcMessageParams('#botgotsthis', 'Hello World')))
 
     def test_prefix_command_params(self):
-        message = IrcMessage(prefix=IrcMessagePrefix(nick='botgotsthis',
-                                                     user='botgotsthis',
-                                                     host='botgotsthis.tmi.twitch.tv'),
-                             command='PART',
-                             params=IrcMessageParams('#botgotsthis'))
+        message = IrcMessage(
+            prefix=IrcMessagePrefix(
+                nick='botgotsthis',
+                user='botgotsthis',
+                host='botgotsthis.tmi.twitch.tv'),
+            command='PART',
+            params=IrcMessageParams('#botgotsthis'))
         self.assertIsNone(message.prefix.servername)
         self.assertEqual(message.prefix.nick, 'botgotsthis')
         self.assertEqual(message.prefix.user, 'botgotsthis')
@@ -136,12 +138,15 @@ class TestsIrcMessage(unittest.TestCase):
         self.assertEqual(message.command, 'PART')
         self.assertIs(message.params.middle, '#botgotsthis')
         self.assertIs(message.params.trailing, None)
-        self.assertEqual(message,
-                         IrcMessage(prefix=IrcMessagePrefix(nick='botgotsthis',
-                                                            user='botgotsthis',
-                                                            host='botgotsthis.tmi.twitch.tv'),
-                                    command='PART',
-                                    params=IrcMessageParams('#botgotsthis')))
+        self.assertEqual(
+            message,
+            IrcMessage(
+                prefix=IrcMessagePrefix(
+                    nick='botgotsthis',
+                    user='botgotsthis',
+                    host='botgotsthis.tmi.twitch.tv'),
+                command='PART',
+                params=IrcMessageParams('#botgotsthis')))
 
     def test_tags_prefix_command_params(self):
         message = IrcMessage(
@@ -200,12 +205,14 @@ class TestsIrcMessage(unittest.TestCase):
 
     def test_str_magic_prefix_command_params(self):
         self.assertEqual(
-            str(IrcMessage(prefix=IrcMessagePrefix(nick='botgotsthis',
-                                                   user='botgotsthis',
-                                                   host='botgotsthis.tmi.twitch.tv'),
-                           command='PART',
-                           params=IrcMessageParams('#botgotsthis'))),
-            ':botgotsthis!botgotsthis@botgotsthis.tmi.twitch.tv PART #botgotsthis')
+            str(IrcMessage(
+                prefix=IrcMessagePrefix(nick='botgotsthis',
+                                        user='botgotsthis',
+                                        host='botgotsthis.tmi.twitch.tv'),
+                command='PART',
+                params=IrcMessageParams('#botgotsthis'))),
+            '''\
+:botgotsthis!botgotsthis@botgotsthis.tmi.twitch.tv PART #botgotsthis''')
 
     def test_str_tags_magic_prefix_command_params(self):
         message = IrcMessage(
@@ -218,8 +225,9 @@ class TestsIrcMessage(unittest.TestCase):
                     }),
                 prefix=IrcMessagePrefix(servername='tmi.twitch.tv'),
                 command='ROOMSTATE', params=IrcMessageParams('#botgotsthis'))
-        self.assertEqual(str(message),
-                         '@' + str(message.tags) +' :tmi.twitch.tv ROOMSTATE #botgotsthis')
+        self.assertEqual(
+            str(message),
+            '@' + str(message.tags) + ' :tmi.twitch.tv ROOMSTATE #botgotsthis')
 
     def test_parse_none(self):
         self.assertRaises(TypeError, IrcMessage.parse, None)
@@ -285,7 +293,8 @@ class TestsIrcMessage(unittest.TestCase):
         self.assertRaises(ValueError, IrcMessage.parse, '@only-tag-here')
 
     def test_parse_only_tags_trailing_space(self):
-        self.assertRaises(ValueError, IrcMessage.parse, '@only-tag-here;with-a-space ')
+        self.assertRaises(ValueError, IrcMessage.parse,
+                          '@only-tag-here;with-a-space ')
 
     def test_parse_only_prefix_servername(self):
         self.assertRaises(ValueError, IrcMessage.parse, ':prefix.only')
@@ -294,16 +303,20 @@ class TestsIrcMessage(unittest.TestCase):
         self.assertRaises(ValueError, IrcMessage.parse, ':prefix!only@here')
 
     def test_parse_only_prefix_servername_trailing_space(self):
-        self.assertRaises(ValueError, IrcMessage.parse, ':prefix.need.a.space ')
+        self.assertRaises(ValueError, IrcMessage.parse,
+                          ':prefix.need.a.space ')
 
     def test_parse_leading_exclamation(self):
-        self.assertRaises(ValueError, IrcMessage.parse, '!invalid starting char')
+        self.assertRaises(ValueError, IrcMessage.parse,
+                          '!invalid starting char')
 
     def test_parse_leading_number_sign(self):
-        self.assertRaises(ValueError, IrcMessage.parse, '#invalid starting char')
+        self.assertRaises(ValueError, IrcMessage.parse,
+                          '#invalid starting char')
 
     def test_parse_leading_dollar_sign(self):
-        self.assertRaises(ValueError, IrcMessage.parse, '$invalid starting char')
+        self.assertRaises(ValueError, IrcMessage.parse,
+                          '$invalid starting char')
 
     def test_parse_tags_empty(self):
         self.assertRaises(ValueError, IrcMessage.parse, '@ 001')
@@ -465,7 +478,8 @@ class TestsIrcMessage(unittest.TestCase):
 
     def test_parse_prefix_command_params_middle(self):
         self.assertEqual(
-            IrcMessage.parse(':bot_gots_this!123botgotsthis@botgotsthis.tmi.twitch.tv JOIN #botgotsthis'),
+            IrcMessage.parse('''\
+:bot_gots_this!123botgotsthis@botgotsthis.tmi.twitch.tv JOIN #botgotsthis'''),
             ParsedMessage(None,
                           IrcMessagePrefix(nick='bot_gots_this',
                                            user='123botgotsthis',
@@ -482,10 +496,10 @@ class TestsIrcMessage(unittest.TestCase):
                           IrcMessageParams('tmi.twitch.tv', 'botgotsthis')))
 
     def test_parse_empty_trailing(self):
-        self.assertEqual(IrcMessage.parse('TEST middle empty trail :'),
-                         ParsedMessage(None, None, 'TEST',
-                                       IrcMessageParams('middle empty trail', '')))
-
+        self.assertEqual(
+            IrcMessage.parse('TEST middle empty trail :'),
+            ParsedMessage(None, None, 'TEST',
+                          IrcMessageParams('middle empty trail', '')))
 
     def test_parse_empty_middle(self):
         self.assertEqual(IrcMessage.parse('TEST :empty middle'),
@@ -494,8 +508,8 @@ class TestsIrcMessage(unittest.TestCase):
 
     def test_parse_multiple_spaces(self):
         self.assertEqual(
-            IrcMessage.parse(
-                '@multiple=spaces  :will!be@used  HERE  to  test :if  this  passes'),
+            IrcMessage.parse('''\
+@multiple=spaces  :will!be@used  HERE  to  test :if  this  passes'''),
             ParsedMessage(
                 IrcMessageTagsReadOnly({'multiple': 'spaces'}),
                 IrcMessagePrefix(nick='will', user='be', host='used'),
@@ -508,11 +522,13 @@ class TestsIrcMessage(unittest.TestCase):
     def test_from_command_param_middle(self):
         self.assertEqual(IrcMessage.fromMessage('PART #botgotsthis'),
                          IrcMessage(command='PART',
-                                    params=IrcMessageParams(middle='#botgotsthis')))
+                                    params=IrcMessageParams(
+                                        middle='#botgotsthis')))
 
     def test_from_prefix_command_param_middle(self):
         self.assertEqual(
-            IrcMessage.fromMessage(':botgotsthis!botgotsthis@botgotsthis.tmi.twitch.tv JOIN #botgotsthis'),
+            IrcMessage.fromMessage('''\
+:botgotsthis!botgotsthis@botgotsthis.tmi.twitch.tv JOIN #botgotsthis'''),
             IrcMessage(
                 prefix=IrcMessagePrefix(nick='botgotsthis',
                                         user='botgotsthis',
@@ -550,17 +566,17 @@ class TestsIrcMessage(unittest.TestCase):
 
     def test_from_twitch_001(self):
         self.assertEqual(
-            IrcMessage.fromMessage(':tmi.twitch.tv 001 botgotsthis :Welcome, GLHF!'),
+            IrcMessage.fromMessage(
+                ':tmi.twitch.tv 001 botgotsthis :Welcome, GLHF!'),
             IrcMessage(prefix=IrcMessagePrefix(servername='tmi.twitch.tv'),
                        command=1,
                        params=IrcMessageParams(middle='botgotsthis',
                                                trailing='Welcome, GLHF!')))
 
     def test_from_twitch_privmsg_bits(self):
-        IrcMessage.fromMessage(
-            '@badges=staff/1,bits/1000;bits=100;color=;'
-            'display-name=TWITCH_UserNaME;emotes=;'
-            'id=b34ccfc7-4977-403a-8a94-33c6bac34fb8;mod=0;room-id=1337;'
-            'subscriber=0;turbo=1;user-id=1337;user-type=staff '
-            ':twitch_username!twitch_username@twitch_username.tmi.twitch.tv '
-            'PRIVMSG #channel :cheer100')
+        IrcMessage.fromMessage('''\
+@badges=staff/1,bits/1000;bits=100;color=;display-name=TWITCH_UserNaME;\
+emotes=;id=b34ccfc7-4977-403a-8a94-33c6bac34fb8;mod=0;room-id=1337;\
+subscriber=0;turbo=1;user-id=1337;user-type=staff \
+:twitch_username!twitch_username@twitch_username.tmi.twitch.tv \
+PRIVMSG #channel :cheer100''')

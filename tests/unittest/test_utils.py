@@ -819,7 +819,7 @@ class TesEnsureServer(unittest.TestCase):
     @patch('bot.utils.partChannel', autospec=True)
     def test_correct(self, mock_part, mock_join):
         self.assertEqual(utils.ensureServer('botgotsthis', cluster='justin'),
-                          utils.ENSURE_CORRECT)
+                         utils.ENSURE_CORRECT)
 
     @patch('bot.utils.joinChannel', autospec=True)
     @patch('bot.utils.partChannel', autospec=True)

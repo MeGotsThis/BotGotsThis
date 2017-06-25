@@ -47,7 +47,8 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         self.assertRaises(TypeError, self.queue.sendChat, 1, '')
 
     def test_sendChat_none(self):
-        self.assertRaises(TypeError, self.queue.sendChat, self.bgt_channel, None)
+        self.assertRaises(
+            TypeError, self.queue.sendChat, self.bgt_channel, None)
 
     def test_sendChat_int(self):
         self.assertRaises(TypeError, self.queue.sendChat, self.bgt_channel, 1)
@@ -62,13 +63,17 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         self.assertIs(self.queue._chatQueues[1][0].message, 'Hello Kappa !')
 
     def test_sendChat_list_str(self):
-        self.queue.sendChat(self.bgt_channel, ['Kappa ', 'Kappa Kappa ', 'Kappa Kappa Kappa '])
+        self.queue.sendChat(self.bgt_channel,
+                            ['Kappa ', 'Kappa Kappa ', 'Kappa Kappa Kappa '])
         self.assertFalse(self.queue._chatQueues[0])
         self.assertFalse(self.queue._chatQueues[2])
         self.assertEqual(len(self.queue._chatQueues[1]), 3)
-        self.assertIs(self.queue._chatQueues[1][0].message, 'Kappa ')
-        self.assertIs(self.queue._chatQueues[1][1].message, 'Kappa Kappa ')
-        self.assertIs(self.queue._chatQueues[1][2].message, 'Kappa Kappa Kappa ')
+        self.assertIs(self.queue._chatQueues[1][0].message,
+                      'Kappa ')
+        self.assertIs(self.queue._chatQueues[1][1].message,
+                      'Kappa Kappa ')
+        self.assertIs(self.queue._chatQueues[1][2].message,
+                      'Kappa Kappa Kappa ')
 
     def test_sendChat_tuple_str(self):
         self.queue.sendChat(self.bgt_channel, ('a', 'b', 'c', 'd'))
@@ -97,31 +102,36 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         self.assertEqual(self.queue._chatQueues[1][9].message, '9')
 
     def test_sendChat_generator_int(self):
-        self.assertRaises(TypeError, self.queue.sendChat, self.bgt_channel, range(10))
+        self.assertRaises(
+            TypeError, self.queue.sendChat, self.bgt_channel, range(10))
         self.assertFalse(self.queue._chatQueues[0])
         self.assertFalse(self.queue._chatQueues[1])
         self.assertFalse(self.queue._chatQueues[2])
 
     def test_sendChat_generator_str_int(self):
         self.assertRaises(TypeError, self.queue.sendChat, self.bgt_channel,
-                          itertools.chain((str(i) for i in range(10)), range(10)))
+                          itertools.chain((str(i) for i in range(10)),
+                                          range(10)))
         self.assertFalse(self.queue._chatQueues[0])
         self.assertFalse(self.queue._chatQueues[1])
         self.assertFalse(self.queue._chatQueues[2])
 
     def test_sendChat_multiple_calls(self):
-        self.queue.sendChat(self.bgt_channel, 'TBTacoLeft TBCheesePull TBTacoRight ')
+        self.queue.sendChat(self.bgt_channel,
+                            'TBTacoLeft TBCheesePull TBTacoRight ')
         self.queue.sendChat(self.mgt_channel, '<3 :)')
         self.queue.sendChat(self.bgt_channel, 'duDudu duDudu duDudu ')
         self.assertFalse(self.queue._chatQueues[0])
         self.assertFalse(self.queue._chatQueues[2])
         self.assertEqual(len(self.queue._chatQueues[1]), 3)
         self.assertIs(self.queue._chatQueues[1][0].channel, self.bgt_channel)
-        self.assertIs(self.queue._chatQueues[1][0].message, 'TBTacoLeft TBCheesePull TBTacoRight ')
+        self.assertIs(self.queue._chatQueues[1][0].message,
+                      'TBTacoLeft TBCheesePull TBTacoRight ')
         self.assertIs(self.queue._chatQueues[1][1].channel, self.mgt_channel)
         self.assertIs(self.queue._chatQueues[1][1].message, '<3 :)')
         self.assertIs(self.queue._chatQueues[1][2].channel, self.bgt_channel)
-        self.assertIs(self.queue._chatQueues[1][2].message, 'duDudu duDudu duDudu ')
+        self.assertIs(self.queue._chatQueues[1][2].message,
+                      'duDudu duDudu duDudu ')
 
     def test_sendChat_highest_priority(self):
         self.queue.sendChat(self.bgt_channel, 'KevinTurtle', 0)
@@ -142,11 +152,13 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         self.assertIs(self.queue._chatQueues[2][0].message, 'SwiftRage')
 
     def test_sendChat_priority_out_of_range_positive(self):
-        self.assertRaises(ValueError, self.queue.sendChat, self.bgt_channel, 'SwiftRage', len(self.queue._chatQueues))
+        self.assertRaises(ValueError, self.queue.sendChat, self.bgt_channel,
+                          'SwiftRage', len(self.queue._chatQueues))
         self.assertFalse(any(self.queue._chatQueues))
 
     def test_sendChat_priority_out_of_range_negative(self):
-        self.assertRaises(ValueError, self.queue.sendChat, self.bgt_channel, 'SwiftRage', -len(self.queue._chatQueues) - 1)
+        self.assertRaises(ValueError, self.queue.sendChat, self.bgt_channel,
+                          'SwiftRage', -len(self.queue._chatQueues) - 1)
         self.assertFalse(any(self.queue._chatQueues))
 
     def test_sendChat_priority_multiple_calls(self):
@@ -176,8 +188,10 @@ class TestMessagingQueue(BaseTestMessagingQueue):
     def test_sendChat_allow_disallowed_commands(self):
         self.queue.sendChat(self.bgt_channel, '.disconnect', bypass=True)
         self.queue.sendChat(self.bgt_channel, '/disconnect', bypass=True)
-        self.queue.sendChat(self.bgt_channel, '.ignore megotsthis', bypass=True)
-        self.queue.sendChat(self.bgt_channel, '/ignore botgotsthis', bypass=True)
+        self.queue.sendChat(self.bgt_channel, '.ignore megotsthis',
+                            bypass=True)
+        self.queue.sendChat(self.bgt_channel, '/ignore botgotsthis',
+                            bypass=True)
         self.assertFalse(self.queue._chatQueues[0])
         self.assertFalse(self.queue._chatQueues[2])
         self.assertEqual(len(self.queue._chatQueues[1]), 4)
@@ -265,13 +279,19 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         mock_config.messageSpan = 10
         mock_config.whiperSpan = 10
         mock_now.return_value = now
-        self.queue._chatSent.extend(now + i * timedelta(seconds=1) for i in range(-20, 11))
-        self.queue._whisperSent.extend(now + i * timedelta(seconds=1.5) for i in range(-10, 11))
+        self.queue._chatSent.extend(now + i * timedelta(seconds=1)
+                                    for i in range(-20, 11))
+        self.queue._whisperSent.extend(now + i * timedelta(seconds=1.5)
+                                       for i in range(-10, 11))
         # Call
         self.queue.cleanOldTimestamps()
         # Check
-        self.assertCountEqual(self.queue._chatSent, [now + i * timedelta(seconds=1) for i in range(-10, 11)])
-        self.assertCountEqual(self.queue._whisperSent, [now + i * timedelta(seconds=1.5) for i in range(-6, 11)])
+        self.assertCountEqual(
+            self.queue._chatSent,
+            [now + i * timedelta(seconds=1) for i in range(-10, 11)])
+        self.assertCountEqual(
+            self.queue._whisperSent,
+            [now + i * timedelta(seconds=1.5) for i in range(-6, 11)])
 
     def test_clearChat_empty(self):
         self.assertFalse(any(self.queue._chatQueues))
@@ -279,7 +299,8 @@ class TestMessagingQueue(BaseTestMessagingQueue):
         self.assertFalse(any(self.queue._chatQueues))
 
     def test_clearChat_single(self):
-        self.queue._chatQueues[1].append(ChatMessage(self.bgt_channel, 'Kappa'))
+        self.queue._chatQueues[1].append(
+            ChatMessage(self.bgt_channel, 'Kappa'))
         self.queue.clearChat(self.bgt_channel)
         self.assertFalse(any(self.queue._chatQueues))
 
@@ -351,7 +372,8 @@ class TestMessagingQueue(BaseTestMessagingQueue):
     @patch('bot.utils.now', autospec=True)
     @patch.object(MessagingQueue, '_getChatMessage', autospec=True)
     def test_popChat(self, mock_getChatMessage, mock_now):
-        msg = ChatMessage(self.bgt_channel, 'TBTacoLeft TBCheesePull TBTacoRight')
+        msg = ChatMessage(self.bgt_channel,
+                          'TBTacoLeft TBCheesePull TBTacoRight')
         mock_getChatMessage.return_value = msg
         now = datetime(2000, 1, 1, 0, 0, 0)
         mock_now.return_value = now
@@ -371,7 +393,8 @@ class TestMessagingQueue(BaseTestMessagingQueue):
     @patch('bot.utils.now', autospec=True)
     def test_popWhisper(self, mock_now, mock_config):
         mock_config.whiperLimit = 5
-        msg = WhisperMessage('botgotsthis', 'TBTacoLeft TBCheesePull TBTacoRight')
+        msg = WhisperMessage('botgotsthis',
+                             'TBTacoLeft TBCheesePull TBTacoRight')
         self.queue._whisperQueue.append(msg)
         now = datetime(2000, 1, 1, 0, 0, 0)
         mock_now.return_value = now
@@ -382,7 +405,8 @@ class TestMessagingQueue(BaseTestMessagingQueue):
     @patch('bot.utils.now', autospec=True)
     def test_popWhisper_full(self, mock_now, mock_config):
         mock_config.whiperLimit = 5
-        msg = WhisperMessage('botgotsthis', 'TBTacoLeft TBCheesePull TBTacoRight')
+        msg = WhisperMessage('botgotsthis',
+                             'TBTacoLeft TBCheesePull TBTacoRight')
         self.queue._whisperQueue.append(msg)
         now = datetime(2000, 1, 1, 0, 0, 0)
         mock_now.return_value = now
@@ -418,9 +442,12 @@ class TestMessagingQueueGetChatMessage(BaseTestMessagingQueue):
     def test_full(self):
         self.queue._chatSent.extend(self.now for i in range(5))
         self.queue._whisperSent.extend(self.now for i in range(5))
-        self.queue._chatQueues[0].append(ChatMessage(self.bgt_channel, 'PogChamp'))
-        self.queue._chatQueues[1].append(ChatMessage(self.mgt_channel, 'Kreygasm'))
-        self.queue._chatQueues[2].append(ChatMessage(self.mbt_channel, 'Kappa'))
+        self.queue._chatQueues[0].append(
+            ChatMessage(self.bgt_channel, 'PogChamp'))
+        self.queue._chatQueues[1].append(
+            ChatMessage(self.mgt_channel, 'Kreygasm'))
+        self.queue._chatQueues[2].append(
+            ChatMessage(self.mbt_channel, 'Kappa'))
         self.assertIsNone(self.queue._getChatMessage(self.now))
         self.assertFalse(self.queue._lowQueueRecent)
         self.assertFalse(self.queue._publicTime)
@@ -430,7 +457,8 @@ class TestMessagingQueueGetChatMessage(BaseTestMessagingQueue):
         self.queue._chatQueues[0].append(msg)
         self.assertIs(self.queue._getChatMessage(self.now), msg)
         self.assertFalse(self.queue._lowQueueRecent)
-        self.assertEqual(self.queue._publicTime[msg.channel.channel], self.queue._publicTime.default_factory())
+        self.assertEqual(self.queue._publicTime[msg.channel.channel],
+                         self.queue._publicTime.default_factory())
         self.assertIsNone(self.queue._getChatMessage(self.now))
 
     def test_single_notmod(self):
@@ -452,7 +480,8 @@ class TestMessagingQueueGetChatMessage(BaseTestMessagingQueue):
         msg = ChatMessage(self.bgt_channel, 'ResidentSleeper')
         self.queue._chatQueues[-1].append(msg)
         self.assertIs(self.queue._getChatMessage(self.now), msg)
-        self.assertEqual(self.queue._publicTime[msg.channel.channel], self.queue._publicTime.default_factory())
+        self.assertEqual(self.queue._publicTime[msg.channel.channel],
+                         self.queue._publicTime.default_factory())
         self.assertIn(msg.channel.channel, self.queue._lowQueueRecent)
 
     def test_lowest_priority_nonmod(self):

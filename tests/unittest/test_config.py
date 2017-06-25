@@ -54,7 +54,7 @@ timezone =
 twitchClientID = 
 twitchSecret = 
 redirectUri = 
-'''
+'''  # noqa: W291
 
 
 class TestConfigReader(asynctest.TestCase):

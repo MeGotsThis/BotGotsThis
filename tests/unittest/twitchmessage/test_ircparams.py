@@ -116,7 +116,8 @@ class TestsIrcParams(unittest.TestCase):
         self.assertIs(params.isEmpty, False)
 
     def test_middle_trailing_2(self):
-        params = IrcMessageParams(middle='Kappa Kappa', trailing=':Kappa Kappa')
+        params = IrcMessageParams(middle='Kappa Kappa',
+                                  trailing=':Kappa Kappa')
         self.assertEqual(params.middle, 'Kappa Kappa')
         self.assertEqual(params.trailing, ':Kappa Kappa')
 
@@ -143,12 +144,14 @@ class TestsIrcParams(unittest.TestCase):
         self.assertEqual(str(IrcMessageParams(trailing=' Kappa')), ': Kappa')
 
     def test_str_magic_trailing_complex(self):
-        self.assertEqual(str(IrcMessageParams(trailing='Kappa Keepo :KappaPride')),
-                         ':Kappa Keepo :KappaPride')
+        self.assertEqual(
+            str(IrcMessageParams(trailing='Kappa Keepo :KappaPride')),
+            ':Kappa Keepo :KappaPride')
 
     def test_str_magic_middle_trailing(self):
-        self.assertEqual(str(IrcMessageParams(middle='Kappa Kappa', trailing='Kappa')),
-                         'Kappa Kappa :Kappa')
+        self.assertEqual(
+            str(IrcMessageParams(middle='Kappa Kappa', trailing='Kappa')),
+            'Kappa Kappa :Kappa')
 
     def test_from_empty(self):
         self.assertEqual(IrcMessageParams.fromParams(''), IrcMessageParams())
@@ -162,16 +165,20 @@ class TestsIrcParams(unittest.TestCase):
                          IrcMessageParams(trailing='Kappa'))
 
     def test_from_middle_trailing(self):
-        self.assertEqual(IrcMessageParams.fromParams('Kappa :KappaPride'),
-                         IrcMessageParams(middle='Kappa', trailing='KappaPride'))
+        self.assertEqual(
+            IrcMessageParams.fromParams('Kappa :KappaPride'),
+            IrcMessageParams(middle='Kappa', trailing='KappaPride'))
 
     def test_from_channel(self):
         self.assertEqual(IrcMessageParams.fromParams('#botgotsthis'),
                          IrcMessageParams(middle='#botgotsthis'))
 
     def test_from_list_who(self):
-        self.assertEqual(IrcMessageParams.fromParams('botgotsthis = #botgotsthis :megotsthis botgotsthis'),
-                         IrcMessageParams(middle='botgotsthis = #botgotsthis', trailing='megotsthis botgotsthis'))
+        self.assertEqual(
+            IrcMessageParams.fromParams('''\
+botgotsthis = #botgotsthis :megotsthis botgotsthis'''),
+            IrcMessageParams(middle='botgotsthis = #botgotsthis',
+                             trailing='megotsthis botgotsthis'))
 
     def test_parse_none(self):
         self.assertRaises(TypeError, IrcMessageParams.parse, None)
@@ -225,5 +232,8 @@ class TestsIrcParams(unittest.TestCase):
                          ParsedParams('#botgotsthis', None))
 
     def test_parse_list_who(self):
-        self.assertEqual(IrcMessageParams.parse('botgotsthis = #botgotsthis :megotsthis botgotsthis'),
-                         ParsedParams('botgotsthis = #botgotsthis', 'megotsthis botgotsthis'))
+        self.assertEqual(
+            IrcMessageParams.parse('''\
+botgotsthis = #botgotsthis :megotsthis botgotsthis'''),
+            ParsedParams('botgotsthis = #botgotsthis',
+                         'megotsthis botgotsthis'))

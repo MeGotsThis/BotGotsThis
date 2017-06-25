@@ -126,7 +126,6 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.assertTrue(self.mock_log.called)
 
     def test_log_irc_mode_plus_o(self):
-        now = datetime(2000, 1, 1)
         message = IrcMessage.fromMessage(
             ':jtv MODE #botgotsthis +o botgotsthis')
         ircmessage.irc_mode(self.connection, message, self.now)

@@ -3,8 +3,6 @@ import unittest
 
 import asynctest
 
-import bot.globals
-
 from asynctest.mock import CoroutineMock, Mock, patch
 
 from source.public.library import reload

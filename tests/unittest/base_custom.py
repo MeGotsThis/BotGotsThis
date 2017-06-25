@@ -1,5 +1,7 @@
 import asynctest
 
+import bot  # noqa: F401
+
 from asynctest.mock import MagicMock, Mock
 
 from bot.data import Channel
@@ -40,8 +42,8 @@ class TestCustomProcess(asynctest.TestCase):
             }
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.permissions.inOwnerChannel = False
-        _ = lambda k: self.permissionSet[k]
-        self.permissions.__getitem__.side_effect = _
+        self.permissions.__getitem__.side_effect = \
+            lambda k: self.permissionSet[k]
         self.messages = ['Kappa']
         self.args = CustomProcessArgs(
             self.database, self.channel, self.tags, 'botgotsthis',

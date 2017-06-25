@@ -2,7 +2,6 @@ import unittest
 from typing import Dict
 from bot.twitchmessage import IrcMessageTags, IrcMessageTagsKey
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from bot.twitchmessage._irctags import TagValue
 
 
 class TestsIrcTagsReadOnly(unittest.TestCase):
@@ -39,7 +38,8 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
         self.assertRaises(TypeError, IrcMessageTagsReadOnly, 1)
 
     def test_constructor_tagkey(self):
-        self.assertRaises(TypeError, IrcMessageTagsReadOnly, IrcMessageTagsKey())
+        self.assertRaises(
+            TypeError, IrcMessageTagsReadOnly, IrcMessageTagsKey())
 
     def test_constructor_readonly(self):
         tags = IrcMessageTagsReadOnly()
@@ -72,24 +72,24 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
         with self.assertRaises(TypeError):
             b'Kappa' in tags
         with self.assertRaises(TypeError):
-            t = tags[b'Kappa']
+            tags[b'Kappa']
 
     def test_index_int(self):
         tags = IrcMessageTagsReadOnly()
         with self.assertRaises(TypeError):
             1 in tags
         with self.assertRaises(TypeError):
-            t = tags[1]
+            tags[1]
 
     def test_index_missing_str(self):
         tags = IrcMessageTagsReadOnly()
         with self.assertRaises(KeyError):
-            t = tags['Kappa']
+            tags['Kappa']
 
     def test_index_missing_tagskey(self):
         tags = IrcMessageTagsReadOnly()
         with self.assertRaises(KeyError):
-            t = tags[IrcMessageTagsKey('Kappa')]
+            tags[IrcMessageTagsKey('Kappa')]
 
     def test_readonly(self):
         tags = IrcMessageTagsReadOnly()
@@ -115,7 +115,9 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
         self.assertEqual(tags['turbo/miniK'], True)
         self.assertEqual(tags, {'turbo/miniK': True})
         self.assertEqual(tags, {IrcMessageTagsKey('miniK', 'turbo'): True})
-        self.assertEqual(tags, IrcMessageTagsReadOnly([IrcMessageTagsKey('miniK', 'turbo')]))
+        self.assertEqual(
+            tags,
+            IrcMessageTagsReadOnly([IrcMessageTagsKey('miniK', 'turbo')]))
 
     def test_instance_special_values(self):
         tags = IrcMessageTagsReadOnly({'abc': r';\ '})
@@ -139,8 +141,8 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
         self.assertRaises(StopIteration, next, keyIter)
 
     def test_instance_two_items(self):
-        tags = IrcMessageTagsReadOnly(['KevinTurtle',
-                                       [IrcMessageTagsKey('KreyGasm'), 'PogChamp ']])
+        tags = IrcMessageTagsReadOnly(
+            ['KevinTurtle', [IrcMessageTagsKey('KreyGasm'), 'PogChamp ']])
         self.assertEqual(len(tags), 2)
         self.assertTrue(tags)
         self.assertIn('KevinTurtle', tags)
@@ -156,10 +158,11 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
                               'KreyGasm': 'PogChamp '}))
 
     def test_instance_multi_items(self):
-        tags = IrcMessageTagsReadOnly(['KevinTurtle',
-                                       IrcMessageTagsKey('PraiseIt'),
-                                       ['Kappa', 'Keepo'],
-                                       [IrcMessageTagsKey('SwiftRage'), 'DansGame']])
+        tags = IrcMessageTagsReadOnly(
+            ['KevinTurtle',
+             IrcMessageTagsKey('PraiseIt'),
+             ['Kappa', 'Keepo'],
+             [IrcMessageTagsKey('SwiftRage'), 'DansGame']])
         self.assertEqual(len(tags), 4)
         self.assertEqual(tags['KevinTurtle'], True)
         self.assertEqual(tags['PraiseIt'], True)
@@ -168,10 +171,14 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
 
     def test_format_values(self):
         self.assertEqual(IrcMessageTagsReadOnly.formatValue('abc'), r'abc')
-        self.assertEqual(IrcMessageTagsReadOnly.formatValue('a b c'), r'a\sb\sc')
-        self.assertEqual(IrcMessageTagsReadOnly.formatValue('a b c'), r'a\sb\sc')
-        self.assertEqual(IrcMessageTagsReadOnly.formatValue('a;b;c'), r'a\:b\:c')
-        self.assertEqual(IrcMessageTagsReadOnly.formatValue('a\rb\nc'), r'a\rb\nc')
+        self.assertEqual(IrcMessageTagsReadOnly.formatValue('a b c'),
+                         r'a\sb\sc')
+        self.assertEqual(IrcMessageTagsReadOnly.formatValue('a b c'),
+                         r'a\sb\sc')
+        self.assertEqual(IrcMessageTagsReadOnly.formatValue('a;b;c'),
+                         r'a\:b\:c')
+        self.assertEqual(IrcMessageTagsReadOnly.formatValue('a\rb\nc'),
+                         r'a\rb\nc')
 
     def test_str_magic_empty_instance(self):
         self.assertEqual(str(IrcMessageTagsReadOnly()), '')
@@ -183,7 +190,8 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
 
     def test_str_magic_one_item_with_value(self):
         self.assertEqual(
-            str(IrcMessageTagsReadOnly([IrcMessageTagsKey(vendor='twitch.tv', key='KappaHD')])),
+            str(IrcMessageTagsReadOnly([IrcMessageTagsKey(vendor='twitch.tv',
+                                                          key='KappaHD')])),
             'twitch.tv/KappaHD')
 
     def test_str_magic_two_items_mixed(self):
@@ -298,13 +306,14 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
 
     def test_parse_three_items(self):
         self.assertEqual(
-            IrcMessageTagsReadOnly.parseTags('Kappa=Kippa;BibleThump;FrankerZ=RalpherZ'),
+            IrcMessageTagsReadOnly.parseTags(
+                'Kappa=Kippa;BibleThump;FrankerZ=RalpherZ'),
             {'Kappa': 'Kippa', 'BibleThump': True, 'FrankerZ': 'RalpherZ'})
 
     def test_parse_twitch_tags(self):
-        items = IrcMessageTagsReadOnly.parseTags(
-            'badges=broadcaster/1;color=;display-name=BotGotsThis;'
-            'emote-sets=0;mod=0;subscriber=0;turbo=0;user-type=')
+        items = IrcMessageTagsReadOnly.parseTags('''\
+badges=broadcaster/1;color=;display-name=BotGotsThis;emote-sets=0;mod=0;\
+subscriber=0;turbo=0;user-type=''')
         self.assertEqual(items['badges'], 'broadcaster/1')
         self.assertEqual(items['color'], '')
         self.assertEqual(items['display-name'], 'BotGotsThis')
@@ -315,11 +324,10 @@ class TestsIrcTagsReadOnly(unittest.TestCase):
         self.assertEqual(items['user-type'], '')
 
     def test_parse_twitch_bits(self):
-        items = IrcMessageTagsReadOnly.parseTags(
-            'badges=staff/1,bits/1000;bits=100;color=;'
-            'display-name=TWITCH_UserNaME;emotes=;'
-            'id=b34ccfc7-4977-403a-8a94-33c6bac34fb8;mod=0;room-id=1337;'
-            'subscriber=0;turbo=1;user-id=1337;user-type=staff')
+        IrcMessageTagsReadOnly.parseTags('''\
+badges=staff/1,bits/1000;bits=100;color=;display-name=TWITCH_UserNaME;emotes=;\
+id=b34ccfc7-4977-403a-8a94-33c6bac34fb8;mod=0;room-id=1337;subscriber=0;\
+turbo=1;user-id=1337;user-type=staff''')
 
 
 class TestsIrcTags(unittest.TestCase):

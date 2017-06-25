@@ -2,7 +2,7 @@ import platform
 
 import asynctest
 
-import bot
+import bot  # noqa: F401
 
 from collections.abc import Sequence
 

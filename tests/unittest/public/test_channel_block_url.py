@@ -1,4 +1,3 @@
-import socket
 import unittest
 
 import aiohttp

@@ -1,7 +1,5 @@
 import asynctest
 
-import lists.whisper
-
 from datetime import datetime
 
 from asynctest.mock import MagicMock, Mock, patch
@@ -27,7 +25,7 @@ class TestLibraryWhisper(asynctest.TestCase):
     @patch('bot.utils.whisper', autospec=True)
     def test_send(self, mock_whisper):
         whisper.send('botgotsthis')('Kappa')
-        mock_whisper.assert_called_once_with('botgotsthis','Kappa')
+        mock_whisper.assert_called_once_with('botgotsthis', 'Kappa')
 
     async def test_permission(self):
         self.permissions.__getitem__.return_value = True
