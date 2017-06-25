@@ -40,8 +40,8 @@ class TestWhisper(asynctest.TestCase):
     @patch('source.whisper.commandsToProcess', autospec=True)
     async def test_whisperCommand(self, mock_commands, mock_database):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
-        command2 = CoroutineMock(spec=lambda args: False, return_value = True)
-        command3 = CoroutineMock(spec=lambda args: False, return_value = False)
+        command2 = CoroutineMock(spec=lambda args: False, return_value=True)
+        command3 = CoroutineMock(spec=lambda args: False, return_value=False)
         mock_commands.return_value = [command1, command2, command3]
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database

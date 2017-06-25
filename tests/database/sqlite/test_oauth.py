@@ -33,7 +33,7 @@ CREATE TABLE oauth_tokens (
 
     async def test_save_existing(self):
         await self.execute('INSERT INTO oauth_tokens VALUES (?, ?)',
-                     ('botgotsthis', '0123456789ABCDEF'))
+                           ('botgotsthis', '0123456789ABCDEF'))
         await self.database.saveBroadcasterToken(
             'botgotsthis', 'FEDCBA9876543210')
         self.assertEqual(await self.row('SELECT * FROM oauth_tokens'),

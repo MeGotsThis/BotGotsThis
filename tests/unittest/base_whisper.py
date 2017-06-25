@@ -26,7 +26,7 @@ class TestWhisper(asynctest.TestCase):
             'globalMod': False,
             }
         self.permissions = MagicMock(spec=WhisperPermissionSet)
-        _ = lambda k: self.permissionSet[k]
-        self.permissions.__getitem__.side_effect = _
+        self.permissions.__getitem__.side_effect = \
+            lambda k: self.permissionSet[k]
         self.args = WhisperCommandArgs(self.database, 'botgotsthis',
                                        Message(''), self.permissions, self.now)

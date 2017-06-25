@@ -9,13 +9,13 @@ class TestSqlitePermittedUsers(TestSqlite):
         await self.execute(['''
 CREATE TABLE bot_managers (
     twitchUser VARCHAR NOT NULL PRIMARY KEY
-)''','''
+)''', '''
 CREATE TABLE bot_managers_log (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     twitchUser VARCHAR NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     actionLog VARCHAR NOT NULL
-)''','''
+)''', '''
 INSERT INTO bot_managers VALUES ('megotsthis')'''])
 
     async def test_is_bot_manager_true(self):

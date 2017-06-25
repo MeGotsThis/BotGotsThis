@@ -39,7 +39,7 @@ INSERT INTO "timezone" VALUES ("399","PDT","954669600","-25200","1")
 INSERT INTO "timezone" VALUES ("399","PST","972810000","-28800","0")
 ''', '''
 INSERT INTO "timezone" VALUES ("399","PDT","2120119200","-25200","1")
-''','''
+''', '''
 INSERT INTO "timezone" VALUES ("399","PST","2140678800","-28800","0")
 '''])
 

@@ -1,29 +1,31 @@
 import math
 import unittest
 
-import bot
-
 from datetime import datetime, time, timedelta, tzinfo
 
 from asynctest.mock import patch
 
-from source.data import timezones
-from source.data.timedelta import format
 from tests.unittest.base_custom import TestCustomField
 
 # Needs to be imported last
+from source.data import timezones
+from source.data.timedelta import format
 from source.public.custom import countdown
+
+
+class TimeZone(tzinfo):
+    def __init__(self, offset):
+        self.offset = offset
+
+    def utcoffset(self, dt):
+        return timedelta(seconds=self.offset)
+
+    def dst(self, dt):
+        return timedelta()
 
 
 class TestCustomCountdownParse(unittest.TestCase):
     def setUp(self):
-        class TimeZone(tzinfo):
-            def __init__(self, offset):
-                self.offset = offset
-            def utcoffset(self, dt):
-                return timedelta(seconds=self.offset)
-            def dst(self, dt):
-                return timedelta()
 
         patcher = patch('source.public.custom.countdown.timezones',
                         autospec=True)
@@ -308,14 +310,6 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
 
-        class TimeZone(tzinfo):
-            def __init__(self, offset):
-                self.offset = offset
-            def utcoffset(self, dt):
-                return timedelta(seconds=self.offset)
-            def dst(self, dt):
-                return timedelta()
-
         patcher = patch('source.data.timezones', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_timezones = patcher.start()
@@ -427,14 +421,6 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
 class TestCustomCountdownPastDatetime(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
-
-        class TimeZone(tzinfo):
-            def __init__(self, offset):
-                self.offset = offset
-            def utcoffset(self, dt):
-                return timedelta(seconds=self.offset)
-            def dst(self, dt):
-                return timedelta()
 
         patcher = patch('source.data.timezones', autospec=True)
         self.addCleanup(patcher.stop)
@@ -1037,7 +1023,8 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(await countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(
+            await countdown.fieldCountdown(self.args), 'has passed')
         self.assertTrue(self.mock_parse.called)
 
     async def test_default_prefix_suffix(self):
@@ -1047,7 +1034,8 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             None)
-        self.assertEqual(await countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(
+            await countdown.fieldCountdown(self.args), 'has passed')
         self.assertTrue(self.mock_parse.called)
 
     async def test_default_default(self):
@@ -1195,7 +1183,8 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
             countdown.DateTime(
                 datetime(1999, 12, 31, 0, 0, tzinfo=timezones.utc), True),
             -1)
-        self.assertEqual(await countdown.fieldCountdown(self.args), 'has passed')
+        self.assertEqual(
+            await countdown.fieldCountdown(self.args), 'has passed')
         self.assertTrue(self.mock_parse.called)
 
     async def test_cooldown_default(self):

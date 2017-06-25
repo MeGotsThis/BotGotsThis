@@ -26,13 +26,16 @@ class TestsIrcTagsKey(unittest.TestCase):
         self.assertRaises(TypeError, IrcMessageTagsKey, key=123)
 
     def test_constructor_key_bytes_vendor_None(self):
-        self.assertRaises(TypeError, IrcMessageTagsKey, vendor=None, key=b'Kappa')
+        self.assertRaises(
+            TypeError, IrcMessageTagsKey, vendor=None, key=b'Kappa')
 
     def test_constructor_key_bytes_vendor(self):
-        self.assertRaises(TypeError, IrcMessageTagsKey, vendor='Keepo', key=b'Kappa')
+        self.assertRaises(
+            TypeError, IrcMessageTagsKey, vendor='Keepo', key=b'Kappa')
 
     def test_constructor_key_vendor_bytes(self):
-        self.assertRaises(TypeError, IrcMessageTagsKey, vendor=b'Keepo', key='Kappa')
+        self.assertRaises(
+            TypeError, IrcMessageTagsKey, vendor=b'Keepo', key='Kappa')
 
     def test_constructor_key_vendor_None(self):
         key = IrcMessageTagsKey('Kappa', None)
@@ -96,24 +99,29 @@ class TestsIrcTagsKey(unittest.TestCase):
                          IrcMessageTagsKey(key='abc'))
 
     def test_equals_key_vendor(self):
-        self.assertEqual(IrcMessageTagsKey.fromKeyVendor('OpieOP.SoBayed/PJSalt'),
-                         IrcMessageTagsKey(vendor='OpieOP.SoBayed', key='PJSalt'))
+        self.assertEqual(
+            IrcMessageTagsKey.fromKeyVendor('OpieOP.SoBayed/PJSalt'),
+            IrcMessageTagsKey(vendor='OpieOP.SoBayed', key='PJSalt'))
 
     def test_not_equals_key(self):
-        self.assertNotEqual(IrcMessageTagsKey.fromKeyVendor('abc'),
-                            IrcMessageTagsKey(key='123'))
+        self.assertNotEqual(
+            IrcMessageTagsKey.fromKeyVendor('abc'),
+            IrcMessageTagsKey(key='123'))
 
     def test_not_equals_key_vendor_by_key(self):
-        self.assertNotEqual(IrcMessageTagsKey.fromKeyVendor('OpieOP.SoBayed/PJSalt'),
-                            IrcMessageTagsKey(vendor='OpieOP.SoBayed', key='DansGame'))
+        self.assertNotEqual(
+            IrcMessageTagsKey.fromKeyVendor('OpieOP.SoBayed/PJSalt'),
+            IrcMessageTagsKey(vendor='OpieOP.SoBayed', key='DansGame'))
 
     def test_not_equals_key_vendor_by_vendor(self):
-        self.assertNotEqual(IrcMessageTagsKey.fromKeyVendor('OpieOP.SoBayed/PJSalt'),
-                            IrcMessageTagsKey(vendor='SoBayed.OpieOP', key='PJSalt'))
+        self.assertNotEqual(
+            IrcMessageTagsKey.fromKeyVendor('OpieOP.SoBayed/PJSalt'),
+            IrcMessageTagsKey(vendor='SoBayed.OpieOP', key='PJSalt'))
 
     def test_not_equals_key_vendor(self):
-        self.assertNotEqual(IrcMessageTagsKey.fromKeyVendor('OpieOP.SoBayed/PJSalt'),
-                            IrcMessageTagsKey(vendor='SoBayed.PJSalt', key='OpieOP'))
+        self.assertNotEqual(
+            IrcMessageTagsKey.fromKeyVendor('OpieOP.SoBayed/PJSalt'),
+            IrcMessageTagsKey(vendor='SoBayed.PJSalt', key='OpieOP'))
 
     def test_hash(self):
         key = IrcMessageTagsKey()
@@ -191,7 +199,8 @@ class TestsIrcTagsKey(unittest.TestCase):
         self.assertRaises(ValueError, IrcMessageTagsKey.parse, '.a.a./')
 
     def test_parse(self):
-        self.assertEqual(IrcMessageTagsKey.parse(''), ParsedKeyVendor('', None))
+        self.assertEqual(IrcMessageTagsKey.parse(''),
+                         ParsedKeyVendor('', None))
 
     def test_parse_key(self):
         self.assertEqual(IrcMessageTagsKey.parse('Kreygasm'),

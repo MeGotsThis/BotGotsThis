@@ -1,6 +1,6 @@
 import asynctest
 
-import lists.manage
+import lists.manage  # noqa: F401
 
 from datetime import datetime
 
@@ -36,7 +36,7 @@ class TestManageBot(asynctest.TestCase):
             'bannable': True,
             }
         self.permissions = MagicMock(spec=ChatPermissionSet)
-        _ = lambda k: self.permissionSet[k]
-        self.permissions.__getitem__.side_effect = _
+        self.permissions.__getitem__.side_effect = \
+            lambda k: self.permissionSet[k]
         self.args = ManageBotArgs(self.database, self.permissions, self.send,
                                   'botgotsthis', Message(''))

@@ -1,5 +1,9 @@
 import unittest
+
+import bot.globals  # noqa: F401
+
 from source.data import message
+
 
 class TestDataTokenized(unittest.TestCase):
     def test_none(self):
@@ -28,7 +32,7 @@ class TestDataTokenized(unittest.TestCase):
     def test_len(self):
         self.assertEqual(len(message.Tokenized('Kappa \r\n\tKappaHD')), 2)
 
-    def test_getitem_int(self):
+    def test_getitem_none(self):
         tokenized = message.Tokenized('Kappa     KappaHD\n\n\n\nKappaPride')
         with self.assertRaises(TypeError):
             tokenized[None]
@@ -54,6 +58,7 @@ class TestDataTokenized(unittest.TestCase):
         self.assertEqual(tokenized[:-1], 'Kappa  KappaHD  KappaPride')
         self.assertEqual(tokenized[:-4], '')
         self.assertEqual(tokenized[0:0], '')
+
 
 class TestDataMessage(unittest.TestCase):
     def test_command(self):

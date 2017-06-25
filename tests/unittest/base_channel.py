@@ -1,5 +1,7 @@
 import asynctest
 
+import bot  # noqa: F401
+
 from datetime import datetime
 
 from asynctest.mock import MagicMock, Mock
@@ -38,8 +40,8 @@ class TestChannel(asynctest.TestCase):
             }
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.permissions.inOwnerChannel = False
-        _ = lambda k: self.permissionSet[k]
-        self.permissions.__getitem__.side_effect = _
+        self.permissions.__getitem__.side_effect = \
+            lambda k: self.permissionSet[k]
         self.args = ChatCommandArgs(self.database, self.channel, self.tags,
                                     'botgotsthis', Message(''),
                                     self.permissions, self.now)

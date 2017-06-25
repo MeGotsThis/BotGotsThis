@@ -27,7 +27,8 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertRaises(ValueError, IrcMessagePrefix, servername='', nick='')
 
     def test_servername_nick(self):
-        self.assertRaises(ValueError, IrcMessagePrefix, servername='a', nick='b')
+        self.assertRaises(
+            ValueError, IrcMessagePrefix, servername='a', nick='b')
 
     def test_nick_empty_user(self):
         self.assertRaises(ValueError, IrcMessagePrefix, nick='a', user='')
@@ -141,7 +142,8 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertEqual(prefix.nick, 'MeGotsThis')
         self.assertEqual(prefix.user, 'BotGotsThis')
         self.assertIs(prefix.host, None)
-        self.assertEqual(prefix, IrcMessagePrefix(None, 'MeGotsThis', 'BotGotsThis'))
+        self.assertEqual(
+            prefix, IrcMessagePrefix(None, 'MeGotsThis', 'BotGotsThis'))
 
     def test_nick_host(self):
         prefix = IrcMessagePrefix(nick='MeGotsThis', host='localhost')
@@ -149,7 +151,8 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertEqual(prefix.nick, 'MeGotsThis')
         self.assertIsNone(prefix.user)
         self.assertEqual(prefix.host, 'localhost')
-        self.assertEqual(prefix, IrcMessagePrefix(None, 'MeGotsThis', None, 'localhost'))
+        self.assertEqual(
+            prefix, IrcMessagePrefix(None, 'MeGotsThis', None, 'localhost'))
 
     def test_nick_user_host(self):
         prefix = IrcMessagePrefix(nick='MeGotsThis', user='BotGotsThis',
@@ -158,7 +161,9 @@ class TestsIrcPrefix(unittest.TestCase):
         self.assertEqual(prefix.nick, 'MeGotsThis')
         self.assertEqual(prefix.user, 'BotGotsThis')
         self.assertIs(prefix.host, 'localhost')
-        self.assertEqual(prefix, IrcMessagePrefix(None, 'MeGotsThis', 'BotGotsThis', 'localhost'))
+        self.assertEqual(
+            prefix,
+            IrcMessagePrefix(None, 'MeGotsThis', 'BotGotsThis', 'localhost'))
 
     def test_str_magic_servername(self):
         prefix = IrcMessagePrefix(servername='localhost')
@@ -335,9 +340,13 @@ class TestsIrcPrefix(unittest.TestCase):
                          ParsedPrefix(None, 'Kappa', 'Keepo', 'localhost'))
 
     def test_parse_nick_user_host_2(self):
-        self.assertEqual(IrcMessagePrefix.parse('MeGotsThis!BotGotsThis@megotsthis.com'),
-                         ParsedPrefix(None, 'MeGotsThis', 'BotGotsThis', 'megotsthis.com'))
+        self.assertEqual(
+            IrcMessagePrefix.parse('MeGotsThis!BotGotsThis@megotsthis.com'),
+            ParsedPrefix(None, 'MeGotsThis', 'BotGotsThis', 'megotsthis.com'))
 
     def test_parse_from_twitch(self):
-        self.assertEqual(IrcMessagePrefix.parse('botgotsthis!botgotsthis@botgotsthis.tmi.twitch.tv'),
-                         ParsedPrefix(None, 'botgotsthis', 'botgotsthis', 'botgotsthis.tmi.twitch.tv'))
+        self.assertEqual(
+            IrcMessagePrefix.parse('''\
+botgotsthis!botgotsthis@botgotsthis.tmi.twitch.tv'''),
+            ParsedPrefix(None, 'botgotsthis', 'botgotsthis',
+                         'botgotsthis.tmi.twitch.tv'))

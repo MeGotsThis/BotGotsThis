@@ -65,8 +65,8 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('#global', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('#global', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         self.assertEqual(
             await self.database.getChatCommands('botgotsthis', 'kappa'),
             {'#global': {'': 'Kappa'}, 'botgotsthis': {}})
@@ -75,11 +75,12 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.executemany('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                         [('botgotsthis', '', 'kappa', None, 'KappaPride',
-                           'botgotsthis', now, 'botgotsthis', now),
-                          ('#global', '', 'kappa', None, 'KappaRoss',
-                           'botgotsthis', now, 'botgotsthis', now),
-                          ])
+                               [('botgotsthis', '', 'kappa', None,
+                                 'KappaPride', 'botgotsthis', now,
+                                 'botgotsthis', now),
+                                ('#global', '', 'kappa', None, 'KappaRoss',
+                                 'botgotsthis', now, 'botgotsthis', now),
+                                ])
         self.assertEqual(
             await self.database.getChatCommands('botgotsthis', 'kappa'),
             {'#global': {'': 'KappaRoss'},
@@ -155,8 +156,8 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         self.assertEqual(
             await self.database.getCustomCommand('botgotsthis', '', 'kappa'),
             'Kappa')
@@ -215,8 +216,8 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         self.assertIs(
             await self.database.updateCustomCommand(
                 'botgotsthis', '', 'kappa', 'KappaHD', 'botgotsthis'),
@@ -358,11 +359,11 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         await self.execute('''
 INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
+                           ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
         self.assertIs(
             await self.database.deleteCustomCommand(
                 'botgotsthis', '', 'kappa', 'botgotsthis'),
@@ -429,10 +430,11 @@ INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.executemany('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                         [('botgotsthis', '', 'kappa', None, 'Kappa',
-                           'botgotsthis', now, 'botgotsthis', now),
-                          ('botgotsthis', 'moderator', 'kappa', None, 'Kappa',
-                           'botgotsthis', now, 'botgotsthis', now)])
+                               [('botgotsthis', '', 'kappa', None, 'Kappa',
+                                 'botgotsthis', now, 'botgotsthis', now),
+                                ('botgotsthis', 'moderator', 'kappa', None,
+                                 'Kappa', 'botgotsthis', now, 'botgotsthis',
+                                 now)])
         await self.execute('''
 INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
                            ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
@@ -454,8 +456,8 @@ INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         self.assertIs(
             await self.database.levelCustomCommand(
                 'botgotsthis', '', 'Kappa', 'botgotsthis', 'moderator'),
@@ -486,7 +488,7 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                             'botgotsthis', now, 'botgotsthis', now))
         await self.execute('''
 INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
+                           ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
         self.assertIs(
             await self.database.renameCustomCommand(
                 'botgotsthis', '', 'kappa', 'botgotsthis', 'pogchamp'),
@@ -533,8 +535,8 @@ INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         self.assertIs(
             await self.database.renameCustomCommand(
                 'botgotsthis', '', 'Kappa', 'botgotsthis', 'PogChamp'),
@@ -635,8 +637,8 @@ INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         self.assertIs(
             await self.database.processCustomCommandProperty(
                 'botgotsthis', '', 'kappa', 'kappa', 'Kappa'),
@@ -649,11 +651,11 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         await self.execute('''
 INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', 'kappa', 'PogChamp'))
+                           ('botgotsthis', '', 'kappa', 'kappa', 'PogChamp'))
         self.assertIs(
             await self.database.processCustomCommandProperty(
                 'botgotsthis', '', 'kappa', 'kappa', 'Kappa'),
@@ -666,11 +668,11 @@ INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
         now = datetime(2000, 1, 1)
         await self.execute('''
 INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', None, 'Kappa', 'botgotsthis',
-                      now, 'botgotsthis', now))
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
         await self.execute('''
 INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
-                     ('botgotsthis', '', 'kappa', 'kappa', 'PogChamp'))
+                           ('botgotsthis', '', 'kappa', 'kappa', 'PogChamp'))
         self.assertIs(
             await self.database.processCustomCommandProperty(
                 'botgotsthis', '', 'kappa', 'kappa'),

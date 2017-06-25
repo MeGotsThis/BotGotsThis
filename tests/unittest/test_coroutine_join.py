@@ -141,7 +141,7 @@ class TestJoinManager(unittest.TestCase):
     @patch('bot.coroutine.join._can_process')
     @patch('bot.coroutine.join._connected_channels')
     def test_join_full(self, mock_channels, mock_canProcess,
-                          mock_lowPriority, mock_queue_write):
+                       mock_lowPriority, mock_queue_write):
         mock_canProcess.return_value = False
         bot.coroutine.join.join_a_channel()
         self.assertFalse(mock_channels.called)
@@ -154,7 +154,7 @@ class TestJoinManager(unittest.TestCase):
     @patch('bot.coroutine.join._can_process')
     @patch('bot.coroutine.join._connected_channels')
     def test_join_no_channels(self, mock_channels, mock_canProcess,
-                                 mock_lowPriority, mock_queue_write):
+                              mock_lowPriority, mock_queue_write):
         mock_canProcess.return_value = True
         mock_channels.return_value = {}
         bot.coroutine.join.join_a_channel()
@@ -166,7 +166,7 @@ class TestJoinManager(unittest.TestCase):
     @patch('bot.coroutine.join._can_process')
     @patch('bot.coroutine.join._connected_channels')
     def test_join_no_to_join(self, mock_channels, mock_canProcess,
-                                mock_lowPriority, mock_queue_write):
+                             mock_lowPriority, mock_queue_write):
         mock_canProcess.return_value = True
         mock_channels.return_value = {'botgotsthis': self.channel}
         bot.coroutine.join._channelJoined.add('botgotsthis')

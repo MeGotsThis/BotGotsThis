@@ -12,7 +12,7 @@ CREATE TABLE banned_channels (
     currentTime TIMESTAMP NOT NULL,
     reason VARCHAR NOT NULL,
     who VARCHAR NOT NULL
-)''','''
+)''', '''
 CREATE TABLE banned_channels_log (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     broadcaster VARCHAR NOT NULL,
@@ -38,7 +38,8 @@ CREATE TABLE banned_channels_log (
         await self.executemany(
             'INSERT INTO banned_channels VALUES (?, ?, ?, ?)',
             [('botgotsthis', now, 'Kappa', 'botgotsthis'),
-             ('megotsthis', now, 'Kappa', 'botgotsthis'),])
+             ('megotsthis', now, 'Kappa', 'botgotsthis'),
+             ])
         self.assertEqual([b async for b in self.database.listBannedChannels()],
                          ['botgotsthis', 'megotsthis'])
 

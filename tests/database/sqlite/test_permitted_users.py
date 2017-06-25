@@ -11,7 +11,7 @@ CREATE TABLE permitted_users (
     broadcaster VARCHAR NOT NULL,
     twitchUser VARCHAR NOT NULL,
     PRIMARY KEY (broadcaster, twitchUser)
-)''','''
+)''', '''
 CREATE TABLE permitted_users_log (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     broadcaster VARCHAR NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE permitted_users_log (
     moderator VARCHAR NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     actionLog VARCHAR NOT NULL
-)''','''
+)''', '''
 INSERT INTO permitted_users VALUES ('botgotsthis', 'megotsthis')'''])
 
     async def test_is_permitted_true(self):

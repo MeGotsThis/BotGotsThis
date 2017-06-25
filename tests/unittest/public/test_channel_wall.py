@@ -60,7 +60,8 @@ class TestChannelWall(TestChannel):
         message = Message('!wall Kappa 3 10')
         args = self.args._replace(message=message)
         self.assertIs(await wall.commandWall(args), True)
-        self.mock_process.assert_called_once_with(args, 'Kappa Kappa Kappa', 10)
+        self.mock_process.assert_called_once_with(
+            args, 'Kappa Kappa Kappa', 10)
 
     async def test_wall_repeat_rows_limit(self):
         self.mock_config.messageLimit = 25

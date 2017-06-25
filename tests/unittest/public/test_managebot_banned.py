@@ -1,5 +1,3 @@
-import unittest
-
 import asynctest
 
 from asynctest.mock import Mock, patch

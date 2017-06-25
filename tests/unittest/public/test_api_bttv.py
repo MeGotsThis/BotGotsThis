@@ -4,7 +4,7 @@ import json
 import aiohttp
 
 from source.api import bttv
-from asynctest.mock import MagicMock, Mock, patch
+from asynctest.mock import MagicMock, patch
 
 globalEmotes = b'''{
     "status": 200,
@@ -87,4 +87,5 @@ class TestApiBttv(asynctest.TestCase):
     async def fail_test_broadcasterEmotes_error(self):
         exception = aiohttp.ClientResponseError(None, None)
         self.mock_session.get.side_effect = exception
-        self.assertIsNone(await bttv.getBroadcasterEmotes('pokemonspeedrunstv'))
+        self.assertIsNone(
+            await bttv.getBroadcasterEmotes('pokemonspeedrunstv'))
