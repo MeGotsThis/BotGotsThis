@@ -94,7 +94,7 @@ class TestWhisperCommandToProcess(unittest.TestCase):
         patcher = patch('lists.whisper', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
-        self.mock_list.commands = {}
+        self.mock_list.commands.return_value = {}
 
         self.command = lambda args: False
 
@@ -102,14 +102,14 @@ class TestWhisperCommandToProcess(unittest.TestCase):
         self.assertEqual(list(whisper.commandsToProcess('!kappa')), [])
 
     def test_commandsToProcess_specific(self):
-        self.mock_list.commands['!kappa'] = self.command
+        self.mock_list.commands.return_value['!kappa'] = self.command
         self.assertEqual(
             list(whisper.commandsToProcess('!kappa')), [self.command])
 
     def test_commandsToProcess_specific_no_match(self):
-        self.mock_list.commands['!kappahd'] = self.command
+        self.mock_list.commands.return_value['!kappahd'] = self.command
         self.assertEqual(list(whisper.commandsToProcess('!kappa')), [])
 
     def test_commandsToProcess_specific_none(self):
-        self.mock_list.commands['!kappa'] = None
+        self.mock_list.commands.return_value['!kappa'] = None
         self.assertEqual(list(whisper.commandsToProcess('!kappa')), [])

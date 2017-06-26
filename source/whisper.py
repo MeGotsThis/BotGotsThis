@@ -3,7 +3,7 @@
 import lists.whisper
 
 from datetime import datetime
-from typing import Iterator, cast
+from typing import Iterator, Mapping, Optional, cast  # noqa: F401
 
 from bot import utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
@@ -56,6 +56,8 @@ async def whisperCommand(tags: IrcMessageTagsReadOnly,
 
 
 def commandsToProcess(command: str) -> Iterator[data.WhisperCommand]:
-    if command in lists.whisper.commands:
-        if lists.whisper.commands[command] is not None:
-            yield lists.whisper.commands[command]
+    commands: Mapping[str, Optional[data.WhisperCommand]]
+    commands = lists.whisper.commands()
+    if command in commands:
+        if commands[command] is not None:
+            yield commands[command]

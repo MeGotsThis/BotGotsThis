@@ -9,4 +9,6 @@ except ImportError:
 
 WhisperDict = Mapping[str, Optional[data.WhisperCommand]]
 
-commands: WhisperDict = ChainMap(privateList.commands, publicList.commands)
+
+def commands() -> WhisperDict:
+    return ChainMap(privateList.commands(), publicList.commands())
