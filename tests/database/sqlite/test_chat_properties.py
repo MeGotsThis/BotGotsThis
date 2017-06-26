@@ -14,7 +14,7 @@ CREATE TABLE chat_properties (
 
     async def tearDown(self):
         await self.execute('DROP TABLE IF EXISTS chat_properties')
-        await super().setUp()
+        await super().tearDown()
 
     async def test_get_property(self):
         self.assertIsNone(

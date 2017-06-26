@@ -25,7 +25,7 @@ INSERT INTO permitted_users VALUES ('botgotsthis', 'megotsthis')'''])
     async def tearDown(self):
         await self.execute('DROP TABLE IF EXISTS permitted_users')
         await self.execute('DROP TABLE IF EXISTS permitted_users_log')
-        await super().setUp()
+        await super().tearDown()
 
     async def test_is_permitted_true(self):
         self.assertIs(

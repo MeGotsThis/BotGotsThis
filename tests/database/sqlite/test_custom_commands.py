@@ -50,7 +50,7 @@ CREATE INDEX custom_commands_history_broadcaster ON
         await self.execute('DROP TABLE IF EXISTS custom_commands')
         await self.execute('DROP TABLE IF EXISTS custom_command_properties')
         await self.execute('DROP TABLE IF EXISTS custom_commands_history')
-        await super().setUp()
+        await super().tearDown()
 
     async def test_get_commands(self):
         self.assertEqual(
