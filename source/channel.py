@@ -3,7 +3,7 @@
 import lists.channel
 
 from datetime import datetime
-from typing import Iterator, Optional, cast
+from typing import Iterator, Mapping, Optional, cast  # noqa: F401
 
 from bot import data as botData, utils  # noqa: F401
 from bot.twitchmessage import IrcMessageTagsReadOnly
@@ -68,12 +68,16 @@ async def chatCommand(chat: 'botData.Channel',
 
 
 def commandsToProcess(command: str) -> Iterator[data.ChatCommand]:
-    yield from lists.channel.filterMessage
-    if command in lists.channel.commands:
-        if lists.channel.commands[command] is not None:
-            yield lists.channel.commands[command]
-    for starting in lists.channel.commandsStartWith:
+    yield from lists.channel.filterMessage()
+    commands: Mapping[str, Optional[data.ChatCommand]]
+    commands = lists.channel.commands()
+    if command in commands:
+        if commands[command] is not None:
+            yield commands[command]
+    commands = lists.channel.commandsStartWith()
+    starting: str
+    for starting in commands:
         if command.startswith(starting):
-            if lists.channel.commandsStartWith[starting] is not None:
-                yield lists.channel.commandsStartWith[starting]
-    yield from lists.channel.processNoCommand
+            if commands[starting] is not None:
+                yield commands[starting]
+    yield from lists.channel.processNoCommand()

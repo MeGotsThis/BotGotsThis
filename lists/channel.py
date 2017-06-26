@@ -9,19 +9,28 @@ except ImportError:
 
 CommandsDict = Mapping[str, Optional[data.ChatCommand]]
 
-filterMessage: List[data.ChatCommand] = []
-commands: CommandsDict
-commandsStartWith: CommandsDict
-processNoCommand: List[data.ChatCommand]
 
-if privateList.disableFilters:
-    filterMessage = privateList.filterMessage
-else:
-    filterMessage = publicList.filterMessage + privateList.filterMessage
-commands = ChainMap(privateList.commands, publicList.commands)
-commandsStartWith = ChainMap(privateList.commandsStartWith,
-                             publicList.commandsStartWith)
-processNoCommand = privateList.noCommandPreCustom
-if not privateList.disableCustomMessage:
-    processNoCommand += publicList.processNoCommand
-processNoCommand += privateList.noCommandPostCustom
+def filterMessage() -> List[data.ChatCommand]:
+    if privateList.disableFilters():
+        return privateList.filterMessage()
+    else:
+        return publicList.filterMessage() + privateList.filterMessage()
+
+
+def commands() -> CommandsDict:
+    return ChainMap(privateList.commands(), publicList.commands())
+
+
+def commandsStartWith() -> CommandsDict:
+    return ChainMap(privateList.commandsStartWith(),
+                    publicList.commandsStartWith())
+
+
+def processNoCommand() -> List[data.ChatCommand]:
+    if privateList.disableCustomMessage():
+        return (privateList.noCommandPreCustom()
+                + privateList.noCommandPostCustom())
+    else:
+        return (privateList.noCommandPreCustom()
+                + publicList.processNoCommand()
+                + privateList.noCommandPostCustom())
