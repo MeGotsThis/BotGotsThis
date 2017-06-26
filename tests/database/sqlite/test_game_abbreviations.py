@@ -15,7 +15,7 @@ CREATE INDEX game_abbreviations_game ON game_abbreviations (twitchGame)'''])
 
     async def tearDown(self):
         await self.execute('DROP TABLE IF EXISTS game_abbreviations')
-        await super().setUp()
+        await super().tearDown()
 
     async def test_not_existing(self):
         self.assertIsNone(await self.database.getFullGameTitle('kappahd'))

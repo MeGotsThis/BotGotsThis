@@ -18,7 +18,7 @@ CREATE TABLE oauth_tokens (
 
     async def tearDown(self):
         await self.execute('DROP TABLE IF EXISTS oauth_tokens')
-        await super().setUp()
+        await super().tearDown()
 
     async def test_get_empty(self):
         self.assertIsNone(await self.database.getOAuthToken('botgotsthis'))
