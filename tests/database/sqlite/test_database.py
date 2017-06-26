@@ -16,7 +16,7 @@ class TestSqlite(asynctest.TestCase):
 Driver=SQLite3 ODBC Driver;Database=:memory:;FKSupport=true;'''
         else:
             self.connectionString = '''\
-Driver=SQLite3;Data Source=:memory:;Version=3;New=True;'''
+Driver=SQLite3;Database=:memory:;FKSupport=true;'''
         self.database = DatabaseMain(self.connectionString)
         await self.database.connect()
         self.cursor = await self.database.cursor()
