@@ -121,10 +121,10 @@ async def reload_commands(send: Send) -> bool:
 async def reload_config(send: Send) -> bool:
     send('Reloading Config')
 
-    importlib.reload(sys.modules['bot.config'])
-    importlib.reload(sys.modules['bot.config.reader'])
-    bot.config = bot.BotConfig()
-    await bot.config.read_config()
+    importlib.reload(sys.modules['bot'])
+    config: bot.BotConfig = bot.BotConfig()
+    await config.read_config()
+    bot.config = config
 
     send('Complete Reloading')
     return True
