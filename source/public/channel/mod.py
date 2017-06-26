@@ -1,4 +1,4 @@
-﻿import bot.globals
+﻿import bot
 
 from typing import Optional, cast  # noqa: F401
 

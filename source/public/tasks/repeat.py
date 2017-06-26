@@ -1,4 +1,4 @@
-﻿import bot.globals
+﻿import bot
 
 from datetime import datetime
 from typing import Tuple, cast  # noqa: F401

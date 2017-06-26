@@ -1,5 +1,4 @@
 ﻿import bot
-import bot.globals
 from bot import utils
 from typing import Optional, Union  # noqa: F401
 from . import timeout

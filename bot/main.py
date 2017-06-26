@@ -1,7 +1,6 @@
 ﻿# Import some necessary libraries.
 import asyncio
 import bot
-import bot.globals
 import importlib
 import pkgutil
 import source.private.autoload as privateAuto

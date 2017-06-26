@@ -6,7 +6,6 @@ from typing import Any, Dict, Iterable, List, Optional, Type, Tuple, Union  # no
 from source.api import twitch
 import builtins
 import bot
-import bot.globals
 import bot.coroutine.logging
 import os.path
 import sys

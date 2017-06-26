@@ -1,4 +1,4 @@
-﻿import bot.globals
+﻿import bot
 import copy
 import random
 from bot import data, utils  # noqa: F401

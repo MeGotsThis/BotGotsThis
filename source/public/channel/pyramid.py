@@ -1,5 +1,4 @@
 ﻿import bot
-import bot.globals
 import itertools
 import random
 from contextlib import suppress

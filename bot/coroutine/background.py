@@ -1,6 +1,6 @@
 import asyncio
 
-import bot.globals
+import bot
 
 from datetime import datetime, timedelta
 from typing import Awaitable, Callable, List

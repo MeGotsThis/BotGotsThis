@@ -1,6 +1,6 @@
 import unittest
 
-import bot.globals  # noqa: F401
+import bot  # noqa: F401
 
 from source.data import message
 

@@ -1,5 +1,4 @@
 import bot
-import bot.globals
 from bot.coroutine import connection as connectionM
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta

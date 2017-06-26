@@ -1,4 +1,4 @@
-import bot.globals
+import bot
 from bot import utils
 from contextlib import suppress
 from collections import defaultdict

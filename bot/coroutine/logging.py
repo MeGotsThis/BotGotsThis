@@ -2,7 +2,7 @@ import asyncio
 
 import aiofiles
 
-import bot.globals
+import bot
 
 from collections import deque
 from typing import Deque, Tuple
