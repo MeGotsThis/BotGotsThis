@@ -133,7 +133,7 @@ class TestFieldReplace(TestCustomField):
         patcher = patch('lists.custom')
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
-        self.mock_list.fields = [self.mock_fieldUrl]
+        self.mock_list.fields.return_value = [self.mock_fieldUrl]
 
         self.match = re.match(r'(.*)', 'Kappa')
 
@@ -142,12 +142,14 @@ class TestFieldReplace(TestCustomField):
         self.assertFalse(self.mock_fieldUrl.called)
 
     async def test_something(self):
-        self.mock_list.fields.append(CoroutineMock(return_value='Kappa'))
+        self.mock_list.fields.return_value.append(
+            CoroutineMock(return_value='Kappa'))
         self.assertEqual(await url.field_replace(self.args, self.match),
                          'Kappa')
         self.assertFalse(self.mock_fieldUrl.called)
 
     async def test_none(self):
-        self.mock_list.fields.append(CoroutineMock(return_value=None))
+        self.mock_list.fields.return_value.append(
+            CoroutineMock(return_value=None))
         self.assertEqual(await url.field_replace(self.args, self.match), '')
         self.assertFalse(self.mock_fieldUrl.called)

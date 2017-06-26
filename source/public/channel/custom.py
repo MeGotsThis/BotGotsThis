@@ -175,7 +175,7 @@ async def command_property(args: ChatCommandArgs,
     if len(parts) < 2:
         parts.append(None)
     property, value = parts
-    if property not in lists.custom.properties:
+    if property not in lists.custom.properties():
         args.chat.send("{user} -> The property '{property}' does not "
                        'exist'.format(user=args.nick, property=property))
         return True

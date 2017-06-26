@@ -1,8 +1,18 @@
 ﻿from source.data import CustomCommandField, CustomCommandProcess
 from typing import List
 
-disablePublic: bool = True
 
-fields: List[CustomCommandField] = []
-properties: List[str] = []
-postProcess: List[CustomCommandProcess] = []
+def disablePublic() -> bool:
+    return True
+
+
+def fields() -> List[CustomCommandField]:
+    return []
+
+
+def properties() -> List[str]:
+    return []
+
+
+def postProcess() -> List[CustomCommandProcess]:
+    return []

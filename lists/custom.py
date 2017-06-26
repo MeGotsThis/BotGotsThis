@@ -6,15 +6,25 @@ try:
 except ImportError:
     from .private.default import custom as privateCustom  # type: ignore
 
-fields: List[data.CustomCommandField] = []
-properties: List[str] = []
-postProcess: List[data.CustomCommandProcess] = []
-if privateCustom.disablePublic:
-    fields = privateCustom.fields
-    properties = privateCustom.properties
-    postProcess = privateCustom.postProcess
-else:
-    fields = (publicCustom.fields + privateCustom.fields
-              + publicCustom.fieldsEnd)
-    properties = publicCustom.properties + privateCustom.properties
-    postProcess = publicCustom.postProcess + privateCustom.postProcess
+
+def fields() -> List[data.CustomCommandField]:
+    if privateCustom.disablePublic():
+        return privateCustom.fields()
+    else:
+        return (publicCustom.fields()
+                + privateCustom.fields()
+                + publicCustom.fieldsEnd())
+
+
+def properties() -> List[str]:
+    if privateCustom.disablePublic():
+        return privateCustom.properties()
+    else:
+        return publicCustom.properties() + privateCustom.properties()
+
+
+def postProcess() -> List[data.CustomCommandProcess]:
+    if privateCustom.disablePublic():
+        return privateCustom.postProcess()
+    else:
+        return publicCustom.postProcess() + privateCustom.postProcess()
