@@ -10,6 +10,13 @@ addons:
       - libsqliteodbc
 install:
   - pip install -r requirements-test.txt
+before_script:
+  - cp $TRAVIS_BUILD_DIR/private/lists/channel.dist.py $TRAVIS_BUILD_DIR/private/lists/channel.py
+  - cp $TRAVIS_BUILD_DIR/private/lists/custom.dist.py $TRAVIS_BUILD_DIR/private/lists/custom.py
+  - cp $TRAVIS_BUILD_DIR/private/lists/feature.dist.py $TRAVIS_BUILD_DIR/private/lists/feature.py
+  - cp $TRAVIS_BUILD_DIR/private/lists/mamage.dist.py $TRAVIS_BUILD_DIR/private/lists/mamage.py
+  - cp $TRAVIS_BUILD_DIR/private/lists/whisper.dist.py $TRAVIS_BUILD_DIR/private/lists/whisper.py
+  - cp $TRAVIS_BUILD_DIR/source/private/ircmessage.dist.py $TRAVIS_BUILD_DIR/source/private/ircmessage.py
 script:
   - python -m unittest discover -s ./tests/unittest -t ./tests/unittest -p test_*.py
   - python -m unittest discover -s ./tests/database -t ./tests/database -p test_*.py
