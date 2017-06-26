@@ -13,6 +13,10 @@ CREATE TABLE auto_join (
     cluster VARCHAR NOT NULL DEFAULT 'main'
 )''')
 
+    async def tearDown(self):
+        await self.execute('DROP TABLE IF EXISTS auto_join')
+        await super().setUp()
+
     async def test_chats_empty(self):
         self.assertEqual([c async for c in self.database.getAutoJoinsChats()],
                          [])

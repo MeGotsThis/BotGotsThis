@@ -13,6 +13,10 @@ CREATE INDEX game_abbreviations_game ON game_abbreviations (twitchGame)'''])
         await self.execute('INSERT INTO game_abbreviations VALUES (?, ?)',
                            ('kappa', 'FrankerZ'))
 
+    async def tearDown(self):
+        await self.execute('DROP TABLE IF EXISTS game_abbreviations')
+        await super().setUp()
+
     async def test_not_existing(self):
         self.assertIsNone(await self.database.getFullGameTitle('kappahd'))
 
