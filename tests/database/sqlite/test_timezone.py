@@ -43,11 +43,6 @@ INSERT INTO "timezone" VALUES ("399","PDT","2120119200","-25200","1")
 INSERT INTO "timezone" VALUES ("399","PST","2140678800","-28800","0")
 '''])
 
-    async def tearDown(self):
-        await self.execute('DROP TABLE IF EXISTS zone')
-        await self.execute('DROP TABLE IF EXISTS timezone')
-        await super().tearDown()
-
     async def test_timezone_names(self):
         self.assertCountEqual(
             [row async for row in self.database.timezone_names()],

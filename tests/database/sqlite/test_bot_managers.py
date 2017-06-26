@@ -18,11 +18,6 @@ CREATE TABLE bot_managers_log (
 )''', '''
 INSERT INTO bot_managers VALUES ('megotsthis')'''])
 
-    async def tearDown(self):
-        await self.execute('DROP TABLE IF EXISTS bot_managers')
-        await self.execute('DROP TABLE IF EXISTS bot_managers_log')
-        await super().tearDown()
-
     async def test_is_bot_manager_true(self):
         self.assertIs(await self.database.isBotManager('megotsthis'), True)
 
