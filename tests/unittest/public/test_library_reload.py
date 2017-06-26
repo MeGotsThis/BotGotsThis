@@ -155,10 +155,12 @@ class TestLibraryReload(asynctest.TestCase):
     @patch('source.public.library.reload.bot')
     async def test_reload_config(self, mock_bot, mock_reload):
         module = Mock()
+        originalConfig = mock_bot.config
         mock_bot.BotConfig.return_value.read_config = CoroutineMock()
-        sys.modules = {'bot.config': module, 'bot.config.reader': module}
+        sys.modules = {'bot': module}
         self.assertIs(await reload.reload_config(self.send), True)
         self.assertEqual(self.send.call_count, 2)
-        self.assertEqual(mock_reload.call_count, 2)
+        self.assertEqual(mock_reload.call_count, 1)
         mock_bot.BotConfig.assert_called_once_with()
         mock_bot.BotConfig.return_value.read_config.assert_called_once_with()
+        self.assertNotEqual(mock_bot.config, originalConfig)
