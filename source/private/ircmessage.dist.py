@@ -2,7 +2,7 @@
 from datetime import datetime
 
 
-def parseMessage(connection: 'connectioM.ConnectionHandler',
+def parseMessage(connection: 'connectionM.ConnectionHandler',
                  ircmsg: str,
                  now: datetime) -> None:
     pass
