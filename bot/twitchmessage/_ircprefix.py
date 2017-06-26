@@ -1,5 +1,6 @@
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional  # noqa: F401
 import string
+
 
 class ParsedPrefix(NamedTuple):
     servername: Optional[str]
@@ -7,12 +8,13 @@ class ParsedPrefix(NamedTuple):
     user: Optional[str]
     host: Optional[str]
 
+
 nickSpecials: str = '-_'
 
 
 class IrcMessagePrefix:
     __slots__ = ('_servername', '_nick', '_user', '_host')
-    
+
     def __init__(self,
                  servername: Optional[str]=None,
                  nick: Optional[str]=None,
@@ -26,7 +28,7 @@ class IrcMessagePrefix:
             raise TypeError()
         if not isinstance(host, (type(None), str)):
             raise TypeError()
-        
+
         if servername is None and nick is None:
             raise ValueError()
         if servername is not None:
@@ -48,29 +50,29 @@ class IrcMessagePrefix:
         self._nick: Optional[str] = nick
         self._user: Optional[str] = user
         self._host: Optional[str] = host
-    
+
     @classmethod
     def fromPrefix(cls, prefix: str) -> 'IrcMessagePrefix':
         if not isinstance(prefix, str):
             raise TypeError()
         return cls(*cls.parse(prefix))
-    
+
     @property
     def servername(self) -> Optional[str]:
         return self._servername
-    
+
     @property
     def nick(self) -> Optional[str]:
         return self._nick
-    
+
     @property
     def user(self) -> Optional[str]:
         return self._user
-    
+
     @property
     def host(self) -> Optional[str]:
         return self._host
-    
+
     def __str__(self) -> str:
         if self._servername is not None:
             return str(self._servername)
@@ -82,7 +84,7 @@ class IrcMessagePrefix:
                 s += '@' + self._host
             return s
         return ''
-    
+
     def __eq__(self, other: object) -> bool:
         if isinstance(other, IrcMessagePrefix):
             return (self._servername == other._servername
@@ -90,21 +92,21 @@ class IrcMessagePrefix:
                     and self._user == other._user
                     and self._host == other._host)
         return False
-    
+
     def __ne__(self, other: object) -> bool:
         return not (self == other)
-    
+
     @staticmethod
     def parse(params: str) -> ParsedPrefix:
         if not isinstance(params, str):
             raise TypeError()
-        
+
         length: int = len(params)
         i: int = 0
-        
+
         if i == length:
             raise ValueError()
-        
+
         char: str
         ss: str
         s: List[str]
@@ -120,7 +122,7 @@ class IrcMessagePrefix:
         while i < length:
             char = params[i]
             i += 1
-            
+
             if char == '!':
                 if isServerName:
                     raise ValueError()
@@ -160,13 +162,13 @@ class IrcMessagePrefix:
             servername = ss
         else:
             nick = ss
-            
+
         if char == '!':
             u = []
             while i < length:
                 char = params[i]
                 i += 1
-                    
+
                 if char == '@':
                     break
                 if char == '.':
@@ -177,14 +179,14 @@ class IrcMessagePrefix:
             if len(u) == 0:
                 raise ValueError()
             user = ''.join(u)
-            
+
         if char == '@':
             h = []
             s = []
             while i < length:
                 char = params[i]
                 i += 1
-                    
+
                 if char == '.':
                     if len(s) == 0:
                         raise ValueError()
@@ -199,7 +201,7 @@ class IrcMessagePrefix:
                     if not char.isalnum() and char != '-' and char != '_':
                         raise ValueError()
                     s.append(char)
-                
+
             if len(s) == 0:
                 raise ValueError()
             if s[-1] == '-':
@@ -207,10 +209,10 @@ class IrcMessagePrefix:
             if not s[0].isalpha() and not s[0].isdigit():
                 raise ValueError()
             h.extend(s)
-                
+
             host = ''.join(h)
-        
+
         if i != length:
             raise ValueError()
-        
+
         return ParsedPrefix(servername, nick, user, host)

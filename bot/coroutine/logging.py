@@ -5,7 +5,7 @@ import aiofiles
 import bot.globals
 
 from collections import deque
-from typing import Deque, IO, Tuple
+from typing import Deque, Tuple
 
 from bot import utils
 

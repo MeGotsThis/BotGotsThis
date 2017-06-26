@@ -11,6 +11,7 @@ _AnyDecorator = Callable[..., _AnyCallable]
 def send(nick: Any) -> data.Send:
     return cast(data.Send, partial(utils.whisper, nick))
 
+
 permission = chat.permission
 not_permission = chat.not_permission
 
@@ -21,7 +22,7 @@ def min_args(amount: int,
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def command(args: data.WhisperCommandArgs,
-                    *pargs, **kwargs) -> Any:
+                          *pargs, **kwargs) -> Any:
             if len(args.message) < amount:
                 if reason:
                     utils.whisper(args.nick, reason)

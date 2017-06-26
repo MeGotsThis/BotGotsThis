@@ -8,7 +8,7 @@ import bot.globals
 import source.public.autoload.twitch
 import source.public.autoload.emotes
 import source.public.autoload.repeat
-import source.private.mypy
+import source.private.mypy  # noqa: F401
 
 import bot.main
 import sys

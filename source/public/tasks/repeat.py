@@ -1,9 +1,9 @@
 ﻿import bot.globals
 
 from datetime import datetime
-from typing import Tuple, cast
+from typing import Tuple, cast  # noqa: F401
 
-from bot import data
+from bot import data  # noqa: F401
 from ..library import timeout
 from ... import database
 

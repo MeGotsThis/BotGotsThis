@@ -4,9 +4,9 @@ import textwrap
 from bot import utils
 from ..library import chat, custom, timeout
 from ..library.chat import min_args, not_feature, permission, ownerChannel
-from ...data import ChatCommandArgs, CustomCommand, CommandActionTokens
+from ...data import ChatCommandArgs, CustomCommand, CommandActionTokens  # noqa: F401, E501
 from datetime import timedelta
-from typing import Awaitable, Callable, Dict, List, Optional
+from typing import Awaitable, Callable, Dict, List, Optional  # noqa: F401
 
 
 @not_feature('nocustom')
@@ -24,7 +24,7 @@ async def customCommands(args: ChatCommandArgs) -> bool:
         if chat.in_user_cooldown(args, cooldown, 'customUserCommand',
                                  'moderator'):
             return False
-        
+
         msgs: List[str] = await custom.create_messages(command, args)
         args.chat.send(msgs)
         if args.permissions.chatModerator:
@@ -97,7 +97,7 @@ async def process_command(args: ChatCommandArgs,
 
 
 async def insert_command(args: ChatCommandArgs,
-                   input: CommandActionTokens) -> bool:
+                         input: CommandActionTokens) -> bool:
     message: str
     successful: bool = await args.database.insertCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)

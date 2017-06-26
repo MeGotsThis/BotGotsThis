@@ -18,4 +18,3 @@ async def commandEmpty(args: WhisperCommandArgs) -> bool:
 async def commandAutoJoin(args: WhisperCommandArgs) -> bool:
     return await broadcaster.auto_join(args.database, args.nick,
                                        send(args.nick), args.message)
-

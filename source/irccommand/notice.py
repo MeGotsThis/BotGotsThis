@@ -12,6 +12,7 @@ invalidLogin: List[str] = [
     'Improperly formatted auth',
     ]
 
+
 def parse(tags: Optional[IrcMessageTagsReadOnly],
           chat: 'Optional[data.Channel]',
           nick: Optional[str],

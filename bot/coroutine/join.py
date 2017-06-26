@@ -5,11 +5,11 @@ import bot.globals
 
 from datetime import datetime, timedelta
 from collections import deque
-from typing import Dict, Deque, List, Optional, Set
+from typing import Dict, Deque, List, Optional, Set  # noqa: F401
 
-from bot import data, utils
+from bot import data, utils  # noqa: F401
 from bot.twitchmessage import IrcMessage, IrcMessageParams
-from . import connection
+from . import connection  # noqa: F401
 
 joinDuration: timedelta = timedelta(seconds=10.05)
 _joinTimes: Deque[datetime] = deque()

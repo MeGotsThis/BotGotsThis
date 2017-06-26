@@ -1,6 +1,6 @@
 ﻿from bot import data
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from typing import List, Optional
+from typing import List, Optional  # noqa: F401
 import datetime
 import bot.globals
 

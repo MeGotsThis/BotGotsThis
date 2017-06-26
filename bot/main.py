@@ -10,8 +10,8 @@ from itertools import chain
 from importlib.abc import PathEntryFinder
 from source import database
 from source.data import timezones
-from source.database import AutoJoinChannel
-from typing import Awaitable, Generator, List, Iterable, Optional, Tuple, cast
+from source.database import AutoJoinChannel  # noqa: F401
+from typing import Awaitable, Generator, List, Iterable, Optional, Tuple, cast  # noqa: F401,E501
 from . import utils
 from .coroutine import background, connection, join, logging
 

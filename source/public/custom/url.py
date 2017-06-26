@@ -1,5 +1,4 @@
-﻿import asyncio
-import re
+﻿import re
 
 import aiohttp
 
@@ -7,9 +6,9 @@ import bot
 import lists.custom
 
 from contextlib import suppress
-from typing import Iterator, Match, List, Optional
+from typing import Iterator, Match, List, Optional  # noqa: F401
 
-from ...data import CustomCommandField, CustomFieldArgs
+from ...data import CustomCommandField, CustomFieldArgs  # noqa: F401
 
 
 async def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
@@ -27,7 +26,8 @@ async def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
         session: aiohttp.ClientSession
         response: aiohttp.ClientResponse
         with suppress(aiohttp.ClientError):
-            async with aiohttp.ClientSession(raise_for_status=True) as session,\
+            async with aiohttp.ClientSession(
+                    raise_for_status=True) as session,\
                     session.get(url, timeout=urlTimeout) as response:
                 if response.status == 200:
                     data: str = await response.text()

@@ -4,7 +4,7 @@ from ..library.chat import min_args, permission_feature
 from ...data import ChatCommandArgs
 from contextlib import suppress
 from datetime import timedelta
-from typing import Iterator
+from typing import Iterator  # noqa: F401
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))

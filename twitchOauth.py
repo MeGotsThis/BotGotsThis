@@ -10,10 +10,10 @@ ini.read('twitchApi.ini')
 
 try:
     returnUrl = input('Return URL -> ')
-    
+
     parsedUrl = urllib.parse.urlparse(returnUrl)
     queryParts = urllib.parse.parse_qs(parsedUrl.query)
-    
+
     if 'code' in queryParts and len(queryParts['code']):
         for code in queryParts['code']:
             response, data = twitch.api_call(
@@ -29,11 +29,11 @@ try:
                     'redirect_uri': ini['twitch']['redirectUri'],
                     'code': code,
                     })
-            
+
             if response.status == 200:
                 oauthTokens = json.loads(data.decode('utf-8'))
                 token = oauthTokens['access_token']
-                
+
                 response, data = twitch.api_call(
                     None, 'GET', '/kraken/',
                     headers={
@@ -42,7 +42,7 @@ try:
                         })
                 if response.status == 200:
                     tokenInfo = json.loads(data.decode('utf-8'))
-                    
+
                     with database.get_database(database.Schema.OAuth) as db:
                         db.saveBroadcasterToken(
                             tokenInfo['token']['user_name'].lower(), token)

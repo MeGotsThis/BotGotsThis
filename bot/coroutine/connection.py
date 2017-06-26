@@ -6,7 +6,7 @@ import source.ircmessage
 
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Deque, Dict, List, Optional, Tuple, no_type_check
+from typing import Deque, Dict, List, Optional, Tuple, no_type_check  # noqa: F401, E501
 
 
 from bot import data, utils
@@ -160,9 +160,9 @@ class ConnectionHandler:
             time=utils.now(), name=self.name, server=self._server))
 
     async def write(self,
-              command: IrcMessage, *,
-              channel: 'Optional[data.Channel]'=None,
-              whisper: 'Optional[data.WhisperMessage]'=None) -> None:
+                    command: IrcMessage, *,
+                    channel: 'Optional[data.Channel]'=None,
+                    whisper: 'Optional[data.WhisperMessage]'=None) -> None:
         if not isinstance(command, IrcMessage):
             raise TypeError()
         if self._transport is None:

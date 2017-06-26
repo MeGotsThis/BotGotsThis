@@ -1,4 +1,4 @@
-from typing import Iterator, List, Sequence, Union
+from typing import List, Sequence, Union  # noqa: F401
 
 
 class Tokenized(Sequence[str]):
@@ -8,14 +8,14 @@ class Tokenized(Sequence[str]):
         self._string: str = string
         self._tokens: List[str] = self._string.split()
 
-    def __eq__(self, other:object) -> bool:
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, Tokenized):
             return self._string == other._string
         if isinstance(other, str):
             return self._string == other
         return False
 
-    def __ne__(self, other:object) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
     def __hash__(self) -> int:
@@ -23,10 +23,10 @@ class Tokenized(Sequence[str]):
 
     def __str__(self) -> str:
         return self._string
-    
+
     def __len__(self) -> int:
         return len(self._tokens)
-    
+
     def __getitem__(self, key: Union[int, slice]) -> str:
         if isinstance(key, int):
             return self._tokens[key]
@@ -41,7 +41,7 @@ class Tokenized(Sequence[str]):
                 if key.step != 1:
                     raise ValueError('step other than 1 is not supported')
             lenTokens = len(self._tokens)
-            
+
             # Trivial cases
             if not self._string:
                 return self._string
@@ -51,7 +51,7 @@ class Tokenized(Sequence[str]):
             if key.stop is not None:
                 if key.stop == 0 or -key.stop >= lenTokens:
                     return ''
-            
+
             message = self._string
             start = 0
             if key.start is not None:
@@ -80,17 +80,17 @@ class Message(Tokenized):
         super().__init__(message)
         self._query: str = None
         self._lower: Tokenized = None
-    
+
     @property
     def command(self) -> str:
         return self.lower[0]
-    
+
     @property
     def query(self) -> str:
         if self._query is None:
             self._query = self[1:]
         return self._query
-    
+
     @property
     def lower(self):
         if self._lower is None:

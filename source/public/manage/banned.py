@@ -1,6 +1,6 @@
 ﻿import bot
 from bot import utils
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional  # noqa: F401
 from ..library import message
 from ...data import ManageBotArgs, Send
 from ...database import DatabaseMain
@@ -14,7 +14,7 @@ async def manageBanned(args: ManageBotArgs) -> bool:
         return False
     if args.message.lower[2] in ['list']:
         return await list_banned_channels(args.database, args.send)
-    
+
     if len(args.message) < 5:
         if args.message.lower[2] in needReason:
             args.send(args.nick + ' -> Reason needs to be specified')
@@ -31,7 +31,7 @@ async def manageBanned(args: ManageBotArgs) -> bool:
 
 
 async def list_banned_channels(database: DatabaseMain,
-                         send: Send) -> bool:
+                               send: Send) -> bool:
     bannedChannels: Iterable[str]
     bannedChannels = [channel async for channel
                       in database.listBannedChannels()]

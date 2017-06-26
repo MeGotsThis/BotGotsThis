@@ -1,6 +1,6 @@
 ﻿from source.api import oauth
-from contextlib import closing, suppress
-from datetime import datetime, timedelta
+from contextlib import suppress
+from datetime import datetime
 from http import client
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
@@ -9,9 +9,7 @@ import asyncio
 import bot
 import bot.globals
 import bot.utils
-import configparser
 import email.utils
-import os.path
 import time
 import urllib.parse
 
@@ -24,6 +22,7 @@ class TwitchStatus(NamedTuple):
     status: Optional[str]
     game: Optional[str]
     communityId: Optional[str]
+
 
 OnlineStreams = Dict[str, TwitchStatus]
 
@@ -95,10 +94,10 @@ async def post_call(channel: Optional[str],
 
 
 async def put_call(channel: Optional[str],
-                    uri: str,
-                    headers: MutableMapping[str, str]=None,
-                    data: Union[str, Mapping[str, str]]=None
-                    ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+                   uri: str,
+                   headers: MutableMapping[str, str]=None,
+                   data: Union[str, Mapping[str, str]]=None
+                   ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)

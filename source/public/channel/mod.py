@@ -1,6 +1,6 @@
 ﻿import bot.globals
 
-from typing import Optional, cast
+from typing import Optional, cast  # noqa: F401
 
 from ..library.chat import min_args, permission_not_feature, permission
 from ...api import oauth, twitch

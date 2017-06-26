@@ -1,10 +1,9 @@
-import bot.globals
 import configparser
 import os
 
 import aiofiles
 
-from typing import Dict, List
+from typing import Dict, List  # noqa: F401
 
 
 class BotConfig:

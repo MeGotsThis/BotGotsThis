@@ -14,6 +14,7 @@ def text_command(name: str, asciiTo: Callable[[str], str]) -> ChatCommand:
     command.__name__ = name
     return command
 
+
 commandFull: ChatCommand = text_command(
     'commandFull', textformat.to_full_width)
 commandParenthesized: ChatCommand = text_command(

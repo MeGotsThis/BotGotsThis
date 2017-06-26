@@ -1,8 +1,8 @@
 import lists.custom
 from typing import Dict, Iterable, List, Optional
 from ...data import ChatCommandArgs, CustomFieldArgs, CustomCommand
-from ...data import CommandActionTokens, CustomCommandField
-from ...data import CustomCommandProcess, CustomFieldParts, CustomProcessArgs
+from ...data import CommandActionTokens, CustomCommandField  # noqa: F401
+from ...data import CustomCommandProcess, CustomFieldParts, CustomProcessArgs  # noqa: F401, E501
 from ...data.message import Message
 from ...data.permissions import ChatPermissionSet
 from ...database import DatabaseMain
@@ -64,7 +64,7 @@ async def get_command(database: DatabaseMain,
 
 
 async def create_messages(command: CustomCommand,
-                    args: ChatCommandArgs) -> List[str]:
+                          args: ChatCommandArgs) -> List[str]:
     textFormat: bool
     textFormat = await args.database.hasFeature(args.chat.channel,
                                                 'textconvert')
@@ -116,7 +116,7 @@ def parse_action_message(message: Message,
             level = None
         command = message[i]
         text = message[i+1:]
-        
+
         return CommandActionTokens(action, broadcaster, level, command, text)
     except:
         return None
@@ -127,13 +127,13 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
     parsed: List[CustomFieldParts] = []
     i: int = 0
     length: int = len(message)
-    
+
     while True:
         noFormat: List[str] = []
         while i < length:
             char: str = message[i]
             i += 1
-            
+
             if char == '}':
                 if i < length and message[i] == '}':
                     i += 1
@@ -145,29 +145,29 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                 else:
                     i -= 1
                     break
-            
+
             noFormat.append(char)
-        
+
         if i == length:
             if noFormat:
                 parsed.append(
                     CustomFieldParts(''.join(noFormat), None, None, None, None,
                                      None, None, None))
             break
-        
+
         s: int = i
         i += 1
         if i == length:
             raise ValueError()
-        
+
         field: List[str] = []
         while True:
             if i == length:
                 raise ValueError()
-            
+
             char = message[i]
             i += 1
-            
+
             if char == ':':
                 if i < length and message[i] == ':':
                     i += 1
@@ -206,16 +206,16 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                     break
             field.append(char)
 
-        format: Optional[List[str]] = None
+        format: Optional[List[str]] = None  # noqa: E701
         if char == ':':
             format = []
             while True:
                 if i == length:
                     raise ValueError()
-                
+
                 char = message[i]
                 i += 1
-                
+
                 if char == '@':
                     if i < length and message[i] == '@':
                         i += 1
@@ -255,10 +255,10 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
             while True:
                 if i == length:
                     raise ValueError()
-                
+
                 char = message[i]
                 i += 1
-                
+
                 if char == '>':
                     if i < length and message[i] == '>':
                         i += 1
@@ -293,10 +293,10 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
             while True:
                 if i == length:
                     raise ValueError()
-                
+
                 char = message[i]
                 i += 1
-                
+
                 if char == '@':
                     if i < length and message[i] == '@':
                         i += 1
@@ -326,10 +326,10 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
             while True:
                 if i == length:
                     raise ValueError()
-                
+
                 char = message[i]
                 i += 1
-                
+
                 if char == '!':
                     if i < length and message[i] == '!':
                         i += 1
@@ -354,10 +354,10 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
             while True:
                 if i == length:
                     raise ValueError()
-                
+
                 char = message[i]
                 i += 1
-                
+
                 if char == '{':
                     if i < length and message[i] == '{':
                         i += 1
@@ -375,7 +375,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
             raise ValueError()
         i += 1
         original: str = message[s:i]
-        
+
         parsed.append(
             CustomFieldParts(
                 ''.join(noFormat),
@@ -386,7 +386,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
                 ''.join(param) if param is not None else None,
                 ''.join(default) if default is not None else None,
                 original))
-        
+
     return parsed
 
 

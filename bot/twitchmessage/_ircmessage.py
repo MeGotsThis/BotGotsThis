@@ -1,11 +1,12 @@
 from ._ircparams import IrcMessageParams
 from ._ircprefix import IrcMessagePrefix, nickSpecials
 from ._irctags import IrcMessageTagsReadOnly, IrcMessageTags, IrcMessageTagsKey
-from ._irctags import TagValue, unescapedValue
-from typing import List, NamedTuple, Optional, Union
+from ._irctags import TagValue, unescapedValue  # noqa: F401
+from typing import List, NamedTuple, Optional, Union  # noqa: F401
 import string
 
 Command = Union[str, int]
+
 
 class ParsedMessage(NamedTuple):
     tags: Optional[IrcMessageTagsReadOnly]
@@ -16,7 +17,7 @@ class ParsedMessage(NamedTuple):
 
 class IrcMessage:
     __slots__ = ('_tags', '_prefix', '_command', '_params')
-    
+
     def __init__(self,
                  tags: Optional[IrcMessageTagsReadOnly]=None,
                  prefix: Optional[IrcMessagePrefix]=None,
@@ -38,34 +39,34 @@ class IrcMessage:
             raise TypeError()
         if not isinstance(params, IrcMessageParams):
             raise TypeError()
-        
+
         self._tags: Optional[IrcMessageTagsReadOnly] = tags
         self._prefix: Optional[IrcMessagePrefix] = prefix
         self._command: Command = command
         self._params: IrcMessageParams = params
-    
+
     @classmethod
     def fromMessage(cls, message: str) -> 'IrcMessage':
         if not isinstance(message, str):
             raise TypeError()
         return cls(*cls.parse(message))
-    
+
     @property
     def tags(self) -> Optional[IrcMessageTagsReadOnly]:
         return self._tags
-    
+
     @property
     def prefix(self) -> Optional[IrcMessagePrefix]:
         return self._prefix
-    
+
     @property
     def command(self) -> Command:
         return self._command
-    
+
     @property
     def params(self) -> IrcMessageParams:
         return self._params
-    
+
     def __str__(self) -> str:
         message: str = ''
         if self._tags is not None:
@@ -79,7 +80,7 @@ class IrcMessage:
         if not self._params.isEmpty:
             message += ' ' + str(self._params)
         return message
-    
+
     def __eq__(self, other: object) -> bool:
         if isinstance(other, IrcMessage):
             return (self._tags == other._tags
@@ -87,21 +88,21 @@ class IrcMessage:
                     and self._command == other._command
                     and self._params == other._params)
         return False
-    
+
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
-    
+
     @staticmethod
     def parse(message: str) -> ParsedMessage:
         if not isinstance(message, str):
             raise TypeError()
-        
+
         length: int = len(message)
         i: int = 0
-        
+
         if i == length:
             raise ValueError()
-        
+
         tags: Optional[IrcMessageTags] = None
         prefix: Optional[IrcMessagePrefix] = None
         command: Command
@@ -119,7 +120,7 @@ class IrcMessage:
         char: str = message[i]
         if char == '@':
             i += 1
-            
+
             tags = IrcMessageTags()
             while True:
                 if i == length:
@@ -128,7 +129,7 @@ class IrcMessage:
                     raise ValueError()
                 if message[i] == ';':
                     raise ValueError()
-                
+
                 v = []
                 isVendor = False
                 isKey = False
@@ -137,7 +138,7 @@ class IrcMessage:
                 while i < length:
                     char = message[i]
                     i += 1
-                    
+
                     if char == ' ':
                         while i < length and message[i] == ' ':
                             i += 1
@@ -176,19 +177,19 @@ class IrcMessage:
                         if not char.isalnum() and char != '-' and char != '_':
                             raise ValueError()
                         s.append(char)
-                
+
                 if isVendor:
                     raise ValueError()
-                
+
                 key = ''.join(s)
                 vendor = ''.join(v) if v else None
-                
+
                 if char == '=':
                     v = []
                     while i < length:
                         char = message[i]
                         i += 1
-                        
+
                         if char == ' ':
                             while i < length and message[i] == ' ':
                                 i += 1
@@ -207,20 +208,20 @@ class IrcMessage:
                         else:
                             v.append(char)
                     value = ''.join(v)
-                
+
                 tagkey = IrcMessageTagsKey(key, vendor)
-                
+
                 if tagkey in tags:
                     raise ValueError()
-                
+
                 tags[tagkey] = value
-                
+
                 if i == length:
                     raise ValueError()
                 if char == ' ':
                     char = message[i]
                     break
-        
+
         # Prefix
         u: List[str]
         h: List[str]
@@ -234,10 +235,10 @@ class IrcMessage:
         ss: str
         if char == ':':
             i += 1
-            
+
             if i == length:
                 raise ValueError()
-            
+
             s = []
             servername = None
             nick = None
@@ -248,7 +249,7 @@ class IrcMessage:
             while i < length:
                 char = message[i]
                 i += 1
-                
+
                 if char == ' ':
                     while i < length and message[i] == ' ':
                         i += 1
@@ -298,13 +299,13 @@ class IrcMessage:
                 servername = ss
             else:
                 nick = ss
-            
+
             if char == '!':
                 u = []
                 while i < length:
                     char = message[i]
                     i += 1
-                    
+
                     if char == ' ':
                         while i < length and message[i] == ' ':
                             i += 1
@@ -317,14 +318,14 @@ class IrcMessage:
                         raise ValueError()
                     u.append(char)
                 user = ''.join(u)
-            
+
             if char == '@':
                 h = []
                 s = []
                 while i < length:
                     char = message[i]
                     i += 1
-                    
+
                     if char == ' ':
                         if len(s) == 0:
                             raise ValueError()
@@ -334,7 +335,7 @@ class IrcMessage:
                             raise ValueError()
                         h.extend(s)
                         s = []
-                        
+
                         while i < length and message[i] == ' ':
                             i += 1
                         break
@@ -353,18 +354,18 @@ class IrcMessage:
                             raise ValueError()
                         s.append(char)
                 host = ''.join(h)
-            
+
             prefix = IrcMessagePrefix(servername, nick, user, host)
-        
+
         # Command
         if i == length:
             raise ValueError()
-        
+
         s: List[str] = []
         while i < length:
             char = message[i]
             i += 1
-            
+
             if char == ' ':
                 while i < length and message[i] == ' ':
                     i += 1
@@ -386,7 +387,7 @@ class IrcMessage:
             command = int(''.join(s))
         else:
             command = ''.join(s)
-        
+
         # Params
         s: List[str]
         m: List[str]
@@ -402,7 +403,7 @@ class IrcMessage:
             while i < length:
                 char = message[i]
                 i += 1
-                
+
                 if char == ' ':
                     while i < length and message[i] == ' ':
                         i += 1
@@ -414,22 +415,22 @@ class IrcMessage:
                     break
                 else:
                     s.append(char)
-            
+
             if len(s):
                 m.extend(s)
             elif len(m):
                 del m[-1]
-            
+
             if char == ':':
                 hasTrailing = True
                 while i < length:
                     char = message[i]
                     i += 1
-                    
+
                     t.append(char)
-            
+
             middle = ''.join(m) if m else None
             trailing = ''.join(t) if hasTrailing else None
         params = IrcMessageParams(middle, trailing)
-        
+
         return ParsedMessage(tags, prefix, command, params)

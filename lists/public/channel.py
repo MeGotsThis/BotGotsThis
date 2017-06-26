@@ -10,7 +10,7 @@ from source.public.channel import reload
 from source.public.channel import repeat
 from source.public.channel import textformat
 from source.public.channel import wall
-from typing import Callable, List, Mapping, Optional
+from typing import List, Mapping, Optional
 
 filterMessage: List[data.ChatCommand] = [
     block_url.filterNoUrlForBots

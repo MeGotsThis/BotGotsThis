@@ -2,9 +2,9 @@
 import bot.globals
 import copy
 import random
-from bot import data
+from bot import data  # noqa: F401
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple  # noqa: F401
 from ...api import bttv
 from ...api import ffz
 from ...api import twitch
@@ -13,10 +13,10 @@ from ...api import twitch
 async def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
     if timestamp - bot.globals.globalEmotesCache >= timedelta(hours=1):
         bot.globals.globalEmotesCache = timestamp
-        data: Optional[Tuple[Dict[int, str], Dict[int, int]]]
-        data = await twitch.twitch_emotes()
-        if data:
-            emotes, emoteSets = data
+        emote_data: Optional[Tuple[Dict[int, str], Dict[int, int]]]
+        emote_data = await twitch.twitch_emotes()
+        if emote_data:
+            emotes, emoteSets = emote_data
             bot.globals.globalEmotes = emotes
             bot.globals.globalEmoteSets = emoteSets
         elif not bot.globals.globalEmotes:

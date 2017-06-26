@@ -43,7 +43,7 @@ class ChatPermissionSet:
         if not hasattr(self, '_isOwner'):
             self._isOwner = self._user == bot.config.owner
         return self._isOwner
-    
+
     @property
     def inOwnerChannel(self) -> bool:
         if not hasattr(self, '_inOwnerChannel'):
@@ -62,28 +62,28 @@ class ChatPermissionSet:
             self._isTwitchStaff = self._userType in typeTwitchStaff
             self._isTwitchStaff = self.manager or self._isTwitchStaff
         return self._isTwitchStaff
-    
+
     @property
     def twitchAdmin(self) -> bool:
         if not hasattr(self, '_isTwitchAdmin'):
             self._isTwitchAdmin = self._userType in typeTwitchAdmin
             self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
-    
+
     @property
     def globalModerator(self) -> bool:
         if not hasattr(self, '_isGlobalMod'):
             self._isGlobalMod = self._userType in typeGlobalModerator
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod
-    
+
     @property
     def broadcaster(self) -> bool:
         if not hasattr(self, '_isBroadcaster'):
             self._isBroadcaster = self._channel.channel == self._user
             self._isBroadcaster = self.globalModerator or self._isBroadcaster
         return self._isBroadcaster
-    
+
     @property
     def moderator(self) -> bool:
         if not hasattr(self, '_isModerator'):
@@ -112,11 +112,11 @@ class ChatPermissionSet:
             self._bannable = (self._userType not in typeModerator
                               and self._channel.channel != self._user)
         return self._bannable
-    
+
     @property
     def chatModerator(self) -> bool:
         return self._channel.isMod
-    
+
     def __getitem__(self, key: str) -> bool:
         if isinstance(key, str):
             if key == 'owner':
@@ -166,7 +166,7 @@ class WhisperPermissionSet:
         self._isTwitchAdmin: bool
         self._isGlobalMod: bool
         self._isTurbo: bool
-    
+
     @property
     def owner(self) -> bool:
         if not hasattr(self, '_isOwner'):
@@ -183,21 +183,21 @@ class WhisperPermissionSet:
             self._isTwitchStaff = self._userType in typeTwitchStaff
             self._isTwitchStaff = self.manager or self._isTwitchStaff
         return self._isTwitchStaff
-    
+
     @property
     def twitchAdmin(self) -> bool:
         if not hasattr(self, '_isTwitchAdmin'):
             self._isTwitchAdmin = self._userType in typeTwitchAdmin
             self._isTwitchAdmin = self.twitchStaff or self._isTwitchAdmin
         return self._isTwitchAdmin
-    
+
     @property
     def globalModerator(self) -> bool:
         if not hasattr(self, '_isGlobalMod'):
             self._isGlobalMod = self._userType in typeGlobalModerator
             self._isGlobalMod = self.twitchAdmin or self._isGlobalMod
         return self._isGlobalMod
-    
+
     def __getitem__(self, key: str) -> bool:
         if isinstance(key, str):
             if key == 'owner':

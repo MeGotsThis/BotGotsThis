@@ -1,10 +1,9 @@
-﻿import asyncio
-import bot.globals
+﻿import bot.globals
 import copy
 import random
-from bot import data, utils
+from bot import data, utils  # noqa: F401
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Union, cast
+from typing import Dict, List, Optional, Union, cast  # noqa: F401
 from ...api import twitch
 from ... import database
 

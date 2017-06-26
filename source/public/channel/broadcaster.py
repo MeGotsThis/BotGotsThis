@@ -1,7 +1,5 @@
-﻿import asyncio
-
-from datetime import datetime, timedelta
-from typing import Optional
+﻿from datetime import datetime, timedelta  # noqa: F401
+from typing import Optional  # noqa: F401
 from ..library import broadcaster
 from ..library.chat import cooldown, permission, ownerChannel, send
 from ...api import twitch

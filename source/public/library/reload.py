@@ -1,7 +1,7 @@
 ﻿import bot
 import sys
 import importlib
-from typing import Iterator, Tuple
+from typing import Iterator, Tuple  # noqa: F401
 from ...data import Send, timezones
 
 
@@ -35,7 +35,7 @@ def key(module: str) -> Tuple[int, str]:
         return 98, module
     if module == 'source.ircmessage':
         return 99, module
-    
+
     if is_submodule(module, 'source.data'):
         return 0, module
     if module == 'source.database':
@@ -49,12 +49,12 @@ def key(module: str) -> Tuple[int, str]:
         return 18, module
     if is_submodule(module, 'source.private.library'):
         return 19, module
-    
+
     if is_submodule(module, 'source.public.tasks'):
         return 20, module
     if is_submodule(module, 'source.private.tasks'):
         return 21, module
-    
+
     if is_submodule(module, 'source.public.manage'):
         return 60, module
     if is_submodule(module, 'source.private.manage'):
@@ -63,7 +63,7 @@ def key(module: str) -> Tuple[int, str]:
         return 62, module
     if is_submodule(module, 'source.private.custom'):
         return 63, module
-    
+
     if is_submodule(module, 'source.public.channel'):
         return 70, module
     if is_submodule(module, 'source.private.channel'):
@@ -72,7 +72,7 @@ def key(module: str) -> Tuple[int, str]:
         return 72, module
     if is_submodule(module, 'source.private.whisper'):
         return 73, module
-    
+
     if module.startswith('lists.private.'):
         return 84, module
     if module == 'lists.private':
@@ -97,7 +97,7 @@ def key(module: str) -> Tuple[int, str]:
 
 async def full_reload(send: Send) -> bool:
     send('Reloading')
-    
+
     await reload_config(send)
     await reload_commands(send)
 
@@ -113,14 +113,14 @@ async def reload_commands(send: Send) -> bool:
     for moduleString in sorted(modules, key=key):
         importlib.reload(sys.modules[moduleString])
     await timezones.load_timezones()
-    
+
     send('Complete Reloading')
     return True
 
 
 async def reload_config(send: Send) -> bool:
     send('Reloading Config')
-    
+
     importlib.reload(sys.modules['bot.config'])
     importlib.reload(sys.modules['bot.config.reader'])
     bot.config = bot.BotConfig()

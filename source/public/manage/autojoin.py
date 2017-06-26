@@ -1,9 +1,9 @@
 ﻿from bot import utils
 from contextlib import suppress
-from typing import Optional
+from typing import Optional  # noqa: F401
 from ..library import broadcaster
 from ...api import twitch
-from ...database import AutoJoinChannel, DatabaseMain
+from ...database import AutoJoinChannel, DatabaseMain  # noqa: F401
 from ...data import ManageBotArgs, Send
 
 
@@ -12,7 +12,7 @@ async def manageAutoJoin(args: ManageBotArgs) -> bool:
         return False
     if args.message.lower[2] in ['reloadserver']:
         return await reload_server(args.database, args.send)
-    
+
     if len(args.message) < 4:
         return False
 
@@ -27,7 +27,7 @@ async def manageAutoJoin(args: ManageBotArgs) -> bool:
     if args.message.lower[2] in ['add', 'insert', 'join']:
         return await broadcaster.auto_join_add(
             args.database, args.message.lower[3], args.send)
-    if args.message.lower[2] in ['del', 'delete', 'rem', 'remove' ,'part']:
+    if args.message.lower[2] in ['del', 'delete', 'rem', 'remove', 'part']:
         return await broadcaster.auto_join_delete(
             args.database, args.message.lower[3], args.send)
     if args.message.lower[2] in ['pri', 'priority']:
@@ -54,7 +54,7 @@ async def auto_join_priority(database: DatabaseMain,
 
 
 async def reload_server(database: DatabaseMain,
-                  send: Send) -> bool:
+                        send: Send) -> bool:
     autojoin: AutoJoinChannel
     async for autojoin in database.getAutoJoinsChats():
         cluster: Optional[str] = await twitch.chat_server(autojoin.broadcaster)

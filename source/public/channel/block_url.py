@@ -7,16 +7,16 @@ import bot
 
 
 from datetime import datetime
-from urllib.parse import ParseResult, urlparse
-from typing import Match, cast
+from urllib.parse import ParseResult, urlparse  # noqa: F401
+from typing import Match, cast  # noqa: F401
 
-from bot import data, utils
+from bot import data, utils  # noqa: F401
 from ...api import twitch
 from ...data import ChatCommandArgs
 from ...data.message import Message
 from ... import database
 from ..library import timeout
-from ..library.chat import feature, not_permission, permission
+from ..library.chat import feature, permission
 
 
 twitchUrlRegex: str = (
@@ -43,7 +43,7 @@ async def check_domain_redirect(chat: 'data.Channel',
                                 timestamp: datetime) -> None:
     if await twitch.num_followers(nick):
         return
-    
+
     # Record all urls with users of no follows
     utils.logIrcMessage(chat.ircChannel + '#blockurl.log',
                         '{nick}: {message}'.format(nick=nick, message=message),
@@ -58,7 +58,7 @@ async def check_domain_redirect(chat: 'data.Channel',
             if (not url.startswith('http://')
                     and not url.startswith('https://')):
                 url = 'http://' + url
-            headers = {'User-Agent': 'BotGotsThis/' + bot.config.botnick,}
+            headers = {'User-Agent': 'BotGotsThis/' + bot.config.botnick}
             try:
                 response: aiohttp.ClientSession
                 async with session.get(url, headers=headers) as response:
