@@ -7,7 +7,6 @@ from typing import NamedTuple, Optional, Tuple, Union
 import aiohttp
 import asyncio
 import bot
-import bot.globals
 import bot.utils
 import email.utils
 import time

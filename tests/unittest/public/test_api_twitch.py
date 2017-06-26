@@ -1,5 +1,5 @@
 import asyncio
-import bot.globals  # noqa: F401
+import bot  # noqa: F401
 import json
 
 import aiohttp

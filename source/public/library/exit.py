@@ -1,6 +1,6 @@
 ﻿import asyncio
 
-import bot.globals
+import bot
 
 from bot import utils
 

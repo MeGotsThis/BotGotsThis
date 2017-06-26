@@ -3,7 +3,7 @@ This file is for mypy on checking the background tasks as they are not being
 checked as of version 0.4.2.
 '''
 
-import bot.globals
+import bot
 
 import source.public.autoload.twitch
 import source.public.autoload.emotes

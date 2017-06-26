@@ -1,7 +1,6 @@
 import asyncio
 
 import bot
-import bot.globals
 import source.ircmessage
 
 from collections import deque

@@ -1,7 +1,6 @@
 import asyncio
 
 import bot
-import bot.globals
 
 from datetime import datetime, timedelta
 from collections import deque

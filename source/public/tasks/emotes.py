@@ -1,5 +1,5 @@
 ﻿import asyncio
-import bot.globals
+import bot
 import copy
 import random
 from bot import data  # noqa: F401
