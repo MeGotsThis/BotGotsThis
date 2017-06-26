@@ -46,12 +46,6 @@ CREATE TABLE custom_commands_history (
 CREATE INDEX custom_commands_history_broadcaster ON
     custom_commands_history (broadcaster, command)'''])
 
-    async def tearDown(self):
-        await self.execute('DROP TABLE IF EXISTS custom_commands')
-        await self.execute('DROP TABLE IF EXISTS custom_command_properties')
-        await self.execute('DROP TABLE IF EXISTS custom_commands_history')
-        await super().tearDown()
-
     async def test_get_commands(self):
         self.assertEqual(
             await self.database.getChatCommands('botgotsthis', 'kappa'),

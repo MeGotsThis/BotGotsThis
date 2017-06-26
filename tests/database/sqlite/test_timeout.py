@@ -26,10 +26,6 @@ CREATE TABLE timeout_logs (
     reason VARCHAR
 )''')
 
-    async def tearDown(self):
-        await self.execute('DROP TABLE IF EXISTS timeout_logs')
-        await super().tearDown()
-
     async def test_record(self):
         await self.database.recordTimeout(
             'botgotsthis', 'botgotsthis', None, 'tests', None, None, None,

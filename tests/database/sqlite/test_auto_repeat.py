@@ -19,10 +19,6 @@ CREATE TABLE auto_repeat (
 );
 ''')
 
-    async def tearDown(self):
-        await self.execute('DROP TABLE IF EXISTS auto_repeat')
-        await super().tearDown()
-
     async def test_empty(self):
         self.assertEqual(
             [r async for r in self.database.getAutoRepeatToSend()], [])

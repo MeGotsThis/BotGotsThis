@@ -22,11 +22,6 @@ CREATE TABLE banned_channels_log (
     actionLog VARCHAR NOT NULL
 )'''])
 
-    async def tearDown(self):
-        await self.execute('DROP TABLE IF EXISTS banned_channels')
-        await self.execute('DROP TABLE IF EXISTS banned_channels_log')
-        await super().tearDown()
-
     async def test_list(self):
         self.assertEqual([b async for b in self.database.listBannedChannels()],
                          [])
