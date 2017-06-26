@@ -258,7 +258,7 @@ class TestLibraryCustomCreateMessages(asynctest.TestCase):
         patcher = patch('lists.custom', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
-        self.mock_list.postProcess = []
+        self.mock_list.postProcess.return_value = []
 
     async def test_blank(self):
         self.mock_split.return_value = []
@@ -467,7 +467,7 @@ class TestLibraryCustomCreateMessages(asynctest.TestCase):
         async def process(args):
             args.messages[0] = 'Kappa'
         mock_process = CoroutineMock(spec=process, side_effect=process)
-        self.mock_list.postProcess = [mock_process]
+        self.mock_list.postProcess.return_value = [mock_process]
         self.mock_split.return_value = []
         self.assertEqual(await custom.create_messages(self.command, self.args),
                          ['Kappa'])
@@ -966,7 +966,7 @@ class TestLibraryCustomConvertField(asynctest.TestCase):
         patcher = patch('lists.custom', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
-        self.mock_list.fields = []
+        self.mock_list.fields.return_value = []
 
     async def test_no_fields(self):
         self.assertIsNone(await custom.convert_field(self.args))
@@ -975,7 +975,7 @@ class TestLibraryCustomConvertField(asynctest.TestCase):
         async def convert(args):
             pass
         mock_convert = CoroutineMock(spec=convert, return_value=None)
-        self.mock_list.fields = [mock_convert]
+        self.mock_list.fields.return_value = [mock_convert]
         self.assertIsNone(await custom.convert_field(self.args))
         self.assertEqual(mock_convert.call_count, 1)
 
@@ -983,7 +983,7 @@ class TestLibraryCustomConvertField(asynctest.TestCase):
         async def convert(args):
             pass
         mock_convert = CoroutineMock(spec=convert, return_value='Kappa')
-        self.mock_list.fields = [mock_convert]
+        self.mock_list.fields.return_value = [mock_convert]
         self.assertEqual(await custom.convert_field(self.args), 'Kappa')
         self.assertEqual(mock_convert.call_count, 1)
 

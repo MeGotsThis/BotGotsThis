@@ -512,7 +512,7 @@ class TestChannelCustomProcessCommand(TestChannel):
 
     @patch('lists.custom', autospec=True)
     async def test_command_property_empty(self, mock_list):
-        mock_list.properties = []
+        mock_list.properties.return_value = []
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'someproperty PogChamp')
         self.permissionSet['broadcaster'] = True
@@ -524,7 +524,7 @@ class TestChannelCustomProcessCommand(TestChannel):
 
     @patch('lists.custom', autospec=True)
     async def test_command_property(self, mock_list):
-        mock_list.properties = ['someproperty']
+        mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'someproperty PogChamp')
         self.database.processCustomCommandProperty.return_value = True
@@ -538,7 +538,7 @@ class TestChannelCustomProcessCommand(TestChannel):
 
     @patch('lists.custom', autospec=True)
     async def test_command_property_no_value(self, mock_list):
-        mock_list.properties = ['someproperty']
+        mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'someproperty')
         self.database.processCustomCommandProperty.return_value = True
@@ -551,7 +551,7 @@ class TestChannelCustomProcessCommand(TestChannel):
 
     @patch('lists.custom', autospec=True)
     async def test_command_property_dberror(self, mock_list):
-        mock_list.properties = ['someproperty']
+        mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'someproperty PogChamp')
         self.database.processCustomCommandProperty.return_value = False

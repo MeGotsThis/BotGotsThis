@@ -96,7 +96,7 @@ async def create_messages(command: CustomCommand,
         command.broadcaster, command.level, args.message.command,
         messages)
     process: CustomCommandProcess
-    for process in lists.custom.postProcess:
+    for process in lists.custom.postProcess():
         await process(processArgument)
     return messages
 
@@ -392,7 +392,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
 
 async def convert_field(args: CustomFieldArgs) -> Optional[str]:
     convert: CustomCommandField
-    for convert in lists.custom.fields:
+    for convert in lists.custom.fields():
         result: Optional[str] = await convert(args)
         if result is not None:
             return result

@@ -48,7 +48,7 @@ async def field_replace(args: CustomFieldArgs, match: Match[str]) -> str:
                             default=None,
                             )
     fields: Iterator[CustomCommandField]
-    fields = (f for f in lists.custom.fields if f is not fieldUrl)
+    fields = (f for f in lists.custom.fields() if f is not fieldUrl)
     field: CustomCommandField
     for field in fields:
         replacement: Optional[str] = await field(newargs)
