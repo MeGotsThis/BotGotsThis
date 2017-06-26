@@ -15,7 +15,7 @@ async def manage_bot(database: DatabaseMain,
                      message: Message) -> bool:
     argument: ManageBotArgs
     argument = ManageBotArgs(database, permissions, send, nick, message)
-    
+
     method: str = message.lower[1]
     if (method in lists.manage.methods
             and lists.manage.methods[method] is not None):

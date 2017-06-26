@@ -2,7 +2,7 @@
 import bot
 import bot.globals
 from bot import utils
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union  # noqa: F401
 from ...api import twitch
 from ...data import Send
 from ...data.message import Message

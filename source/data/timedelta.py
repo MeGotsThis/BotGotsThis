@@ -1,11 +1,11 @@
 ﻿from datetime import timedelta
-from typing import List
+from typing import List  # noqa: F401
 
 
 def format(timeDelta: timedelta) -> str:
     if not isinstance(timeDelta, timedelta):
         raise TypeError()
-    formatted: List[str] = []
+    formatted: List[str] = []  # noqa: E701
     if timeDelta.days == 1:
         formatted.append('1 day')
     elif timeDelta.days > 1:

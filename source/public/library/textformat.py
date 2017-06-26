@@ -1,15 +1,15 @@
 ﻿import re
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List  # noqa: F401
 
 FormatText = Callable[[str], str]
 
 ascii: str = (''' !"#$%&'()*+,-./'''
               '0123456789'
-               ':;<=>?@'
-               'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-               r'[\]^_`'
-               'abcdefghijklmnopqrstuvwxyz'
-               '{|}~')
+              ':;<=>?@'
+              'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+              r'[\]^_`'
+              'abcdefghijklmnopqrstuvwxyz'
+              '{|}~')
 upper: str = (''' !"#$%&'()*+,-./'''
               '0123456789'
               ':;<=>?@'
@@ -161,24 +161,32 @@ def _createAsciiTo(name: str,
     asciiTo.__name__ = name
     return asciiTo
 
-to_upper:FormatText = _createAsciiTo('to_upper', upper)
+
+to_upper: FormatText = _createAsciiTo('to_upper', upper)
 to_lower: FormatText = _createAsciiTo('to_lower', lower)
 to_full_width: FormatText = _createAsciiTo('to_full_width', full)
-to_parenthesized: FormatText = _createAsciiTo('to_parenthesized', parenthesized)
+to_parenthesized: FormatText = _createAsciiTo(
+    'to_parenthesized', parenthesized)
 to_circled: FormatText = _createAsciiTo('to_circled', circled)
 to_small_caps: FormatText = _createAsciiTo('to_small_caps', smallcaps)
-_to_upside_down_reversed: FormatText = _createAsciiTo('to_upside_down', upsidedown)
+_to_upside_down_reversed: FormatText = _createAsciiTo(
+    'to_upside_down', upsidedown)
+
+
 def to_upside_down(text: str) -> str:
     return _to_upside_down_reversed(text)[::-1]
+
+
 to_serif_bold: FormatText = _createAsciiTo('to_serif_bold', serifBold)
 to_serif_italic: FormatText = _createAsciiTo('to_serif_italic', serifItalic)
-to_serif_bold_italic: FormatText = _createAsciiTo('to_serif_bold_italic',
-                                                  serifBoldItalic)
+to_serif_bold_italic: FormatText = _createAsciiTo(
+    'to_serif_bold_italic', serifBoldItalic)
 to_sanserif: FormatText = _createAsciiTo('to_sanserif', sanSerif)
 to_sanserif_bold: FormatText = _createAsciiTo('to_sanserif_bold', sanSerifBold)
-to_sanserif_italic: FormatText = _createAsciiTo('to_sanserif_italic', sanSerifItalic)
-to_sanserif_bold_italic:FormatText = _createAsciiTo('to_sanserif_bold_italic',
-                                                    sanSerifBoldItalic)
+to_sanserif_italic: FormatText = _createAsciiTo(
+    'to_sanserif_italic', sanSerifItalic)
+to_sanserif_bold_italic: FormatText = _createAsciiTo(
+    'to_sanserif_bold_italic', sanSerifBoldItalic)
 to_script: FormatText = _createAsciiTo('to_script', script)
 to_script_bold: FormatText = _createAsciiTo('to_script_bold', scriptBold)
 to_fraktur: FormatText = _createAsciiTo('to_fraktur', fraktur)

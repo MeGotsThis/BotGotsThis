@@ -20,7 +20,7 @@ def parse(tags: IrcMessageTagsReadOnly,
           timestamp: datetime):
     if len(rawMessage) == 0:
         return
-    
+
     message: Message = Message(rawMessage)
     if len(message) == 0:
         return

@@ -1,8 +1,8 @@
 ﻿from contextlib import suppress
-from typing import List, Optional
+from typing import List, Optional  # noqa: F401
 from ..library.chat import min_args, permission
 from ...data import ChatCommandArgs
-from ...database import AutoRepeatList
+from ...database import AutoRepeatList  # noqa: F401
 
 
 @permission('broadcaster')
@@ -12,7 +12,7 @@ async def commandAutoRepeat(args: ChatCommandArgs) -> bool:
     !autorepeat 0
     !autorepeat off
     """
-    
+
     count: Optional[int] = None
     return await process_auto_repeat(args, count)
 
@@ -20,11 +20,11 @@ async def commandAutoRepeat(args: ChatCommandArgs) -> bool:
 @permission('broadcaster')
 async def commandAutoRepeatCount(args: ChatCommandArgs) -> bool:
     """
-    !autorepeat-20 0.5 MONEY MONEY 
+    !autorepeat-20 0.5 MONEY MONEY
     !autorepeat-20 0
     !autorepeat-20 off
     """
-    
+
     count: Optional[int] = 10
     with suppress(ValueError, IndexError):
         count = int(args.message.command.split('autorepeat-')[1])

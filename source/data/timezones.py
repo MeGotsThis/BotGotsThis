@@ -25,7 +25,7 @@ class BaseTimeZone(tzinfo, metaclass=ABCMeta):
 class BasicTimeZone(BaseTimeZone):
     """Fixed offset in minutes east from UTC."""
     __slots__ = ('__offset', '__name')
-    
+
     def __init__(self,
                  offset: int,
                  name: str) -> None:
@@ -35,16 +35,16 @@ class BasicTimeZone(BaseTimeZone):
             raise TypeError()
         self.__offset: timedelta = timedelta(minutes=offset)
         self.__name: str = name
-    
+
     def zone(self) -> str:
         return self.__name
-    
+
     def tzname(self, dt: Optional[datetime]) -> str:
         return self.__name
-    
+
     def utcoffset(self, dt: Optional[datetime]) -> timedelta:
         return timedelta(minutes=self.__offset.total_seconds() // 60)
-    
+
     def dst(self, dt: Optional[datetime]) -> timedelta:
         return ZERO
 
@@ -52,7 +52,7 @@ class BasicTimeZone(BaseTimeZone):
 class TimeZone(BaseTimeZone):
     """Fixed offset in minutes east from UTC."""
     __slots__ = ('__zone', '_transitions')
-    
+
     def __init__(self,
                  zone: str,
                  transitions: Sequence[Transition]) -> None:
@@ -64,10 +64,10 @@ class TimeZone(BaseTimeZone):
             raise ValueError()
         self.__zone: str = zone
         self._transitions: Sequence[Transition] = transitions
-    
+
     def zone(self) -> str:
         return self.__zone
-    
+
     def tzname(self, dt: Optional[datetime]) -> str:
         if dt is None:
             return self._transitions[0].abbreviation
@@ -82,7 +82,7 @@ class TimeZone(BaseTimeZone):
                 transistion = t
                 break
         return transistion.abbreviation
-    
+
     def utcoffset(self, dt: Optional[datetime]) -> timedelta:
         if dt is None:
             return timedelta(minutes=self._transitions[0].offset // 60)
@@ -97,7 +97,7 @@ class TimeZone(BaseTimeZone):
                 transistion = t
                 break
         return timedelta(minutes=transistion.offset // 60)
-     
+
     def dst(self, dt: Optional[datetime]) -> timedelta:
         if dt is None:
             return ZERO

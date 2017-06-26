@@ -1,7 +1,7 @@
 ﻿import bot
 import bot.globals
 from bot import utils
-from typing import Optional, Union
+from typing import Optional, Union  # noqa: F401
 from . import timeout
 from ...api import twitch
 from ...data import Send

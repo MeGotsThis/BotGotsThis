@@ -1,9 +1,9 @@
 ﻿import bot
-from bot import data, utils
-from bot.coroutine import connection
-from bot.twitchmessage import IrcMessage, IrcMessageTagsReadOnly
+from bot import data, utils  # noqa: F401
+from bot.coroutine import connection as connectionM  # noqa: F401
+from bot.twitchmessage import IrcMessage, IrcMessageTagsReadOnly  # noqa: F401
 from datetime import datetime
-from typing import Callable, Dict, Mapping, List, Optional, Union
+from typing import Callable, Dict, Mapping, List, Optional, Union  # noqa: F401
 from . import channel, whisper
 from .irccommand import clearchat, notice, userstate
 try:
@@ -21,7 +21,7 @@ _logCommandPerChannel: List[str] = [
     ]
 
 
-def parseMessage(connection: 'connection.ConnectionHandler',
+def parseMessage(connection: 'connectionM.ConnectionHandler',
                  ircmsg: str,
                  timestamp: datetime) -> None:
     message: IrcMessage = IrcMessage.fromMessage(ircmsg)
@@ -33,7 +33,8 @@ def parseMessage(connection: 'connection.ConnectionHandler',
     ircmessage.parseMessage(connection, ircmsg, timestamp)
 
 
-def registerIrc(command: Union[str, int]) -> Callable[[IrcHandler], IrcHandler]:
+def registerIrc(command: Union[str, int]
+                ) -> Callable[[IrcHandler], IrcHandler]:
     def decorator(func: IrcHandler) -> IrcHandler:
         ircHandlers[command] = func
         return func
@@ -42,7 +43,7 @@ def registerIrc(command: Union[str, int]) -> Callable[[IrcHandler], IrcHandler]:
 
 @registerIrc('PRIVMSG')
 def irc_privmsg(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = connection.channels
@@ -60,7 +61,7 @@ def irc_privmsg(
 
 @registerIrc('WHISPER')
 def irc_whisper(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     tags: IrcMessageTagsReadOnly = message.tags
@@ -79,7 +80,7 @@ def irc_whisper(
 
 @registerIrc('NOTICE')
 def irc_notice(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = connection.channels
@@ -98,7 +99,7 @@ def irc_notice(
 
 @registerIrc('CLEARCHAT')
 def irc_clearchat(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = connection.channels
@@ -117,7 +118,7 @@ def irc_clearchat(
 
 @registerIrc('ROOMSTATE')
 def irc_roomstate(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     where: Optional[str] = message.params.middle
@@ -127,7 +128,7 @@ def irc_roomstate(
 
 @registerIrc('HOSTTARGET')
 def irc_hosttarget(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     where: Optional[str] = message.params.middle
@@ -137,7 +138,7 @@ def irc_hosttarget(
 
 @registerIrc('MODE')
 def irc_mode(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = connection.channels
@@ -154,7 +155,7 @@ def irc_mode(
 
 @registerIrc('JOIN')
 def irc_join(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = connection.channels
@@ -166,7 +167,7 @@ def irc_join(
 
 @registerIrc(353)
 def irc_353(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = connection.channels
@@ -181,7 +182,7 @@ def irc_353(
 
 @registerIrc(366)
 def irc_366(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     where: str = message.params.middle.split()[-1]
@@ -192,7 +193,7 @@ def irc_366(
 
 @registerIrc('PART')
 def irc_part(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = connection.channels
@@ -204,7 +205,7 @@ def irc_part(
 
 @registerIrc('PING')
 def irc_ping(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     if message.params.trailing is not None:
@@ -213,7 +214,7 @@ def irc_ping(
 
 @registerIrc('PONG')
 def irc_pong(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     if (message.prefix is not None
@@ -227,7 +228,7 @@ def irc_pong(
 
 @registerIrc('USERSTATE')
 def irc_userstate(
-        connection: 'connection.ConnectionHandler',
+        connection: 'connectionM.ConnectionHandler',
         message: IrcMessage,
         timestamp: datetime) -> None:
     channels: Mapping[str, data.Channel] = connection.channels

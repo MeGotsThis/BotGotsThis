@@ -1,5 +1,5 @@
 ﻿from contextlib import suppress
-from typing import Match, Optional, Sequence
+from typing import Match, Optional, Sequence  # noqa: F401
 from ...data import CustomFieldArgs
 import re
 

@@ -4,7 +4,7 @@ import itertools
 import random
 from contextlib import suppress
 from datetime import timedelta
-from typing import Dict, Iterator, List
+from typing import Dict, Iterator, List  # noqa: F401
 from ..library import chat, timeout
 from ..library.chat import min_args, permission_feature
 from ...data import ChatCommandArgs

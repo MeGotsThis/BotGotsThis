@@ -3,10 +3,9 @@ import bot.globals
 from bot.coroutine import connection as connectionM
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple
-from typing import Optional, Set, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Iterable, List, NamedTuple  # noqa: F401, E501
+from typing import Optional, Set, Tuple, TypeVar, Union  # noqa: F401
 from source.api import bttv, ffz
-from .error import ConnectionReset, LoginUnsuccessful
 from .. import utils
 
 
@@ -322,7 +321,7 @@ class MessagingQueue:
         if any(msg for msg in listMessages if not isinstance(msg, str)):
             raise TypeError()
         if (priority < -len(self._chatQueues)
-            or priority >= len(self._chatQueues)):
+                or priority >= len(self._chatQueues)):
             raise ValueError()
         whispers: DefaultOrderedDict[str, List[str]]
         whispers = DefaultOrderedDict(list)
@@ -332,7 +331,7 @@ class MessagingQueue:
             if not message:
                 continue
             if (not bypass
-                and message.startswith(tuple(disallowedCommands))):
+                    and message.startswith(tuple(disallowedCommands))):
                 continue
             if message.startswith(('/w ', '.w ')):
                 tokens = message.split(' ', 2)
@@ -381,7 +380,7 @@ class MessagingQueue:
                     last: datetime
                     last = self._publicTime[message.channel.channel]
                     if (self._isMod(message.channel)
-                        or timestamp - last < publicDelay):
+                            or timestamp - last < publicDelay):
                         continue
                     self._publicTime[message.channel.channel] = timestamp
                     del queue[i]
@@ -420,7 +419,8 @@ class MessagingQueue:
         return channel.isMod or bot.config.botnick == channel.channel
 
     def popWhisper(self) -> Optional[WhisperMessage]:
-        if self._whisperQueue and len(self._whisperSent) < bot.config.whiperLimit:
+        if (self._whisperQueue
+                and len(self._whisperSent) < bot.config.whiperLimit):
             self._whisperSent.append(utils.now())
             return self._whisperQueue.popleft()
         return None

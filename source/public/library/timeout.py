@@ -1,9 +1,9 @@
 import bot
-from bot import data, utils
+from bot import data, utils  # noqa: F401
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timedelta
-from typing import Dict, Iterable, Mapping, List, Optional, Union, cast
+from typing import Dict, Iterable, Mapping, List, Optional, Union, cast  # noqa: F401, E501
 from ... import database
 
 
@@ -27,13 +27,14 @@ async def timeout_user(database_: database.DatabaseMain,
                                                  defaults, int)
     timeouts = [chatProp['timeoutLength0'],
                 chatProp['timeoutLength1'],
-                chatProp['timeoutLength2'],]
-    
+                chatProp['timeoutLength2'],
+                ]
+
     if 'timeouts' not in chat.sessionData:
         chat.sessionData['timeouts'] = defaultdict(
             lambda: defaultdict(
                 lambda: (datetime.min, 0)))
-    
+
     timestamp: datetime = utils.now()
     duration: timedelta = timedelta(seconds=bot.config.warningDuration)
     level: int
@@ -97,4 +98,4 @@ async def record_timeout(chat: 'data.Channel',
                 db_: database.DatabaseTimeout
                 db_ = cast(database.DatabaseTimeout, db)
                 await db_.recordTimeout(chat.channel, who, user, module, None,
-                                  length, source_message, reason)
+                                        length, source_message, reason)

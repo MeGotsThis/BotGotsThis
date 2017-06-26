@@ -1,4 +1,5 @@
-from typing import List, NamedTuple, Optional
+from typing import List, NamedTuple, Optional  # noqa: F401
+
 
 class ParsedParams(NamedTuple):
     middle: Optional[str]
@@ -7,7 +8,7 @@ class ParsedParams(NamedTuple):
 
 class IrcMessageParams:
     __slots__ = ('_middle', '_trailing')
-    
+
     def __init__(self,
                  middle: Optional[str]=None,
                  trailing: Optional[str]=None) -> None:
@@ -62,18 +63,18 @@ class IrcMessageParams:
             return (self._middle == other._middle
                     and self._trailing == other._trailing)
         return False
-    
+
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
-    
+
     @staticmethod
     def parse(params: str) -> ParsedParams:
         if not isinstance(params, str):
             raise TypeError()
-        
+
         length: int = len(params)
         i: int = 0
-        
+
         if i == length:
             return ParsedParams(None, None)
 
@@ -87,7 +88,7 @@ class IrcMessageParams:
         while i < length:
             char = params[i]
             i += 1
-                    
+
             if char == ' ':
                 while i < length and params[i] == ' ':
                     i += 1
@@ -99,24 +100,24 @@ class IrcMessageParams:
                 break
             else:
                 s.append(char)
-        
+
         if len(s):
             m.extend(s)
         elif len(m):
             del m[-1]
-        
+
         if char == ':':
             hasTrailing = True
             while i < length:
                 char = params[i]
                 i += 1
-                
+
                 t.append(char)
-        
+
         if i != length:
             raise ValueError()
-        
+
         middle = ''.join(m) if m else None
         trailing = ''.join(t) if hasTrailing else None
-        
+
         return ParsedParams(middle, trailing)

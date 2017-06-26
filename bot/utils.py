@@ -1,8 +1,8 @@
 ﻿from . import data
-from .coroutine import connection
+from .coroutine import connection  # noqa: F401
 from datetime import datetime, timedelta
 from types import TracebackType
-from typing import Any, Dict, Iterable, List, Optional, Type, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Type, Tuple, Union  # noqa: F401, E501
 from source.api import twitch
 import builtins
 import bot
@@ -215,7 +215,7 @@ def logException(extraMessage: str='',
     if bot.config.exceptionLog is None:
         return
     timestamp = timestamp or now()
-    exceptType: Optional[Type[BaseException]]
+    exceptType: Optional[Type[BaseException]]  # noqa: E701
     excecption: Optional[BaseException]
     trackback: Optional[TracebackType]
     excep: List[str]

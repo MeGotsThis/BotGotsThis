@@ -1,5 +1,4 @@
-﻿import asyncio
-import datetime
+﻿import datetime
 
 from bot.coroutine import background
 from ..tasks import repeat

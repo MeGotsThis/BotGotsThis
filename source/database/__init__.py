@@ -1,5 +1,3 @@
-import os.path
-
 import aioodbc
 import aioodbc.cursor
 import pyodbc
@@ -9,7 +7,7 @@ import bot
 from datetime import datetime
 from enum import Enum
 from typing import Any, AsyncIterator, Callable, Dict, List, Mapping
-from typing import NamedTuple, Optional, Sequence, Tuple, Type, TypeVar, Union
+from typing import NamedTuple, Optional, Sequence, Tuple, Type, TypeVar, Union  # noqa: F401, E501
 from typing import overload
 
 T = TypeVar('T')
@@ -88,7 +86,8 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
             async for r in cursor:
                 yield AutoJoinChannel(*r)
 
-    async def getAutoJoinsPriority(self, broadcaster: str) -> Union[int, float]:
+    async def getAutoJoinsPriority(self, broadcaster: str
+                                   ) -> Union[int, float]:
         query: str = '''SELECT priority FROM auto_join WHERE broadcaster=?'''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
@@ -478,7 +477,7 @@ SELECT property, value FROM custom_command_properties
 ''' % ','.join('?' * len(property))
                 values = {}
                 params = (broadcaster, permission, command.lower(),
-                                 ) + tuple(property)
+                          ) + tuple(property)
                 await cursor.execute(query, params)
                 async for p, v in cursor:
                     values[p] = v
@@ -488,7 +487,7 @@ SELECT property, value FROM custom_command_properties
                 return values
             else:
                 query = '''
-SELECT value FROM custom_command_properties 
+SELECT value FROM custom_command_properties
     WHERE broadcaster=? AND permission=? AND command=? AND property=?
 '''
                 await cursor.execute(query, (broadcaster, permission,
@@ -589,13 +588,13 @@ SELECT reason FROM banned_channels WHERE broadcaster=?
                                reason: str,
                                nick: str) -> bool:
         query: str = '''
-INSERT INTO banned_channels 
+INSERT INTO banned_channels
     (broadcaster, currentTime, reason, who)
     VALUES (?, CURRENT_TIMESTAMP, ?, ?)
 '''
         history: str = '''
 INSERT INTO banned_channels_log
-    (broadcaster, currentTime, reason, who, actionLog) 
+    (broadcaster, currentTime, reason, who, actionLog)
     VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)
 '''
         cursor: aioodbc.cursor.Cursor
@@ -618,7 +617,7 @@ DELETE FROM banned_channels WHERE broadcaster=?
 '''
         history: str = '''
 INSERT INTO banned_channels_log
-    (broadcaster, currentTime, reason, who, actionLog) 
+    (broadcaster, currentTime, reason, who, actionLog)
     VALUES (?, CURRENT_TIMESTAMP, ?, ?, ?)
 '''
         cursor: aioodbc.cursor.Cursor
@@ -636,20 +635,20 @@ INSERT INTO banned_channels_log
     async def getChatProperty(self,
                               broadcaster: str,
                               property: str) -> Optional[str]: ...
-    @overload
+    @overload  # noqa: F811, E301
     async def getChatProperty(self,
                               broadcaster: str,
                               property: str,
                               default: T
                               ) -> Union[str, T]: ...
-    @overload
+    @overload  # noqa: F811, E301
     async def getChatProperty(self,
                               broadcaster: str,
                               property: str,
                               default: T,
                               parse: Callable[[str], S]
                               ) -> Union[T, S]: ...
-    async def getChatProperty(self,
+    async def getChatProperty(self,  # noqa: F811, E301
                               broadcaster,
                               property,
                               default=None,
@@ -671,47 +670,50 @@ SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''
                                 broadcaster: str,
                                 properties: Sequence[str]
                                 ) -> Mapping[str, Optional[str]]: ...
-    @overload
+    @overload  # noqa: F811, E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: T
                                 ) -> Mapping[str, Union[str, T]]: ...
-    @overload
+    @overload  # noqa: F811, E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: Mapping[str, T]
                                 ) -> Mapping[str, Union[str, T]]: ...
-    @overload
+    @overload  # noqa: F811, E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: T,
                                 parse: Mapping[str, Callable[[str], S]]
                                 ) -> Mapping[str, Union[str, T, S]]: ...
-    @overload
+    @overload  # noqa: F811, E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: T,
                                 parse: Callable[[str], S]
                                 ) -> Mapping[str, Union[T, S]]: ...
-    @overload
+    @overload  # noqa: F811, E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: Mapping[str, T],
                                 parse: Mapping[str, Callable[[str], S]]
                                 ) -> Mapping[str, Union[str, T, S]]: ...
-    @overload
+    @overload  # noqa: F811, E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: Mapping[str, T],
                                 parse: Callable[[str], S]
                                 ) -> Mapping[str, Union[T, S]]: ...
-    async def getChatProperties(self, broadcaster, properties, default=None,
+    async def getChatProperties(self,  # noqa: F811, E301
+                                broadcaster,
+                                properties,
+                                default=None,
                                 parse=None):
         query: str = '''
 SELECT property, value FROM chat_properties
@@ -984,7 +986,7 @@ class DatabaseTimeout(Database):
                             message: Optional[str],
                             reason: Optional[str]) -> bool:
         query: str = '''
-INSERT INTO timeout_logs 
+INSERT INTO timeout_logs
     (broadcaster, twitchUser, fromUser, module, level, length, message, reason)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 '''
@@ -1040,9 +1042,9 @@ SELECT zone_id, zone_name FROM zone ORDER BY zone_id
 
     async def zone_transitions(self) -> List[tuple]:
         query: str = '''
-SELECT zone_id, abbreviation, time_start, gmt_offset 
+SELECT zone_id, abbreviation, time_start, gmt_offset
     FROM timezone
-    WHERE abbreviation != 'UTC' 
+    WHERE abbreviation != 'UTC'
     ORDER BY zone_id, time_start
 '''
         cursor: aioodbc.cursor.Cursor

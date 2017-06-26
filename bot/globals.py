@@ -1,7 +1,7 @@
-﻿from . import data
-from .coroutine import connection
+﻿from . import data  # noqa: F401
+from .coroutine import connection  # noqa: F401
 from datetime import datetime
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional, List  # noqa: F401
 
 
 running: bool = True
@@ -50,7 +50,7 @@ globalEmotes: Dict[int, str] = {
     9805: 'NightBat',
     28: 'MrDestructoid',
     1901: 'Kippa',
-    1900: 'RalpherZ', 
+    1900: 'RalpherZ',
     1: ':)',
     2: ':(',
     8: ':o',

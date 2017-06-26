@@ -8,6 +8,9 @@ from typing import Any, Awaitable, Callable, Iterable, List, NamedTuple
 from typing import Optional, Union
 
 
+Send = Callable[[Union[str, Iterable[str]]], None]
+
+
 class ChatCommandArgs(NamedTuple):
     database: Any  # DatabaseMain
     chat: Any  # Channel
@@ -54,7 +57,7 @@ class CustomProcessArgs(NamedTuple):
 class ManageBotArgs(NamedTuple):
     database: Any  # DatabaseMain
     permissions: Any  # Union[ChatPermissionSet, WhisperPermissionSet]
-    send: Callable[[Union[str,Iterable[str]]], None]
+    send: Send
     nick: str
     message: Message
 
@@ -68,8 +71,6 @@ CustomCommandField = Callable[[CustomFieldArgs], Awaitable[Optional[str]]]
 CustomCommandProcess = Callable[[CustomProcessArgs], Awaitable[None]]
 
 ManageBotCommand = Callable[[ManageBotArgs], Awaitable[bool]]
-
-Send = Callable[[Union[str,Iterable[str]]], None]
 
 
 class CustomCommand(NamedTuple):
@@ -89,7 +90,7 @@ class CommandActionTokens(NamedTuple):
 class CustomFieldParts(NamedTuple):
     plainText: str
     field: Optional[str]
-    format: Optional[str]
+    format: Optional[str]  # noqa: E701
     prefix: Optional[str]
     suffix: Optional[str]
     param: Optional[str]

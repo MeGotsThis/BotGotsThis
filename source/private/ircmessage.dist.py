@@ -1,8 +1,8 @@
-﻿from bot.coroutine import connection
+﻿from bot.coroutine import connection as connectionM  # noqa: F401
 from datetime import datetime
 
 
-def parseMessage(connection: 'connection.ConnectionHandler',
+def parseMessage(connection: 'connectioM.ConnectionHandler',
                  ircmsg: str,
                  now: datetime) -> None:
     pass

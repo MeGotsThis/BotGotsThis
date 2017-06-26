@@ -10,7 +10,7 @@
 # {countdown@15:00,Friday 6:00PM,1/1 7:00 PST,12/22/2015 9:00 PM}
 
 from datetime import date, datetime, time, timedelta
-from typing import Dict, List, Match, NamedTuple, Optional, Sequence, Union
+from typing import Dict, List, Match, NamedTuple, Optional, Sequence, Union  # noqa: F401, E501
 from ...data import CustomFieldArgs
 from ...data.timedelta import format as format_timedelta
 from ...data import timezones
@@ -26,14 +26,14 @@ class Date(NamedTuple):
 
 class DateTime(NamedTuple):
     timestamp: datetime
-    format24: bool
+    format24: bool  # noqa: E701
 
 
 class DateTimeInstance(NamedTuple):
     timeofday: time
     dayofweek: Optional[int]
     date: Optional[Date]
-    format24: bool
+    format24: bool  # noqa: E701
 
 
 class NextPastCooldown(NamedTuple):
@@ -77,7 +77,7 @@ daysOfWeek: Dict[str, int] = {
     'thursday': THURSDAY,
     'friday': FRIDAY,
     'saturday': SATURDAY,
-    
+
     'sun': SUNDAY,
     'mon': MONDAY,
     'tue': TUESDAY,
@@ -141,7 +141,7 @@ async def fieldNext(args: CustomFieldArgs) -> Optional[str]:
                 return None
             return args.default if args.default is not None else 'None'
         else:
-            format: str = _24HourFormat if next.format24 else _12HourFormat
+            format: str = _24HourFormat if next.format24 else _12HourFormat  # noqa: E701, E501
             timeStr: str = next.timestamp.strftime(format)
             return (args.prefix or '') + timeStr + (args.suffix or '')
     return None
@@ -161,7 +161,7 @@ async def fieldPrevious(args: CustomFieldArgs) -> Optional[str]:
                 return None
             return args.default if args.default is not None else 'None'
         else:
-            format: str = _24HourFormat if past.format24 else _12HourFormat
+            format: str = _24HourFormat if past.format24 else _12HourFormat  # noqa: E701, E501
             timeStr: str = past.timestamp.strftime(format)
             return (args.prefix or '') + timeStr + (args.suffix or '')
     return None

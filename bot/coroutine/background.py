@@ -59,7 +59,7 @@ def run_tasks():
 
 
 async def _run_task(task: Callable[[datetime], Awaitable[None]],
-                   timestamp: datetime) -> None:
+                    timestamp: datetime) -> None:
     try:
         await task(timestamp)
     except:

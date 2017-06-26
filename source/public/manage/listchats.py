@@ -1,5 +1,5 @@
 ﻿import bot.globals
-from typing import List
+from typing import List  # noqa: F401
 from ..library import message
 from ...data import ManageBotArgs
 

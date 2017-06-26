@@ -5,7 +5,7 @@ import lists.channel
 from datetime import datetime
 from typing import Iterator, Optional, cast
 
-from bot import data as botData, utils
+from bot import data as botData, utils  # noqa: F401
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
@@ -21,12 +21,13 @@ def parse(chat: 'botData.Channel',
           timestamp: datetime) -> None:
     if len(rawMessage) == 0:
         return
-    
+
     message: Message = Message(rawMessage)
     if len(message) == 0:
         return
-    
+
     asyncio.ensure_future(chatCommand(chat, tags, nick, message, timestamp))
+
 
 async def chatCommand(chat: 'botData.Channel',
                       tags: Optional[IrcMessageTagsReadOnly],
@@ -42,7 +43,8 @@ async def chatCommand(chat: 'botData.Channel',
     try:
         if tags is not None:
             if 'room-id' in tags:
-                utils.saveTwitchId(chat.channel, str(tags['room-id']), timestamp)
+                utils.saveTwitchId(chat.channel, str(tags['room-id']),
+                                   timestamp)
             if 'user-id' in tags:
                 utils.saveTwitchId(nick, str(tags['user-id']), timestamp)
         async with database.get_database() as db:
