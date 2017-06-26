@@ -22,6 +22,11 @@ CREATE TABLE permitted_users_log (
 )''', '''
 INSERT INTO permitted_users VALUES ('botgotsthis', 'megotsthis')'''])
 
+    async def tearDown(self):
+        await self.execute('DROP TABLE IF EXISTS permitted_users')
+        await self.execute('DROP TABLE IF EXISTS permitted_users_log')
+        await super().setUp()
+
     async def test_is_permitted_true(self):
         self.assertIs(
             await self.database.isPermittedUser('botgotsthis', 'megotsthis'),

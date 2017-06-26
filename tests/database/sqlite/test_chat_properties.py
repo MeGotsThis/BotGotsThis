@@ -12,6 +12,10 @@ CREATE TABLE chat_properties (
     PRIMARY KEY (broadcaster, property)
 )''')
 
+    async def tearDown(self):
+        await self.execute('DROP TABLE IF EXISTS chat_properties')
+        await super().setUp()
+
     async def test_get_property(self):
         self.assertIsNone(
             await self.database.getChatProperty('botgotsthis', 'kappa'))

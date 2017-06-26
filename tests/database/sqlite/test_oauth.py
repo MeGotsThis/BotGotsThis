@@ -16,6 +16,10 @@ CREATE TABLE oauth_tokens (
     token VARCHAR NOT NULL UNIQUE ON CONFLICT REPLACE
 )''')
 
+    async def tearDown(self):
+        await self.execute('DROP TABLE IF EXISTS oauth_tokens')
+        await super().setUp()
+
     async def test_get_empty(self):
         self.assertIsNone(await self.database.getOAuthToken('botgotsthis'))
 

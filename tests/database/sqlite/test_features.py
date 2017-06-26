@@ -11,6 +11,10 @@ CREATE TABLE chat_features (
     PRIMARY KEY (broadcaster, feature)
 )''')
 
+    async def tearDown(self):
+        await self.execute('DROP TABLE IF EXISTS chat_features')
+        await super().setUp()
+
     async def test_has(self):
         self.assertIs(await self.database.hasFeature('botgotsthis', 'feature'),
                       False)
