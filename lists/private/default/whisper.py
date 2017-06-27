@@ -4,3 +4,7 @@ from typing import Mapping, Optional
 
 def commands() -> Mapping[str, Optional[WhisperCommand]]:
     return {}
+
+
+def commandsStartWith() -> Mapping[str, Optional[WhisperCommand]]:
+    return {}

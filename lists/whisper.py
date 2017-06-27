@@ -12,3 +12,8 @@ WhisperDict = Mapping[str, Optional[data.WhisperCommand]]
 
 def commands() -> WhisperDict:
     return ChainMap(privateList.commands(), publicList.commands())
+
+
+def commandsStartWith() -> WhisperDict:
+    return ChainMap(privateList.commandsStartWith(),
+                    publicList.commandsStartWith())

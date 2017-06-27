@@ -24,3 +24,7 @@ def commands() -> Mapping[str, Optional[data.WhisperCommand]]:
             '!feature': feature.commandFeature,
             })
     return getattr(commands, 'commands')
+
+
+def commandsStartWith() -> Mapping[str, Optional[data.WhisperCommand]]:
+    return {}
