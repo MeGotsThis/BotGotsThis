@@ -1,7 +1,7 @@
 import bot
-# from bot import data  -- https://github.com/python/mypy/issues/1701
+from bot import data  # noqa: F401
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from typing import Any, Optional, Set
+from typing import Optional, Set
 
 
 typeTwitchStaff: Set[str] = {'staff'}
@@ -14,7 +14,7 @@ class ChatPermissionSet:
     def __init__(self,
                  tags: Optional[IrcMessageTagsReadOnly],
                  user: str,
-                 channel: Any,
+                 channel: 'data.Channel',
                  permitted: bool,
                  manager: bool) -> None:
         userType: str
@@ -25,7 +25,7 @@ class ChatPermissionSet:
         self._tags: Optional[IrcMessageTagsReadOnly] = tags
         self._userType: str = userType
         self._user: str = user
-        self._channel: Any = channel
+        self._channel: data.Channel = channel
         self._isOwner: bool
         self._isManager: bool = manager
         self._inOwnerChannel: bool
