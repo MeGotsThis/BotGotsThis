@@ -2,10 +2,12 @@
 
 
 def features() -> Mapping[str, Optional[str]]:
-    return {
-        'textconvert': None,
-        'modpyramid': None,
-        'modwall': None,
-        'nocustom': None,
-        'nourlredirect': None,
-        }
+    if not hasattr(features, 'features'):
+        setattr(features, 'features', {
+            'textconvert': None,
+            'modpyramid': None,
+            'modwall': None,
+            'nocustom': None,
+            'nourlredirect': None,
+            })
+    return getattr(features, 'features')
