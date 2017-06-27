@@ -15,14 +15,9 @@ def fields() -> Iterable[data.CustomCommandField]:
             countdown.fieldSince,
             countdown.fieldNext,
             countdown.fieldPrevious,
+            params.fieldParams,
             ])
     return getattr(fields, 'fields')
-
-
-def fieldsEnd() -> Iterable[data.CustomCommandField]:
-    if not hasattr(fieldsEnd, 'fields'):
-        setattr(fieldsEnd, 'fields', [params.fieldParams])
-    return getattr(fieldsEnd, 'fields')
 
 
 def properties() -> Collection[str]:
