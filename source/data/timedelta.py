@@ -9,20 +9,20 @@ def format(timeDelta: timedelta) -> str:
     if timeDelta.days == 1:
         formatted.append('1 day')
     elif timeDelta.days > 1:
-        formatted.append('{days} days'.format(days=timeDelta.days))
+        formatted.append(f'{timeDelta.days} days')
     hours: int = timeDelta.seconds // 3600
     if hours == 1:
         formatted.append('1 hour')
     elif hours > 1:
-        formatted.append('{hours} hours'.format(hours=hours))
+        formatted.append(f'{hours} hours')
     minutes: int = timeDelta.seconds // 60 % 60
     if minutes == 1:
         formatted.append('1 minute')
     elif minutes > 1:
-        formatted.append('{minutes} minutes'.format(minutes=minutes))
+        formatted.append(f'{minutes} minutes')
     seconds: int = timeDelta.seconds % 60
     if seconds == 1:
         formatted.append('1 second')
     elif seconds > 1:
-        formatted.append('{seconds} seconds'.format(seconds=seconds))
+        formatted.append(f'{seconds} seconds')
     return ', '.join(formatted)

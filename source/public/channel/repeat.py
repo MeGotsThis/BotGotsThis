@@ -59,11 +59,9 @@ async def process_auto_repeat(args: ChatCommandArgs,
         repeat: AutoRepeatList
         for repeat in repeats:
             name = repeat.name if repeat.name else '<default>'
-            args.chat.send(
-                'Name: {name}, Duration: {duration} minutes, '
-                'Message: {message}'.format(name=name,
-                                            duration=repeat.duration,
-                                            message=repeat.message))
+            args.chat.send(f'''\
+Name: {name}, Duration: {repeat.duration} minutes, Message: {repeat.message}\
+''')
         return True
     elif secondArg == 'clear':
         await args.database.clearAutoRepeat(args.chat.channel)

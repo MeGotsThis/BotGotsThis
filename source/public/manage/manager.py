@@ -20,15 +20,13 @@ async def insert_manager(user: str,
                          send: Send) -> bool:
     manager: bool = await database.isBotManager(user)
     if manager:
-        send('{user} is already a manager'.format(user=user))
+        send(f'{user} is already a manager')
         return True
     successful: bool = await database.addBotManager(user)
-    msg: str
     if successful:
-        msg = '{user} is now a manager'
+        send(f'{user} is now a manager')
     else:
-        msg = '{user} could not be added as a manager. Error has occured.'
-    send(msg.format(user=user))
+        send(f'{user} could not be added as a manager. Error has occured.')
     return True
 
 
@@ -37,13 +35,11 @@ async def delete_manager(user: str,
                          send: Send) -> bool:
     manager: bool = await database.isBotManager(user)
     if not manager:
-        send('{user} is already not a manager'.format(user=user))
+        send(f'{user} is already not a manager')
         return True
     successful: bool = await database.removeBotManager(user)
-    msg: str
     if successful:
-        msg = '{user} has been removed as a manager'
+        send(f'{user} has been removed as a manager')
     else:
-        msg = '{user} could not be removed as a manager. Error has occured.'
-    send(msg.format(user=user))
+        send(f'{user} could not be removed as a manager. Error has occured.')
     return True

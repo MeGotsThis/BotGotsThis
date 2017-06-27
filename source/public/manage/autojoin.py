@@ -20,8 +20,8 @@ async def manageAutoJoin(args: ManageBotArgs) -> bool:
     bannedWithReason = await args.database.isChannelBannedReason(
         args.message.lower[3])
     if bannedWithReason is not None:
-        args.send('Chat {channel} is banned from joining'.format(
-            channel=args.message.lower[3]))
+        channel: str = args.message.lower[3]
+        args.send(f'Chat {channel} is banned from joining')
         return True
 
     if args.message.lower[2] in ['add', 'insert', 'join']:
@@ -45,11 +45,9 @@ async def auto_join_priority(database: DatabaseMain,
                              send: Send) -> bool:
     result: bool = await database.setAutoJoinPriority(channel, priority)
     if result:
-        send('Auto join for {channel} is set to priority '
-             '{priority}'.format(channel=channel, priority=priority))
+        send(f'Auto join for {channel} is set to priority {priority}')
     else:
-        send('Auto join for {channel} was never '
-             'enabled'.format(channel=channel))
+        send(f'Auto join for {channel} was never enabled')
     return True
 
 
@@ -62,7 +60,6 @@ async def reload_server(database: DatabaseMain,
             database.setAutoJoinServer(autojoin.broadcaster, cluster)
             utils.ensureServer(autojoin.broadcaster, autojoin.priority,
                                cluster)
-            print('{time} Set Server for {channel}'.format(
-                time=utils.now(), channel=autojoin.broadcaster))
+            print(f'{utils.now()} Set Server for {autojoin.broadcaster}')
     send('Auto Join reload server complete')
     return True

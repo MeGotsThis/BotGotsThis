@@ -45,13 +45,11 @@ async def timeout_user(database_: database.DatabaseMain,
         level = min(max(base_level + 1, prevLevel + 1, 0), 2)
     chat.sessionData['timeouts'][module][user] = timestamp, level
     length: int = timeouts[level]
+    theReason: str = reason or ''
     if length:
-        chat.send(
-            '.timeout {user} {length} {reason}'.format(
-                user=user, length=length, reason=reason or ''), 0)
+        chat.send(f'.timeout {user} {length} {theReason}', 0)
     else:
-        chat.send(
-            '.ban {user} {reason}'.format(user=user, reason=reason or ''), 0)
+        chat.send(f'.ban {user} {theReason}', 0)
 
     db: database.Database
     async with database.get_database(database.Schema.Timeout) as db:
