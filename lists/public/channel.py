@@ -113,4 +113,4 @@ def commandsStartWith() -> Mapping[str, Optional[data.ChatCommand]]:
 
 
 def processNoCommand() -> Iterable[data.ChatCommand]:
-    yield from custom.customCommands
+    yield custom.customCommands
