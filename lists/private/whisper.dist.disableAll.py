@@ -21,3 +21,7 @@ def commands() -> Mapping[str, Optional[WhisperCommand]]:
         '!autojoin': None,
         '!feature': None,
         }
+
+
+def commandsStartWith() -> Mapping[str, Optional[WhisperCommand]]:
+    return {}

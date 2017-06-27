@@ -95,21 +95,58 @@ class TestWhisperCommandToProcess(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.commands.return_value = {}
+        self.mock_list.commandsStartWith.return_value = {}
 
-        self.command = lambda args: False
+        self.command1 = lambda args: False
+        self.command2 = lambda args: False
+        self.command3 = lambda args: False
 
     def test_commandsToProcess_empty(self):
         self.assertEqual(list(whisper.commandsToProcess('!kappa')), [])
 
     def test_commandsToProcess_specific(self):
-        self.mock_list.commands.return_value['!kappa'] = self.command
+        self.mock_list.commands.return_value['!kappa'] = self.command1
         self.assertEqual(
-            list(whisper.commandsToProcess('!kappa')), [self.command])
+            list(whisper.commandsToProcess('!kappa')), [self.command1])
 
     def test_commandsToProcess_specific_no_match(self):
-        self.mock_list.commands.return_value['!kappahd'] = self.command
+        self.mock_list.commands.return_value['!kappahd'] = self.command1
         self.assertEqual(list(whisper.commandsToProcess('!kappa')), [])
 
     def test_commandsToProcess_specific_none(self):
         self.mock_list.commands.return_value['!kappa'] = None
         self.assertEqual(list(whisper.commandsToProcess('!kappa')), [])
+
+    def test_commandsToProcess_startswith(self):
+        self.mock_list.commandsStartWith.return_value['!k'] = self.command1
+        self.assertEqual(
+            list(whisper.commandsToProcess('!kappa')), [self.command1])
+
+    def test_commandsToProcess_startswith_exact(self):
+        self.mock_list.commandsStartWith.return_value['!kappa'] = self.command1
+        self.assertEqual(
+            list(whisper.commandsToProcess('!kappa')), [self.command1])
+
+    def test_commandsToProcess_startswith_none(self):
+        self.mock_list.commandsStartWith.return_value['!k'] = None
+        self.assertEqual(list(whisper.commandsToProcess('!kappa')), [])
+
+    def test_commandsToProcess_startswith_no_match(self):
+        commands = self.mock_list.commandsStartWith.return_value
+        commands['!kevinturtle'] = self.command1
+        self.assertEqual(list(whisper.commandsToProcess('!kappa')), [])
+
+    def test_commandsToProcess_startswith_multiple(self):
+        self.mock_list.commandsStartWith.return_value['!k'] = self.command1
+        self.mock_list.commandsStartWith.return_value['!ka'] = self.command2
+        self.assertCountEqual(
+            list(whisper.commandsToProcess('!kappa')),
+            [self.command1, self.command2])
+
+    def test_commandsToProcess_specific_startswith(self):
+        self.mock_list.commands.return_value['!kappa'] = self.command1
+        self.mock_list.commandsStartWith.return_value['!k'] = self.command2
+        self.mock_list.commandsStartWith.return_value['!ka'] = self.command3
+        self.assertCountEqual(
+            list(whisper.commandsToProcess('!kappa')),
+            [self.command1, self.command2, self.command3])

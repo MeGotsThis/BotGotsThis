@@ -61,3 +61,9 @@ def commandsToProcess(command: str) -> Iterator[data.WhisperCommand]:
     if command in commands:
         if commands[command] is not None:
             yield commands[command]
+    commands = lists.whisper.commandsStartWith()
+    starting: str
+    for starting in commands:
+        if command.startswith(starting):
+            if commands[starting] is not None:
+                yield commands[starting]
