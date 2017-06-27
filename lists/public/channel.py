@@ -14,11 +14,7 @@ from typing import Iterable, Mapping, Optional
 
 
 def filterMessage() -> Iterable[data.ChatCommand]:
-    if not hasattr(filterMessage, 'commands'):
-        setattr(filterMessage, 'commands', [
-            block_url.filterNoUrlForBots
-            ])
-    return getattr(filterMessage, 'commands')
+    yield block_url.filterNoUrlForBots
 
 
 def commands() -> Mapping[str, Optional[data.ChatCommand]]:
@@ -117,6 +113,4 @@ def commandsStartWith() -> Mapping[str, Optional[data.ChatCommand]]:
 
 
 def processNoCommand() -> Iterable[data.ChatCommand]:
-    if not hasattr(processNoCommand, 'commands'):
-        setattr(processNoCommand, 'commands', [custom.customCommands])
-    return getattr(processNoCommand, 'commands')
+    yield from custom.customCommands

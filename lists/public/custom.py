@@ -5,19 +5,15 @@ from typing import Collection, Iterable
 
 
 def fields() -> Iterable[data.CustomCommandField]:
-    if not hasattr(fields, 'fields'):
-        setattr(fields, 'fields', [
-            broadcaster.fieldBroadcaster,
-            user.fieldUser,
-            query.fieldQuery,
-            url.fieldUrl,
-            countdown.fieldCountdown,
-            countdown.fieldSince,
-            countdown.fieldNext,
-            countdown.fieldPrevious,
-            params.fieldParams,
-            ])
-    return getattr(fields, 'fields')
+    yield broadcaster.fieldBroadcaster
+    yield user.fieldUser
+    yield query.fieldQuery
+    yield url.fieldUrl
+    yield countdown.fieldCountdown
+    yield countdown.fieldSince
+    yield countdown.fieldNext
+    yield countdown.fieldPrevious
+    yield params.fieldParams
 
 
 def properties() -> Collection[str]:
@@ -27,6 +23,4 @@ def properties() -> Collection[str]:
 
 
 def postProcess() -> Iterable[data.CustomCommandProcess]:
-    if not hasattr(postProcess, 'post'):
-        setattr(postProcess, 'post', [multiple.propertyMultipleLines])
-    return getattr(postProcess, 'post')
+    yield multiple.propertyMultipleLines
