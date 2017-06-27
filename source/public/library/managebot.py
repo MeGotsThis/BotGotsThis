@@ -1,6 +1,6 @@
 ﻿import lists.manage
-from typing import Union
-from ...data import ManageBotArgs, Send
+from typing import Mapping, Optional, Union  # noqa: F401
+from ...data import ManageBotArgs, ManageBotCommand, Send  # noqa: F401
 from ...data.message import Message
 from ...data.permissions import ChatPermissionSet, WhisperPermissionSet
 from ...database import DatabaseMain
@@ -17,7 +17,8 @@ async def manage_bot(database: DatabaseMain,
     argument = ManageBotArgs(database, permissions, send, nick, message)
 
     method: str = message.lower[1]
-    if (method in lists.manage.methods
-            and lists.manage.methods[method] is not None):
-        return await lists.manage.methods[method](argument)
+    methods: Mapping[str, Optional[ManageBotCommand]]
+    methods = lists.manage.methods()
+    if method in methods and methods[method] is not None:
+        return await methods[method](argument)
     return False
