@@ -9,5 +9,6 @@ def features() -> Mapping[str, Optional[str]]:
             'modwall': None,
             'nocustom': None,
             'nourlredirect': None,
+            'gamestatusbroadcaster': None,
             })
     return getattr(features, 'features')

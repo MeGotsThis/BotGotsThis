@@ -8,5 +8,6 @@ def methods() -> Mapping[str, Optional[ManageBotCommand]]:
             'listchats': None,
             'autojoin': None,
             'banned': None,
+            'manager': None,
             })
     return getattr(methods, 'methods')
