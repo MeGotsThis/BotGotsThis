@@ -252,8 +252,8 @@ async def num_followers(user: str) -> Optional[int]:
                   asyncio.TimeoutError):
         response: client.HTTPResponse
         followerData: dict
-        uri: str = '/kraken/users/{}/follows/channels?limit=1'.format(
-            bot.globals.twitchId[user])
+        twitchId: str = bot.globals.twitchId[user]
+        uri: str = f'/kraken/users/{twitchId}/follows/channels?limit=1'
         response, followerData = await get_call(None, uri)
         return int(followerData['_total'])
     return None

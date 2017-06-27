@@ -43,15 +43,15 @@ async def commandSetTimeoutLevel(args: ChatCommandArgs) -> bool:
 @cooldown(timedelta(seconds=60), 'uptime')
 async def commandUptime(args: ChatCommandArgs) -> bool:
     if not args.chat.isStreaming:
-        args.chat.send(
-            '{channel} is currently not streaming or has not been for a '
-            'minute'.format(channel=args.chat.channel))
+        channel: str = args.chat.channel
+        args.chat.send(f'''\
+{channel} is currently not streaming or has not been for a minute''')
     else:
         currentTime: Optional[datetime]
         currentTime = await twitch.server_time()
         if currentTime is not None:
             uptime: timedelta = currentTime - args.chat.streamingSince
-            args.chat.send('Uptime: {uptime}'.format(uptime=uptime))
+            args.chat.send(f'Uptime: {uptime}')
         else:
             args.chat.send('Failed to get information from twitch.tv')
     return True
