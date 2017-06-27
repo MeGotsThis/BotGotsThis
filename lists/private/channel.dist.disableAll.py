@@ -61,9 +61,5 @@ def commandsStartWith() -> Mapping[str, Optional[ChatCommand]]:
         }
 
 
-def noCommandPreCustom() -> Iterable[ChatCommand]:
-    return []
-
-
-def noCommandPostCustom() -> Iterable[ChatCommand]:
+def noCommand() -> Iterable[ChatCommand]:
     return []

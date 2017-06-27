@@ -8,11 +8,9 @@ except ImportError:
 
 
 def fields() -> Iterable[data.CustomCommandField]:
-    if not privateCustom.disablePublic():
-        yield from publicCustom.fields()
     yield from privateCustom.fields()
     if not privateCustom.disablePublic():
-        yield from publicCustom.fieldsEnd()
+        yield from publicCustom.fields()
 
 
 def properties() -> Collection[str]:

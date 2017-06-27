@@ -11,9 +11,9 @@ CommandsDict = Mapping[str, Optional[data.ChatCommand]]
 
 
 def filterMessage() -> Iterable[data.ChatCommand]:
+    yield from privateList.filterMessage()
     if not privateList.disableFilters():
         yield from publicList.filterMessage()
-    yield from privateList.filterMessage()
 
 
 def commands() -> CommandsDict:
@@ -26,7 +26,6 @@ def commandsStartWith() -> CommandsDict:
 
 
 def processNoCommand() -> Iterable[data.ChatCommand]:
-    yield from privateList.noCommandPreCustom()
+    yield from privateList.noCommand()
     if not privateList.disableCustomMessage():
         yield from publicList.processNoCommand()
-    yield from privateList.noCommandPostCustom()
