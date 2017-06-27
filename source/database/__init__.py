@@ -73,6 +73,9 @@ class Database:
     async def cursor(self) -> aioodbc.cursor.Cursor:
         return await self.connection.cursor()
 
+    async def commit(self) -> None:
+        await self.connection.commit()
+
 
 class DatabaseMain(Database):
     async def getAutoJoinsChats(self) -> AsyncIterator[AutoJoinChannel]:
@@ -108,7 +111,7 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
         async with await self.cursor() as cursor:
             try:
                 await cursor.execute(query, (broadcaster, priority, cluster))
-                await self.connection.commit()
+                await self.commit()
                 return True
             except pyodbc.Error:
                 return False
@@ -118,7 +121,7 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster,))
-            await self.connection.commit()
+            await self.commit()
             return cursor.rowcount != 0
 
     async def setAutoJoinPriority(self,
@@ -128,7 +131,7 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (priority, broadcaster))
-            await self.connection.commit()
+            await self.commit()
             return cursor.rowcount != 0
 
     async def setAutoJoinServer(self,
@@ -138,7 +141,7 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (cluster, broadcaster))
-            await self.connection.commit()
+            await self.commit()
             return cursor.rowcount != 0
 
     async def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
@@ -219,7 +222,7 @@ INSERT INTO custom_commands_history
 
             await cursor.execute(history, (broadcaster, permission, lower,
                                            display, 'add', fullMessage, user))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def updateCustomCommand(self,
@@ -248,14 +251,13 @@ INSERT INTO custom_commands_history
             await cursor.execute(query, (display, fullMessage, user,
                                          broadcaster, permission,
                                          command.lower()))
-            self.connection.commit()
             if cursor.rowcount == 0:
                 return False
 
             await cursor.execute(history, (broadcaster, permission,
                                            command.lower(), display, 'edit',
                                            fullMessage, user))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def replaceCustomCommand(self,
@@ -284,14 +286,13 @@ INSERT INTO custom_commands_history
             await cursor.execute(query, (broadcaster, permission,
                                          command.lower(), display, fullMessage,
                                          user, user))
-            self.connection.commit()
             if cursor.rowcount == 0:
                 return False
 
             await cursor.execute(history, (broadcaster, permission,
                                            command.lower(), display, 'replace',
                                            fullMessage, user))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def appendCustomCommand(self,
@@ -335,7 +336,7 @@ INSERT INTO custom_commands_history
             await cursor.execute(history, (broadcaster, permission,
                                            command.lower(), display, 'append',
                                            fullMessage, user))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def deleteCustomCommand(self,
@@ -367,7 +368,7 @@ INSERT INTO custom_commands_history
             await cursor.execute(history, (broadcaster, permission,
                                            command.lower(), display, 'delete',
                                            None, user))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def levelCustomCommand(self,
@@ -403,7 +404,7 @@ INSERT INTO custom_commands_history
             await cursor.execute(history, (broadcaster, new_permission,
                                            command.lower(), display, 'level',
                                            permission, user))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def renameCustomCommand(self,
@@ -440,7 +441,7 @@ INSERT INTO custom_commands_history
             await cursor.execute(history, (broadcaster, permission,
                                            new_command.lower(), display,
                                            'rename', command.lower(), user))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def getCustomCommandProperty(
@@ -518,7 +519,7 @@ REPLACE INTO custom_command_properties
                     await cursor.execute(query, (broadcaster, permission,
                                                  command.lower(), property,
                                                  value))
-                await self.connection.commit()
+                await self.commit()
                 return cursor.rowcount != 0
             except pyodbc.Error:
                 return False
@@ -544,7 +545,7 @@ INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)
         async with await self.cursor() as cursor:
             try:
                 await cursor.execute(query, (broadcaster, feature))
-                await self.connection.commit()
+                await self.commit()
                 return True
             except pyodbc.Error:
                 return False
@@ -558,7 +559,7 @@ DELETE FROM chat_features WHERE broadcaster=? AND feature=?
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, feature))
-            await self.connection.commit()
+            await self.commit()
             return cursor.rowcount != 0
 
     async def listBannedChannels(self) -> AsyncIterator[str]:
@@ -601,7 +602,7 @@ INSERT INTO banned_channels_log
                 return False
 
             await cursor.execute(history, (broadcaster, reason, nick, 'add'))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def removeBannedChannel(self,
@@ -624,7 +625,7 @@ INSERT INTO banned_channels_log
 
             await cursor.execute(history, (broadcaster, reason, nick,
                                            'remove'))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     @overload
@@ -756,7 +757,7 @@ REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)
 '''
                 params = broadcaster, property, value,
             await cursor.execute(query, params)
-            await self.connection.commit()
+            await self.commit()
             return cursor.rowcount != 0
 
     async def isPermittedUser(self,
@@ -791,7 +792,7 @@ INSERT INTO permitted_users_log
 
             await cursor.execute(history, (broadcaster, user, moderator,
                                            'add'))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def removePermittedUser(self,
@@ -814,7 +815,7 @@ INSERT INTO permitted_users_log
 
             await cursor.execute(history, (broadcaster, user, moderator,
                                            'remove'))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def isBotManager(self, user: str) -> bool:
@@ -841,7 +842,7 @@ INSERT INTO bot_managers_log
                 return False
 
             await cursor.execute(history, (user, 'add'))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def removeBotManager(self, user: str) -> bool:
@@ -860,7 +861,7 @@ INSERT INTO bot_managers_log
                 return False
 
             await cursor.execute(history, (user, 'remove'))
-            await self.connection.commit()
+            await self.commit()
             return True
 
     async def getAutoRepeatToSend(self) -> AsyncIterator[AutoRepeatMessage]:
@@ -898,7 +899,7 @@ SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster,))
-            await self.connection.commit()
+            await self.commit()
             return cursor.rowcount != 0
 
     async def sentAutoRepeat(self,
@@ -917,7 +918,7 @@ DELETE FROM auto_repeat
             await cursor.execute(query, (broadcaster, name))
             ret: bool = cursor.rowcount != 0
             await cursor.execute(delete, (broadcaster, name))
-            await self.connection.commit()
+            await self.commit()
             return ret
 
     async def setAutoRepeat(self,
@@ -934,7 +935,7 @@ VALUES (?, ?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''
         async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, name, message, count,
                                          minutes, minutes))
-            await self.connection.commit()
+            await self.commit()
             return cursor.rowcount != 0
 
     async def removeAutoRepeat(self,
@@ -945,7 +946,7 @@ DELETE FROM auto_repeat WHERE broadcaster=? AND name=?'''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, name))
-            await self.connection.commit()
+            await self.commit()
             return cursor.rowcount != 0
 
 
@@ -967,7 +968,7 @@ REPLACE INTO oauth_tokens (broadcaster, token) VALUES (?, ?)
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, token))
-            await self.connection.commit()
+            await self.commit()
 
 
 class DatabaseTimeout(Database):
@@ -991,7 +992,7 @@ INSERT INTO timeout_logs
                 await cursor.execute(query, (broadcaster, user, fromUser,
                                              module, level, length, message,
                                              reason))
-                await self.connection.commit()
+                await self.commit()
                 return True
             except pyodbc.Error:
                 return False
