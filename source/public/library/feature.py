@@ -1,5 +1,5 @@
 ﻿import lists.feature
-from typing import Set
+from typing import Mapping, Optional, Set  # noqa: F401
 from ...data import Send
 from ...data.message import Message
 from ...database import DatabaseMain
@@ -24,8 +24,8 @@ async def feature(database: DatabaseMain,
     action: str = message.lower[2] if len(message) >= 3 else ''
 
     feature_: str = message.lower[1]
-    if (feature_ not in lists.feature.features
-            or lists.feature.features[feature_] is None):
+    features: Mapping[str, Optional[str]] = lists.feature.features()
+    if feature_ not in features or features[feature_] is None:
         send('Unrecognized feature: ' + feature_)
         return True
 
@@ -51,7 +51,8 @@ async def feature_add(database: DatabaseMain,
         msg = 'The feature {feature} has already been enabled in {channel}'
     else:
         msg = 'The feature {feature} has been enabled in {channel}'
-    send(msg.format(feature=lists.feature.features[feature_], channel=channel))
+    send(msg.format(feature=lists.feature.features()[feature_],
+                    channel=channel))
     return True
 
 
@@ -68,5 +69,6 @@ async def feature_remove(database: DatabaseMain,
         msg = 'The feature {feature} has been disabled in {channel}'
     else:
         msg = 'The feature {feature} was not enabled in {channel}'
-    send(msg.format(feature=lists.feature.features[feature_], channel=channel))
+    send(msg.format(feature=lists.feature.features()[feature_],
+                    channel=channel))
     return True

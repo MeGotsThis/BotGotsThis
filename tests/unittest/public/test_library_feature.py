@@ -1,9 +1,13 @@
 import asynctest
+
+import bot  # noqa: F401
+
+from asynctest.mock import Mock, patch
+
 from source.data.message import Message
 from source.database import DatabaseMain
 from source.public.library import feature
 from tests.unittest.mock_class import StrContains
-from asynctest.mock import Mock, patch
 
 
 def send(messages):
@@ -15,11 +19,13 @@ class TestLibraryFeatureFeature(asynctest.TestCase):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict('lists.feature.features')
+        patcher = patch('lists.feature')
         self.addCleanup(patcher.stop)
-        patcher.start()
-        feature.lists.feature.features['feature'] = 'Feature'
-        feature.lists.feature.features['none'] = None
+        self.mock_feature = patcher.start()
+        self.mock_feature.features.return_value = {
+            'feature': 'Feature',
+            'none': None
+            }
 
         patcher = patch('source.public.library.feature.feature_add')
         self.addCleanup(patcher.stop)
@@ -98,10 +104,10 @@ class TestLibraryFeatureAdd(asynctest.TestCase):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict('lists.feature.features')
+        patcher = patch('lists.feature')
         self.addCleanup(patcher.stop)
-        patcher.start()
-        feature.lists.feature.features['feature'] = 'Feature'
+        self.mock_feature = patcher.start()
+        self.mock_feature.features.return_value = {'feature': 'Feature'}
 
     async def test(self):
         self.database.hasFeature.return_value = False
@@ -133,10 +139,10 @@ class TestLibraryFeatureRemove(asynctest.TestCase):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-        patcher = patch.dict('lists.feature.features')
+        patcher = patch('lists.feature')
         self.addCleanup(patcher.stop)
-        patcher.start()
-        feature.lists.feature.features['feature'] = 'Feature'
+        self.mock_feature = patcher.start()
+        self.mock_feature.features.return_value = {'feature': 'Feature'}
 
     async def test(self):
         self.database.hasFeature.return_value = True
