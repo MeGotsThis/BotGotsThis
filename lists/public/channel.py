@@ -10,10 +10,10 @@ from source.public.channel import reload
 from source.public.channel import repeat
 from source.public.channel import textformat
 from source.public.channel import wall
-from typing import List, Mapping, Optional
+from typing import Iterable, Mapping, Optional
 
 
-def filterMessage() -> List[data.ChatCommand]:
+def filterMessage() -> Iterable[data.ChatCommand]:
     if not hasattr(filterMessage, 'commands'):
         setattr(filterMessage, 'commands', [
             block_url.filterNoUrlForBots
@@ -116,7 +116,7 @@ def commandsStartWith() -> Mapping[str, Optional[data.ChatCommand]]:
     return getattr(commandsStartWith, 'commands')
 
 
-def processNoCommand() -> List[data.ChatCommand]:
+def processNoCommand() -> Iterable[data.ChatCommand]:
     if not hasattr(processNoCommand, 'commands'):
         setattr(processNoCommand, 'commands', [custom.customCommands])
     return getattr(processNoCommand, 'commands')

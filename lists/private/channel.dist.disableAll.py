@@ -1,5 +1,5 @@
 ﻿from source.data import ChatCommand
-from typing import List, Mapping, Optional
+from typing import Iterable, Mapping, Optional
 
 
 def disableFilters() -> bool:
@@ -10,7 +10,7 @@ def disableCustomMessage() -> bool:
     return True
 
 
-def filterMessage() -> List[ChatCommand]:
+def filterMessage() -> Iterable[ChatCommand]:
     return []
 
 
@@ -61,9 +61,9 @@ def commandsStartWith() -> Mapping[str, Optional[ChatCommand]]:
         }
 
 
-def noCommandPreCustom() -> List[ChatCommand]:
+def noCommandPreCustom() -> Iterable[ChatCommand]:
     return []
 
 
-def noCommandPostCustom() -> List[ChatCommand]:
+def noCommandPostCustom() -> Iterable[ChatCommand]:
     return []

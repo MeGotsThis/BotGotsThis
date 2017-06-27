@@ -1,18 +1,18 @@
 ﻿from source.data import CustomCommandField, CustomCommandProcess
-from typing import List
+from typing import Collection, Iterable
 
 
 def disablePublic() -> bool:
     return True
 
 
-def fields() -> List[CustomCommandField]:
+def fields() -> Iterable[CustomCommandField]:
     return []
 
 
-def properties() -> List[str]:
+def properties() -> Collection[str]:
     return []
 
 
-def postProcess() -> List[CustomCommandProcess]:
+def postProcess() -> Iterable[CustomCommandProcess]:
     return []

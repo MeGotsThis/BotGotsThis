@@ -1,5 +1,5 @@
 ﻿from source import data
-from typing import List
+from typing import Collection, Iterable, List  # noqa: F401
 from .public import custom as publicCustom
 try:
     from .private import custom as privateCustom
@@ -7,24 +7,22 @@ except ImportError:
     from .private.default import custom as privateCustom  # type: ignore
 
 
-def fields() -> List[data.CustomCommandField]:
-    if privateCustom.disablePublic():
-        return privateCustom.fields()
-    else:
-        return (publicCustom.fields()
-                + privateCustom.fields()
-                + publicCustom.fieldsEnd())
+def fields() -> Iterable[data.CustomCommandField]:
+    if not privateCustom.disablePublic():
+        yield from publicCustom.fields()
+    yield from privateCustom.fields()
+    if not privateCustom.disablePublic():
+        yield from publicCustom.fieldsEnd()
 
 
-def properties() -> List[str]:
-    if privateCustom.disablePublic():
-        return privateCustom.properties()
-    else:
-        return publicCustom.properties() + privateCustom.properties()
+def properties() -> Collection[str]:
+    props: List[str] = list(privateCustom.properties())
+    if not privateCustom.disablePublic():
+        props.extend(publicCustom.properties())
+    return props
 
 
-def postProcess() -> List[data.CustomCommandProcess]:
-    if privateCustom.disablePublic():
-        return privateCustom.postProcess()
-    else:
-        return publicCustom.postProcess() + privateCustom.postProcess()
+def postProcess() -> Iterable[data.CustomCommandProcess]:
+    if not privateCustom.disablePublic():
+        yield from publicCustom.postProcess()
+    yield from privateCustom.postProcess()
