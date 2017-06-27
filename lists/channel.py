@@ -1,7 +1,7 @@
 ﻿from .public import channel as publicList
 from collections import ChainMap
 from source import data
-from typing import List, Mapping, Optional
+from typing import Iterable, Mapping, Optional
 try:
     from .private import channel as privateList
 except ImportError:
@@ -10,11 +10,10 @@ except ImportError:
 CommandsDict = Mapping[str, Optional[data.ChatCommand]]
 
 
-def filterMessage() -> List[data.ChatCommand]:
-    if privateList.disableFilters():
-        return privateList.filterMessage()
-    else:
-        return publicList.filterMessage() + privateList.filterMessage()
+def filterMessage() -> Iterable[data.ChatCommand]:
+    if not privateList.disableFilters():
+        yield from publicList.filterMessage()
+    yield from privateList.filterMessage()
 
 
 def commands() -> CommandsDict:
@@ -26,11 +25,8 @@ def commandsStartWith() -> CommandsDict:
                     publicList.commandsStartWith())
 
 
-def processNoCommand() -> List[data.ChatCommand]:
-    if privateList.disableCustomMessage():
-        return (privateList.noCommandPreCustom()
-                + privateList.noCommandPostCustom())
-    else:
-        return (privateList.noCommandPreCustom()
-                + publicList.processNoCommand()
-                + privateList.noCommandPostCustom())
+def processNoCommand() -> Iterable[data.ChatCommand]:
+    yield from privateList.noCommandPreCustom()
+    if not privateList.disableCustomMessage():
+        yield from publicList.processNoCommand()
+    yield from privateList.noCommandPostCustom()
