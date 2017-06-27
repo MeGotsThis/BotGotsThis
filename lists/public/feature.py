@@ -2,11 +2,13 @@
 
 
 def features() -> Mapping[str, Optional[str]]:
-    return {
-        'textconvert': 'Text Character Conversion',
-        'modpyramid': 'Mods Using !pyramid',
-        'modwall': 'Mods Using !wall',
-        'nocustom': 'Disable Custom Commands',
-        'nourlredirect': 'Ban URL Redirect (user has no follows)',
-        'gamestatusbroadcaster': '!game and !status only for broadcaster',
-        }
+    if not hasattr(features, 'features'):
+        setattr(features, 'features', {
+            'textconvert': 'Text Character Conversion',
+            'modpyramid': 'Mods Using !pyramid',
+            'modwall': 'Mods Using !wall',
+            'nocustom': 'Disable Custom Commands',
+            'nourlredirect': 'Ban URL Redirect (user has no follows)',
+            'gamestatusbroadcaster': '!game and !status only for broadcaster',
+        })
+    return getattr(features, 'features')
