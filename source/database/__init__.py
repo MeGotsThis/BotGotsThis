@@ -82,8 +82,7 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             r: tuple
-            await cursor.execute(query)
-            async for r in cursor:
+            async for r in await cursor.execute(query):
                 yield AutoJoinChannel(*r)
 
     async def getAutoJoinsPriority(self, broadcaster: str
@@ -167,9 +166,9 @@ SELECT broadcaster, permission, fullMessage
         async with await self.cursor() as cursor:
             commands: Dict[str, Dict[str, str]]
             commands = {broadcaster: {}, '#global': {}}
+            params: tuple = (broadcaster, command)
             row: Optional[Tuple[str, str, str]]
-            await cursor.execute(query, (broadcaster, command))
-            async for row in cursor:
+            async for row in await cursor.execute(query, params):
                 commands[row[0]][row[1]] = row[2]
             return commands
 
@@ -465,8 +464,7 @@ SELECT property, value FROM custom_command_properties
 '''
                 values = {}
                 params = (broadcaster, permission, command.lower())
-                await cursor.execute(query, params)
-                async for p, v in cursor:
+                async for p, v in await cursor.execute(query, params):
                     values[p] = v
                 return values
             elif isinstance(property, list):
@@ -478,8 +476,7 @@ SELECT property, value FROM custom_command_properties
                 values = {}
                 params = (broadcaster, permission, command.lower(),
                           ) + tuple(property)
-                await cursor.execute(query, params)
-                async for p, v in cursor:
+                async for p, v in await cursor.execute(query, params):
                     values[p] = v
                 for p in property:
                     if p not in values:
@@ -568,9 +565,8 @@ DELETE FROM chat_features WHERE broadcaster=? AND feature=?
         query: str = '''SELECT broadcaster FROM banned_channels'''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            await cursor.execute(query)
             broadcaster: str
-            async for broadcaster, in cursor:
+            async for broadcaster, in await cursor.execute(query):
                 yield broadcaster
 
     async def isChannelBannedReason(self, broadcaster: str) -> Optional[str]:
@@ -723,8 +719,7 @@ SELECT property, value FROM chat_properties
         async with await self.cursor() as cursor:
             values: Dict[str, Any] = {}
             params = (broadcaster,) + tuple(properties)
-            await cursor.execute(query, params)
-            async for property, value in cursor:
+            async for property, value in await cursor.execute(query, params):
                 if isinstance(parse, dict) and property in parse:
                     value = parse[property](value)
                 if callable(parse):
@@ -875,8 +870,9 @@ SELECT broadcaster, name, message FROM auto_repeat
         <= CURRENT_TIMESTAMP'''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            await cursor.execute(query)
-            async for broadcaster, name, message in cursor:
+            row: tuple
+            async for row in await cursor.execute(query):
+                broadcaster, name, message = row
                 yield AutoRepeatMessage(broadcaster, name, message)
 
     async def listAutoRepeat(self, broadcaster: str
@@ -887,9 +883,8 @@ SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
 '''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            await cursor.execute(query, (broadcaster,))
             row: tuple
-            async for row in cursor:
+            async for row in await cursor.execute(query, (broadcaster,)):
                 name: str
                 message: str
                 count: Optional[int]
@@ -1026,8 +1021,7 @@ SELECT abbreviation, gmt_offset
 '''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            await cursor.execute(query)
-            async for row in cursor:
+            async for row in await cursor.execute(query):
                 yield row[0], row[1]
 
     async def zones(self) -> AsyncIterator[Tuple[str, int]]:
@@ -1036,8 +1030,7 @@ SELECT zone_id, zone_name FROM zone ORDER BY zone_id
 '''
             cursor: aioodbc.cursor.Cursor
             async with await self.cursor() as cursor:
-                await cursor.execute(query)
-                async for row in cursor:
+                async for row in await cursor.execute(query):
                     yield row[0], row[1]
 
     async def zone_transitions(self) -> List[tuple]:
