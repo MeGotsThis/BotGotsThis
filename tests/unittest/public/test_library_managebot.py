@@ -25,11 +25,13 @@ class TestLibraryManageBot(asynctest.TestCase):
         self.send = Mock(spec=send)
         self.method = CoroutineMock(spec=method, return_value=True)
 
-        patcher = patch.dict('lists.manage.methods')
+        patcher = patch('lists.manage')
         self.addCleanup(patcher.stop)
-        patcher.start()
-        managebot.lists.manage.methods['method'] = self.method
-        managebot.lists.manage.methods['none'] = None
+        self.mock_manage = patcher.start()
+        self.mock_manage.methods.return_value = {
+            'method': self.method,
+            'none': None,
+            }
 
     async def test(self):
         message = Message('!managebot method')
