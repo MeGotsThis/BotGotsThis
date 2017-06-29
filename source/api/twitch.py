@@ -1,7 +1,6 @@
 ﻿from source.api import oauth
 from contextlib import suppress
 from datetime import datetime
-from http import client
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
 from typing import NamedTuple, Optional, Tuple, Union
 import aiohttp
@@ -49,10 +48,11 @@ async def get_headers(headers: MutableMapping[str, str],
 async def get_call(channel: Optional[str],
                    uri: str,
                    headers: MutableMapping[str, str]=None
-                   ) -> Tuple[Any, Optional[Dict]]:
+                   ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
+    response: aiohttp.ClientResponse
     async with aiohttp.ClientSession(raise_for_status=True) as session, \
             session.get('https://api.twitch.tv' + uri,
                         headers=headers,
@@ -250,7 +250,7 @@ async def num_followers(user: str) -> Optional[int]:
         return 0
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
-        response: client.HTTPResponse
+        response: aiohttp.ClientResponse
         followerData: dict
         twitchId: str = bot.globals.twitchId[user]
         uri: str = f'/kraken/users/{twitchId}/follows/channels?limit=1'
@@ -349,8 +349,8 @@ async def channel_community(channel: str) -> Optional[TwitchCommunity]:
         return None
     uri: str = ('/kraken/channels/' + bot.globals.twitchId[channel]
                 + '/community')
-    with suppress(ConnectionError, client.HTTPException):
-        response: client.HTTPResponse
+    with suppress(ConnectionError, aiohttp.ClientResponseError):
+        response: aiohttp.ClientResponse
         community: Optional[Dict[str, str]]
         response, community = await get_call(None, uri)
         if response.status not in [200, 204]:
