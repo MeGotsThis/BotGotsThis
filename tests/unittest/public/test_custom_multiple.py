@@ -13,8 +13,9 @@ class TestCustomMultiple(TestCustomProcess):
 
     async def test(self):
         self.property_return[0] = False
+        self.messages[0] = 'Kappa&&KappaHD'
         await multiple.propertyMultipleLines(self.args)
-        self.assertEqual(self.messages, ['Kappa'])
+        self.assertEqual(self.messages, ['Kappa&&KappaHD'])
 
     async def test_split(self):
         self.messages[0] = 'Kappa&&KappaHD'
