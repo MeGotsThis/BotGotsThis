@@ -6,7 +6,7 @@ import aiohttp
 import asynctest
 
 from datetime import datetime
-from http.client import HTTPException, HTTPResponse
+from http.client import HTTPResponse
 from source.api import twitch
 from tests.unittest.mock_class import StrContains, TypeMatch
 from asynctest.mock import MagicMock, Mock, patch
