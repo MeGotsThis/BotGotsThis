@@ -51,6 +51,7 @@ class Database:
                  **kwargs) -> None:
         self._connectionString: str = connectionString
         self._connection: Optional[aioodbc.Connection] = None
+        self._driver: Optional[str] = None
 
     @property
     def connection(self) -> Any:
@@ -58,6 +59,12 @@ class Database:
 
     async def connect(self) -> None:
         self._connection = await aioodbc.connect(dsn=self._connectionString)
+        driver: str = await self._connection.getinfo(pyodbc.SQL_DRIVER_NAME)
+        self._driver = driver.lower()
+        if self.isPostgres:
+            cursor: aioodbc.cursor.Cursor
+            async with await self.cursor() as cursor:
+                await cursor.execute("SET TIME ZONE 'UTC'")
 
     async def close(self) -> None:
         if self.connection is not None:
@@ -69,6 +76,14 @@ class Database:
 
     async def __aexit__(self, type, value, traceback) -> None:
         await self.close()
+
+    @property
+    def isSqlite(self):
+        return 'sqlite' in self._driver
+
+    @property
+    def isPostgres(self):
+        return 'psql' in self._driver
 
     async def cursor(self) -> aioodbc.cursor.Cursor:
         return await self.connection.cursor()
@@ -146,15 +161,15 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
 
     async def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
         query: str = '''
-SELECT DISTINCT twitchGame
+SELECT DISTINCT twitchGame, LOWER(twitchGame)=? AS isGame
     FROM game_abbreviations
-    WHERE abbreviation=?
-        OR twitchGame=?
-    ORDER BY twitchGame=? DESC
+    WHERE LOWER(abbreviation)=?
+        OR LOWER(twitchGame)=?
+    ORDER BY isGame DESC
 '''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            await cursor.execute(query, (abbreviation, ) * 3)
+            await cursor.execute(query, (abbreviation.lower(), ) * 3)
             game: Optional[Tuple[str]] = await cursor.fetchone()
             return game and game[0]
 
@@ -266,12 +281,8 @@ INSERT INTO custom_commands_history
                                    command: str,
                                    fullMessage: str,
                                    user: str) -> bool:
-        query: str = '''
-REPLACE INTO custom_commands
-    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
-    created, lastEditor, lastUpdated)
-    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)
-'''
+        query: str
+        params: tuple
         history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
@@ -283,9 +294,29 @@ INSERT INTO custom_commands_history
             display: Optional[str] = None
             if command.lower() != command:
                 display = command
-            await cursor.execute(query, (broadcaster, permission,
-                                         command.lower(), display, fullMessage,
-                                         user, user))
+            if self.isSqlite:
+                query = '''
+REPLACE INTO custom_commands
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created, lastEditor, lastUpdated)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)
+'''
+                params = (broadcaster, permission, command.lower(), display,
+                          fullMessage, user, user)
+            else:
+                query = '''
+INSERT INTO custom_commands
+    (broadcaster, permission, command, commandDisplay, fullMessage, creator,
+    created, lastEditor, lastUpdated)
+    VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT ON CONSTRAINT custom_commands_pkey
+    DO UPDATE SET commandDisplay=?, fullMessage=?, creator=?,
+        created=CURRENT_TIMESTAMP, lastEditor=?, lastUpdated=CURRENT_TIMESTAMP
+'''
+                params = (broadcaster, permission, command.lower(), display,
+                          fullMessage, user, user, display, fullMessage, user,
+                          user)
+            await cursor.execute(query, params)
             if cursor.rowcount == 0:
                 return False
 
@@ -500,6 +531,7 @@ SELECT value FROM custom_command_properties
                                            property: str,
                                            value: Optional[str]=None) -> bool:
         query: str
+        params: tuple
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             try:
@@ -508,17 +540,27 @@ SELECT value FROM custom_command_properties
 DELETE FROM custom_command_properties
     WHERE broadcaster=? AND permission=? AND command=? AND property=?
 '''
-                    await cursor.execute(query, (broadcaster, permission,
-                                                 command.lower(), property))
+                    params = broadcaster, permission, command.lower(), property
                 else:
-                    query = '''
+                    if self.isSqlite:
+                        query = '''
 REPLACE INTO custom_command_properties
     (broadcaster, permission, command, property, value)
     VALUES (?, ?, ?, ?, ?)
 '''
-                    await cursor.execute(query, (broadcaster, permission,
-                                                 command.lower(), property,
-                                                 value))
+                        params = (broadcaster, permission, command.lower(),
+                                  property, value)
+                    else:
+                        query = '''
+INSERT INTO custom_command_properties
+    (broadcaster, permission, command, property, value)
+    VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT ON CONSTRAINT custom_command_properties_pkey
+    DO UPDATE SET value=?
+'''
+                        params = (broadcaster, permission, command.lower(),
+                                  property, value, value)
+                await cursor.execute(query, params)
                 await self.commit()
                 return cursor.rowcount != 0
             except pyodbc.Error:
@@ -752,10 +794,18 @@ DELETE FROM chat_properties WHERE broadcaster=? AND property=?
 '''
                 params = broadcaster, property,
             else:
-                query = '''
+                if self.isSqlite:
+                    query = '''
 REPLACE INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)
 '''
-                params = broadcaster, property, value,
+                    params = broadcaster, property, value,
+                else:
+                    query = '''
+INSERT INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)
+    ON CONFLICT ON CONSTRAINT chat_properties_pkey
+    DO UPDATE SET value=?
+'''
+                    params = broadcaster, property, value, value,
             await cursor.execute(query, params)
             await self.commit()
             return cursor.rowcount != 0
@@ -865,9 +915,16 @@ INSERT INTO bot_managers_log
             return True
 
     async def getAutoRepeatToSend(self) -> AsyncIterator[AutoRepeatMessage]:
-        query: str = '''
+        query: str
+        if self.isSqlite:
+            query = '''
 SELECT broadcaster, name, message FROM auto_repeat
     WHERE datetime(lastSent, '+' || duration || ' minutes')
+        <= CURRENT_TIMESTAMP'''
+        else:
+            query = '''
+SELECT broadcaster, name, message FROM auto_repeat
+    WHERE lastSent + CAST((duration || ' minutes') AS INTERVAL)
         <= CURRENT_TIMESTAMP'''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
@@ -927,14 +984,29 @@ DELETE FROM auto_repeat
                             message: str,
                             count: Optional[int],
                             minutes: float) -> bool:
-        query: str = '''
+        cursor: aioodbc.cursor.Cursor
+        query: str
+        params: tuple
+        async with await self.cursor() as cursor:
+            if self.isSqlite:
+                query = '''
 REPLACE INTO auto_repeat
     (broadcaster, name, message, numLeft, duration, lastSent)
-VALUES (?, ?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (broadcaster, name, message, count,
-                                         minutes, minutes))
+VALUES (?, ?, ?, ?, ?, datetime('now', '-' || ? || ' minutes'))
+'''
+                params = broadcaster, name, message, count, minutes, minutes
+            else:
+                query = '''
+INSERT INTO auto_repeat
+    (broadcaster, name, message, numLeft, duration, lastSent)
+VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP - CAST((? || ' minutes') AS INTERVAL))
+    ON CONFLICT ON CONSTRAINT auto_repeat_pkey
+    DO UPDATE SET message=?, numLeft=?, duration=?,
+    lastSent=CURRENT_TIMESTAMP - CAST((? || ' minutes') AS INTERVAL)
+'''
+                params = (broadcaster, name, message, count, minutes, minutes,
+                          message, count, minutes, minutes)
+            await cursor.execute(query, params)
             await self.commit()
             return cursor.rowcount != 0
 
@@ -962,13 +1034,24 @@ class DatabaseOAuth(Database):
     async def saveBroadcasterToken(self,
                                    broadcaster: str,
                                    token: str) -> None:
-        query: str = '''
-REPLACE INTO oauth_tokens (broadcaster, token) VALUES (?, ?)
-'''
+        query: str
+        params: tuple
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            await cursor.execute(query, (broadcaster, token))
-            await self.commit()
+            if self.isSqlite:
+                query = '''
+REPLACE INTO oauth_tokens (broadcaster, token) VALUES (?, ?)
+'''
+                params = broadcaster, token
+            else:
+                query = '''
+INSERT INTO oauth_tokens (broadcaster, token) VALUES (?, ?)
+    ON CONFLICT ON CONSTRAINT oauth_tokens_pkey
+    DO UPDATE SET token=?
+'''
+                params = broadcaster, token, token
+            await cursor.execute(query, params)
+        await self.commit()
 
 
 class DatabaseTimeout(Database):
@@ -1008,7 +1091,7 @@ class DatabaseTimeZone(Database):
         Europe/London
         '''
         query: str = '''
-SELECT abbreviation, gmt_offset
+SELECT abbreviation, CAST(ROUND(AVG(gmt_offset) / 60 / 15) * 60 * 15 AS INT)
     FROM timezone
     WHERE time_start >= 2114380800
         AND abbreviation NOT IN ('CST', 'CDT', 'AMT', 'AST', 'GST', 'IST',

@@ -1,3 +1,5 @@
+dist: trusty
+sudo: false
 language: python
 cache: pip
 python:
@@ -8,6 +10,11 @@ addons:
       - sqlite3
       - unixodbc-dev
       - libsqliteodbc
+      - postgresql-9.5
+      - odbc-postgresql
+  postgresql: "9.5"
+services:
+  - postgresql
 install:
   - pip install -r requirements-test.txt
 before_script:
@@ -17,9 +24,12 @@ before_script:
   - cp $TRAVIS_BUILD_DIR/lists/private/manage.dist.py $TRAVIS_BUILD_DIR/lists/private/manage.py
   - cp $TRAVIS_BUILD_DIR/lists/private/whisper.dist.py $TRAVIS_BUILD_DIR/lists/private/whisper.py
   - cp $TRAVIS_BUILD_DIR/source/private/ircmessage.dist.py $TRAVIS_BUILD_DIR/source/private/ircmessage.py
+  - psql -U postgres -c 'CREATE ROLE botgotsthis_test'
+  - psql -U postgres -c "ALTER ROLE botgotsthis_test WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION BYPASSRLS PASSWORD 'md5b3591780cc0946affe0bb30ed8c31736'"
+  - psql -U postgres -c 'CREATE DATABASE botgotsthis_test WITH OWNER = botgotsthis_test'
 script:
-  - python -m unittest discover -s ./tests/unittest -t ./tests/unittest -p test_*.py
-  - python -m unittest discover -s ./tests/database -t ./tests/database -p test_*.py
-  - python -m unittest discover -s ./tests/integrationtest -t ./tests/integrationtest -p test_*.py
+  - python -m unittest discover -s ./tests/unittest -t ./ -p test_*.py
+  - python -m unittest discover -s ./tests/database -t ./ -p test_*.py
+  - python -m unittest discover -s ./tests/integrationtest -t ./ -p test_*.py
   - mypy mypy-test.py
   - flake8
