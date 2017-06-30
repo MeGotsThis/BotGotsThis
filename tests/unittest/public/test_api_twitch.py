@@ -813,7 +813,8 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_load.assert_called_once_with('botgotsthis')
 
     async def test_channel_community_exception(self):
-        self.mock_get_call.side_effect = HTTPException
+        exception = aiohttp.ClientResponseError(None, None)
+        self.mock_get_call.side_effect = exception
         self.assertIsNone(await twitch.channel_community('botgotsthis'))
         self.mock_load.assert_called_once_with('botgotsthis')
 
