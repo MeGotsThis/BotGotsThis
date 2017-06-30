@@ -1,5 +1,7 @@
 import itertools
 
+from datetime import datetime, timedelta
+
 
 sentinal = object()
 
@@ -101,3 +103,14 @@ class AsyncIterator:
             return next(self.iter)
         except StopIteration:
             raise StopAsyncIteration
+
+
+class DateTimeNear:
+    def __init__(self, dt, epsilon=timedelta(seconds=1)):
+        self.dt = dt
+        self.epsilon = epsilon
+
+    def __eq__(self, other):
+        if not isinstance(other, datetime):
+            return False
+        return -self.epsilon <= self.dt - other <= self.epsilon

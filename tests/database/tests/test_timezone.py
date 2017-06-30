@@ -1,0 +1,25 @@
+class TestTimezone:
+    async def tearDown(self):
+        await self.execute(['''DROP TABLE zone''',
+                            '''DROP TABLE timezone'''])
+        await super().tearDown()
+
+    async def test_timezone_names(self):
+        self.assertCountEqual(
+            [row async for row in self.database.timezone_names()],
+            [('PDT', -25200), ('PST', -28800)])
+
+    async def test_zones(self):
+        self.assertCountEqual(
+            [row async for row in self.database.zones()],
+            [(399, 'America/Los_Angeles')])
+
+    async def test_transitions(self):
+        self.assertCountEqual(
+            await self.database.zone_transitions(),
+            [(399, 'PDT', 923220000, -25200),
+             (399, 'PST', 941360400, -28800),
+             (399, 'PDT', 954669600, -25200),
+             (399, 'PST', 972810000, -28800),
+             (399, 'PDT', 2120119200, -25200),
+             (399, 'PST', 2140678800, -28800)])
