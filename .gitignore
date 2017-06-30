@@ -10,6 +10,7 @@ nohup.out
 config.ini
 twitch.ini
 twitchApi.ini
+database.ini
 src/*
 
 # Ignoring sqlite databases
