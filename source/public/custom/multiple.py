@@ -3,7 +3,7 @@ from ...data import CustomProcessArgs
 
 
 async def propertyMultipleLines(args: CustomProcessArgs) -> None:
-    if not args.database.getCustomCommandProperty(
+    if not await args.database.getCustomCommandProperty(
             args.broadcaster, args.level, args.command, 'multiple'):
         return
 
