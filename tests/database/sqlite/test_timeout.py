@@ -1,6 +1,6 @@
 from source.database import DatabaseTimeout
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_timeout import TestTimeout
+from tests.database.tests.timeout import TestTimeout
 
 
 class TestSqliteTimeout(TestTimeout, TestSqlite):

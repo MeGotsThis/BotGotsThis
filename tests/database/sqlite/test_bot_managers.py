@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_bot_managers import TestBotManagers
+from tests.database.tests.bot_managers import TestBotManagers
 
 
 class TestSqliteBotManagers(TestBotManagers, TestSqlite):

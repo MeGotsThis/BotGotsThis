@@ -1,5 +1,5 @@
 from tests.database.postgres.test_database import TestPostgres
-from tests.database.tests.test_features import TestFeatures
+from tests.database.tests.features import TestFeatures
 
 
 class TestPostgresFeatures(TestFeatures, TestPostgres):

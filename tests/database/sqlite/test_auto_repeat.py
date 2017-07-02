@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_auto_repeat import TestAutoRepeat
+from tests.database.tests.auto_repeat import TestAutoRepeat
 
 
 class TestSqliteAutoRepeat(TestAutoRepeat, TestSqlite):

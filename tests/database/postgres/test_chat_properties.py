@@ -1,5 +1,5 @@
 from tests.database.postgres.test_database import TestPostgres
-from tests.database.tests.test_chat_properties import TestChatProperties
+from tests.database.tests.chat_properties import TestChatProperties
 
 
 class TestPostgresChatProperties(TestChatProperties, TestPostgres):

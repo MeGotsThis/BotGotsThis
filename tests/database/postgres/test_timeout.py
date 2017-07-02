@@ -1,5 +1,5 @@
 from tests.database.postgres.test_database import TestPostgres
-from tests.database.tests.test_timeout import TestTimeout
+from tests.database.tests.timeout import TestTimeout
 from source.database import DatabaseTimeout
 
 

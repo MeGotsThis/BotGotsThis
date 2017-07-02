@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_custom_commands import TestCustomCommands
+from tests.database.tests.custom_commands import TestCustomCommands
 
 
 class TestSqliteCustomCommands(TestCustomCommands, TestSqlite):

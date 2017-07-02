@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_banned_channels import TestBannedChannels
+from tests.database.tests.banned_channels import TestBannedChannels
 
 
 class TestSqliteBannedChannels(TestBannedChannels, TestSqlite):

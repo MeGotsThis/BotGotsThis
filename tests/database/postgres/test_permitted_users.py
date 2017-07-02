@@ -1,6 +1,6 @@
 from datetime import datetime
 from tests.database.postgres.test_database import TestPostgres
-from tests.database.tests.test_permitted_users import TestPermittedUsers
+from tests.database.tests.permitted_users import TestPermittedUsers
 from tests.unittest.mock_class import TypeMatch
 
 

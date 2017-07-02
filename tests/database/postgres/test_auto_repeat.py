@@ -1,5 +1,5 @@
 from tests.database.postgres.test_database import TestPostgres
-from tests.database.tests.test_auto_repeat import TestAutoRepeat
+from tests.database.tests.auto_repeat import TestAutoRepeat
 
 
 class TestPostgresAutoRepeat(TestAutoRepeat, TestPostgres):

@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_chat_properties import TestChatProperties
+from tests.database.tests.chat_properties import TestChatProperties
 
 
 class TestSqliteChatProperties(TestChatProperties, TestSqlite):

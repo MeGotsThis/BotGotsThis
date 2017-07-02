@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_timezone import TestTimezone
+from tests.database.tests.timezone import TestTimezone
 from source.database import DatabaseTimeZone
 
 

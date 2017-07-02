@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_game_abbreviations import TestGameAbbreviation
+from tests.database.tests.game_abbreviations import TestGameAbbreviation
 
 
 class TestSqliteGameAbbreviation(TestGameAbbreviation, TestSqlite):

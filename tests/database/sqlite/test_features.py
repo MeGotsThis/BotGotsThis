@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_features import TestFeatures
+from tests.database.tests.features import TestFeatures
 
 
 class TestSqliteFeatures(TestFeatures, TestSqlite):
