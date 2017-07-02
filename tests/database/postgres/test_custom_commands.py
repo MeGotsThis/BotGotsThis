@@ -1,5 +1,5 @@
 from tests.database.postgres.test_database import TestPostgres
-from tests.database.tests.test_custom_commands import TestCustomCommands
+from tests.database.tests.custom_commands import TestCustomCommands
 
 
 class TestPostgresCustomCommands(TestCustomCommands, TestPostgres):

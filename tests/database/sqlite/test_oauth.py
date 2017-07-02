@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_oauth import TestOAuth
+from tests.database.tests.oauth import TestOAuth
 from source.database import DatabaseOAuth
 
 

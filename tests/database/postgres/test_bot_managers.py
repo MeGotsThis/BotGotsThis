@@ -1,5 +1,5 @@
 from tests.database.postgres.test_database import TestPostgres
-from tests.database.tests.test_bot_managers import TestBotManagers
+from tests.database.tests.bot_managers import TestBotManagers
 
 
 class TestPostgresBotMangers(TestBotManagers, TestPostgres):

@@ -1,5 +1,5 @@
 from tests.database.postgres.test_database import TestPostgres
-from tests.database.tests.test_auto_join import TestAutoJoin
+from tests.database.tests.auto_join import TestAutoJoin
 
 
 class TestPostgresAutoJoin(TestAutoJoin, TestPostgres):

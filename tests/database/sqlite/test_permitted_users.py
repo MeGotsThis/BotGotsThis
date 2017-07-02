@@ -1,5 +1,5 @@
 from tests.database.sqlite.test_database import TestSqlite
-from tests.database.tests.test_permitted_users import TestPermittedUsers
+from tests.database.tests.permitted_users import TestPermittedUsers
 
 
 class TestSqlitePermittedUsers(TestPermittedUsers, TestSqlite):
