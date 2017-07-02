@@ -1,4 +1,9 @@
+from source.database import DatabaseTimeZone
+
+
 class TestTimezone:
+    DatabaseClass = DatabaseTimeZone
+
     async def tearDown(self):
         await self.execute(['''DROP TABLE zone''',
                             '''DROP TABLE timezone'''])

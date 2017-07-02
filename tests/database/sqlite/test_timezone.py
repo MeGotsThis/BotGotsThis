@@ -1,16 +1,10 @@
 from tests.database.sqlite.test_database import TestSqlite
 from tests.database.tests.timezone import TestTimezone
-from source.database import DatabaseTimeZone
 
 
 class TestSqliteTimezone(TestTimezone, TestSqlite):
     async def setUp(self):
         await super().setUp()
-        await self.cursor.close()
-        await self.database.close()
-        self.database = DatabaseTimeZone(self.connectionString)
-        await self.database.connect()
-        self.cursor = await self.database.cursor()
         await self.execute(['''
 CREATE TABLE zone (
     zone_id INTEGER PRIMARY KEY AUTOINCREMENT,

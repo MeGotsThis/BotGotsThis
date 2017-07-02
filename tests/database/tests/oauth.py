@@ -1,4 +1,9 @@
+from source.database import DatabaseOAuth
+
+
 class TestOAuth:
+    DatabaseClass = DatabaseOAuth
+
     async def tearDown(self):
         await self.execute('''DROP TABLE oauth_tokens''')
         await super().tearDown()

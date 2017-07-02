@@ -18,7 +18,8 @@ class TestPostgres(asynctest.TestCase):
         self.connectionString = f'''\
 Driver={self.driver};Server=localhost;Port=5432;\
 Database=botgotsthis_test;Uid=botgotsthis_test;Pwd=botgotsthis_test'''
-        self.database = DatabaseMain(self.connectionString)
+        databaseClass = getattr(self, 'DatabaseClass', DatabaseMain)
+        self.database = databaseClass(self.connectionString)
         await self.database.connect()
         self.cursor = await self.database.cursor()
 
