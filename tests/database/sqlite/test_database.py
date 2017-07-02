@@ -17,7 +17,8 @@ Driver=SQLite3 ODBC Driver;Database=:memory:;FKSupport=true;'''
         else:
             self.connectionString = '''\
 Driver=SQLite3;Database=:memory:;FKSupport=true;'''
-        self.database = DatabaseMain(self.connectionString)
+        databaseClass = getattr(self, 'DatabaseClass', DatabaseMain)
+        self.database = databaseClass(self.connectionString)
         await self.database.connect()
         self.cursor = await self.database.cursor()
 
