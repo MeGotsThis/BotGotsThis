@@ -64,6 +64,15 @@ class TestConfigReader(asynctest.TestCase):
         self.mock_isfile = patcher.start()
         self.mock_isfile.return_value = True
 
+        patcher = patch('os.path.isdir')
+        self.addCleanup(patcher.stop)
+        self.mock_isdir = patcher.start()
+        self.mock_isdir.return_value = False
+
+        patcher = patch('os.mkdir')
+        self.addCleanup(patcher.stop)
+        self.mock_mkdir = patcher.start()
+
         patcher = patch('aiofiles.open')
         self.addCleanup(patcher.stop)
         self.mock_open = patcher.start()
@@ -114,3 +123,4 @@ class TestConfigReader(asynctest.TestCase):
         self.assertIsInstance(config.database['oauth'], str)
         self.assertIsInstance(config.database['timeout'], str)
         self.assertIsInstance(config.database['timezone'], str)
+        self.mock_mkdir.assert_called_once_with('ircLogs')
