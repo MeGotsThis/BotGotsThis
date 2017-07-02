@@ -2,7 +2,7 @@ from tests.database.postgres.test_database import TestPostgres
 from tests.database.tests.test_bot_managers import TestBotManagers
 
 
-class TestPostgresPermittedUsers(TestBotManagers, TestPostgres):
+class TestPostgresBotMangers(TestBotManagers, TestPostgres):
     async def setUp(self):
         await super().setUp()
         await self.execute(['''
