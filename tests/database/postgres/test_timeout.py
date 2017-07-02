@@ -4,6 +4,7 @@ from tests.database.tests.timeout import TestTimeout
 
 class TestPostgresTimeout(TestTimeout, TestPostgres):
     async def setUp(self):
+        await super().setUp()
         await self.execute('''
 CREATE TABLE timeout_logs (
     id SERIAL NOT NULL PRIMARY KEY,

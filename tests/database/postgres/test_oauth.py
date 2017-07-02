@@ -4,6 +4,7 @@ from tests.database.tests.oauth import TestOAuth
 
 class TestPostgresOAuth(TestOAuth, TestPostgres):
     async def setUp(self):
+        await super().setUp()
         await self.execute('''
 CREATE TABLE oauth_tokens (
     broadcaster VARCHAR NOT NULL PRIMARY KEY,
