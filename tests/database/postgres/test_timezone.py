@@ -3,7 +3,7 @@ from tests.database.tests.test_timezone import TestTimezone
 from source.database import DatabaseTimeZone
 
 
-class TestPostgresTimeout(TestTimezone, TestPostgres):
+class TestPostgresTimezone(TestTimezone, TestPostgres):
     async def setUp(self):
         await super().setUp()
         await self.cursor.close()
