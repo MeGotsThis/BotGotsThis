@@ -1,8 +1,11 @@
 from datetime import datetime
+from source.database import DatabaseTimeout
 from tests.unittest.mock_class import TypeMatch
 
 
 class TestTimeout:
+    DatabaseClass = DatabaseTimeout
+
     async def tearDown(self):
         await self.execute('''DROP TABLE timeout_logs''')
         await super().tearDown()
