@@ -1,8 +1,11 @@
-﻿import bot
+﻿import asyncio
+import bot
 import sys
 import importlib
 from typing import Iterator, Tuple  # noqa: F401
 from ...data import Send, timezones
+
+_reload_lock: asyncio.Lock = asyncio.Lock()
 
 
 def reloadable(module: str) -> bool:
@@ -96,35 +99,48 @@ def key(module: str) -> Tuple[int, str]:
 
 
 async def full_reload(send: Send) -> bool:
-    send('Reloading')
+    if _reload_lock.locked():
+        return True
 
-    await reload_config(send)
-    await reload_commands(send)
+    with await _reload_lock:
+        send('Reloading')
 
-    send('Complete')
-    return True
+        await reload_config(send)
+        await reload_commands(send)
+
+        send('Complete')
+        return True
 
 
 async def reload_commands(send: Send) -> bool:
-    send('Reloading Commands')
+    if _reload_lock.locked():
+        return True
 
-    modules: Iterator[str] = (m for m in sys.modules.keys() if reloadable(m))
-    moduleString: str
-    for moduleString in sorted(modules, key=key):
-        importlib.reload(sys.modules[moduleString])
-    await timezones.load_timezones()
+    with await _reload_lock:
+        send('Reloading Commands')
 
-    send('Complete Reloading')
-    return True
+        modules: Iterator[str]
+        modules = (m for m in sys.modules.keys() if reloadable(m))
+        moduleString: str
+        for moduleString in sorted(modules, key=key):
+            importlib.reload(sys.modules[moduleString])
+        await timezones.load_timezones()
+
+        send('Complete Reloading')
+        return True
 
 
 async def reload_config(send: Send) -> bool:
-    send('Reloading Config')
+    if _reload_lock.locked():
+        return True
 
-    importlib.reload(sys.modules['bot'])
-    config: bot.BotConfig = bot.BotConfig()
-    await config.read_config()
-    bot.config = config
+    with await _reload_lock:
+        send('Reloading Config')
 
-    send('Complete Reloading')
-    return True
+        importlib.reload(sys.modules['bot'])
+        config: bot.BotConfig = bot.BotConfig()
+        await config.read_config()
+        bot.config = config
+
+        send('Complete Reloading')
+        return True
