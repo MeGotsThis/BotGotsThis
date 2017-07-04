@@ -2,7 +2,7 @@
 *.pyc
 source/private/*
 lists/private/*
-unittest/private/*
+tests/*/private/*
 nohup.out
 *.log
 .idea
