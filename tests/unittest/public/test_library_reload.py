@@ -1,3 +1,4 @@
+import asyncio
 import sys
 import unittest
 
@@ -139,6 +140,28 @@ class TestLibraryReload(asynctest.TestCase):
         mock_reload_config.assert_called_once_with(self.send)
         mock_reload_command.assert_called_once_with(self.send)
 
+    @patch('source.public.library.reload.reload_config')
+    @patch('source.public.library.reload.reload_commands')
+    async def test_full_reload_multiple(self, mock_reload_command,
+                                        mock_reload_config):
+        async def wait(*args):
+            await asyncio.sleep(0.2)
+
+        async def call_0():
+            return await reload.full_reload(self.send)
+
+        async def call_1():
+            await asyncio.sleep(0.1)
+            return await reload.full_reload(self.send)
+
+        mock_reload_command.side_effect = wait
+        self.assertEqual(
+            await asyncio.gather(call_0(), call_1()),
+            [True, True])
+        self.assertEqual(self.send.call_count, 2)
+        mock_reload_config.assert_called_once_with(self.send)
+        mock_reload_command.assert_called_once_with(self.send)
+
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
     @patch('source.data.timezones.load_timezones')
@@ -146,6 +169,31 @@ class TestLibraryReload(asynctest.TestCase):
         module = Mock()
         sys.modules = {'source': module}
         self.assertIs(await reload.reload_commands(self.send), True)
+        self.assertEqual(self.send.call_count, 2)
+        mock_reload.assert_called_once_with(module)
+        mock_load_timezones.assert_called_once_with()
+
+    @patch.dict('sys.modules', autospec=True)
+    @patch('importlib.reload', autospec=True)
+    @patch('source.data.timezones.load_timezones')
+    async def test_reload_commands_multiple(self, mock_load_timezones,
+                                            mock_reload):
+        async def wait(*args):
+            await asyncio.sleep(0.2)
+
+        async def call_0():
+            return await reload.reload_commands(self.send)
+
+        async def call_1():
+            await asyncio.sleep(0.1)
+            return await reload.reload_commands(self.send)
+
+        module = Mock()
+        sys.modules = {'source': module}
+        mock_load_timezones.side_effect = wait
+        self.assertEqual(
+            await asyncio.gather(call_0(), call_1()),
+            [True, True])
         self.assertEqual(self.send.call_count, 2)
         mock_reload.assert_called_once_with(module)
         mock_load_timezones.assert_called_once_with()
@@ -163,4 +211,33 @@ class TestLibraryReload(asynctest.TestCase):
         self.assertEqual(mock_reload.call_count, 1)
         mock_bot.BotConfig.assert_called_once_with()
         mock_bot.BotConfig.return_value.read_config.assert_called_once_with()
+        self.assertNotEqual(mock_bot.config, originalConfig)
+
+    @patch.dict('sys.modules', autospec=True)
+    @patch('importlib.reload', autospec=True)
+    @patch('source.public.library.reload.bot')
+    async def test_reload_config_multiple(self, mock_bot, mock_reload):
+        async def wait(*args):
+            await asyncio.sleep(0.2)
+
+        async def call_0():
+            return await reload.reload_config(self.send)
+
+        async def call_1():
+            await asyncio.sleep(0.1)
+            return await reload.reload_config(self.send)
+
+        module = Mock()
+        originalConfig = mock_bot.config
+        mock_read = CoroutineMock()
+        mock_bot.BotConfig.return_value.read_config = mock_read
+        sys.modules = {'bot': module}
+        mock_read.side_effect = wait
+        self.assertEqual(
+            await asyncio.gather(call_0(), call_1()),
+            [True, True])
+        self.assertEqual(self.send.call_count, 2)
+        self.assertEqual(mock_reload.call_count, 1)
+        mock_bot.BotConfig.assert_called_once_with()
+        mock_read.assert_called_once_with()
         self.assertNotEqual(mock_bot.config, originalConfig)
