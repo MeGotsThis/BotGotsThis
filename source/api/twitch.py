@@ -11,7 +11,7 @@ import email.utils
 import time
 import urllib.parse
 
-DateTuple = Tuple[int, int, int, int, int, int, int, int, int]
+DateStruct = Optional[Tuple[int, int, int, int, int, int, int, int, int]]
 TwitchEmotes = Dict[str, List[Dict[str, Union[str, int]]]]
 
 
@@ -152,12 +152,16 @@ async def server_time() -> Optional[datetime]:
         response: aiohttp.ClientResponse
         data: dict
         response, data = await get_call(None, '/kraken/')
-        if response.status == 200:
-            date = response.headers['Date']
-            if data is not None:
-                dateStruct: DateTuple = email.utils.parsedate(date)
-                unixTimestamp: float = time.mktime(dateStruct)
-                return datetime.fromtimestamp(unixTimestamp)
+        if response.status != 200:
+            return None
+        if 'Date' not in response.headers:
+            return None
+        date = response.headers['Date']
+        dateStruct: DateStruct = email.utils.parsedate(date)
+        if dateStruct is None:
+            return None
+        unixTimestamp: float = time.mktime(dateStruct)
+        return datetime.fromtimestamp(unixTimestamp)
     return None
 
 
