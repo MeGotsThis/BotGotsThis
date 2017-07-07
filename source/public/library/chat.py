@@ -1,20 +1,23 @@
+import bot.data  # noqa: F401
+
 from collections import defaultdict
 from datetime import datetime, timedelta
 from functools import partial, wraps
-from typing import Any, Callable, Optional, Tuple, Union, cast
+from typing import Any, Awaitable, Callable, Optional, Tuple, Union, cast
+
 from ... import data
 
 _AnyArgs = Union[data.ChatCommandArgs, data.WhisperCommandArgs,
                  data.ManageBotArgs]
-_AnyCallable = Callable[..., Any]
+_AnyCallable = Callable[..., Awaitable[bool]]
 _AnyDecorator = Callable[..., _AnyCallable]
 
 
-def send(chat: Any) -> data.Send:
+def send(chat: 'bot.data.Channel') -> data.Send:
     return chat.send
 
 
-def sendPriority(chat: Any,
+def sendPriority(chat: 'bot.data.Channel',
                  priority: int) -> data.Send:
     return cast(data.Send, partial(chat.send, priority=priority))
 
@@ -23,7 +26,7 @@ def permission(level: str) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def command(args: _AnyArgs,
-                          *pargs, **kwargs) -> Any:
+                          *pargs, **kwargs) -> bool:
             if not args.permissions[level]:
                 return False
             return await func(args, *pargs, **kwargs)
