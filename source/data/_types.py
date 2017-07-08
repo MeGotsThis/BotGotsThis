@@ -1,10 +1,10 @@
-# from bot.data import Channel
+from bot import data  # noqa: F401
 from .message import Message
-# from .permissions import ChatPermissionSet, WhisperPermissionSet
-# from ..database import DatabaseMain
+from .permissions import ChatPermissionSet, WhisperPermissionSet
+from ..database import DatabaseMain
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
-from typing import Any, Awaitable, Callable, Iterable, List, NamedTuple
+from typing import Awaitable, Callable, Iterable, List, NamedTuple
 from typing import Optional, Union
 
 
@@ -12,20 +12,20 @@ Send = Callable[[Union[str, Iterable[str]]], None]
 
 
 class ChatCommandArgs(NamedTuple):
-    database: Any  # DatabaseMain
-    chat: Any  # Channel
+    database: DatabaseMain
+    chat: 'data.Channel'
     tags: IrcMessageTagsReadOnly
     nick: str
     message: Message
-    permissions: Any  # ChatPermissionSet
+    permissions: ChatPermissionSet
     timestamp: datetime
 
 
 class WhisperCommandArgs(NamedTuple):
-    database: Any  # DatabaseMain
+    database: DatabaseMain
     nick: str
     message: Message
-    permissions: Any  # WhisperPermissionSet
+    permissions: WhisperPermissionSet
     timestamp: datetime
 
 
@@ -38,16 +38,16 @@ class CustomFieldArgs(NamedTuple):
     message: Message
     channel: str
     nick: str
-    permissions: Any  # ChatPermissionSet
+    permissions: ChatPermissionSet
     timestamp: datetime
 
 
 class CustomProcessArgs(NamedTuple):
-    database: Any  # DatabaseMain
-    chat: Any  # Channel
+    database: DatabaseMain
+    chat: 'data.Channel'
     tags: IrcMessageTagsReadOnly
     nick: str
-    permissions: Any  # ChatPermissionSet
+    permissions: ChatPermissionSet
     broadcaster: str
     level: str
     command: str
@@ -55,8 +55,8 @@ class CustomProcessArgs(NamedTuple):
 
 
 class ManageBotArgs(NamedTuple):
-    database: Any  # DatabaseMain
-    permissions: Any  # Union[ChatPermissionSet, WhisperPermissionSet]
+    database: DatabaseMain
+    permissions: Union[ChatPermissionSet, WhisperPermissionSet]
     send: Send
     nick: str
     message: Message
