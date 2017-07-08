@@ -2,8 +2,8 @@ import asynctest
 
 from asynctest.mock import Mock, patch
 
-from source.data import Message
 from source.database import DatabaseMain
+from source.data.message import Message
 from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import StrContains
 
