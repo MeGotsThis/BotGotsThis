@@ -9,8 +9,8 @@ from typing import Deque, Dict, List, Optional, Tuple, no_type_check  # noqa: F4
 
 
 from bot import data, utils
+from bot.data._messaging_queue import WhisperMessage
 from bot.coroutine import join
-from bot.data.error import ConnectionReset, LoginUnsuccessful
 from bot.twitchmessage import IrcMessage, IrcMessageParams
 
 
@@ -79,10 +79,10 @@ class ConnectionHandler:
                     await asyncio.wait_for(self.read(), 0.01)
                 except asyncio.TimeoutError:
                     pass
-            except (ConnectionError, ConnectionReset):
+            except (data.ConnectionError, data.ConnectionReset):
                 if self._transport is None:
                     self.disconnect()
-            except LoginUnsuccessful:
+            except data.LoginUnsuccessful:
                 if self._transport is None:
                     self.disconnect()
                 break
@@ -161,7 +161,7 @@ class ConnectionHandler:
     async def write(self,
                     command: IrcMessage, *,
                     channel: 'Optional[data.Channel]'=None,
-                    whisper: 'Optional[data.WhisperMessage]'=None) -> None:
+                    whisper: Optional[WhisperMessage]=None) -> None:
         if not isinstance(command, IrcMessage):
             raise TypeError()
         if self._transport is None:
@@ -215,9 +215,9 @@ class ConnectionHandler:
             message: str = ircmsg.decode('utf-8')
             self._log_read(message)
             source.ircmessage.parseMessage(self, message, utils.now())
-        except ConnectionReset:
+        except data.ConnectionReset:
             raise
-        except LoginUnsuccessful:
+        except data.LoginUnsuccessful:
             bot.globals.running = False
             raise
 
@@ -296,7 +296,7 @@ class ConnectionHandler:
     def queue_write(self,
                     message: IrcMessage, *,
                     channel: 'Optional[data.Channel]'=None,
-                    whisper: 'Optional[data.WhisperMessage]'=None,
+                    whisper: Optional[WhisperMessage]=None,
                     prepend: bool=False) -> None:
         if not isinstance(message, IrcMessage):
             raise TypeError()
@@ -306,7 +306,7 @@ class ConnectionHandler:
                 raise TypeError()
             kwargs['channel'] = channel
         if whisper:
-            if not isinstance(whisper, data.WhisperMessage):
+            if not isinstance(whisper, WhisperMessage):
                 raise TypeError()
             kwargs['whisper'] = whisper
         if channel and whisper:

@@ -1,6 +1,6 @@
 import unittest
 from bot.data import Channel
-from bot.data.error import LoginUnsuccessful
+from bot.data._error import LoginUnsuccessful
 from bot.twitchmessage import IrcMessageTags
 from datetime import datetime
 from source.ircmessage import clearchat, notice, userstate

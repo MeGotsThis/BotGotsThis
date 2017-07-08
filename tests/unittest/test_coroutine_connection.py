@@ -9,9 +9,9 @@ from io import StringIO
 from asynctest.mock import Mock, patch
 
 from bot.coroutine import connection
-from bot.data import Channel, ChatMessage, MessagingQueue
-from bot.data import WhisperMessage
-from bot.data.error import ConnectionReset, LoginUnsuccessful
+from bot.data import Channel, MessagingQueue
+from bot.data._messaging_queue import ChatMessage, WhisperMessage
+from bot.data._error import ConnectionReset, LoginUnsuccessful
 from bot.twitchmessage import IrcMessage
 
 
