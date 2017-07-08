@@ -10,8 +10,8 @@ from asynctest.mock import call, patch
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from source import channel
-from source.data import Message
 from source.database import DatabaseMain
+from source.data.message import Message
 
 
 class TestChannel(asynctest.TestCase):

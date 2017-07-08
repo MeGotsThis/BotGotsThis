@@ -8,8 +8,8 @@ from asynctest.mock import CoroutineMock, MagicMock, Mock, PropertyMock, patch
 
 from bot.twitchmessage import IrcMessageTags
 from source import whisper
-from source.data import Message
 from source.database import DatabaseMain
+from source.data.message import Message
 
 
 class TestWhisper(asynctest.TestCase):
