@@ -1,6 +1,6 @@
 ﻿from bot import data
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from bot.data.error import LoginUnsuccessful
+from bot.data._error import LoginUnsuccessful
 from typing import List, Optional
 
 invalidLogin: List[str] = [

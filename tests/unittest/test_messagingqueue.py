@@ -2,7 +2,8 @@ import itertools
 import math
 import unittest
 from bot.coroutine.connection import ConnectionHandler
-from bot.data import Channel, ChatMessage, MessagingQueue, WhisperMessage
+from bot.data import Channel, MessagingQueue
+from bot.data._messaging_queue import ChatMessage, WhisperMessage
 from datetime import datetime, timedelta
 from unittest.mock import call, patch
 
