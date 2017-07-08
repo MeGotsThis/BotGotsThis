@@ -197,6 +197,12 @@ def print(*args: Any,
                 time=_timestamp, message=' '.join(str(a) for a in args)))
 
 
+def property_bool(value: Optional[bool]) -> Optional[str]:
+    if value is None:
+        return None
+    return '1' if value else ''
+
+
 def logIrcMessage(filename: str,
                   message: str,
                   timestamp: Optional[datetime]=None) -> None:

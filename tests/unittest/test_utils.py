@@ -298,6 +298,19 @@ class TestUtils(unittest.TestCase):
         mock_logging.log.assert_called_once_with(
             'output.log', '2000-01-01T00:00:00.000000 Kappa Kappa\n')
 
+    def test_property_bool_None(self):
+        self.assertIsNone(utils.property_bool(None))
+
+    def test_property_bool_True(self):
+        pValue = utils.property_bool(True)
+        self.assertIsNotNone(pValue)
+        self.assertTrue(pValue)
+
+    def test_property_bool_False(self):
+        pValue = utils.property_bool(False)
+        self.assertIsNotNone(pValue)
+        self.assertFalse(pValue)
+
     @patch('bot.coroutine.logging', autospec=True)
     @patch('bot.config', autospec=True)
     @patch('bot.utils.now', autospec=True)
