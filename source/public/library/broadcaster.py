@@ -39,7 +39,7 @@ async def leave(channel: str,
                 send: Send) -> bool:
     if channel == bot.config.botnick:
         return False
-    send('Bye {channel}'.format(channel=channel))
+    send(f'Bye {channel}')
     await asyncio.sleep(1.0)
     utils.partChannel(channel)
     return True
@@ -61,8 +61,7 @@ async def auto_join(database: DatabaseMain,
     bannedWithReason: Optional[str]
     bannedWithReason = await database.isChannelBannedReason(channel)
     if bannedWithReason is not None:
-        send('Chat {channel} is banned from '
-             'joining'.format(channel=channel))
+        send(f'Chat {channel} is banned from joining')
         return True
 
     if len(message) >= 2:

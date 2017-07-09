@@ -55,18 +55,16 @@ async def process_command(args: ChatCommandArgs,
         return False
 
     if input.level is None:
-        args.chat.send(
-            '{user} -> Invalid level, command ignored'.format(user=args.nick))
+        args.chat.send(f'{args.nick} -> Invalid level, command ignored')
         return True
     if input.level:
         try:
             if not args.permissions[input.level]:
-                args.chat.send('{user} -> You do not have permission to set '
-                               'that level'.format(user=args.nick))
+                args.chat.send(f'''\
+{args.nick} -> You do not have permission to set that level''')
                 return True
         except KeyError:
-            args.chat.send('{user} -> Invalid level, command '
-                           'ignored'.format(user=args.nick))
+            args.chat.send(f'{args.nick} -> Invalid level, command ignored')
             return True
 
     actions: Dict[str, Callable[[ChatCommandArgs, CommandActionTokens],
@@ -102,11 +100,12 @@ async def insert_command(args: ChatCommandArgs,
     successful: bool = await args.database.insertCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)
     if successful:
-        message = '{user} -> {command} was added successfully'
+        message = f'{args.nick} -> {input.command} was added successfully'
     else:
-        message = ('{user} -> {command} was not added successfully. There '
-                   'might be an existing command')
-    args.chat.send(message.format(user=args.nick, command=input.command))
+        message = f'''\
+{args.nick} -> {input.command} was not added successfully. There might be an \
+existing command'''
+    args.chat.send(message)
     return True
 
 
@@ -116,11 +115,12 @@ async def update_command(args: ChatCommandArgs,
     successful: bool = await args.database.updateCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)
     if successful:
-        message = '{user} -> {command} was updated successfully'
+        message = f'{args.nick} -> {input.command} was updated successfully'
     else:
-        message = ('{user} -> {command} was not updated successfully. The '
-                   'command might not exist')
-    args.chat.send(message.format(user=args.nick, command=input.command))
+        message = f'''\
+{args.nick} -> {input.command} was not updated successfully. The command \
+might not exist'''
+    args.chat.send(message)
     return True
 
 
@@ -130,11 +130,13 @@ async def append_command(args: ChatCommandArgs,
     successful: bool = await args.database.appendCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)
     if successful:
-        message = '{user} -> {command} was appended successfully'
+        message = f'''\
+{args.nick} -> {input.command} was appended successfully'''
     else:
-        message = ('{user} -> {command} was not appended successfully. The '
-                   'command might not exist')
-    args.chat.send(message.format(user=args.nick, command=input.command))
+        message = f'''\
+{args.nick} -> {input.command} was not appended successfully. The command \
+might not exist'''
+    args.chat.send(message)
     return True
 
 
@@ -144,11 +146,12 @@ async def replace_command(args: ChatCommandArgs,
     successful: bool = await args.database.replaceCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)
     if successful:
-        message = '{user} -> {command} was replaced successfully'
+        message = f'{args.nick} -> {input.command} was replaced successfully'
     else:
-        message = ('{user} -> {command} was not replaced successfully. The '
-                   'command might not exist')
-    args.chat.send(message.format(user=args.nick, command=input.command))
+        message = f'''\
+{args.nick} -> {input.command} was not replaced successfully. The command \
+might not exist'''
+    args.chat.send(message)
     return True
 
 
@@ -158,11 +161,12 @@ async def delete_command(args: ChatCommandArgs,
     successful: bool = await args.database.deleteCustomCommand(
         input.broadcaster, input.level, input.command, args.nick)
     if successful:
-        message = '{user} -> {command} was removed successfully'
+        message = f'{args.nick} -> {input.command} was removed successfully'
     else:
-        message = ('{user} -> {command} was not removed successfully. The '
-                   'command might not exist')
-    args.chat.send(message.format(user=args.nick, command=input.command))
+        message = f'''\
+{args.nick} -> {input.command} was not removed successfully. The command \
+might not exist'''
+    args.chat.send(message)
     return True
 
 
@@ -176,21 +180,23 @@ async def command_property(args: ChatCommandArgs,
         parts.append(None)
     property, value = parts
     if property not in lists.custom.properties():
-        args.chat.send("{user} -> The property '{property}' does not "
-                       'exist'.format(user=args.nick, property=property))
+        args.chat.send(f'''\
+{args.nick} -> The property '{property}' does not exist''')
         return True
     if await args.database.processCustomCommandProperty(
             input.broadcaster, input.level, input.command, property,
             value):
         if value is None:
-            message = '{user} -> {command} with {property} has been unset'
+            message = f'''\
+{args.nick} -> {input.command} with {property} has been unset'''
         else:
-            message = ('{user} -> {command} with {property} has been set with '
-                       'the value of {value}')
+            message = f'''\
+{args.nick} -> {input.command} with {property} has been set with the value of \
+{value}'''
     else:
-        message = '{user} -> {command} with {property} could not be processed'
-    args.chat.send(message.format(user=args.nick, command=input.command,
-                                  property=property, value=value))
+        message = f'''\
+{args.nick} -> {input.command} with {property} could not be processed'''
+    args.chat.send(message)
     return True
 
 
@@ -201,8 +207,7 @@ async def raw_command(args: ChatCommandArgs,
         input.broadcaster, input.level, input.command)
     message: str
     if command is None:
-        message = '{user} -> {command} does not exist'
-        args.chat.send(message.format(user=args.nick, command=input.command))
+        args.chat.send(f'{args.nick} -> {input.command} does not exist')
     else:
         utils.whisper(args.nick,
                       textwrap.wrap(command, width=bot.config.messageLimit))
@@ -213,19 +218,19 @@ async def level_command(args: ChatCommandArgs,
                         input: CommandActionTokens) -> bool:
     permission: str = input.text.lower()
     if permission not in custom.permissions:
-        message = '{user} -> {inputLevel} is an invalid permission'
+        message = f'{args.nick} -> {input.text} is an invalid permission'
     else:
         successful: bool = await args.database.levelCustomCommand(
             input.broadcaster, input.level, input.command, args.nick,
             custom.permissions[permission])
         if successful:
-            message = '{user} -> {command} changed permission successfully'
+            message = f'''\
+{args.nick} -> {input.command} changed permission successfully'''
         else:
-            message = ('{user} -> {command} was not changed successfully. The '
-                       'command might not exist or there is a command with '
-                       'that level existing')
-    args.chat.send(message.format(user=args.nick, command=input.command,
-                                  inputLevel=input.text))
+            message = f'''\
+{args.nick} -> {input.command} was not changed successfully. The command \
+might not exist or there is a command with that level existing'''
+    args.chat.send(message)
     return True
 
 
@@ -234,18 +239,17 @@ async def rename_command(args: ChatCommandArgs,
     newCommand: str = input.text and input.text.split(None, 1)[0]
     message: str
     if not newCommand:
-        message = '{user} -> Please specify a command to rename to'
+        message = f'{args.nick} -> Please specify a command to rename to'
     else:
         successful: bool = await args.database.renameCustomCommand(
             input.broadcaster, input.level, input.command, args.nick,
             newCommand)
         if successful:
-            message = ('{user} -> {command} was renamed to successfully to '
-                       '{newcommand}')
+            message = f'''\
+{args.nick} -> {input.command} was renamed to successfully to {newCommand}'''
         else:
-            message = ('{user} -> {command} was not renamed successfully to '
-                       '{newcommand}. The command might not exist or there is '
-                       'a command already existing')
-    args.chat.send(message.format(user=args.nick, command=input.command,
-                                  newcommand=newCommand))
+            message = f'''\
+{args.nick} -> {input.command} was not renamed successfully to {newCommand}. \
+The command might not exist or there is a command already existing'''
+    args.chat.send(message)
     return True

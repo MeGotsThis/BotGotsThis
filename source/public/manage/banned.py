@@ -53,8 +53,7 @@ async def insert_banned_channel(channel: str,
     bannedWithReason: Optional[str]
     bannedWithReason = await database.isChannelBannedReason(channel)
     if bannedWithReason is not None:
-        send('{channel} is already banned for: {reason}'.format(
-            channel=channel, reason=bannedWithReason))
+        send(f'{channel} is already banned for: {bannedWithReason}')
         return True
     result: bool = await database.addBannedChannel(channel, reason, nick)
     if result:
@@ -63,10 +62,10 @@ async def insert_banned_channel(channel: str,
 
     msg: str
     if result:
-        msg = 'Chat {channel} is now banned'
+        msg = f'Chat {channel} is now banned'
     else:
-        msg = 'Chat {channel} could not be banned. Error has occured.'
-    send(msg.format(channel=channel))
+        msg = f'Chat {channel} could not be banned. Error has occured.'
+    send(msg)
     return True
 
 
@@ -78,14 +77,14 @@ async def delete_banned_channel(channel: str,
     bannedWithReason: Optional[str]
     bannedWithReason = await database.isChannelBannedReason(channel)
     if bannedWithReason is None:
-        send('{channel} is not banned'.format(channel=channel))
+        send(f'{channel} is not banned')
         return True
     result: bool = await database.removeBannedChannel(channel, reason, nick)
 
     msg: str
     if result:
-        msg = 'Chat {channel} is now unbanned'
+        msg = f'Chat {channel} is now unbanned'
     else:
-        msg = 'Chat {channel} could not be unbanned. Error has occured.'
-    send(msg.format(channel=channel))
+        msg = f'Chat {channel} could not be unbanned. Error has occured.'
+    send(msg)
     return True

@@ -125,7 +125,7 @@ abbreviations: Dict[str, BaseTimeZone] = {}
 
 async def load_timezones():
     global timezones, abbreviations
-    print('{time} Loading Time Zones'.format(time=utils.now()))
+    print(f'{utils.now()} Loading Time Zones')
     timezones = [
         utc,
         BasicTimeZone(0, 'UTC±00:00'),
@@ -232,4 +232,4 @@ async def load_timezones():
             timezones.append(TimeZone(zones[z], transitions[z]))
         abbreviations = {tz.zone().lower(): tz for tz in timezones}
 
-    print('{time} Loaded Time Zones'.format(time=utils.now()))
+    print(f'{utils.now()} Loaded Time Zones')

@@ -46,13 +46,12 @@ async def feature_add(database: DatabaseMain,
     if not hasFeature:
         await database.addFeature(channel, feature_)
 
+    theFeature: str = lists.feature.features()[feature_]
     msg: str
     if hasFeature:
-        msg = 'The feature {feature} has already been enabled in {channel}'
+        send(f'The feature {theFeature} has already been enabled in {channel}')
     else:
-        msg = 'The feature {feature} has been enabled in {channel}'
-    send(msg.format(feature=lists.feature.features()[feature_],
-                    channel=channel))
+        send(f'The feature {theFeature} has been enabled in {channel}')
     return True
 
 
@@ -64,11 +63,10 @@ async def feature_remove(database: DatabaseMain,
     if hasFeature:
         await database.removeFeature(channel, feature_)
 
+    theFeature: str = lists.feature.features()[feature_]
     msg: str
     if hasFeature:
-        msg = 'The feature {feature} has been disabled in {channel}'
+        send(f'The feature {theFeature} has been disabled in {channel}')
     else:
-        msg = 'The feature {feature} was not enabled in {channel}'
-    send(msg.format(feature=lists.feature.features()[feature_],
-                    channel=channel))
+        send(f'The feature {theFeature} was not enabled in {channel}')
     return True

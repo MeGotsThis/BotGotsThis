@@ -191,10 +191,10 @@ def print(*args: Any,
             filename = file
         else:
             filename = 'output.log'
+        message: str = ' '.join(str(a) for a in args)
         bot.coroutine.logging.log(
             filename,
-            '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
-                time=_timestamp, message=' '.join(str(a) for a in args)))
+            f'{_timestamp:%Y-%m-%dT%H:%M:%S.%f} {message}\n')
 
 
 def property_bool(value: Optional[bool]) -> Optional[str]:
@@ -211,8 +211,7 @@ def logIrcMessage(filename: str,
     timestamp = timestamp or now()
     bot.coroutine.logging.log(
         os.path.join(bot.config.ircLogFolder, filename),
-        '{time:%Y-%m-%dT%H:%M:%S.%f} {message}\n'.format(
-            time=timestamp, message=message))
+        f'{timestamp:%Y-%m-%dT%H:%M:%S.%f} {message}\n')
 
 
 def logException(extraMessage: str='',
@@ -229,16 +228,16 @@ def logException(extraMessage: str='',
     excep = traceback.format_exception(exceptType, excecption, trackback)
     if extraMessage:
         extraMessage += '\n'
+    threadName: str = threading.current_thread().name
+    exception: str = ''.join(excep)  # noqa: E701
     bot.coroutine.logging.log(
-        bot.config.exceptionLog,
-        '{time:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {thread}:\n'
-        '{extra}{exception}'.format(
-            time=timestamp, thread=threading.current_thread().name,
-            extra=extraMessage, exception=''.join(excep)))
+        bot.config.exceptionLog, f'''\
+{timestamp:%Y-%m-%dT%H:%M:%S.%f} Exception in thread {threadName}:
+{extraMessage}{exception}''')
     if bot.config.development:
         builtins.print(
             timestamp,
-            'Exception in thread {thread}:\n{extra}{exception}'.format(
-                thread=threading.current_thread().name,
-                extra=extraMessage, exception=''.join(excep)),
+            f'''\
+Exception in thread {threadName}:
+{extraMessage}{exception}''',
             file=sys.stderr)
