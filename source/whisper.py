@@ -50,9 +50,7 @@ async def whisperCommand(tags: IrcMessageTagsReadOnly,
                 if await command(arguments):
                     return
     except:
-        extra = 'From: {nick}\nMessage: {message}'.format(
-            nick=nick, message=message)
-        utils.logException(extra, timestamp)
+        utils.logException(f'From: {nick}\nMessage: {message}', timestamp)
 
 
 def commandsToProcess(command: str) -> Iterator[data.WhisperCommand]:

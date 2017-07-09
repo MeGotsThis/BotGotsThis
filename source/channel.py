@@ -62,9 +62,8 @@ async def chatCommand(chat: 'botData.Channel',
                 if await command(arguments):
                     return
     except:
-        extra = 'Channel: {channel}\nMessage: {message}'.format(
-            channel=chat.channel, message=message)
-        utils.logException(extra, timestamp)
+        utils.logException(f'Channel: {chat.channel}\nMessage: {message}',
+                           timestamp)
 
 
 def commandsToProcess(command: str) -> Iterator[data.ChatCommand]:

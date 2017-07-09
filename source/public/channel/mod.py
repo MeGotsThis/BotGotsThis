@@ -84,7 +84,7 @@ async def commandCommunity(args: ChatCommandArgs) -> bool:
         else:
             msg = 'Channel Community has been unset'
     elif result is False:
-        msg = 'Channel Community failed to set, {} not exist'.format(community)
+        msg = f'Channel Community failed to set, {community} not exist'
     else:
         msg = 'Channel Community failed to set'
     args.chat.send(msg)
@@ -95,10 +95,9 @@ async def commandCommunity(args: ChatCommandArgs) -> bool:
 @permission('chatModerator')
 @min_args(2)
 async def commandPurge(args: ChatCommandArgs) -> bool:
+    user: str = args.message[1]
     reason: str = args.message[2:]
-    args.chat.send(
-        '.timeout {user} 1 {reason}'.format(
-            user=args.message[1], reason=reason))
+    args.chat.send(f'.timeout {user} 1 {reason}')
     db_: database.Database
     async with database.get_database(database.Schema.Timeout) as db_:
         db: database.DatabaseTimeout = cast(database.DatabaseTimeout, db_)
@@ -111,7 +110,9 @@ async def commandPurge(args: ChatCommandArgs) -> bool:
 @permission('moderator')
 @min_args(2)
 async def commandPermit(args: ChatCommandArgs) -> bool:
+    mod: str = args.nick
     user: str = args.message.lower[1]
+    channel: str = args.chat.channel
     permitted: bool
     permitted = await args.database.isPermittedUser(args.chat.channel, user)
     msg: str
@@ -120,16 +121,15 @@ async def commandPermit(args: ChatCommandArgs) -> bool:
         successful = await args.database.removePermittedUser(
             args.chat.channel, user, args.nick)
         if successful:
-            msg = '{mod} -> {user} is now unpermitted in {channel}'
+            msg = f'{mod} -> {user} is now unpermitted in {channel}'
         else:
-            msg = '{mod} -> Error'
+            msg = f'{mod} -> Error'
     else:
         successful = await args.database.addPermittedUser(
             args.chat.channel, user, args.nick)
         if successful:
-            msg = '{mod} -> {user} is now unpermitted in {channel}'
+            msg = f'{mod} -> {user} is now unpermitted in {channel}'
         else:
-            msg = '{mod} -> Error'
-    args.chat.send(msg.format(mod=args.nick, user=user,
-                              channel=args.chat.channel))
+            msg = f'{mod} -> Error'
+    args.chat.send(msg)
     return True

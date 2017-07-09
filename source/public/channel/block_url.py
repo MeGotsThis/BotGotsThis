@@ -45,8 +45,8 @@ async def check_domain_redirect(chat: 'data.Channel',
         return
 
     # Record all urls with users of no follows
-    utils.logIrcMessage(chat.ircChannel + '#blockurl.log',
-                        '{nick}: {message}'.format(nick=nick, message=message),
+    utils.logIrcMessage(f'{chat.ircChannel}#blockurl.log',
+                        f'{nick}: {message}',
                         timestamp)
 
     session: aiohttp.ClientSession
@@ -88,11 +88,9 @@ def compare_domains(originalUrl: str,
     if response.startswith('www.'):
         response = response[len('www.'):]
     if original != response:
-        utils.logIrcMessage(
-            chat.ircChannel + '#blockurl-match.log',
-            '{nick}: {original} -> {response}'.format(
-                nick=nick, original=originalUrl, response=responseUrl),
-            timestamp)
+        utils.logIrcMessage(f'{chat.ircChannel}#blockurl-match.log',
+                            f'{nick}: {originalUrl} -> {responseUrl}',
+                            timestamp)
         return True
     return False
 

@@ -42,11 +42,11 @@ class Task:
 
 async def background_tasks():
     name = 'Background Tasker'
-    print('{time} Starting {name}'.format(time=utils.now(), name=name))
+    print(f'{utils.now()} Starting {name}')
     while bot.globals.running:
         await asyncio.sleep(0)
         run_tasks()
-    print('{time} Ending {name}'.format(time=utils.now(), name=name))
+    print(f'{utils.now()} Ending {name}')
 
 
 def run_tasks():
