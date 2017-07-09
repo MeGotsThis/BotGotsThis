@@ -38,7 +38,7 @@ def not_permission(level: str) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def command(args: _AnyArgs,
-                          *pargs, **kwargs) -> Any:
+                          *pargs, **kwargs) -> bool:
             if args.permissions[level]:
                 return False
             return await func(args, *pargs, **kwargs)
@@ -49,7 +49,7 @@ def not_permission(level: str) -> _AnyDecorator:
 def ownerChannel(func: _AnyCallable) -> _AnyCallable:
     @wraps(func)
     async def chatCommand(args: data.ChatCommandArgs,
-                          *pargs, **kwargs) -> Any:
+                          *pargs, **kwargs) -> bool:
         if not args.permissions.inOwnerChannel:
             return False
         return await func(args, *pargs, **kwargs)
@@ -60,7 +60,7 @@ def feature(featureKey: str):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> Any:
+                              *pargs, **kwargs) -> bool:
             hasFeature: bool = await args.database.hasFeature(
                 args.chat.channel, featureKey)
             if not hasFeature:
@@ -74,7 +74,7 @@ def not_feature(featureKey: str):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> Any:
+                              *pargs, **kwargs) -> bool:
             hasFeature: bool = await args.database.hasFeature(
                 args.chat.channel, featureKey)
             if hasFeature:
@@ -88,7 +88,7 @@ def permission_feature(*levelFeatures: Tuple[str, str]):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> Any:
+                              *pargs, **kwargs) -> bool:
             level: str
             featureKey: str
             for level, featureKey in levelFeatures:
@@ -109,7 +109,7 @@ def permission_not_feature(*levelFeatures: Tuple[str, str]):
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> Any:
+                              *pargs, **kwargs) -> bool:
             level: str
             featureKey: str
             for level, featureKey in levelFeatures:
@@ -132,7 +132,7 @@ def cooldown(duration: timedelta,
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> Any:
+                              *pargs, **kwargs) -> bool:
             if inCooldown(args, duration, key, level):
                 return False
             return await func(args, *pargs, **kwargs)
@@ -173,7 +173,7 @@ def min_args(amount: int,
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def command(args: data.ChatCommandArgs,
-                          *pargs, **kwargs) -> Any:
+                          *pargs, **kwargs) -> bool:
             if len(args.message) < amount:
                 if reason:
                     args.chat.send(reason)
