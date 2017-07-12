@@ -15,6 +15,8 @@ def parse(channel: 'data.Channel',
     bot.globals.isGlobalMod = tags['user-type'] in ['staff', 'admin',
                                                     'global_mod']
     if isinstance(channel, data.Channel):
+        assert isinstance(tags['mod'], str)
+        assert isinstance(tags['subscriber'], str)
         channel.isMod = bool(int(tags['mod'])) or bot.globals.isGlobalMod
         channel.isSubscriber = bool(int(tags['subscriber']))
 

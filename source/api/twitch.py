@@ -199,6 +199,7 @@ async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
         emote: Dict[str, Union[str, int]]
         for emoteSetId in globalEmotes:
             for emote in globalEmotes[emoteSetId]:
+                assert isinstance(emote['id'], int)
                 id: int = int(emote['id'])
                 if id in replaceGlobal:
                     emotes[id] = replaceGlobal[id]

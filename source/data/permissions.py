@@ -96,6 +96,7 @@ class ChatPermissionSet:
         if not hasattr(self, '_isSubscriber'):
             subscriber: int
             if self._tags is not None and 'subscriber' in self._tags:
+                assert isinstance(self._tags['subscriber'], str)
                 subscriber = int(self._tags['subscriber'])
             else:
                 subscriber = 0
