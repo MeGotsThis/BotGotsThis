@@ -27,7 +27,7 @@ class AutoRepeatMessage(NamedTuple):
 class AutoRepeatList(NamedTuple):
     name: str
     message: str
-    count: Optional[int]
+    remaining: Optional[int]
     duration: float
     last: datetime
 

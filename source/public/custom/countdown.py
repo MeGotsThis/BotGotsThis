@@ -358,11 +358,11 @@ def parse_cooldown(string: str) -> Optional[Union[float, timedelta]]:
           or groups[3] is not None
           or groups[4] is not None
           or groups[5] is not None):
-        weeks: int = int(groups[1] or 0)
-        days: int = int(groups[2] or 0)
-        hours: int = int(groups[3] or 0)
-        minutes: int = int(groups[4] or 0)
-        seconds: int = int(groups[5] or 0)
+        weeks: int = int(groups[1] or '0')
+        days: int = int(groups[2] or '0')
+        hours: int = int(groups[3] or '0')
+        minutes: int = int(groups[4] or '0')
+        seconds: int = int(groups[5] or '0')
         return timedelta(weeks=weeks, days=days, hours=hours,
                          minutes=minutes, seconds=seconds)
     return None
