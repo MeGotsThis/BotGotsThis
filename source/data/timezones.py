@@ -2,7 +2,7 @@
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta, tzinfo
-from typing import Dict, List, NamedTuple, Optional, Sequence, cast
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, cast  # noqa: F401,E501
 
 from source import database
 
@@ -123,7 +123,7 @@ timezones: List[BaseTimeZone] = []
 abbreviations: Dict[str, BaseTimeZone] = {}
 
 
-async def load_timezones():
+async def load_timezones() -> None:
     global timezones, abbreviations
     print(f'{utils.now()} Loading Time Zones')
     timezones = [
@@ -215,7 +215,7 @@ async def load_timezones():
     db: database.DatabaseTimeZone
     async with database.get_database(database.Schema.TimeZone) as _db:
         db = cast(database.DatabaseTimeZone, _db)
-        row: tuple
+        row: Tuple[Any, ...]
         async for row in db.timezone_names():
             timezones.append(BasicTimeZone(row[1] // 60, row[0]))
 

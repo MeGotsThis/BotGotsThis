@@ -128,37 +128,37 @@ class Channel:
         return self._twitchCache
 
     @twitchCache.setter
-    def twitchCache(self, value: datetime):
+    def twitchCache(self, value: datetime) -> None:
         if not isinstance(value, datetime):
             raise TypeError()
         self._twitchCache = value
 
     @property
-    def twitchStatus(self) -> str:
+    def twitchStatus(self) -> Optional[str]:
         return self._twitchStatus
 
     @twitchStatus.setter
-    def twitchStatus(self, value: Optional[str]):
+    def twitchStatus(self, value: Optional[str]) -> None:
         if value is not None and not isinstance(value, str):
             raise TypeError()
         self._twitchStatus = value
 
     @property
-    def twitchGame(self) -> str:
+    def twitchGame(self) -> Optional[str]:
         return self._twitchGame
 
     @twitchGame.setter
-    def twitchGame(self, value: Optional[str]):
+    def twitchGame(self, value: Optional[str]) -> None:
         if value is not None and not isinstance(value, str):
             raise TypeError()
         self._twitchGame = value
 
     @property
-    def community(self) -> str:
+    def community(self) -> Optional[str]:
         return self._community
 
     @community.setter
-    def community(self, value: Optional[str]):
+    def community(self, value: Optional[str]) -> None:
         if value is not None and not isinstance(value, str):
             raise TypeError()
         self._community = value
@@ -168,7 +168,7 @@ class Channel:
         return self._serverCheck
 
     @serverCheck.setter
-    def serverCheck(self, value: datetime):
+    def serverCheck(self, value: datetime) -> None:
         if not isinstance(value, datetime):
             raise TypeError()
         self._serverCheck = value
@@ -186,7 +186,7 @@ class Channel:
              priority: int=1) -> None:
         self.connection.messaging.sendChat(self, messages, priority)
 
-    def clear(self):
+    def clear(self) -> None:
         self.connection.messaging.clearChat(self)
 
     async def updateFfzEmotes(self) -> None:

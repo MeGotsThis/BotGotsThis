@@ -88,9 +88,9 @@ async def checkOfflineChannels(timestamp: datetime) -> None:
         return
     (chat.streamingSince, chat.twitchStatus,
      chat.twitchGame, shouldBeNone) = current
-    community: twitch.TwitchCommunity
+    community: Optional[twitch.TwitchCommunity]
     community = await twitch.channel_community(chat.channel)
-    if community is not None:
+    if community is not None and community.id is not None:
         chat.community = community.id
         bot.utils.saveTwitchCommunity(community.name, community.id, timestamp)
     bot.globals.globalSessionData['offlineCheck'].append(timestamp)

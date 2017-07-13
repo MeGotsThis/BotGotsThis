@@ -262,7 +262,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.status_property.assert_called_once_with('Keepo')
         self.game_property.assert_called_once_with('Music')
         mock_community.assert_called_once_with('botgotsthis')
-        mock_save.assert_called_once_with(None, None, self.now)
+        self.assertFalse(mock_save.called)
 
     @patch('bot.utils.saveTwitchCommunity')
     @patch('source.api.twitch.channel_community')

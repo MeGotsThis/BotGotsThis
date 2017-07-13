@@ -4,7 +4,7 @@ import aiohttp
 
 import bot
 
-from typing import Dict, Optional
+from typing import Any, Dict, Optional  # noqa: F401
 
 
 async def getGlobalEmotes() -> Optional[Dict[str, str]]:
@@ -15,7 +15,7 @@ async def getGlobalEmotes() -> Optional[Dict[str, str]]:
                 session.get(url, timeout=bot.config.httpTimeout) as response:
             if response.status != 200:
                 return None
-            bttvData: dict = await response.json()
+            bttvData: Dict[str, Any] = await response.json()
             emotes: Dict[str, str] = {}
             emote: Dict[str, str]
             for emote in bttvData['emotes']:
@@ -37,7 +37,7 @@ async def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[str, str]]:
                 session.get(url, timeout=bot.config.httpTimeout) as response:
             if response.status != 200:
                 return None
-            bttvData: dict = await response.json()
+            bttvData: Dict[str, Any] = await response.json()
             emotes: Dict[str, str] = {}
             emote: Dict[str, str]
             for emote in bttvData['emotes']:

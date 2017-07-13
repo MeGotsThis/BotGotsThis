@@ -26,7 +26,7 @@ def permission(level: str) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def command(args: _AnyArgs,
-                          *pargs, **kwargs) -> bool:
+                          *pargs: Any, **kwargs: Any) -> bool:
             if not args.permissions[level]:
                 return False
             return await func(args, *pargs, **kwargs)
@@ -38,7 +38,7 @@ def not_permission(level: str) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def command(args: _AnyArgs,
-                          *pargs, **kwargs) -> bool:
+                          *pargs: Any, **kwargs: Any) -> bool:
             if args.permissions[level]:
                 return False
             return await func(args, *pargs, **kwargs)
@@ -49,18 +49,18 @@ def not_permission(level: str) -> _AnyDecorator:
 def ownerChannel(func: _AnyCallable) -> _AnyCallable:
     @wraps(func)
     async def chatCommand(args: data.ChatCommandArgs,
-                          *pargs, **kwargs) -> bool:
+                          *pargs: Any, **kwargs: Any) -> bool:
         if not args.permissions.inOwnerChannel:
             return False
         return await func(args, *pargs, **kwargs)
     return chatCommand
 
 
-def feature(featureKey: str):
+def feature(featureKey: str) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> bool:
+                              *pargs: Any, **kwargs: Any) -> bool:
             hasFeature: bool = await args.database.hasFeature(
                 args.chat.channel, featureKey)
             if not hasFeature:
@@ -70,11 +70,11 @@ def feature(featureKey: str):
     return decorator
 
 
-def not_feature(featureKey: str):
+def not_feature(featureKey: str) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> bool:
+                              *pargs: Any, **kwargs: Any) -> bool:
             hasFeature: bool = await args.database.hasFeature(
                 args.chat.channel, featureKey)
             if hasFeature:
@@ -84,11 +84,11 @@ def not_feature(featureKey: str):
     return decorator
 
 
-def permission_feature(*levelFeatures: Tuple[str, str]):
+def permission_feature(*levelFeatures: Tuple[str, str]) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> bool:
+                              *pargs: Any, **kwargs: Any) -> bool:
             level: str
             featureKey: str
             for level, featureKey in levelFeatures:
@@ -105,11 +105,11 @@ def permission_feature(*levelFeatures: Tuple[str, str]):
     return decorator
 
 
-def permission_not_feature(*levelFeatures: Tuple[str, str]):
+def permission_not_feature(*levelFeatures: Tuple[str, str]) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> bool:
+                              *pargs: Any, **kwargs: Any) -> bool:
             level: str
             featureKey: str
             for level, featureKey in levelFeatures:
@@ -128,11 +128,11 @@ def permission_not_feature(*levelFeatures: Tuple[str, str]):
 
 def cooldown(duration: timedelta,
              key: Any,
-             level: Optional[str]=None):
+             level: Optional[str]=None) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
-                              *pargs, **kwargs) -> bool:
+                              *pargs: Any, **kwargs: Any) -> bool:
             if inCooldown(args, duration, key, level):
                 return False
             return await func(args, *pargs, **kwargs)
@@ -143,7 +143,7 @@ def cooldown(duration: timedelta,
 def inCooldown(args: data.ChatCommandArgs,
                duration: timedelta,
                key: Any,
-               level: Optional[str]=None):
+               level: Optional[str]=None) -> bool:
     if ((level is None or not args.permissions[level])
             and key in args.chat.sessionData
             and args.timestamp - args.chat.sessionData[key] < duration):
@@ -169,11 +169,11 @@ def in_user_cooldown(args: data.ChatCommandArgs,
 
 def min_args(amount: int,
              _return: bool=False,
-             reason: Optional[str]=None):
+             reason: Optional[str]=None) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def command(args: data.ChatCommandArgs,
-                          *pargs, **kwargs) -> bool:
+                          *pargs: Any, **kwargs: Any) -> bool:
             if len(args.message) < amount:
                 if reason:
                     args.chat.send(reason)

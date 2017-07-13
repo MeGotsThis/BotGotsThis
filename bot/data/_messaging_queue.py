@@ -2,8 +2,8 @@ import bot
 
 from collections import defaultdict, deque, OrderedDict
 from datetime import datetime, timedelta
-from typing import Any, Dict, Iterable, NamedTuple, List, Optional, Set, Tuple  # noqa: F401,E501
-from typing import Union  # noqa: F401
+from typing import Any, Deque, Dict, Iterable, NamedTuple, List, Optional, Set  # noqa: F401,E501
+from typing import Tuple, Union  # noqa: F401
 
 from bot import utils
 from . import _channel, _collections
@@ -28,10 +28,10 @@ disallowedCommands: Set[str] = {
 
 
 class MessagingQueue:
-    def __init__(self):
+    def __init__(self) -> None:
         self._chatQueues: Tuple[List[ChatMessage], ...]
         self._chatQueues = [], [], []
-        self._whisperQueue: deque[WhisperMessage] = deque()
+        self._whisperQueue: Deque[WhisperMessage] = deque()
         self._chatSent: List[datetime] = []
         self._whisperSent: List[datetime] = []
         self._lowQueueRecent: OrderedDict[str, Any] = OrderedDict()

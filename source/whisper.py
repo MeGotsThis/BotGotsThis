@@ -17,7 +17,7 @@ from . import data
 def parse(tags: IrcMessageTagsReadOnly,
           nick: str,
           rawMessage: str,
-          timestamp: datetime):
+          timestamp: datetime) -> None:
     if len(rawMessage) == 0:
         return
 

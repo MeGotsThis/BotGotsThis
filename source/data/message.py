@@ -92,7 +92,7 @@ class Message(Tokenized):
         return self._query
 
     @property
-    def lower(self):
+    def lower(self) -> Tokenized:
         if self._lower is None:
             self._lower = Tokenized(self._string.lower())
         return self._lower

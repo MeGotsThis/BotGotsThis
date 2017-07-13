@@ -4,7 +4,7 @@ import aiohttp
 
 import bot
 
-from typing import Dict, Optional
+from typing import Any, Dict, Optional  # noqa: F401
 
 
 async def getGlobalEmotes() -> Optional[Dict[int, str]]:
@@ -15,9 +15,9 @@ async def getGlobalEmotes() -> Optional[Dict[int, str]]:
                 session.get(url, timeout=bot.config.httpTimeout) as response:
             if response.status != 200:
                 return None
-            ffzData: dict = await response.json()
+            ffzData: Dict[str, Any] = await response.json()
             emotes: Dict[int, str] = {}
-            emote: dict
+            emote: Dict[str, Any]
             s: str
             for s in ffzData['default_sets']:
                 for emote in ffzData['sets'][str(s)]['emoticons']:
@@ -39,10 +39,10 @@ async def getBroadcasterEmotes(broadcaster: str) -> Optional[Dict[int, str]]:
                 session.get(url, timeout=bot.config.httpTimeout) as response:
             if response.status != 200:
                 return None
-            ffzData: dict = await response.json()
+            ffzData: Dict[str, Any] = await response.json()
             emotes: Dict[int, str] = {}
             ffzSet: str = ffzData['room']['set']
-            emote: dict
+            emote: Dict[str, Any]
             for emote in ffzData['sets'][str(ffzSet)]['emoticons']:
                 emotes[emote['id']] = emote['name']
             return emotes

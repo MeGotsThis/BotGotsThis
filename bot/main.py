@@ -10,7 +10,8 @@ from importlib.abc import PathEntryFinder
 from source import database
 from source.data import timezones
 from source.database import AutoJoinChannel  # noqa: F401
-from typing import Awaitable, Generator, List, Iterable, Optional, Tuple, cast  # noqa: F401,E501
+from typing import Any, Awaitable, Generator, List, Iterable, Optional, Tuple  # noqa: F401,E501
+from typing import cast
 from . import utils
 from .coroutine import background, connection, join, logging
 
@@ -56,7 +57,7 @@ def main(argv: Optional[List[str]]=None) -> int:
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(initializer())
-        coro: Awaitable = asyncio.gather(
+        coro: Awaitable[List[Any]] = asyncio.gather(
             timezones.load_timezones(),
             background.background_tasks(),
             logging.record_logs(),

@@ -43,7 +43,7 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
 '''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            r: tuple
+            r: Tuple[Any, ...]
             async for r in await cursor.execute(query):
                 yield AutoJoinChannel(*r)
 
@@ -128,7 +128,7 @@ SELECT broadcaster, permission, fullMessage
         async with await self.cursor() as cursor:
             commands: Dict[str, Dict[str, str]]
             commands = {broadcaster: {}, '#global': {}}
-            params: tuple = (broadcaster, command)
+            params: Tuple[Any, ...] = (broadcaster, command)
             row: Optional[Tuple[str, str, str]]
             async for row in await cursor.execute(query, params):
                 commands[row[0]][row[1]] = row[2]
@@ -226,7 +226,7 @@ INSERT INTO custom_commands_history
                                    fullMessage: str,
                                    user: str) -> bool:
         query: str
-        params: tuple
+        params: Tuple[Any, ...]
         history: str = '''
 INSERT INTO custom_commands_history
     (broadcaster, permission, command, commandDisplay, process, fullMessage,
@@ -430,7 +430,7 @@ INSERT INTO custom_commands_history
         cursor: aioodbc.cursor.Cursor
         p: str
         v: str
-        params: tuple
+        params: Tuple[Any, ...]
         values: Dict[str, str]
         async with await self.cursor() as cursor:
             if property is None:
@@ -475,7 +475,7 @@ SELECT value FROM custom_command_properties
                                            property: str,
                                            value: Optional[str]=None) -> bool:
         query: str
-        params: tuple
+        params: Tuple[Any, ...]
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             try:
@@ -631,7 +631,7 @@ INSERT INTO banned_channels_log
                               default: T,
                               parse: Callable[[str], S]
                               ) -> Union[T, S]: ...
-    async def getChatProperty(self,  # noqa: F811, E301
+    async def getChatProperty(self,  # type: ignore  # noqa: F811, E301
                               broadcaster,
                               property,
                               default=None,
@@ -693,7 +693,7 @@ SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''
                                 default: Mapping[str, T],
                                 parse: Callable[[str], S]
                                 ) -> Mapping[str, Union[T, S]]: ...
-    async def getChatProperties(self,  # noqa: F811, E301
+    async def getChatProperties(self,  # type: ignore  # noqa: F811, E301
                                 broadcaster,
                                 properties,
                                 default=None,
@@ -731,7 +731,7 @@ SELECT property, value FROM chat_properties
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             query: str
-            params: tuple
+            params: Tuple[Any, ...]
             if value is None:
                 query = '''
 DELETE FROM chat_properties WHERE broadcaster=? AND property=?
@@ -872,7 +872,7 @@ SELECT broadcaster, name, message FROM auto_repeat
         <= CURRENT_TIMESTAMP'''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            row: tuple
+            row: Tuple[Any, ...]
             async for row in await cursor.execute(query):
                 broadcaster, name, message = row
                 yield AutoRepeatMessage(broadcaster, name, message)
@@ -885,7 +885,7 @@ SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
 '''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
-            row: tuple
+            row: Tuple[Any, ...]
             async for row in await cursor.execute(query, (broadcaster,)):
                 name: str
                 message: str
@@ -930,7 +930,7 @@ DELETE FROM auto_repeat
                             minutes: float) -> bool:
         cursor: aioodbc.cursor.Cursor
         query: str
-        params: tuple
+        params: Tuple[Any, ...]
         async with await self.cursor() as cursor:
             if self.isSqlite:
                 query = '''

@@ -1,6 +1,6 @@
 import aioodbc.cursor  # noqa: F401, E501
 
-from typing import AsyncIterator, List, Tuple
+from typing import AsyncIterator, List, Tuple, cast
 
 from ._base import Database
 
@@ -41,7 +41,7 @@ SELECT zone_id, zone_name FROM zone ORDER BY zone_id
                 async for row in await cursor.execute(query):
                     yield row[0], row[1]
 
-    async def zone_transitions(self) -> List[tuple]:
+    async def zone_transitions(self) -> List[Tuple[int, str, int, int]]:
         query: str = '''
 SELECT zone_id, abbreviation, time_start, gmt_offset
     FROM timezone
@@ -51,4 +51,5 @@ SELECT zone_id, abbreviation, time_start, gmt_offset
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query)
-            return [tuple(row) for row in await cursor.fetchall()]
+            return [cast(Tuple[int, str, int, int], tuple(row))
+                    for row in await cursor.fetchall()]

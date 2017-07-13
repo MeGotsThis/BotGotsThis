@@ -5,7 +5,7 @@ import source.ircmessage
 
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Deque, Dict, List, Optional, Tuple, no_type_check  # noqa: F401, E501
+from typing import Any, Deque, Dict, List, Optional, Tuple, no_type_check  # noqa: F401, E501
 
 
 from bot import data, utils
@@ -19,7 +19,8 @@ class ConnectionHandler:
                  name: str,
                  server: str,
                  port: int) -> None:
-        self._writeQueue: Deque[Tuple[Tuple[IrcMessage], dict]] = deque()
+        self._writeQueue: Deque[Tuple[Tuple[IrcMessage], Dict[str, Any]]]
+        self._writeQueue = deque()
         self._name: str = name
         self._server: str = server
         self._port: int = port
@@ -61,10 +62,10 @@ class ConnectionHandler:
         return self._messaging
 
     @property
-    def writeQueue(self) -> Deque[Tuple[Tuple[IrcMessage], dict]]:
+    def writeQueue(self) -> Deque[Tuple[Tuple[IrcMessage], Dict[str, Any]]]:
         return self._writeQueue
 
-    async def run_connection(self):
+    async def run_connection(self) -> None:
         name: str = self.name
         print('{time} Starting {name}'.format(time=utils.now(), name=name))
         while bot.globals.running:
@@ -79,7 +80,7 @@ class ConnectionHandler:
                     await asyncio.wait_for(self.read(), 0.01)
                 except asyncio.TimeoutError:
                     pass
-            except (data.ConnectionError, data.ConnectionReset):
+            except (ConnectionError, data.ConnectionReset):
                 if self._transport is None:
                     self.disconnect()
             except data.LoginUnsuccessful:
@@ -144,7 +145,7 @@ class ConnectionHandler:
             self._log_write(command)
             await writer.drain()
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         if self._transport is None:
             raise ConnectionError()
         self._transport.close()
@@ -196,7 +197,8 @@ class ConnectionHandler:
         if self._transport is None:
             raise ConnectionError()
         while self.writeQueue:
-            item: Tuple[Tuple[IrcMessage], dict] = self.writeQueue.popleft()
+            item: Tuple[Tuple[IrcMessage], Dict[str, Any]]
+            item = self.writeQueue.popleft()
             await self.write(*item[0], **item[1])
 
     async def read(self) -> None:

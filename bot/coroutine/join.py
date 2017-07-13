@@ -15,7 +15,7 @@ _joinTimes: Deque[datetime] = deque()
 _channelJoined: Set[str] = set()
 
 
-async def join_manager():
+async def join_manager() -> None:
     name = 'Channel Join Manager'
     print('{time} Starting {name}'.format(time=utils.now(), name=name))
     while bot.globals.running:

@@ -7,7 +7,7 @@ from .coroutine import connection  # noqa: F401
 
 
 class BotGlobals:
-    def __init__(self):
+    def __init__(self) -> None:
         self.running: bool = True
 
         self.groupChannel: 'data.Channel' = None

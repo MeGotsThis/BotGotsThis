@@ -7,7 +7,7 @@ from typing import Dict, List  # noqa: F401
 
 
 class BotConfig:
-    def __init__(self):
+    def __init__(self) -> None:
         self.development: bool = False
 
         self.botnick: str = ''

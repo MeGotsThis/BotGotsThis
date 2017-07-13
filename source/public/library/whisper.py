@@ -18,11 +18,11 @@ not_permission = chat.not_permission
 
 def min_args(amount: int,
              _return: bool=False,
-             reason: Optional[str]=None):
+             reason: Optional[str]=None) -> _AnyDecorator:
     def decorator(func: _AnyCallable) -> _AnyCallable:
         @wraps(func)
         async def command(args: data.WhisperCommandArgs,
-                          *pargs, **kwargs) -> Any:
+                          *pargs: Any, **kwargs: Any) -> bool:
             if len(args.message) < amount:
                 if reason:
                     utils.whisper(args.nick, reason)

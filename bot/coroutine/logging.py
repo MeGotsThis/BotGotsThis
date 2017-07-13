@@ -12,7 +12,7 @@ from bot import utils
 _queue: Deque[Tuple[str, str]] = deque()
 
 
-async def record_logs():
+async def record_logs() -> None:
     name = 'File Logger'
     print('{time} Starting {name}'.format(time=utils.now(), name=name))
     try:

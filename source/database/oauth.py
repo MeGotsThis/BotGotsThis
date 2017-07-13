@@ -1,6 +1,6 @@
 import aioodbc.cursor  # noqa: F401
 
-from typing import Optional, Tuple  # noqa: F401
+from typing import Any, Optional, Tuple  # noqa: F401
 
 from ._base import Database
 
@@ -18,7 +18,7 @@ class DatabaseOAuth(Database):
                                    broadcaster: str,
                                    token: str) -> None:
         query: str
-        params: tuple
+        params: Tuple[Any, ...]
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             if self.isSqlite:

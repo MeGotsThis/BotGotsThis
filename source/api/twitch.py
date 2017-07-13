@@ -48,7 +48,8 @@ async def get_headers(headers: MutableMapping[str, str],
 async def get_call(channel: Optional[str],
                    uri: str,
                    headers: MutableMapping[str, str]=None
-                   ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+                   ) -> Tuple[aiohttp.ClientResponse,
+                              Optional[Dict[str, Any]]]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
@@ -69,7 +70,8 @@ async def post_call(channel: Optional[str],
                     uri: str,
                     headers: MutableMapping[str, str]=None,
                     data: Union[str, Mapping[str, str]]=None
-                    ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+                    ) -> Tuple[aiohttp.ClientResponse,
+                               Optional[Dict[str, Any]]]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
@@ -96,7 +98,8 @@ async def put_call(channel: Optional[str],
                    uri: str,
                    headers: MutableMapping[str, str]=None,
                    data: Union[str, Mapping[str, str]]=None
-                   ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+                   ) -> Tuple[aiohttp.ClientResponse,
+                              Optional[Dict[str, Any]]]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
@@ -123,7 +126,8 @@ async def delete_call(channel: Optional[str],
                       uri: str,
                       headers: MutableMapping[str, str]=None,
                       data: Union[str, Mapping[str, str]]=None
-                      ) -> Tuple[aiohttp.ClientResponse, Optional[Dict]]:
+                      ) -> Tuple[aiohttp.ClientResponse,
+                                 Optional[Dict[str, Any]]]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
@@ -150,7 +154,7 @@ async def server_time() -> Optional[datetime]:
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
         response: aiohttp.ClientResponse
-        data: dict
+        data: Dict[str, Any]
         response, data = await get_call(None, '/kraken/')
         if response.status != 200:
             return None
@@ -171,7 +175,7 @@ async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
         response: aiohttp.ClientResponse
-        data: Optional[Dict]
+        data: Optional[Dict[str, Any]]
         globalEmotes: TwitchEmotes
         response, data = await get_call(None, uri)
         if data is None:
@@ -217,7 +221,7 @@ async def chat_server(chat: str) -> Optional[str]:
             session.get('https://tmi.twitch.tv/servers?channel=' + chat,
                         timeout=bot.config.httpTimeout) as response:
         with suppress(ValueError, aiohttp.ClientResponseError):
-            jData: dict = await response.json()
+            jData: Dict[str, Any] = await response.json()
             return str(jData['cluster'])
     return None
 
@@ -232,7 +236,7 @@ async def getTwitchIds(channels: Iterable[str]) -> Optional[Dict[str, str]]:
             uri: str
             uri = '/kraken/users?limit=100&login=' + ','.join(channelsToCheck)
             response: aiohttp.ClientResponse
-            idData: Optional[dict]
+            idData: Optional[Dict[str, Any]]
             response, idData = await get_call(None, uri)
             if response.status != 200 or idData is None:
                 return None
@@ -256,7 +260,7 @@ async def num_followers(user: str) -> Optional[int]:
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
         response: aiohttp.ClientResponse
-        followerData: dict
+        followerData: Dict[str, Any]
         twitchId: str = bot.globals.twitchId[user]
         uri: str = f'/kraken/users/{twitchId}/follows/channels?limit=1'
         response, followerData = await get_call(None, uri)
@@ -280,7 +284,7 @@ async def update(channel: str, *,
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
         response: aiohttp.ClientResponse
-        data: Optional[dict]
+        data: Optional[Dict[str, Any]]
         response, data = await put_call(
             channel, '/kraken/channels/' + bot.globals.twitchId[channel],
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
@@ -299,7 +303,7 @@ async def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
             return {}
         uri: str = '/kraken/streams?limit=100&channel=' + ','.join(allChannels)
         response: aiohttp.ClientResponse
-        streamsData: dict
+        streamsData: Dict[str, Any]
         response, streamsData = await get_call(None, uri)
         if response.status != 200:
             return None
@@ -317,7 +321,8 @@ async def active_streams(channels: Iterable[str]) -> Optional[OnlineStreams]:
 
 
 def _handle_streams(streams: List[Dict[str, Any]],
-                    online: Dict[str, TwitchStatus]=None):
+                    online: Dict[str, TwitchStatus]=None
+                    ) -> Dict[str, TwitchStatus]:
     if online is None:
         online = {}
     stream: Dict[str, Any]
@@ -400,7 +405,7 @@ async def set_channel_community(channel: str,
         return None
     uri: str
     response: aiohttp.ClientResponse
-    data: Optional[dict]
+    data: Optional[Dict[str, Any]]
     if communityName is not None:
         name: str = communityName.lower()
         if not await bot.utils.loadTwitchCommunity(communityName):

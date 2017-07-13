@@ -344,7 +344,7 @@ class IrcMessageTags(IrcMessageTagsReadOnly, MutableMappingAbc):
                 raise ValueError
             raise TypeError()
 
-    def __delitem__(self, key: KeyParam):
+    def __delitem__(self, key: KeyParam) -> None:
         if isinstance(key, str):
             key = IrcMessageTagsKey.fromKeyVendor(key)
         elif not isinstance(key, IrcMessageTagsKey):

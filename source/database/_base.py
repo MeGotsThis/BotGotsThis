@@ -2,19 +2,22 @@ import aioodbc
 import aioodbc.cursor
 import pyodbc
 
-from typing import Optional
+from typing import Optional, Type, TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import TracebackType  # noqa: F401
 
 
 class Database:
     def __init__(self,
-                 connectionString: str,
-                 **kwargs) -> None:
+                 connectionString: str) -> None:
         self._connectionString: str = connectionString
         self._connection: Optional[aioodbc.Connection] = None
         self._driver: Optional[str] = None
 
     @property
-    def connection(self) -> Optional[aioodbc.Connection]:
+    def connection(self) -> aioodbc.Connection:
+        if self._connection is None:
+            raise ConnectionError('Database not connected')
         return self._connection
 
     async def connect(self) -> None:
@@ -34,15 +37,18 @@ class Database:
         await self.connect()
         return self
 
-    async def __aexit__(self, type, value, traceback) -> None:
+    async def __aexit__(self,
+                        type: Optional[Type[BaseException]],
+                        value: Optional[BaseException],
+                        traceback: 'Optional[TracebackType]') -> None:
         await self.close()
 
     @property
-    def isSqlite(self):
+    def isSqlite(self) -> bool:
         return 'sqlite' in self._driver
 
     @property
-    def isPostgres(self):
+    def isPostgres(self) -> bool:
         return 'psql' in self._driver
 
     async def cursor(self) -> aioodbc.cursor.Cursor:

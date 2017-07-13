@@ -241,7 +241,7 @@ def irc_userstate(
 
 
 def log_channel_message(message: IrcMessage,
-                        timestamp: datetime):
+                        timestamp: datetime) -> None:
     if message.command in _logCommandPerChannel:
         where = message.params.middle.split(None, 1)[0]
         if where[0] == '#':

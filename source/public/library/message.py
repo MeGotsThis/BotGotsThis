@@ -1,6 +1,6 @@
 import bot
 from collections import deque
-from typing import Generator, Iterable, Optional
+from typing import Deque, Generator, Iterable, Optional  # noqa: F401
 
 
 def messagesFromItems(items: Iterable[str],
@@ -8,8 +8,8 @@ def messagesFromItems(items: Iterable[str],
                       ) -> Generator[str, None, None]:
     prepend = prepend or ''
     limit: int = bot.config.messageLimit - len(prepend)
-    queue: deque = deque(items)
-    itemsMsg: deque = deque()
+    queue: Deque[str] = deque(items)
+    itemsMsg: Deque[str] = deque()
     length: int = 0
     while queue:
         item: str = queue.popleft()

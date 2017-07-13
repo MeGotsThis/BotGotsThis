@@ -1,17 +1,22 @@
 from collections import OrderedDict
 
-from typing import Any, Dict, Callable, Generic, Optional, TypeVar
+from typing import Any, Dict, Callable, Optional, Tuple, TypeVar, TYPE_CHECKING
 
 _KT = TypeVar('_KT')
 _VT = TypeVar('_VT')
 
+if TYPE_CHECKING:
+    OD = OrderedDict[_KT, _VT]
+else:
+    OD = OrderedDict
 
-class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
+
+class DefaultOrderedDict(OD, Dict[_KT, _VT]):
     # Source: http://stackoverflow.com/a/6190500/562769
     def __init__(self,
                  default_factory: Optional[Callable[[], _VT]]=None,
-                 *args,
-                 **kwargs) -> None:
+                 *args: Any,
+                 **kwargs: Any) -> None:
         if default_factory is not None:
             if not callable(default_factory):
                 raise TypeError('first argument must be callable')
@@ -31,7 +36,8 @@ class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT], Generic[_KT, _VT]):
         self[key] = value = self.default_factory()
         return value
 
-    def __reduce__(self):
+    def __reduce__(self) -> Tuple[Any, ...]:
+        args:  Tuple[Any, ...]
         if self.default_factory is None:
             args = tuple()
         else:

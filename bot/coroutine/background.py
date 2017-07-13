@@ -40,7 +40,7 @@ class Task:
         self._timestamp = value
 
 
-async def background_tasks():
+async def background_tasks() -> None:
     name = 'Background Tasker'
     print(f'{utils.now()} Starting {name}')
     while bot.globals.running:
@@ -49,7 +49,7 @@ async def background_tasks():
     print(f'{utils.now()} Ending {name}')
 
 
-def run_tasks():
+def run_tasks() -> None:
     timestamp: datetime = utils.now()
     task: Task
     for task in _tasks[:]:
