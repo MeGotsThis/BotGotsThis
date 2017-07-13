@@ -204,13 +204,14 @@ class TestLibraryReload(asynctest.TestCase):
     async def test_reload_config(self, mock_bot, mock_reload):
         module = Mock()
         originalConfig = mock_bot.config
-        mock_bot.BotConfig.return_value.read_config = CoroutineMock()
-        sys.modules = {'bot': module}
+        mock_read = CoroutineMock()
+        mock_bot._config.BotConfig.return_value.read_config = mock_read
+        sys.modules = {'bot._config': module}
         self.assertIs(await reload.reload_config(self.send), True)
         self.assertEqual(self.send.call_count, 2)
         self.assertEqual(mock_reload.call_count, 1)
-        mock_bot.BotConfig.assert_called_once_with()
-        mock_bot.BotConfig.return_value.read_config.assert_called_once_with()
+        mock_bot._config.BotConfig.assert_called_once_with()
+        mock_read.assert_called_once_with()
         self.assertNotEqual(mock_bot.config, originalConfig)
 
     @patch.dict('sys.modules', autospec=True)
@@ -230,14 +231,14 @@ class TestLibraryReload(asynctest.TestCase):
         module = Mock()
         originalConfig = mock_bot.config
         mock_read = CoroutineMock()
-        mock_bot.BotConfig.return_value.read_config = mock_read
-        sys.modules = {'bot': module}
+        mock_bot._config.BotConfig.return_value.read_config = mock_read
+        sys.modules = {'bot._config': module}
         mock_read.side_effect = wait
         self.assertEqual(
             await asyncio.gather(call_0(), call_1()),
             [True, True])
         self.assertEqual(self.send.call_count, 2)
         self.assertEqual(mock_reload.call_count, 1)
-        mock_bot.BotConfig.assert_called_once_with()
+        mock_bot._config.BotConfig.assert_called_once_with()
         mock_read.assert_called_once_with()
         self.assertNotEqual(mock_bot.config, originalConfig)

@@ -2,7 +2,7 @@ import asynctest
 
 from asynctest.mock import CoroutineMock, MagicMock, patch
 
-import bot
+import bot._config
 
 config_data = '''
 [TWITCH]
@@ -87,7 +87,7 @@ class TestConfigReader(asynctest.TestCase):
         self.mock_open.return_value = self.file_mock
 
     async def test_now(self):
-        config = bot.BotConfig()
+        config = bot._config.BotConfig()
         await config.read_config()
         self.assertEqual(self.file_mock.read.call_count, 4)
         self.assertIsInstance(config.botnick, str)

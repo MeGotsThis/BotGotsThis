@@ -1,5 +1,6 @@
 ﻿import asyncio
 import bot
+import bot._config
 import sys
 import importlib
 from typing import Iterator, Tuple  # noqa: F401
@@ -137,8 +138,8 @@ async def reload_config(send: Send) -> bool:
     with await _reload_lock:
         send('Reloading Config')
 
-        importlib.reload(sys.modules['bot'])
-        config: bot.BotConfig = bot.BotConfig()
+        importlib.reload(sys.modules['bot._config'])
+        config: bot._config.BotConfig = bot._config.BotConfig()
         await config.read_config()
         bot.config = config
 
