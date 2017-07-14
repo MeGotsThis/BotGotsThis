@@ -11,7 +11,7 @@ from source import database
 from source.data import timezones
 from source.database import AutoJoinChannel  # noqa: F401
 from typing import Any, Awaitable, Generator, List, Iterable, Optional, Tuple  # noqa: F401,E501
-from typing import cast
+from typing import cast  # noqa: F401,E501
 from . import utils
 from .coroutine import background, connection, join, logging
 
@@ -53,7 +53,7 @@ async def initializer() -> None:
 
 
 def main(argv: Optional[List[str]]=None) -> int:
-    print('{time} Starting'.format(time=utils.now()))
+    print(f'{utils.now()} Starting')
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(initializer())
@@ -73,4 +73,4 @@ def main(argv: Optional[List[str]]=None) -> int:
         utils.logException()
         raise
     finally:
-        print('{time} Ended'.format(time=utils.now()))
+        print(f'{utils.now()} Ended')

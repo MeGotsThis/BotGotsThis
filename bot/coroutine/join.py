@@ -17,14 +17,14 @@ _channelJoined: Set[str] = set()
 
 async def join_manager() -> None:
     name = 'Channel Join Manager'
-    print('{time} Starting {name}'.format(time=utils.now(), name=name))
+    print(f'{utils.now()} Starting {name}')
     while bot.globals.running:
         try:
             join_a_channel()
             await asyncio.sleep(1 / bot.config.joinPerSecond)
         except:
             utils.logException()
-    print('{time} Ending {name}'.format(time=utils.now(), name=name))
+    print(f'{utils.now()} Ending {name}')
 
 
 def join_a_channel() -> None:

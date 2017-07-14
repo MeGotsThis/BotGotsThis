@@ -14,7 +14,7 @@ _queue: Deque[Tuple[str, str]] = deque()
 
 async def record_logs() -> None:
     name = 'File Logger'
-    print('{time} Starting {name}'.format(time=utils.now(), name=name))
+    print(f'{utils.now()} Starting {name}')
     try:
         while bot.globals.running or _queue:
             if _queue:
@@ -22,7 +22,7 @@ async def record_logs() -> None:
             await asyncio.sleep(0)
     finally:
         bot.globals.running = False
-        print('{time} Ending {name}'.format(time=utils.now(), name=name))
+        print(f'{utils.now()} Ending {name}')
 
 
 def log(file: str,

@@ -67,7 +67,7 @@ class ConnectionHandler:
 
     async def run_connection(self) -> None:
         name: str = self.name
-        print('{time} Starting {name}'.format(time=utils.now(), name=name))
+        print(f'{utils.now()} Starting {name}')
         while bot.globals.running:
             if not self.isConnected and not await self.connect():
                 await asyncio.sleep(5)
@@ -88,7 +88,7 @@ class ConnectionHandler:
                     self.disconnect()
                 break
 
-        print('{time} Ending {name}'.format(time=utils.now(), name=name))
+        print(f'{utils.now()} Ending {name}')
 
     async def connect(self) -> Optional[bool]:
         if self._transport is not None:
@@ -104,8 +104,7 @@ class ConnectionHandler:
             writer: asyncio.StreamWriter
             reader, writer = await asyncio.open_connection(*self.address)
 
-            print('{time} {name} Connected {server}'.format(
-                time=utils.now(), name=self.name, server=self.server))
+            print(f'{utils.now()} {self.name} Connected {self.server}')
             await self.login(writer)
             self._reader = reader
             self._writer = writer
@@ -156,8 +155,7 @@ class ConnectionHandler:
         self.lastConnectAttempt = utils.now()
         self.lastSentPing = datetime.max
         self.lastPing = datetime.max
-        print('{time} {name} Disconnected {server}'.format(
-            time=utils.now(), name=self.name, server=self._server))
+        print(f'{utils.now()} {self.name} Disconnected {self.server}')
 
     async def write(self,
                     command: IrcMessage, *,
@@ -190,8 +188,7 @@ class ConnectionHandler:
         if command.command == 'JOIN' and isinstance(channel, data.Channel):
             channel.onJoin()
             join.record_join()
-            print('{time} Joined {channel} on {socket}'.format(
-                time=timestamp, channel=channel.channel, socket=self.name))
+            print(f'{utils.now()} Joined {channel.channel} on {self.name}')
 
     async def drain(self) -> None:
         if self._transport is None:
@@ -242,8 +239,7 @@ class ConnectionHandler:
             raise ConnectionError()
 
     def _log_read(self, message: str) -> None:
-        file: str = '{nick}-{server}.log'.format(nick=bot.config.botnick,
-                                                 server=self.name)
+        file: str = f'{bot.config.botnick}-{self.name}.log'
         utils.logIrcMessage(file, '< ' + message)
 
     # TODO: mypy fix in the future
@@ -258,8 +254,7 @@ class ConnectionHandler:
             command = IrcMessage(command='PASS')
         files: List[str] = []
         logs: List[str] = []
-        files.append('{bot}-{socket}.log'.format(bot=bot.config.botnick,
-                                                 socket=self.name))
+        files.append(f'{bot.config.botnick}-{self.name}.log')
         logs.append('> ' + str(command))
         file: str
         log: str
@@ -268,28 +263,19 @@ class ConnectionHandler:
                 utils.logIrcMessage(file, log, timestamp)
             raise ValueError()
         if whisper:
-            files.append('@{nick}@whisper.log'.format(nick=whisper.nick))
-            logs.append('{bot}: {message}'.format(bot=bot.config.botnick,
-                                                  message=whisper.message))
-            files.append(
-                '{bot}-All Whisper.log'.format(bot=bot.config.botnick))
+            files.append(f'@{whisper.nick}@whisper.log')
+            logs.append(f'{bot.config.botnick}: {whisper.message}')
+            files.append(f'{bot.config.botnick}-All Whisper.log')
             logs.append(
-                '{bot} -> {nick}: {message}'.format(
-                    bot=bot.config.botnick, nick=whisper.nick,
-                    message=whisper.message))
-            files.append(
-                '{bot}-Raw Whisper.log'.format(bot=bot.config.botnick))
-            logs.append('> ' + str(command))
+                f'{bot.config.botnick} -> {whisper.nick}: {whisper.message}')
+            files.append(f'{bot.config.botnick}-Raw Whisper.log')
+            logs.append(f'> {command}')
         if channel:
-            files.append(
-                '{channel}#full.log'.format(channel=channel.ircChannel))
-            logs.append('> ' + str(command))
+            files.append(f'{channel.ircChannel}#full.log')
+            logs.append(f'> {command}')
             if command.command == 'PRIVMSG':
-                files.append(
-                    '{channel}#msg.log'.format(channel=channel.ircChannel))
-                logs.append(
-                    '{bot}: {message}'.format(bot=bot.config.botnick,
-                                              message=command.params.trailing))
+                files.append(f'{channel.ircChannel}#msg.log')
+                logs.append(f'{bot.config.botnick}: {command.params.trailing}')
         for file, log in zip(files, logs):
             utils.logIrcMessage(file, log, timestamp)
 
@@ -331,8 +317,7 @@ class ConnectionHandler:
         del self._channels[channel.channel]
 
         join.on_part(channel.channel)
-        print('{time} Parted {channel}'.format(
-            time=utils.now(), channel=channel.channel))
+        print(f'{utils.now()} Parted {channel.channel}')
 
     # TODO: mypy fix in the future
     @no_type_check
@@ -340,9 +325,8 @@ class ConnectionHandler:
         self.messaging.cleanOldTimestamps()
         whisperMessage: data.WhisperMessage
         for whisperMessage in iter(self.messaging.popWhisper, None):
-            ircMsg: str = '.w {nick} {message}'.format(
-                nick=whisperMessage.nick,
-                message=whisperMessage.message)[:bot.config.messageLimit]
+            ircMsg: str = f'.w {whisperMessage.nick} {whisperMessage.message}'
+            ircMsg = ircMsg[:bot.config.messageLimit]
             self.queue_write(
                 IrcMessage(None, None, 'PRIVMSG',
                            IrcMessageParams(
