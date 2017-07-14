@@ -1,17 +1,12 @@
 from collections import OrderedDict
 
-from typing import Any, Dict, Callable, Optional, Tuple, TypeVar, TYPE_CHECKING
+from typing import Any, Dict, Callable, Optional, Tuple, TypeVar
 
 _KT = TypeVar('_KT')
 _VT = TypeVar('_VT')
 
-if TYPE_CHECKING:
-    OD = OrderedDict[_KT, _VT]
-else:
-    OD = OrderedDict
 
-
-class DefaultOrderedDict(OD, Dict[_KT, _VT]):
+class DefaultOrderedDict(OrderedDict, Dict[_KT, _VT]):
     # Source: http://stackoverflow.com/a/6190500/562769
     def __init__(self,
                  default_factory: Optional[Callable[[], _VT]]=None,
