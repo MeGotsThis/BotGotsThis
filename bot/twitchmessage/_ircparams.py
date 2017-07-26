@@ -13,19 +13,19 @@ class IrcMessageParams:
                  middle: Optional[str]=None,
                  trailing: Optional[str]=None) -> None:
         if not isinstance(middle, (type(None), str)):
-            raise TypeError()
+            raise TypeError(f'middle: {type(middle).__name__}')
         if not isinstance(trailing, (type(None), str)):
-            raise TypeError()
+            raise TypeError(f'trailing: {type(trailing).__name__}')
 
         if middle is not None:
             if not middle:
-                raise ValueError()
+                raise ValueError(f'middle is empty')
             if any([s for s in middle.split(' ') if len(s) and s[0] == ':']):
-                raise ValueError()
+                raise ValueError(f'middle: {middle}')
             if set(middle) == {' '} or any(c in '\0\r\n' for c in middle):
-                raise ValueError()
+                raise ValueError(f'middle: {middle}')
         if trailing is not None and any(c in '\0\r\n' for c in trailing):
-            raise ValueError()
+            raise ValueError(f'trailing: {trailing}')
 
         self._middle: Optional[str] = middle
         self._trailing: Optional[str] = trailing
