@@ -284,6 +284,27 @@ class TestConnectionHandler(unittest.TestCase):
                              and m[1]['whisper'].nick in ['megotsthis',
                                                           'botgotsthis']]), 2)
 
+    @patch('bot.globals', autospec=True)
+    @patch('bot.utils.logException', autospec=True)
+    @patch.object(MessagingQueue, 'popChat', autospec=True)
+    @patch.object(MessagingQueue, 'popWhisper', autospec=True)
+    @patch.object(connection.ConnectionHandler, 'queue_write', autospec=True)
+    def test_flush_writes_exception(
+            self, mock_queue_write, mock_popWhisper, mock_popChat, mock_log,
+            mock_globals):
+        mock_globals.groupChannel = self.channel
+        mock_popWhisper.side_effect = [
+            WhisperMessage('botgotsthis', 'Kappa\n'),
+            WhisperMessage('megotsthis', 'KappaPride\n'),
+            None]
+        mock_popChat.side_effect = [
+            ChatMessage(self.channel, 'KappaRoss\n'),
+            ChatMessage(self.channel, 'KappaClaus\n'),
+            None]
+        self.connection.flush_writes()
+        self.assertFalse(mock_queue_write.called)
+        self.assertTrue(mock_log.call_count, 4)
+
 
 class TestConnectionHandlerAsync(asynctest.TestCase):
     def setUp(self):

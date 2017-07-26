@@ -327,16 +327,23 @@ class ConnectionHandler:
         for whisperMessage in iter(self.messaging.popWhisper, None):
             ircMsg: str = f'.w {whisperMessage.nick} {whisperMessage.message}'
             ircMsg = ircMsg[:bot.config.messageLimit]
-            self.queue_write(
-                IrcMessage(None, None, 'PRIVMSG',
-                           IrcMessageParams(
-                               bot.globals.groupChannel.ircChannel, ircMsg)),
-                whisper=whisperMessage)
+            try:
+                self.queue_write(
+                    IrcMessage(None, None, 'PRIVMSG',
+                               IrcMessageParams(
+                                   bot.globals.groupChannel.ircChannel,
+                                   ircMsg)),
+                    whisper=whisperMessage)
+            except ValueError:
+                utils.logException()
         nessage: data.ChatMessage
         for message in iter(self.messaging.popChat, None):
-            self.queue_write(
-                IrcMessage(None, None, 'PRIVMSG',
-                           IrcMessageParams(
-                               message.channel.ircChannel,
-                               message.message[:bot.config.messageLimit])),
-                channel=message.channel)
+            try:
+                self.queue_write(
+                    IrcMessage(None, None, 'PRIVMSG',
+                               IrcMessageParams(
+                                   message.channel.ircChannel,
+                                   message.message[:bot.config.messageLimit])),
+                    channel=message.channel)
+            except ValueError:
+                utils.logException()
