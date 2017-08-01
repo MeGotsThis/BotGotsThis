@@ -1,5 +1,6 @@
 import platform
 
+import aioodbc
 import asynctest
 
 import bot  # noqa: F401
@@ -18,14 +19,18 @@ class TestPostgres(asynctest.TestCase):
         self.connectionString = f'''\
 Driver={self.driver};Server=localhost;Port=5432;\
 Database=botgotsthis_test;Uid=botgotsthis_test;Pwd=botgotsthis_test'''
+        self.pool = await aioodbc.create_pool(minsize=1, maxsize=1,
+                                              dsn=self.connectionString)
         databaseClass = getattr(self, 'DatabaseClass', DatabaseMain)
-        self.database = databaseClass(self.connectionString)
+        self.database = databaseClass(self.pool)
         await self.database.connect()
         self.cursor = await self.database.cursor()
 
     async def tearDown(self):
         await self.cursor.close()
         await self.database.close()
+        self.pool.close()
+        await self.pool.wait_closed()
 
     async def execute(self, query, params=(), *, commit=True):
         if isinstance(query, str):

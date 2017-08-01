@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 class Database:
     def __init__(self,
-                 connectionString: str) -> None:
-        self._connectionString: str = connectionString
+                 pool: aioodbc.Pool) -> None:
+        self._pool: aioodbc.Pool = pool
         self._connection: Optional[aioodbc.Connection] = None
         self._driver: Optional[str] = None
 
@@ -21,7 +21,7 @@ class Database:
         return self._connection
 
     async def connect(self) -> None:
-        self._connection = await aioodbc.connect(dsn=self._connectionString)
+        self._connection = await self._pool.acquire()
         driver: str = await self._connection.getinfo(pyodbc.SQL_DRIVER_NAME)
         self._driver = driver.lower()
         if self.isPostgres:
@@ -31,7 +31,7 @@ class Database:
 
     async def close(self) -> None:
         if self.connection is not None:
-            await self.connection.close()
+            await self._pool.release(self.connection)
 
     async def __aenter__(self) -> 'Database':
         await self.connect()

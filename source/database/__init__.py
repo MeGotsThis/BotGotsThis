@@ -27,5 +27,5 @@ def get_database(schema: Schema=Schema.Main) -> Database:
         Schema.TimeZone: DatabaseTimeZone,
     }
     if schema in databases and schema.value in bot.config.database:
-        return databases[schema](bot.config.database[schema.value])
+        return databases[schema](bot.globals.connectionPools[schema])
     raise ValueError()

@@ -1,5 +1,6 @@
 import platform
 
+import aioodbc
 import asynctest
 
 import bot  # noqa: F401
@@ -17,14 +18,18 @@ Driver=SQLite3 ODBC Driver;Database=:memory:;FKSupport=true;'''
         else:
             self.connectionString = '''\
 Driver=SQLite3;Database=:memory:;FKSupport=true;'''
+        self.pool = await aioodbc.create_pool(minsize=1, maxsize=1,
+                                              dsn=self.connectionString)
         databaseClass = getattr(self, 'DatabaseClass', DatabaseMain)
-        self.database = databaseClass(self.connectionString)
+        self.database = databaseClass(self.pool)
         await self.database.connect()
         self.cursor = await self.database.cursor()
 
     async def tearDown(self):
         await self.cursor.close()
         await self.database.close()
+        self.pool.close()
+        await self.pool.wait_closed()
 
     async def execute(self, query, params=(), *, commit=True):
         if isinstance(query, str):

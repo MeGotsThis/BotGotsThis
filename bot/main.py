@@ -1,5 +1,6 @@
 ﻿# Import some necessary libraries.
 import asyncio
+import aioodbc
 import bot
 import importlib
 import pkgutil
@@ -27,6 +28,12 @@ async def initializer() -> None:
     bot.globals.clusters['aws'] = connection.ConnectionHandler(
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
 
+    schema: database.Schema
+    for schema in database.Schema:
+        pool: aioodbc.Pool
+        pool = await aioodbc.create_pool(dsn=bot.config.database[schema.value])
+        bot.globals.connectionPools[schema] = pool
+
     _modulesList: ModuleList = [
         pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore
                               prefix=publicAuto.__name__ + '.'),
@@ -43,6 +50,7 @@ async def initializer() -> None:
     bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
     if bot.config.owner:
         utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
+
     db: database.Database
     async with database.get_database() as db:
         databaseObj: database.DatabaseMain = cast(database.DatabaseMain, db)
@@ -50,6 +58,13 @@ async def initializer() -> None:
         async for autoJoin in databaseObj.getAutoJoinsChats():
             utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
                               autoJoin.cluster)
+
+
+async def finalizer() -> None:
+    schema: database.Schema
+    for schema in database.Schema:
+        bot.globals.connectionPools[schema].close()
+        await bot.globals.connectionPools[schema].wait_closed()
 
 
 def main(argv: Optional[List[str]]=None) -> int:
@@ -66,6 +81,7 @@ def main(argv: Optional[List[str]]=None) -> int:
         loop.run_until_complete(coro)
         if asyncio.Task.all_tasks():
             asyncio.wait_for(asyncio.gather(*asyncio.Task.all_tasks()), 10)
+        loop.run_until_complete(finalizer())
         loop.close()
         return 0
     except:
