@@ -47,12 +47,20 @@ class BotConfig:
             'timezone': '',
         }
 
+        self.connections: Dict[str, int] = {
+            'main': 10,
+            'oauth': 10,
+            'timeout': 10,
+            'timezone': 10,
+        }
+
         self.twitchClientId: str = ''
 
         self.ircLogFolder: str = ''
         self.exceptionLog: str = ''
 
     async def read_config(self) -> None:
+        ini: configparser.ConfigParser
         if os.path.isfile('twitch.ini'):
             ini = configparser.ConfigParser()
             async with aiofiles.open('twitch.ini', 'r',
@@ -140,10 +148,12 @@ class BotConfig:
                                      encoding='utf-8') as file:
                 ini.read_string(await file.read(None))
 
-            self.database['main'] = str(ini['DATABASE']['main'])
-            self.database['oauth'] = str(ini['DATABASE']['oauth'])
-            self.database['timeout'] = str(ini['DATABASE']['timeout'])
-            self.database['timezone'] = str(ini['DATABASE']['timezone'])
+            for s in ['main', 'oauth', 'timeout', 'timezone']:
+                self.database[s] = str(ini['DATABASE'][s])
+                if ini['CONNECTIONS'][s]:
+                    i = int(ini['CONNECTIONS'][s])
+                    if i:
+                        self.connections[s] = i
 
         if os.path.isfile('twitchApi.ini'):
             ini = configparser.ConfigParser()

@@ -31,7 +31,10 @@ async def initializer() -> None:
     schema: database.Schema
     for schema in database.Schema:
         pool: aioodbc.Pool
-        pool = await aioodbc.create_pool(dsn=bot.config.database[schema.value])
+        pool = await aioodbc.create_pool(
+            minsize=bot.config.connections[schema.value],
+            maxsize=bot.config.connections[schema.value],
+            dsn=bot.config.database[schema.value])
         bot.globals.connectionPools[schema] = pool
 
     _modulesList: ModuleList = [
