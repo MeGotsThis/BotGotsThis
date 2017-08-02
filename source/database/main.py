@@ -3,7 +3,7 @@ import pyodbc
 
 from datetime import datetime
 from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple  # noqa: F401, E501
-from typing import Optional, Sequence, Tuple, TypeVar, Union  # noqa: F401
+from typing import Optional, Sequence, Set, Tuple, TypeVar, Union  # noqa: F401
 from typing import overload
 
 from ._base import Database
@@ -37,6 +37,11 @@ CommandReturn = Union[str, Dict[str, str]]
 
 
 class DatabaseMain(Database):
+    def __init__(self,
+                 pool: aioodbc.Pool) -> None:
+        super().__init__(pool)
+        self.features: Optional[Set[str]] = None
+
     async def getAutoJoinsChats(self) -> AsyncIterator[AutoJoinChannel]:
         query: str = '''
 SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
@@ -513,13 +518,15 @@ INSERT INTO custom_command_properties
     async def hasFeature(self,
                          broadcaster: str,
                          feature: str) -> bool:
-        query: str = '''
-SELECT 1 FROM chat_features WHERE broadcaster=? AND feature=?
+        if self.features is None:
+            query: str = '''
+SELECT feature FROM chat_features WHERE broadcaster=?
 '''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (broadcaster, feature))
-            return await cursor.fetchone() is not None
+            cursor: aioodbc.cursor.Cursor
+            async with await self.cursor() as cursor:
+                await cursor.execute(query, (broadcaster,))
+                self.features = {f async for f, in cursor}
+        return feature in self.features
 
     async def addFeature(self,
                          broadcaster: str,
@@ -532,6 +539,7 @@ INSERT INTO chat_features (broadcaster, feature) VALUES (?, ?)
             try:
                 await cursor.execute(query, (broadcaster, feature))
                 await self.commit()
+                self.features = None
                 return True
             except pyodbc.Error:
                 return False
@@ -545,6 +553,7 @@ DELETE FROM chat_features WHERE broadcaster=? AND feature=?
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (broadcaster, feature))
+            self.features = None
             await self.commit()
             return cursor.rowcount != 0
 
