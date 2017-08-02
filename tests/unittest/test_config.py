@@ -50,6 +50,12 @@ oauth =
 timeout = 
 timezone = 
 
+[CONNECTIONS]
+main =
+oauth =
+timeout =
+timezone =
+
 [twitch]
 twitchClientID = 
 twitchSecret = 
