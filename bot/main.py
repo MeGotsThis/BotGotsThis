@@ -66,8 +66,8 @@ async def initializer() -> None:
 async def finalizer() -> None:
     schema: database.Schema
     for schema in database.Schema:
-        bot.globals.connectionPools[schema].close()
-        await bot.globals.connectionPools[schema].wait_closed()
+        bot.globals.connectionPools[schema.value].close()
+        await bot.globals.connectionPools[schema.value].wait_closed()
 
 
 def main(argv: Optional[List[str]]=None) -> int:
