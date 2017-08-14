@@ -92,4 +92,4 @@ class BotGlobals:
         self.globalBttvEmotes: Dict[str, str] = {}
         self.globalBttvEmotesCache: datetime = datetime.min
 
-        self.connectionPools: Dict[database.Schema, aioodbc.Pool] = {}
+        self.connectionPools: Dict[str, aioodbc.Pool] = {}

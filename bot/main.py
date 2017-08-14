@@ -35,7 +35,7 @@ async def initializer() -> None:
             minsize=bot.config.connections[schema.value],
             maxsize=bot.config.connections[schema.value],
             dsn=bot.config.database[schema.value])
-        bot.globals.connectionPools[schema] = pool
+        bot.globals.connectionPools[schema.value] = pool
 
     _modulesList: ModuleList = [
         pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore

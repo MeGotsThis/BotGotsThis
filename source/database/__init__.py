@@ -1,5 +1,7 @@
 import bot
 
+import aioodbc
+
 from enum import Enum
 from typing import Dict, Type  # noqa: F401
 
@@ -27,5 +29,7 @@ def get_database(schema: Schema=Schema.Main) -> Database:
         Schema.TimeZone: DatabaseTimeZone,
     }
     if schema in databases and schema.value in bot.config.database:
-        return databases[schema](bot.globals.connectionPools[schema])
+        connectionPool: aioodbc.Pool
+        connectionPool = bot.globals.connectionPools[schema.value]
+        return databases[schema](connectionPool)
     raise ValueError()
