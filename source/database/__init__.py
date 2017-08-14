@@ -1,6 +1,6 @@
 import bot
 
-import aioodbc
+import aioodbc  # noqa: F401
 
 from enum import Enum
 from typing import Dict, Type  # noqa: F401
