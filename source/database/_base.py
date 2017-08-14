@@ -26,6 +26,7 @@ class Database:
         self._driver = driver.lower()
         if self.isPostgres:
             cursor: aioodbc.cursor.Cursor
+            await self.connection.rollback()
             async with await self.cursor() as cursor:
                 await cursor.execute("SET TIME ZONE 'UTC'")
 
