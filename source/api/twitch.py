@@ -331,7 +331,7 @@ def _handle_streams(streams: List[Dict[str, Any]],
         online[channel] = TwitchStatus(
             streamingSince, stream['channel']['status'],
             stream['channel']['game'],
-            stream['community_id'] or None)
+            [stream['community_id']] if stream['community_id'] else [])
     return online
 
 
@@ -347,7 +347,7 @@ async def channel_properties(channel: str) -> Optional[TwitchStatus]:
         response, channel_ = await get_call(None, uri)
         if response.status != 200:
             return None
-        return TwitchStatus(None, channel_['status'], channel_['game'], None)
+        return TwitchStatus(None, channel_['status'], channel_['game'], [])
     return None
 
 
