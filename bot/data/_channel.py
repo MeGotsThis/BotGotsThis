@@ -159,7 +159,7 @@ class Channel:
 
     @community.setter
     def community(self, value: List[str]) -> None:
-        if value is not None and not isinstance(value, list):
+        if not isinstance(value, list):
             raise TypeError()
         self._community = value[:]
 
