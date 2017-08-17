@@ -1,6 +1,6 @@
 ﻿import bot
 
-from typing import Optional, cast  # noqa: F401
+from typing import List, Optional, cast  # noqa: F401
 
 from ..library.chat import min_args, permission_not_feature, permission
 from ...api import oauth, twitch
@@ -69,25 +69,28 @@ async def commandCommunity(args: ChatCommandArgs) -> bool:
     token: Optional[str] = await oauth.token(args.chat.channel)
     if token is None:
         return False
-    community: Optional[str] = None
+    communities: List[str] = []
     if len(args.message) >= 2:
-        community = args.message[1]
-    result: Optional[bool]
-    result = await twitch.set_channel_community(args.chat.channel, community)
-    msg: str
-    if result is True:
-        if community is not None:
-            community = community.lower()
-            communityId = bot.globals.twitchCommunity[community]
-            communityName = bot.globals.twitchCommunityId[communityId]
-            msg = 'Channel Community set as: ' + communityName
+        communities = args.message[1:4].split()
+    result: Optional[List[str]]
+    result = await twitch.set_channel_community(args.chat.channel, communities)
+    if result is not None:
+        if communities:
+            if result:
+                communityNames: List[str] = []
+                communityId: str
+                for communityId in result:
+                    name: str = bot.globals.twitchCommunityId[communityId]
+                    communityNames.append(name)
+                args.chat.send('Channel Community set as: '
+                               + ', '.join(communityNames))
+            else:
+                args.chat.send('''\
+Communities not set, they may not exist on Twitch''')
         else:
-            msg = 'Channel Community has been unset'
-    elif result is False:
-        msg = f'Channel Community failed to set, {community} not exist'
+            args.chat.send('Channel Community has been unset')
     else:
-        msg = 'Channel Community failed to set'
-    args.chat.send(msg)
+        args.chat.send('Channel Community failed to set')
     return True
 
 

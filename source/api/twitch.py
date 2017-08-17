@@ -2,15 +2,17 @@
 from contextlib import suppress
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping
-from typing import NamedTuple, Optional, Tuple, Union
+from typing import NamedTuple, Optional, Set, Tuple, Union  # noqa: F401
 import aiohttp
 import asyncio
 import bot
 import bot.utils
 import email.utils
+import json
 import time
 import urllib.parse
 
+JsonData = Any
 DateStruct = Optional[Tuple[int, int, int, int, int, int, int, int, int]]
 TwitchEmotes = Dict[str, List[Dict[str, Union[str, int]]]]
 
@@ -19,7 +21,7 @@ class TwitchStatus(NamedTuple):
     streaming: Optional[datetime]
     status: Optional[str]
     game: Optional[str]
-    communityId: Optional[str]
+    communityId: List[str]
 
 
 OnlineStreams = Dict[str, TwitchStatus]
@@ -48,8 +50,7 @@ async def get_headers(headers: MutableMapping[str, str],
 async def get_call(channel: Optional[str],
                    uri: str,
                    headers: MutableMapping[str, str]=None
-                   ) -> Tuple[aiohttp.ClientResponse,
-                              Optional[Dict[str, Any]]]:
+                   ) -> Tuple[aiohttp.ClientResponse, JsonData]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
@@ -70,8 +71,7 @@ async def post_call(channel: Optional[str],
                     uri: str,
                     headers: MutableMapping[str, str]=None,
                     data: Union[str, Mapping[str, str]]=None
-                    ) -> Tuple[aiohttp.ClientResponse,
-                               Optional[Dict[str, Any]]]:
+                    ) -> Tuple[aiohttp.ClientResponse, JsonData]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
@@ -98,8 +98,7 @@ async def put_call(channel: Optional[str],
                    uri: str,
                    headers: MutableMapping[str, str]=None,
                    data: Union[str, Mapping[str, str]]=None
-                   ) -> Tuple[aiohttp.ClientResponse,
-                              Optional[Dict[str, Any]]]:
+                   ) -> Tuple[aiohttp.ClientResponse, JsonData]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
@@ -126,8 +125,7 @@ async def delete_call(channel: Optional[str],
                       uri: str,
                       headers: MutableMapping[str, str]=None,
                       data: Union[str, Mapping[str, str]]=None
-                      ) -> Tuple[aiohttp.ClientResponse,
-                                 Optional[Dict[str, Any]]]:
+                      ) -> Tuple[aiohttp.ClientResponse, JsonData]:
     if headers is None:
         headers = {}
     headers = await get_headers(headers, channel)
@@ -353,21 +351,25 @@ async def channel_properties(channel: str) -> Optional[TwitchStatus]:
     return None
 
 
-async def channel_community(channel: str) -> Optional[TwitchCommunity]:
+async def channel_community(channel: str) -> Optional[List[TwitchCommunity]]:
     if (not await bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
-    uri: str = ('/kraken/channels/' + bot.globals.twitchId[channel]
-                + '/community')
+    uri: str = f'/kraken/channels/{bot.globals.twitchId[channel]}/communities'
     with suppress(ConnectionError, aiohttp.ClientResponseError):
         response: aiohttp.ClientResponse
-        community: Optional[Dict[str, str]]
-        response, community = await get_call(None, uri)
+        communities: Optional[Dict[str, List[Dict[str, str]]]]
+        response, communities = await get_call(None, uri)
         if response.status not in [200, 204]:
             return None
-        if community is None:
-            return TwitchCommunity(None, None)
-        return TwitchCommunity(community['_id'], community['name'])
+        if communities is None:
+            return []
+        chanCommunities: List[TwitchCommunity] = []
+        community: Dict[str, str]
+        for community in communities['communities']:
+            chanCommunities.append(
+                TwitchCommunity(community['_id'], community['name']))
+        return chanCommunities
     return None
 
 
@@ -398,33 +400,40 @@ async def get_community_by_id(communityId: str) -> Optional[TwitchCommunity]:
 
 
 async def set_channel_community(channel: str,
-                                communityName: Optional[str]
-                                ) -> Optional[bool]:
+                                communities: List[str]
+                                ) -> Optional[List[str]]:
     if (not await bot.utils.loadTwitchId(channel)
             or bot.globals.twitchId[channel] is None):
         return None
     uri: str
     response: aiohttp.ClientResponse
     data: Optional[Dict[str, Any]]
-    if communityName is not None:
-        name: str = communityName.lower()
-        if not await bot.utils.loadTwitchCommunity(communityName):
-            return None
-        if bot.globals.twitchCommunity[name] is None:
-            return False
-        uri = ('/kraken/channels/' + bot.globals.twitchId[channel]
-               + '/community/' + bot.globals.twitchCommunity[name])
+    if communities:
+        communityIds: Set[str] = set()
+        for communityName in communities:
+            name: str = communityName.lower()
+            if not await bot.utils.loadTwitchCommunity(communityName):
+                return None
+            if bot.globals.twitchCommunity[name] is None:
+                continue
+            communityIds.add(bot.globals.twitchCommunity[name])
+        if not communityIds:
+            return []
+        uri = f'/kraken/channels/{bot.globals.twitchId[channel]}/communities'
+        data = {'community_ids': list(communityIds)}
+        headers: Dict[str, str] = {'Content-Type': 'application/json'}
         with suppress(aiohttp.ClientConnectionError,
                       aiohttp.ClientResponseError,
                       asyncio.TimeoutError):
-            response, data = await put_call(channel, uri)
-            return True if response.status == 204 else None
+            response, data = await put_call(channel, uri,
+                                            headers=headers,
+                                            data=json.dumps(data))
+            return list(communityIds) if response.status == 204 else None
     else:
-        uri = ('/kraken/channels/' + bot.globals.twitchId[channel]
-               + '/community')
+        uri = f'/kraken/channels/{bot.globals.twitchId[channel]}/community'
         with suppress(aiohttp.ClientConnectionError,
                       aiohttp.ClientResponseError,
                       asyncio.TimeoutError):
             response, data = await delete_call(channel, uri)
-            return True if response.status == 204 else None
+            return [] if response.status == 204 else None
     return None

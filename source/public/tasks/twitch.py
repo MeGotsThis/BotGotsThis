@@ -53,8 +53,9 @@ async def checkStreamsAndChannel(timestamp: datetime) -> None:
         chat.twitchCache = timestamp
         (chat.streamingSince, chat.twitchStatus,
          chat.twitchGame, chat.community) = onlineStreams[channel]
-        if chat.community is not None:
-            await bot.utils.loadTwitchCommunity(chat.community)
+        communityId: str
+        for communityId in chat.community:
+            await bot.utils.loadTwitchCommunity(communityId)
 
     for channel in channels:
         if channel in onlineStreams:
@@ -88,11 +89,14 @@ async def checkOfflineChannels(timestamp: datetime) -> None:
         return
     (chat.streamingSince, chat.twitchStatus,
      chat.twitchGame, shouldBeNone) = current
-    community: Optional[twitch.TwitchCommunity]
-    community = await twitch.channel_community(chat.channel)
-    if community is not None and community.id is not None:
-        chat.community = community.id
-        bot.utils.saveTwitchCommunity(community.name, community.id, timestamp)
+    communities: Optional[List[twitch.TwitchCommunity]]
+    communities = await twitch.channel_community(chat.channel)
+    if communities is not None:
+        community: twitch.TwitchCommunity
+        chat.community = [community.id for community in communities]
+        for community in communities:
+            bot.utils.saveTwitchCommunity(community.name, community.id,
+                                          timestamp)
     bot.globals.globalSessionData['offlineCheck'].append(timestamp)
 
 

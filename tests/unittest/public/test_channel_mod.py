@@ -260,13 +260,36 @@ class TestChannelMod(TestChannel):
         mock_globals.twitchCommunityId = {
             '6e940c4a-c42f-47d2-af83-0a2c7e47c421': 'Speedrunning'
             }
-        mock_update.return_value = True
+        mock_update.return_value = ['6e940c4a-c42f-47d2-af83-0a2c7e47c421']
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'
         args = self.args._replace(message=Message('!community speedrunning'))
         self.assertIs(await mod.commandCommunity(args), True)
         mock_token.assert_called_once_with('botgotsthis')
-        mock_update.assert_called_once_with('botgotsthis', 'speedrunning')
+        mock_update.assert_called_once_with('botgotsthis', ['speedrunning'])
+        self.channel.send.assert_called_once_with(
+            StrContains('Community', 'Speedrunning'))
+
+    @patch('bot.globals', autospec=True)
+    @patch('source.api.oauth.token')
+    @patch('source.api.twitch.set_channel_community')
+    async def test_community_3(self, mock_update, mock_token, mock_globals):
+        mock_globals.twitchCommunity = {
+            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421',
+            'programming': None
+            }
+        mock_globals.twitchCommunityId = {
+            '6e940c4a-c42f-47d2-af83-0a2c7e47c421': 'Speedrunning'
+            }
+        mock_update.return_value = ['6e940c4a-c42f-47d2-af83-0a2c7e47c421']
+        self.permissionSet['broadcaster'] = True
+        mock_token.return_value = 'oauth:'
+        message = Message('!community Speedrunning Programming')
+        args = self.args._replace(message=message)
+        self.assertIs(await mod.commandCommunity(args), True)
+        mock_token.assert_called_once_with('botgotsthis')
+        mock_update.assert_called_once_with(
+            'botgotsthis', ['Speedrunning', 'Programming'])
         self.channel.send.assert_called_once_with(
             StrContains('Community', 'Speedrunning'))
 
@@ -287,7 +310,7 @@ class TestChannelMod(TestChannel):
         args = self.args._replace(message=Message('!community'))
         self.assertIs(await mod.commandCommunity(args), True)
         mock_token.assert_called_once_with('botgotsthis')
-        mock_update.assert_called_once_with('botgotsthis', None)
+        mock_update.assert_called_once_with('botgotsthis', [])
         self.channel.send.assert_called_once_with(
             StrContains('Community', 'unset'))
 
@@ -302,15 +325,15 @@ class TestChannelMod(TestChannel):
         mock_globals.twitchCommunityId = {
             '6e940c4a-c42f-47d2-af83-0a2c7e47c421': 'Speedrunning'
             }
-        mock_update.return_value = False
+        mock_update.return_value = []
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'
         args = self.args._replace(message=Message('!community Kappa'))
         self.assertIs(await mod.commandCommunity(args), True)
         mock_token.assert_called_once_with('botgotsthis')
-        mock_update.assert_called_once_with('botgotsthis', 'Kappa')
+        mock_update.assert_called_once_with('botgotsthis', ['Kappa'])
         self.channel.send.assert_called_once_with(
-            StrContains('Community', 'Kappa', 'not', 'exist'))
+            StrContains('Communities', 'not', 'exist'))
 
     @patch('bot.globals', autospec=True)
     @patch('source.api.oauth.token')
@@ -328,7 +351,7 @@ class TestChannelMod(TestChannel):
         args = self.args._replace(message=Message('!community'))
         self.assertIs(await mod.commandCommunity(args), True)
         mock_token.assert_called_once_with('botgotsthis')
-        mock_update.assert_called_once_with('botgotsthis', None)
+        mock_update.assert_called_once_with('botgotsthis', [])
         self.channel.send.assert_called_once_with(
             StrContains('Community', 'fail'))
 

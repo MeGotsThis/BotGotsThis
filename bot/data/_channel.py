@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, Iterable, Optional, Set, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Union
 
 from bot import utils
 from bot.coroutine import connection as connectionM
@@ -42,7 +42,7 @@ class Channel:
         self._streamingSince: Optional[datetime] = None
         self._twitchStatus: Optional[str] = ''
         self._twitchGame: Optional[str] = ''
-        self._community: Optional[str] = None
+        self._community: List[str] = []
         self._serverCheck: datetime = datetime.min
 
     @property
@@ -154,14 +154,14 @@ class Channel:
         self._twitchGame = value
 
     @property
-    def community(self) -> Optional[str]:
+    def community(self) -> List[str]:
         return self._community
 
     @community.setter
-    def community(self, value: Optional[str]) -> None:
-        if value is not None and not isinstance(value, str):
+    def community(self, value: List[str]) -> None:
+        if value is not None and not isinstance(value, list):
             raise TypeError()
-        self._community = value
+        self._community = value[:]
 
     @property
     def serverCheck(self) -> datetime:
