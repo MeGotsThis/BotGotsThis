@@ -742,7 +742,7 @@ class TestApiTwitch(asynctest.TestCase):
         twitch._handle_streams(json.loads(streams), online)
         self.assertEqual(online,
                          {'botgotsthis': twitch.TwitchStatus(
-                             datetime(2000, 1, 1), None, None, None)})
+                             datetime(2000, 1, 1), None, None, [])})
 
     @asynctest.fail_on(unused_loop=False)
     def test_handle_streams_community(self):
@@ -752,7 +752,7 @@ class TestApiTwitch(asynctest.TestCase):
         twitch._handle_streams(data, online)
         self.assertEqual(online,
                          {'botgotsthis': twitch.TwitchStatus(
-                             datetime(2000, 1, 1), None, None, '1')})
+                             datetime(2000, 1, 1), None, None, ['1'])})
 
     async def test_properties_no_load(self):
         self.mock_load.return_value = False
@@ -777,7 +777,7 @@ class TestApiTwitch(asynctest.TestCase):
         data = json.loads(channelProperties.decode())
         self.mock_get_call.return_value[1] = data
         self.assertEqual(await twitch.channel_properties('botgotsthis'),
-                         twitch.TwitchStatus(None, None, None, None))
+                         twitch.TwitchStatus(None, None, None, []))
         self.mock_load.assert_called_once_with('botgotsthis')
         self.assertTrue(self.mock_get_call.called)
 
