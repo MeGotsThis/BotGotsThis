@@ -330,8 +330,7 @@ def _handle_streams(streams: List[Dict[str, Any]],
                                                      '%Y-%m-%dT%H:%M:%SZ')
         online[channel] = TwitchStatus(
             streamingSince, stream['channel']['status'],
-            stream['channel']['game'],
-            [stream['community_id']] if stream['community_id'] else [])
+            stream['channel']['game'], stream['community_ids'])
     return online
 
 

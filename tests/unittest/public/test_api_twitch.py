@@ -139,6 +139,7 @@ streams = '''[
         "_id": 1,
         "game": null,
         "community_id":"",
+        "community_ids":[],
         "viewers": 9000,
         "created_at": "2000-01-01T00:00:00Z",
         "video_height": 2160,
@@ -748,7 +749,7 @@ class TestApiTwitch(asynctest.TestCase):
     def test_handle_streams_community(self):
         online = {}
         data = json.loads(streams)
-        data[0]['community_id'] = '1'
+        data[0]['community_ids'] = ['1']
         twitch._handle_streams(data, online)
         self.assertEqual(online,
                          {'botgotsthis': twitch.TwitchStatus(
