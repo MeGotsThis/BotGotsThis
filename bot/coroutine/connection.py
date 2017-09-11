@@ -81,10 +81,10 @@ class ConnectionHandler:
                 except asyncio.TimeoutError:
                     pass
             except (ConnectionError, data.ConnectionReset):
-                if self._transport is None:
+                if self._transport is not None:
                     self.disconnect()
             except data.LoginUnsuccessful:
-                if self._transport is None:
+                if self._transport is not None:
                     self.disconnect()
                 break
 
