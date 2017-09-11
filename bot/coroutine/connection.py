@@ -66,8 +66,7 @@ class ConnectionHandler:
         return self._writeQueue
 
     async def run_connection(self) -> None:
-        name: str = self.name
-        print(f'{utils.now()} Starting {name}')
+        print(f'{utils.now()} Starting {self.name}')
         while bot.globals.running:
             if not self.isConnected and not await self.connect():
                 await asyncio.sleep(5)
@@ -88,7 +87,7 @@ class ConnectionHandler:
                     self.disconnect()
                 break
 
-        print(f'{utils.now()} Ending {name}')
+        print(f'{utils.now()} Ending {self.name}')
 
     async def connect(self) -> Optional[bool]:
         if self._transport is not None:
