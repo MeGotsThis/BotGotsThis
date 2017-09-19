@@ -5,7 +5,7 @@ import bot
 import importlib
 import pkgutil
 import source.private.autoload as privateAuto
-import source.public.autoload as publicAuto
+import pkg.botgotsthis.autoload as publicAuto
 from itertools import chain
 from importlib.abc import PathEntryFinder
 from source import database

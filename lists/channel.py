@@ -1,4 +1,4 @@
-﻿from .public import channel as publicList
+﻿from pkg.botgotsthis.items import channel as publicList
 from collections import ChainMap
 from source import data
 from typing import Iterable, Mapping, Optional

@@ -1,6 +1,6 @@
 ﻿from source import data
 from typing import Collection, Iterable, List  # noqa: F401
-from .public import custom as publicCustom
+from pkg.botgotsthis.items import custom as publicCustom
 try:
     from .private import custom as privateCustom
 except ImportError:

@@ -1,4 +1,4 @@
-﻿from .public import manage as publicList
+﻿from pkg.botgotsthis.items import manage as publicList
 from collections import ChainMap
 from source import data
 from typing import Mapping, Optional

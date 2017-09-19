@@ -1,4 +1,4 @@
-﻿from .public import feature as publicFeature
+﻿from pkg.botgotsthis.items import feature as publicFeature
 from collections import ChainMap
 from typing import Mapping, Optional
 try:
