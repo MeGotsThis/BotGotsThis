@@ -4,7 +4,7 @@ from asynctest.mock import MagicMock, patch
 
 from tests.unittest.base_custom import TestCustomField
 from source.data.message import Message
-from source.public.custom import url
+from pkg.botgotsthis.custom import url
 
 
 class TestCustomUrl(TestCustomField):
