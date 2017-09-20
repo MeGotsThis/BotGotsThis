@@ -17,7 +17,8 @@ def reloadable(module: str) -> bool:
                          'source.private.autoload',
                          'source.public.autoload']
     exclude = exclude or module.startswith('source.private.autoload.')
-    exclude = exclude or re.fullmatch(r'pkg\.[^\.]+\.autoload(\..+)?', module)
+    exclude = exclude or bool(re.fullmatch(r'pkg\.[^\.]+\.autoload(\..+)?',
+                                           module))
     return include and not exclude
 
 
