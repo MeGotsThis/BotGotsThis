@@ -141,12 +141,11 @@ class TestChannelWallProcess(TestChannel):
         self.mock_config = patcher.start()
         self.mock_config.spamModeratorCooldown = 30
 
-        patcher = patch('pkg.botgotsthis.library.chat.inCooldown',
-                        autospec=True)
+        patcher = patch('source.helper.chat.inCooldown', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_cooldown = patcher.start()
 
-        patcher = patch('pkg.botgotsthis.library.timeout.record_timeout')
+        patcher = patch('source.helper.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 

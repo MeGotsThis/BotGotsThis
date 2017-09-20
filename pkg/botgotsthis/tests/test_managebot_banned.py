@@ -112,7 +112,7 @@ class TestManageBotBannedListBannedChannels(asynctest.TestCase):
             await banned.list_banned_channels(self.database, self.send), True)
         self.send.assert_called_once_with(StrContains('no'))
 
-    @patch('pkg.botgotsthis.library.message.messagesFromItems', autospec=True)
+    @patch('source.helper.message.messagesFromItems', autospec=True)
     async def test_one(self, mock_messages):
         self.database.listBannedChannels.return_value = AsyncIterator(
             ['botgotsthis'])
@@ -123,7 +123,7 @@ class TestManageBotBannedListBannedChannels(asynctest.TestCase):
                                               StrContains('Banned'))
         self.send.assert_called_once_with('')
 
-    @patch('pkg.botgotsthis.library.message.messagesFromItems', autospec=True)
+    @patch('source.helper.message.messagesFromItems', autospec=True)
     async def test_many(self, mock_messages):
         self.database.listBannedChannels.return_value = AsyncIterator(
             ['botgotsthis', 'megotsthis'])

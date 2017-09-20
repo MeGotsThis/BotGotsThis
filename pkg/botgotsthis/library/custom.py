@@ -1,5 +1,6 @@
-import lists.custom
 from typing import Dict, Iterable, List, Optional
+
+import lists.custom
 from source.data import ChatCommandArgs, CustomFieldArgs, CustomCommand
 from source.data import CommandActionTokens, CustomCommandField  # noqa: F401
 from source.data import CustomCommandProcess, CustomFieldParts  # noqa: F401
@@ -7,8 +8,7 @@ from source.data import CustomProcessArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
 from source.database import DatabaseMain
-from ..library import textformat
-
+from source.helper import textformat
 
 permissions: Dict[Optional[str], str] = {
     None: '',

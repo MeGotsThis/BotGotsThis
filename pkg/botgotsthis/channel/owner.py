@@ -1,7 +1,7 @@
-﻿from ..library import channel, exit, managebot
-from ..library.chat import min_args, permission, ownerChannel, send
-from ..library.chat import sendPriority
-from source.data import ChatCommandArgs
+﻿from source.data import ChatCommandArgs
+from source.helper.chat import min_args, permission, ownerChannel, send
+from source.helper.chat import sendPriority
+from ..library import channel, exit, managebot
 
 
 @ownerChannel

@@ -1,10 +1,11 @@
-﻿import bot
+﻿from typing import Optional, Union  # noqa: F401
+
+import bot
 from bot import utils
-from typing import Optional, Union  # noqa: F401
-from . import timeout
 from source.api import twitch
 from source.data import Send
 from source.database import DatabaseMain
+from source.helper import timeout
 
 
 async def join(database: DatabaseMain,

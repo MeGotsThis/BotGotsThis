@@ -1,10 +1,12 @@
-import asynctest
-from bot.data import Channel
 from datetime import datetime, timedelta
-from source.database import DatabaseMain, DatabaseTimeout, Schema
-from pkg.botgotsthis.library import timeout
-from tests.unittest.mock_class import TypeMatch
+
+import asynctest
 from asynctest.mock import MagicMock, Mock, call, patch
+
+from bot.data import Channel
+from source.database import DatabaseMain, DatabaseTimeout, Schema
+from source.helper import timeout
+from tests.unittest.mock_class import TypeMatch
 
 
 class TestLibraryTimeoutUser(asynctest.TestCase):

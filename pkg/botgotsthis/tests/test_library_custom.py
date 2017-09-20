@@ -990,8 +990,7 @@ class TestLibraryCustomConvertField(asynctest.TestCase):
 
 class TestLibraryCustomFormat(unittest.TestCase):
     def setUp(self):
-        patcher = patch('pkg.botgotsthis.library.textformat.format',
-                        autospec=True)
+        patcher = patch('source.helper.textformat.format', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_format = patcher.start()
 

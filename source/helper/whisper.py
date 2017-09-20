@@ -1,8 +1,9 @@
-from bot import utils
 from functools import partial, wraps
 from typing import Any, Callable, Optional, cast
-from . import chat
+
+from bot import utils
 from source import data
+from source.helper import chat
 
 _AnyCallable = Callable[..., Any]
 _AnyDecorator = Callable[..., _AnyCallable]

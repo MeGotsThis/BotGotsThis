@@ -1,6 +1,6 @@
-﻿from ..library import feature
-from ..library.whisper import min_args, send
-from source.data import WhisperCommandArgs
+﻿from source.data import WhisperCommandArgs
+from source.helper.whisper import min_args, send
+from ..library import feature
 
 
 @min_args(2)

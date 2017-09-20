@@ -1,7 +1,6 @@
-import asynctest
-
 from datetime import datetime
 
+import asynctest
 from asynctest.mock import MagicMock, Mock, patch
 
 from bot.twitchmessage import IrcMessageTags
@@ -9,7 +8,7 @@ from source.data import WhisperCommandArgs
 from source.data.message import Message
 from source.data.permissions import WhisperPermissionSet
 from source.database import DatabaseMain
-from pkg.botgotsthis.library import whisper
+from source.helper import whisper
 
 
 class TestLibraryWhisper(asynctest.TestCase):

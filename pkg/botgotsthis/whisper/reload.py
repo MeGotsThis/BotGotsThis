@@ -1,6 +1,6 @@
-﻿from ..library import reload
-from ..library.whisper import permission, send
-from source.data import WhisperCommandArgs
+﻿from source.data import WhisperCommandArgs
+from source.helper.whisper import permission, send
+from ..library import reload
 
 
 @permission('owner')
