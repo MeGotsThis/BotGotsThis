@@ -339,7 +339,7 @@ class TestChannelBlockUrlHandleDifferentDomain(asynctest.TestCase):
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database
 
-        patcher = patch('pkg.botgotsthis.library.timeout.timeout_user')
+        patcher = patch('source.helper.timeout.timeout_user')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 

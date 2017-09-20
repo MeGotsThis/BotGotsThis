@@ -1,10 +1,12 @@
-﻿import bot
-from ..library import chat, timeout
-from ..library.chat import min_args, permission_feature
-from source.data import ChatCommandArgs
-from contextlib import suppress
+﻿from contextlib import suppress
 from datetime import timedelta
 from typing import Iterator  # noqa: F401
+
+import bot
+from source.data import ChatCommandArgs
+from source.helper import chat
+from source.helper.chat import min_args, permission_feature
+from source.helper import timeout
 
 
 @permission_feature(('broadcaster', None), ('moderator', 'modwall'))

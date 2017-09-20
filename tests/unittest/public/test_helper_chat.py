@@ -1,7 +1,6 @@
-import asynctest
-
 from datetime import datetime, timedelta
 
+import asynctest
 from asynctest.mock import MagicMock, Mock, PropertyMock, patch
 
 from bot.data import Channel
@@ -10,7 +9,7 @@ from source.data import ChatCommandArgs
 from source.data.message import Message
 from source.data.permissions import ChatPermissionSet
 from source.database import DatabaseMain
-from pkg.botgotsthis.library import chat
+from source.helper import chat
 
 
 class TestLibraryChat(asynctest.TestCase):
@@ -336,7 +335,7 @@ class TestLibraryChat(asynctest.TestCase):
             return True
         self.assertIs(await t(self.args), False)
 
-    @patch('pkg.botgotsthis.library.chat.inCooldown')
+    @patch('source.helper.chat.inCooldown')
     async def test_cooldown(self, mock_inCooldown):
         mock_inCooldown.return_value = False
 
@@ -346,7 +345,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), True)
         self.assertTrue(mock_inCooldown.called)
 
-    @patch('pkg.botgotsthis.library.chat.inCooldown')
+    @patch('source.helper.chat.inCooldown')
     async def test_cooldown_not(self, mock_inCooldown):
         mock_inCooldown.return_value = True
 

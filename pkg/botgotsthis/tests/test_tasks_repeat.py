@@ -30,7 +30,7 @@ class TestTasksRepeat(asynctest.TestCase):
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database
 
-        patcher = patch('pkg.botgotsthis.library.timeout.record_timeout')
+        patcher = patch('source.helper.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 

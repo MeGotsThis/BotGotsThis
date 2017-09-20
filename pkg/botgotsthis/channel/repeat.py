@@ -1,8 +1,9 @@
 ﻿from contextlib import suppress
 from typing import List, Optional  # noqa: F401
-from ..library.chat import min_args, permission
+
 from source.data import ChatCommandArgs
 from source.database import AutoRepeatList  # noqa: F401
+from source.helper.chat import min_args, permission
 
 
 @permission('broadcaster')

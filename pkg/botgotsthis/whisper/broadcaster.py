@@ -1,6 +1,6 @@
-﻿from ..library import broadcaster
-from ..library.whisper import send
-from source.data import WhisperCommandArgs
+﻿from source.data import WhisperCommandArgs
+from source.helper.whisper import send
+from ..library import broadcaster
 
 
 async def commandCome(args: WhisperCommandArgs) -> bool:

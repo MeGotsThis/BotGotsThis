@@ -190,7 +190,7 @@ class TestLibraryChannelSay(asynctest.TestCase):
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}
 
-        patcher = patch('pkg.botgotsthis.library.timeout.record_timeout')
+        patcher = patch('source.helper.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_record = patcher.start()
 

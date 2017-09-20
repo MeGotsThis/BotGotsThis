@@ -1,7 +1,8 @@
 ﻿from typing import Callable
-from ..library import textformat
-from ..library.chat import feature, min_args, permission
+
 from source.data import ChatCommand, ChatCommandArgs
+from source.helper.chat import feature, min_args, permission
+from source.helper import textformat
 
 
 def text_command(name: str, asciiTo: Callable[[str], str]) -> ChatCommand:

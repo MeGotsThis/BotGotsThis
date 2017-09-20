@@ -1,9 +1,10 @@
-﻿import bot
+﻿from typing import Iterable, List, Optional  # noqa: F401
+
+import bot
 from bot import utils
-from typing import Iterable, List, Optional  # noqa: F401
-from ..library import message
 from source.data import ManageBotArgs, Send
 from source.database import DatabaseMain
+from source.helper import message
 
 needReason: List[str] = ['add', 'insert', 'del', 'delete', 'rem', 'remove',
                          'remove']

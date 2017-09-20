@@ -1,6 +1,7 @@
 import unittest
-from pkg.botgotsthis.library import message
 from unittest.mock import patch
+
+from source.helper import message
 
 
 def send(messages):
