@@ -12,6 +12,8 @@ twitch.ini
 twitchApi.ini
 database.ini
 src/*
+pkg/*
+!pkg/botgotsthis
 
 # Ignoring sqlite databases
 *.db
