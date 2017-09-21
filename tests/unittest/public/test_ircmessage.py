@@ -22,16 +22,21 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.mock_log = patcher.start()
 
     @patch.dict('source.ircmessage.ircHandlers')
-    @patch('source.ircmessage.ircmessage.parseMessage')
+    @patch('bot.globals')
+    @patch('importlib.import_module')
     @patch('source.ircmessage.log_channel_message')
-    def test_parseMessage(self, mock_log, mock_privateParse):
+    def test_parseMessage(self, mock_log, mock_import_module, mock_globals):
+        mock_globals.pkgs = ['botgotsthis']
+        mock_parse = Mock()
+        mock_import_module.return_value = Mock()
+        mock_import_module.return_value.parseMessage = mock_parse
         ircmessage.ircHandlers['KAPPA'] = Mock()
         ircmessage.ircHandlers['TWITCH'] = Mock()
         ircmessage.parseMessage(self.connection, 'KAPPA', self.now)
         self.assertTrue(ircmessage.ircHandlers['KAPPA'].called)
         self.assertFalse(ircmessage.ircHandlers['TWITCH'].called)
         self.assertTrue(mock_log.called)
-        self.assertTrue(mock_privateParse.called)
+        self.assertTrue(mock_parse.called)
 
     @patch.dict('source.ircmessage.ircHandlers')
     def test_registerIrc(self):
