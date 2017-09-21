@@ -4,19 +4,16 @@ import aioodbc
 import bot
 import importlib
 import pkgutil
-import source.private.autoload as privateAuto
-import pkg.botgotsthis.autoload as publicAuto
+import types  # noqa: F401
 from itertools import chain
-from importlib.abc import PathEntryFinder
+from importlib.abc import PathEntryFinder  # noqa: F401
 from source import database
 from source.data import timezones
 from source.database import AutoJoinChannel  # noqa: F401
-from typing import Any, Awaitable, Generator, List, Iterable, Optional, Tuple  # noqa: F401,E501
+from typing import Any, Awaitable, Generator, List, Optional, Tuple  # noqa: F401,E501
 from typing import cast  # noqa: F401,E501
 from . import utils
 from .coroutine import background, connection, join, logging
-
-ModuleList = Iterable[Generator[Tuple[PathEntryFinder, str, bool], None, None]]
 
 
 async def initializer() -> None:
@@ -39,17 +36,18 @@ async def initializer() -> None:
             dsn=bot.config.database[schema.value])
         bot.globals.connectionPools[schema.value] = pool
 
-    _modulesList: ModuleList = [
-        pkgutil.walk_packages(path=publicAuto.__path__,  # type: ignore
-                              prefix=publicAuto.__name__ + '.'),
-        pkgutil.walk_packages(path=privateAuto.__path__,  # type: ignore
-                              prefix=privateAuto.__name__ + '.')
-        ]
-    importer: PathEntryFinder
-    modname: str
-    ispkg: bool
-    for importer, modname, ispkg in chain(*_modulesList):
-        importlib.import_module(modname)
+    pkg: str
+    modules: Generator[Tuple[PathEntryFinder, str, bool], None, None]
+    for pkg in bot.globals.pkgs:
+        mod: types.ModuleType
+        mod = importlib.import_module('pkg.' + pkg + '.autoload')
+        modules = pkgutil.walk_packages(path=mod.__path__,  # type: ignore
+                                        prefix=mod.__name__ + '.')
+        importer: PathEntryFinder
+        modname: str
+        ispkg: bool
+        for importer, modname, ispkg in chain(modules):
+            importlib.import_module(modname)
 
     utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
     bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
