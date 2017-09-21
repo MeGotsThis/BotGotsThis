@@ -36,6 +36,11 @@ class TestCustomUrl(TestCustomField):
         self.mock_config = patcher.start()
         self.mock_config.customMessageUrlTimeout = 1
 
+        patcher = patch('bot.globals', autospec=True)
+        self.addCleanup(patcher.stop)
+        self.mock_globals = patcher.start()
+        self.mock_globals.pkgs = ['botgotsthis']
+
     async def test_query(self):
         self.args = self.args._replace(param='http://localhost/{query}')
         self.assertEqual(await url.fieldUrl(self.args), 'Kappa')
