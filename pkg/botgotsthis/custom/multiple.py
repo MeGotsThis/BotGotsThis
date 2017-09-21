@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional, Union  # noqa: F401
-from source.data import CustomProcessArgs
+from lib.data import CustomProcessArgs
 
 
 async def propertyMultipleLines(args: CustomProcessArgs) -> None:

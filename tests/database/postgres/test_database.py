@@ -7,7 +7,7 @@ import bot  # noqa: F401
 
 from collections.abc import Sequence
 
-from source.database import DatabaseMain
+from lib.database import DatabaseMain
 
 
 class TestPostgres(asynctest.TestCase):

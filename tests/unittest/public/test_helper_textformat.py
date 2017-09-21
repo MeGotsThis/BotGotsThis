@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from source.helper import textformat
+from lib.helper import textformat
 
 
 def translate(text):
@@ -120,7 +120,7 @@ class TestLibraryTextFormat(unittest.TestCase):
         self.assertEqual(textformat.format('', ''), '')
         self.assertEqual(textformat.format('Kappa', ''), 'Kappa')
 
-    @patch('source.helper.textformat.to_ascii',
+    @patch('lib.helper.textformat.to_ascii',
            autospec=True, side_effect=translate)
     def test_ascii(self, mock_to):
         self.assertEqual(textformat.format('', 'ascii'), '')
@@ -132,49 +132,49 @@ class TestLibraryTextFormat(unittest.TestCase):
         self.assertEqual(textformat.format('Kappa', 'ASCII'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_upper',
+    @patch('lib.helper.textformat.to_upper',
            autospec=True, side_effect=translate)
     def test_upper(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'upper'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_lower',
+    @patch('lib.helper.textformat.to_lower',
            autospec=True, side_effect=translate)
     def test_lower(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'lower'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_full_width',
+    @patch('lib.helper.textformat.to_full_width',
            autospec=True, side_effect=translate)
     def test_full(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'full'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_parenthesized',
+    @patch('lib.helper.textformat.to_parenthesized',
            autospec=True, side_effect=translate)
     def test_parenthesized(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'parenthesized'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_circled',
+    @patch('lib.helper.textformat.to_circled',
            autospec=True, side_effect=translate)
     def test_circled(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'circled'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_small_caps',
+    @patch('lib.helper.textformat.to_small_caps',
            autospec=True, side_effect=translate)
     def test_smallcaps(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'smallcaps'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_upside_down',
+    @patch('lib.helper.textformat.to_upside_down',
            autospec=True, side_effect=translate)
     def test_upsidedown(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'upsidedown'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_serif_bold',
+    @patch('lib.helper.textformat.to_serif_bold',
            autospec=True, side_effect=translate)
     def test_serif_bold(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'serif-bold'), 'Kappa')
@@ -183,7 +183,7 @@ class TestLibraryTextFormat(unittest.TestCase):
         self.assertEqual(textformat.format('Kappa', 'serifbold'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_serif_italic',
+    @patch('lib.helper.textformat.to_serif_italic',
            autospec=True, side_effect=translate)
     def test_serif_italic(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'serif-italic'), 'Kappa')
@@ -192,7 +192,7 @@ class TestLibraryTextFormat(unittest.TestCase):
         self.assertEqual(textformat.format('Kappa', 'serifitalic'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_serif_bold_italic',
+    @patch('lib.helper.textformat.to_serif_bold_italic',
            autospec=True, side_effect=translate)
     def test_serif_bold_italic(self, mock_to):
         formats = ['serif-bold-italic',
@@ -210,13 +210,13 @@ class TestLibraryTextFormat(unittest.TestCase):
             mock_to.assert_called_once_with('Kappa')
             mock_to.reset_mock()
 
-    @patch('source.helper.textformat.to_sanserif',
+    @patch('lib.helper.textformat.to_sanserif',
            autospec=True, side_effect=translate)
     def test_sanserif(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'sanserif'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_sanserif_bold',
+    @patch('lib.helper.textformat.to_sanserif_bold',
            autospec=True, side_effect=translate)
     def test_sanserif_bold(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'sanserif-bold'), 'Kappa')
@@ -225,7 +225,7 @@ class TestLibraryTextFormat(unittest.TestCase):
         self.assertEqual(textformat.format('Kappa', 'bold'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_sanserif_italic',
+    @patch('lib.helper.textformat.to_sanserif_italic',
            autospec=True, side_effect=translate)
     def test_sanserif_italic(self, mock_to):
         self.assertEqual(
@@ -235,7 +235,7 @@ class TestLibraryTextFormat(unittest.TestCase):
         self.assertEqual(textformat.format('Kappa', 'italic'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_sanserif_bold_italic',
+    @patch('lib.helper.textformat.to_sanserif_bold_italic',
            autospec=True, side_effect=translate)
     def test_sanserif_bold_italic(self, mock_to):
         formats = ['sanserif-bold-italic',
@@ -257,7 +257,7 @@ class TestLibraryTextFormat(unittest.TestCase):
             mock_to.assert_called_once_with('Kappa')
             mock_to.reset_mock()
 
-    @patch('source.helper.textformat.to_script',
+    @patch('lib.helper.textformat.to_script',
            autospec=True, side_effect=translate)
     def test_script(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'script'), 'Kappa')
@@ -267,7 +267,7 @@ class TestLibraryTextFormat(unittest.TestCase):
         mock_to.assert_called_once_with('Kappa')
         mock_to.reset_mock()
 
-    @patch('source.helper.textformat.to_script_bold',
+    @patch('lib.helper.textformat.to_script_bold',
            autospec=True, side_effect=translate)
     def test_script_bold(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'script-bold'), 'Kappa')
@@ -282,13 +282,13 @@ class TestLibraryTextFormat(unittest.TestCase):
         self.assertEqual(textformat.format('Kappa', 'cursivebold'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_fraktur',
+    @patch('lib.helper.textformat.to_fraktur',
            autospec=True, side_effect=translate)
     def test_fraktur(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'fraktur'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_fraktur_bold',
+    @patch('lib.helper.textformat.to_fraktur_bold',
            autospec=True, side_effect=translate)
     def test_fraktur_bold(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'fraktur-bold'), 'Kappa')
@@ -297,13 +297,13 @@ class TestLibraryTextFormat(unittest.TestCase):
         self.assertEqual(textformat.format('Kappa', 'frakturbold'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_monospace',
+    @patch('lib.helper.textformat.to_monospace',
            autospec=True, side_effect=translate)
     def test_monospace(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'monospace'), 'Kappa')
         mock_to.assert_called_once_with('Kappa')
 
-    @patch('source.helper.textformat.to_double_struck',
+    @patch('lib.helper.textformat.to_double_struck',
            autospec=True, side_effect=translate)
     def test_doublestruck(self, mock_to):
         self.assertEqual(textformat.format('Kappa', 'doublestruck'), 'Kappa')

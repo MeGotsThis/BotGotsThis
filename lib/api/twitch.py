@@ -1,4 +1,4 @@
-﻿from source.api import oauth
+﻿from lib.api import oauth
 from contextlib import suppress
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping

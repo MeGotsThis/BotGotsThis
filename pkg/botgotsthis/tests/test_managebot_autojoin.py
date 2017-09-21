@@ -5,8 +5,8 @@ from io import StringIO
 
 from asynctest.mock import Mock, patch
 
-from source.database import AutoJoinChannel, DatabaseMain
-from source.data.message import Message
+from lib.database import AutoJoinChannel, DatabaseMain
+from lib.data.message import Message
 from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import AsyncIterator, StrContains
 
@@ -206,7 +206,7 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_stdout = patcher.start()
 
-        patcher = patch('source.api.twitch.chat_server')
+        patcher = patch('lib.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_server = patcher.start()
 

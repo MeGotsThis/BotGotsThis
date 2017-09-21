@@ -2,10 +2,10 @@
 import bot
 from bot import utils
 from typing import Dict, List, Optional, Union  # noqa: F401
-from source.api import twitch
-from source.data import Send
-from source.data.message import Message
-from source.database import DatabaseMain
+from lib.api import twitch
+from lib.data import Send
+from lib.data.message import Message
+from lib.database import DatabaseMain
 
 
 async def come(database: DatabaseMain,

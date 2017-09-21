@@ -1,7 +1,7 @@
 from asynctest.mock import patch
 
 from tests.unittest.base_channel import TestChannel
-from source.data.message import Message
+from lib.data.message import Message
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last

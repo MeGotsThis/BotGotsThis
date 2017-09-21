@@ -1,5 +1,5 @@
 import math
-from source.database import AutoJoinChannel
+from lib.database import AutoJoinChannel
 
 
 class TestAutoJoin:

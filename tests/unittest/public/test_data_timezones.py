@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
-from source.data import timezones
+from lib.data import timezones
 
 
 class TestDataBasicTimeZone(unittest.TestCase):

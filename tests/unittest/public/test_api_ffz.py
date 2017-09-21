@@ -3,7 +3,7 @@ import json
 
 import aiohttp
 
-from source.api import ffz
+from lib.api import ffz
 from asynctest.mock import MagicMock, patch
 
 globalEmotes = b'''{

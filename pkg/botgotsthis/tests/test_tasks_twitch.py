@@ -3,9 +3,9 @@ import asynctest
 from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
 from datetime import datetime, timedelta
-from source.database import DatabaseMain
+from lib.database import DatabaseMain
 from pkg.botgotsthis.tasks import twitch
-from source.api.twitch import TwitchCommunity, TwitchStatus
+from lib.api.twitch import TwitchCommunity, TwitchStatus
 from asynctest.mock import MagicMock, Mock, PropertyMock, call, patch
 
 
@@ -35,7 +35,7 @@ class TestTasksTwitchIds(TestTasksTwitchBase):
         self.mock_save = patcher.start()
         self.addCleanup(patcher.stop)
 
-        patcher = patch('source.api.twitch.getTwitchIds')
+        patcher = patch('lib.api.twitch.getTwitchIds')
         self.addCleanup(patcher.stop)
         self.mock_twitchid = patcher.start()
         self.mock_twitchid.return_value = {}
@@ -123,13 +123,13 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.game_property = PropertyMock(return_value=None)
         type(self.channel).twitchGame = self.game_property
 
-    @patch('source.api.twitch.active_streams')
+    @patch('lib.api.twitch.active_streams')
     async def test_streams_empty(self, mock_active):
         self.mock_globals.channels = {}
         await twitch.checkStreamsAndChannel(self.now)
         self.assertFalse(mock_active.called)
 
-    @patch('source.api.twitch.active_streams')
+    @patch('lib.api.twitch.active_streams')
     async def test_streams_none(self, mock_active):
         mock_active.return_value = None
         await twitch.checkStreamsAndChannel(self.now)
@@ -139,7 +139,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @patch('source.api.twitch.active_streams')
+    @patch('lib.api.twitch.active_streams')
     async def test_streams(self, mock_active):
         streamed = datetime(1999, 1, 1)
         mock_active.return_value = {
@@ -152,7 +152,7 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.status_property.assert_called_once_with('Kappa')
         self.game_property.assert_called_once_with('Creative')
 
-    @patch('source.api.twitch.active_streams')
+    @patch('lib.api.twitch.active_streams')
     async def test_streams_offline(self, mock_active):
         mock_active.return_value = {}
         await twitch.checkStreamsAndChannel(self.now)
@@ -163,8 +163,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.game_property.called)
 
     @patch('bot.utils.saveTwitchCommunity')
-    @patch('source.api.twitch.channel_community')
-    @patch('source.api.twitch.channel_properties')
+    @patch('lib.api.twitch.channel_community')
+    @patch('lib.api.twitch.channel_properties')
     async def test_offline_empty(self, mock_channel, mock_community,
                                  mock_save):
         self.mock_globals.channels = {}
@@ -178,8 +178,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_save.called)
 
     @patch('bot.utils.saveTwitchCommunity')
-    @patch('source.api.twitch.channel_community')
-    @patch('source.api.twitch.channel_properties')
+    @patch('lib.api.twitch.channel_community')
+    @patch('lib.api.twitch.channel_properties')
     async def test_offline_streaming(self, mock_channel, mock_community,
                                      mock_save):
         self.channel.isStreaming = True
@@ -194,8 +194,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_save.called)
 
     @patch('bot.utils.saveTwitchCommunity')
-    @patch('source.api.twitch.channel_community')
-    @patch('source.api.twitch.channel_properties')
+    @patch('lib.api.twitch.channel_community')
+    @patch('lib.api.twitch.channel_properties')
     async def test_offline_recent(self, mock_channel, mock_community,
                                   mock_save):
         mock_community.return_value = None
@@ -211,8 +211,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_save.called)
 
     @patch('bot.utils.saveTwitchCommunity')
-    @patch('source.api.twitch.channel_community')
-    @patch('source.api.twitch.channel_properties')
+    @patch('lib.api.twitch.channel_community')
+    @patch('lib.api.twitch.channel_properties')
     async def test_offline_none(self, mock_channel, mock_community, mock_save):
         mock_community.return_value = None
         mock_channel.return_value = None
@@ -230,8 +230,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_save.called)
 
     @patch('bot.utils.saveTwitchCommunity')
-    @patch('source.api.twitch.channel_community')
-    @patch('source.api.twitch.channel_properties')
+    @patch('lib.api.twitch.channel_community')
+    @patch('lib.api.twitch.channel_properties')
     async def test_offline(self, mock_channel, mock_community, mock_save):
         mock_community.return_value = None
         mock_channel.return_value = TwitchStatus(None, 'Keepo', 'Music', None)
@@ -247,8 +247,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_save.called)
 
     @patch('bot.utils.saveTwitchCommunity')
-    @patch('source.api.twitch.channel_community')
-    @patch('source.api.twitch.channel_properties')
+    @patch('lib.api.twitch.channel_community')
+    @patch('lib.api.twitch.channel_properties')
     async def test_offline_community_empty(self, mock_channel, mock_community,
                                            mock_save):
         mock_community.return_value = []
@@ -265,8 +265,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(mock_save.called)
 
     @patch('bot.utils.saveTwitchCommunity')
-    @patch('source.api.twitch.channel_community')
-    @patch('source.api.twitch.channel_properties')
+    @patch('lib.api.twitch.channel_community')
+    @patch('lib.api.twitch.channel_properties')
     async def test_offline_community(self, mock_channel, mock_community,
                                      mock_save):
         mock_community.return_value = [TwitchCommunity('1', 'BotGotsThis')]
@@ -296,7 +296,7 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.socket_property = PropertyMock(return_value=self.connection1)
         type(self.channel).connection = self.socket_property
 
-        patcher = patch('source.database.get_database')
+        patcher = patch('lib.database.get_database')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
 
@@ -304,7 +304,7 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.mock_database.return_value = self.database
         self.database.__aenter__.return_value = self.database
 
-        patcher = patch('source.api.twitch.chat_server')
+        patcher = patch('lib.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_chatserver = patcher.start()
 

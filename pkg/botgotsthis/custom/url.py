@@ -8,7 +8,7 @@ import lists.custom
 from contextlib import suppress
 from typing import Iterator, Match, List, Optional  # noqa: F401
 
-from source.data import CustomCommandField, CustomFieldArgs  # noqa: F401
+from lib.data import CustomCommandField, CustomFieldArgs  # noqa: F401
 
 
 async def fieldUrl(args: CustomFieldArgs) -> Optional[str]:

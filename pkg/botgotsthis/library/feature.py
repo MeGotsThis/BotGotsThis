@@ -1,8 +1,8 @@
 ﻿import lists.feature
 from typing import Mapping, Optional, Set  # noqa: F401
-from source.data import Send
-from source.data.message import Message
-from source.database import DatabaseMain
+from lib.data import Send
+from lib.data.message import Message
+from lib.database import DatabaseMain
 
 enable: Set[str] = {
     '',

@@ -1,5 +1,5 @@
-﻿from source.data import ChatCommandArgs
-from source.helper.chat import min_args, permission, send
+﻿from lib.data import ChatCommandArgs
+from lib.helper.chat import min_args, permission, send
 from ..library import feature
 
 

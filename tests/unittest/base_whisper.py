@@ -5,10 +5,10 @@ from datetime import datetime
 from asynctest.mock import MagicMock, Mock
 
 from bot.data import Channel
-from source.data import WhisperCommandArgs
-from source.data.message import Message
-from source.data.permissions import WhisperPermissionSet
-from source.database import DatabaseMain
+from lib.data import WhisperCommandArgs
+from lib.data.message import Message
+from lib.data.permissions import WhisperPermissionSet
+from lib.database import DatabaseMain
 
 
 class TestWhisper(asynctest.TestCase):

@@ -1,5 +1,5 @@
 ﻿from typing import Optional
-from source.data import CustomFieldArgs
+from lib.data import CustomFieldArgs
 
 
 async def fieldBroadcaster(args: CustomFieldArgs) -> Optional[str]:

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from source.database import AutoRepeatList, AutoRepeatMessage
+from lib.database import AutoRepeatList, AutoRepeatMessage
 from tests.unittest.mock_class import DateTimeNear
 
 

@@ -2,9 +2,9 @@
 from contextlib import suppress
 from typing import Optional  # noqa: F401
 from ..library import broadcaster
-from source.api import twitch
-from source.database import AutoJoinChannel, DatabaseMain  # noqa: F401
-from source.data import ManageBotArgs, Send
+from lib.api import twitch
+from lib.database import AutoJoinChannel, DatabaseMain  # noqa: F401
+from lib.data import ManageBotArgs, Send
 
 
 async def manageAutoJoin(args: ManageBotArgs) -> bool:

@@ -4,7 +4,7 @@ import bot
 
 from bot import utils
 
-from source.data import Send
+from lib.data import Send
 
 
 async def exit(send: Send) -> bool:

@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta, tzinfo
 from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, cast  # noqa: F401,E501
 
-from source import database
+from lib import database
 
 
 class Transition(NamedTuple):

@@ -2,9 +2,9 @@
 
 import bot
 from bot import utils
-from source.data import ManageBotArgs, Send
-from source.database import DatabaseMain
-from source.helper import message
+from lib.data import ManageBotArgs, Send
+from lib.database import DatabaseMain
+from lib.helper import message
 
 needReason: List[str] = ['add', 'insert', 'del', 'delete', 'rem', 'remove',
                          'remove']

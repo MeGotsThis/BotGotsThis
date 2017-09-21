@@ -6,10 +6,10 @@ from datetime import datetime
 
 from asynctest.mock import MagicMock, Mock
 
-from source.data import ManageBotArgs
-from source.data.message import Message
-from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseMain
+from lib.data import ManageBotArgs
+from lib.data.message import Message
+from lib.data.permissions import ChatPermissionSet
+from lib.database import DatabaseMain
 
 
 def send(messages):

@@ -13,7 +13,7 @@ class TestTasksEmotes(asynctest.TestCase):
 
         self.now = datetime(2000, 1, 1)
 
-    @patch('source.api.twitch.twitch_emotes')
+    @patch('lib.api.twitch.twitch_emotes')
     async def test_twitch(self, mock_emotes):
         self.mock_globals.globalEmotesCache = self.now
         self.mock_globals.globalEmotes = {}
@@ -28,7 +28,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalEmoteSets, emotesets)
         mock_emotes.assert_called_once_with()
 
-    @patch('source.api.twitch.twitch_emotes')
+    @patch('lib.api.twitch.twitch_emotes')
     async def test_twitch_recent(self, mock_emotes):
         self.mock_globals.globalEmotesCache = self.now
         self.mock_globals.globalEmotes = {}
@@ -42,7 +42,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalEmoteSets, {})
         self.assertFalse(mock_emotes.called)
 
-    @patch('source.api.twitch.twitch_emotes')
+    @patch('lib.api.twitch.twitch_emotes')
     async def test_twitch_none(self, mock_emotes):
         self.mock_globals.globalEmotesCache = self.now
         self.mock_globals.globalEmotes = {}
@@ -62,7 +62,7 @@ class TestTasksEmotes(asynctest.TestCase):
         mock_broadcaster.assert_called_once_with(self.now)
         mock_global.assert_called_once_with(self.now)
 
-    @patch('source.api.ffz.getGlobalEmotes')
+    @patch('lib.api.ffz.getGlobalEmotes')
     async def test_ffz_global(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -74,7 +74,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalFfzEmotes, emotes_)
         mock_emotes.assert_called_once_with()
 
-    @patch('source.api.ffz.getGlobalEmotes')
+    @patch('lib.api.ffz.getGlobalEmotes')
     async def test_ffz_global_recent(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -85,7 +85,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalFfzEmotes, {})
         self.assertFalse(mock_emotes.called)
 
-    @patch('source.api.ffz.getGlobalEmotes')
+    @patch('lib.api.ffz.getGlobalEmotes')
     async def test_ffz_global_none(self, mock_emotes):
         self.mock_globals.globalFfzEmotesCache = self.now
         self.mock_globals.globalFfzEmotes = {}
@@ -163,7 +163,7 @@ class TestTasksEmotes(asynctest.TestCase):
         mock_broadcaster.assert_called_once_with(self.now)
         mock_global.assert_called_once_with(self.now)
 
-    @patch('source.api.bttv.getGlobalEmotes')
+    @patch('lib.api.bttv.getGlobalEmotes')
     async def test_bttv_global(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}
@@ -175,7 +175,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalBttvEmotes, emotes_)
         mock_emotes.assert_called_once_with()
 
-    @patch('source.api.bttv.getGlobalEmotes')
+    @patch('lib.api.bttv.getGlobalEmotes')
     async def test_bttv_global_recent(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}
@@ -186,7 +186,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalBttvEmotes, {})
         self.assertFalse(mock_emotes.called)
 
-    @patch('source.api.bttv.getGlobalEmotes')
+    @patch('lib.api.bttv.getGlobalEmotes')
     async def test_bttv_global_none(self, mock_emotes):
         self.mock_globals.globalBttvEmotesCache = self.now
         self.mock_globals.globalBttvEmotes = {}

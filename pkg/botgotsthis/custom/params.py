@@ -1,6 +1,6 @@
 ﻿from contextlib import suppress
 from typing import Match, Optional, Sequence  # noqa: F401
-from source.data import CustomFieldArgs
+from lib.data import CustomFieldArgs
 import re
 
 

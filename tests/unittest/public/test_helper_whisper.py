@@ -4,11 +4,11 @@ import asynctest
 from asynctest.mock import MagicMock, Mock, patch
 
 from bot.twitchmessage import IrcMessageTags
-from source.data import WhisperCommandArgs
-from source.data.message import Message
-from source.data.permissions import WhisperPermissionSet
-from source.database import DatabaseMain
-from source.helper import whisper
+from lib.data import WhisperCommandArgs
+from lib.data.message import Message
+from lib.data.permissions import WhisperPermissionSet
+from lib.database import DatabaseMain
+from lib.helper import whisper
 
 
 class TestLibraryWhisper(asynctest.TestCase):

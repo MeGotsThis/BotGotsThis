@@ -5,9 +5,9 @@ import random
 from bot import data  # noqa: F401
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple  # noqa: F401
-from source.api import bttv
-from source.api import ffz
-from source.api import twitch
+from lib.api import bttv
+from lib.api import ffz
+from lib.api import twitch
 
 
 async def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:

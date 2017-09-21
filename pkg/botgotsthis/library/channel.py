@@ -2,10 +2,10 @@
 
 import bot
 from bot import utils
-from source.api import twitch
-from source.data import Send
-from source.database import DatabaseMain
-from source.helper import timeout
+from lib.api import twitch
+from lib.data import Send
+from lib.database import DatabaseMain
+from lib.helper import timeout
 
 
 async def join(database: DatabaseMain,

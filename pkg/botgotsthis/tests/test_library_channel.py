@@ -8,7 +8,7 @@ from asynctest.mock import Mock, patch
 from bot import utils
 from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
-from source.database import DatabaseMain
+from lib.database import DatabaseMain
 from pkg.botgotsthis.library import channel
 from tests.unittest.mock_class import StrContains
 
@@ -27,7 +27,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_globals = patcher.start()
         self.mock_globals.clusters = {'twitch': Mock(spec=ConnectionHandler)}
 
-        patcher = patch('source.api.twitch.chat_server')
+        patcher = patch('lib.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_chat_server = patcher.start()
 
@@ -190,7 +190,7 @@ class TestLibraryChannelSay(asynctest.TestCase):
         self.mock_globals = patcher.start()
         self.mock_globals.channels = {'botgotsthis': self.channel}
 
-        patcher = patch('source.helper.timeout.record_timeout')
+        patcher = patch('lib.helper.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_record = patcher.start()
 

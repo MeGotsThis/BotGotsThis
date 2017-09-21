@@ -22,7 +22,7 @@ with sqlite3.connect(
     except:
         lastUpdated = datetime.date.min
     if tzdate > lastUpdated:
-        with open('source/database/sqlite/timezonedb.sql', 'r') as file:
+        with open('lib/database/sqlite/timezonedb.sql', 'r') as file:
             cursor.executescript(file.read())
         url = 'https://timezonedb.com/files/timezonedb.csv.zip'
         with urllib.request.urlopen(url) as response, \

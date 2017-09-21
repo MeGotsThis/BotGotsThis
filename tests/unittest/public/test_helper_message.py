@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from source.helper import message
+from lib.helper import message
 
 
 def send(messages):

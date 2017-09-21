@@ -1,7 +1,7 @@
 from asynctest.mock import patch
 
 import bot.utils
-from source.data.message import Message
+from lib.data.message import Message
 from tests.unittest.base_whisper import TestWhisper
 from tests.unittest.mock_class import PartialMatch, StrContains
 

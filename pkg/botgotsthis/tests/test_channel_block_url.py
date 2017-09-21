@@ -9,8 +9,8 @@ from datetime import datetime
 from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
-from source.data.message import Message
-from source.database import DatabaseMain
+from lib.data.message import Message
+from lib.database import DatabaseMain
 from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import StrContains, TypeMatch
 
@@ -57,7 +57,7 @@ class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.channel.ircChannel = '#botgotsthis'
         self.now = datetime(2000, 1, 1)
 
-        patcher = patch('source.api.twitch.num_followers')
+        patcher = patch('lib.api.twitch.num_followers')
         self.addCleanup(patcher.stop)
         self.mock_followers = patcher.start()
 
@@ -334,12 +334,12 @@ class TestChannelBlockUrlHandleDifferentDomain(asynctest.TestCase):
         self.database.__aenter__.return_value = self.database
         self.database.__aexit__.return_value = False
 
-        patcher = patch('source.database.get_database')
+        patcher = patch('lib.database.get_database')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database
 
-        patcher = patch('source.helper.timeout.timeout_user')
+        patcher = patch('lib.helper.timeout.timeout_user')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 

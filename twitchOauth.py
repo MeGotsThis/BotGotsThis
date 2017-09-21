@@ -1,5 +1,5 @@
-﻿from source.api import twitch
-from source import database
+﻿from lib.api import twitch
+from lib import database
 import urllib.parse
 import configparser
 import json

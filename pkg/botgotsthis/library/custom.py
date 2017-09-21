@@ -1,14 +1,14 @@
 from typing import Dict, Iterable, List, Optional
 
 import lists.custom
-from source.data import ChatCommandArgs, CustomFieldArgs, CustomCommand
-from source.data import CommandActionTokens, CustomCommandField  # noqa: F401
-from source.data import CustomCommandProcess, CustomFieldParts  # noqa: F401
-from source.data import CustomProcessArgs
-from source.data.message import Message
-from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseMain
-from source.helper import textformat
+from lib.data import ChatCommandArgs, CustomFieldArgs, CustomCommand
+from lib.data import CommandActionTokens, CustomCommandField  # noqa: F401
+from lib.data import CustomCommandProcess, CustomFieldParts  # noqa: F401
+from lib.data import CustomProcessArgs
+from lib.data.message import Message
+from lib.data.permissions import ChatPermissionSet
+from lib.database import DatabaseMain
+from lib.helper import textformat
 
 permissions: Dict[Optional[str], str] = {
     None: '',

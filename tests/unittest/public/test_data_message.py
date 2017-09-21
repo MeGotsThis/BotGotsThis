@@ -2,7 +2,7 @@ import unittest
 
 import bot  # noqa: F401
 
-from source.data import message
+from lib.data import message
 
 
 class TestDataTokenized(unittest.TestCase):

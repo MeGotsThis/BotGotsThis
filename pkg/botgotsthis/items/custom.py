@@ -1,4 +1,4 @@
-﻿from source import data
+﻿from lib import data
 from ..custom import broadcaster, countdown, multiple, params
 from ..custom import query, url, user
 from typing import Collection, Iterable

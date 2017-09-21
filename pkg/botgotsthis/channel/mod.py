@@ -1,10 +1,10 @@
 ﻿from typing import List, Optional, cast  # noqa: F401
 
 import bot
-from source import database
-from source.api import oauth, twitch
-from source.data import ChatCommandArgs
-from source.helper.chat import min_args, permission_not_feature, permission
+from lib import database
+from lib.api import oauth, twitch
+from lib.data import ChatCommandArgs
+from lib.helper.chat import min_args, permission_not_feature, permission
 
 
 @permission_not_feature(('broadcaster', None),

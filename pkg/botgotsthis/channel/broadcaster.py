@@ -1,9 +1,9 @@
 ﻿from datetime import datetime, timedelta  # noqa: F401
 from typing import Optional  # noqa: F401
 
-from source.api import twitch
-from source.data import ChatCommandArgs
-from source.helper.chat import cooldown, permission, ownerChannel, send
+from lib.api import twitch
+from lib.data import ChatCommandArgs
+from lib.helper.chat import cooldown, permission, ownerChannel, send
 from ..library import broadcaster
 
 

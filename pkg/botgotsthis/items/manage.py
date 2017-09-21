@@ -1,4 +1,4 @@
-﻿from source import data
+﻿from lib import data
 from ..manage import autojoin, banned, listchats, manager
 from typing import Mapping, Optional
 

@@ -1,4 +1,4 @@
-from source.data.message import Message
+from lib.data.message import Message
 from tests.unittest.base_custom import TestCustomField
 
 # Needs to be imported last

@@ -4,8 +4,8 @@ import bot  # noqa: F401
 
 from asynctest.mock import Mock, patch
 
-from source.data.message import Message
-from source.database import DatabaseMain
+from lib.data.message import Message
+from lib.database import DatabaseMain
 from pkg.botgotsthis.library import feature
 from tests.unittest.mock_class import StrContains
 
