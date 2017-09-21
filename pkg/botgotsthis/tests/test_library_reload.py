@@ -51,7 +51,7 @@ class TestLibraryReloadIsSubmodule(unittest.TestCase):
 class TestLibraryReloadKey(unittest.TestCase):
     @patch('bot.globals', autospec=True)
     def test(self, mock_globals):
-        mock_globals.pkgs = ['megotsthis','botgotsthis']
+        mock_globals.pkgs = ['megotsthis', 'botgotsthis']
         order = [
             'source.data.message',
             'source.data',
