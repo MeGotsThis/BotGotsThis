@@ -1,15 +1,13 @@
-﻿import bot
+﻿import importlib
+from datetime import datetime
+from typing import Any, Callable, Dict, Mapping, List, Optional, Union  # noqa: F401, E501
+
+import bot
 from bot import data, utils  # noqa: F401
 from bot.coroutine import connection as connectionM  # noqa: F401
 from bot.twitchmessage import IrcMessage, IrcMessageTagsReadOnly  # noqa: F401
-from datetime import datetime
-from typing import Callable, Dict, Mapping, List, Optional, Union  # noqa: F401
 from . import channel, whisper
 from .irccommand import clearchat, notice, userstate
-try:
-    from .private import ircmessage
-except ImportError:
-    from .public.default import ircmessage  # type: ignore
 
 IrcHandler = Callable[['connectionM.ConnectionHandler', IrcMessage, datetime],
                       None]
@@ -30,7 +28,11 @@ def parseMessage(connection: 'connectionM.ConnectionHandler',
 
     log_channel_message(message, timestamp)
 
-    ircmessage.parseMessage(connection, ircmsg, timestamp)
+    pkg: str
+    for pkg in bot.globals.pkgs:
+        ircmessage: Any
+        ircmessage = importlib.import_module('pkg.' + pkg + '.ircmessage')
+        ircmessage.parseMessage(connection, ircmsg, timestamp)
 
 
 def registerIrc(command: Union[str, int]
