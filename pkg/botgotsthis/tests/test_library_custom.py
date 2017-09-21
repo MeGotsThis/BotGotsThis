@@ -9,12 +9,12 @@ from asynctest.mock import CoroutineMock, MagicMock, Mock, call, patch
 
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
-from source.data import ChatCommandArgs, CommandActionTokens
-from source.data import CustomCommand, CustomFieldArgs, CustomFieldParts
-from source.data import CustomProcessArgs
-from source.data.message import Message
-from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseMain
+from lib.data import ChatCommandArgs, CommandActionTokens
+from lib.data import CustomCommand, CustomFieldArgs, CustomFieldParts
+from lib.data import CustomProcessArgs
+from lib.data.message import Message
+from lib.data.permissions import ChatPermissionSet
+from lib.database import DatabaseMain
 from pkg.botgotsthis.library import custom
 from tests.unittest.mock_class import TypeMatch
 
@@ -990,7 +990,7 @@ class TestLibraryCustomConvertField(asynctest.TestCase):
 
 class TestLibraryCustomFormat(unittest.TestCase):
     def setUp(self):
-        patcher = patch('source.helper.textformat.format', autospec=True)
+        patcher = patch('lib.helper.textformat.format', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_format = patcher.start()
 

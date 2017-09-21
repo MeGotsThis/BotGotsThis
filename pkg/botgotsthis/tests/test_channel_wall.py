@@ -3,7 +3,7 @@ from datetime import timedelta
 from asynctest.mock import patch
 
 from tests.unittest.base_channel import TestChannel
-from source.data.message import Message
+from lib.data.message import Message
 from tests.unittest.mock_class import IterableMatch, StrContains
 
 # Needs to be imported last
@@ -141,11 +141,11 @@ class TestChannelWallProcess(TestChannel):
         self.mock_config = patcher.start()
         self.mock_config.spamModeratorCooldown = 30
 
-        patcher = patch('source.helper.chat.inCooldown', autospec=True)
+        patcher = patch('lib.helper.chat.inCooldown', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_cooldown = patcher.start()
 
-        patcher = patch('source.helper.timeout.record_timeout')
+        patcher = patch('lib.helper.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 

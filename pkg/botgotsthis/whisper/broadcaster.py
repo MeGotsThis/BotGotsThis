@@ -1,5 +1,5 @@
-﻿from source.data import WhisperCommandArgs
-from source.helper.whisper import send
+﻿from lib.data import WhisperCommandArgs
+from lib.helper.whisper import send
 from ..library import broadcaster
 
 

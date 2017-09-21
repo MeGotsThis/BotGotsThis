@@ -8,8 +8,8 @@ from asynctest.mock import patch
 from tests.unittest.base_custom import TestCustomField
 
 # Needs to be imported last
-from source.data import timezones
-from source.data.timedelta import format
+from lib.data import timezones
+from lib.data.timedelta import format
 from pkg.botgotsthis.custom import countdown
 
 
@@ -310,7 +310,7 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
 
-        patcher = patch('source.data.timezones', autospec=True)
+        patcher = patch('lib.data.timezones', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_timezones = patcher.start()
         self.mock_timezones.abbreviations = {'utc-08:00': TimeZone(-8 * 3600),
@@ -422,7 +422,7 @@ class TestCustomCountdownPastDatetime(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
 
-        patcher = patch('source.data.timezones', autospec=True)
+        patcher = patch('lib.data.timezones', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_timezones = patcher.start()
         self.mock_timezones.abbreviations = {'utc-08:00': TimeZone(-8 * 3600),

@@ -1,7 +1,7 @@
 import unittest
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
-from source.data import permissions
+from lib.data import permissions
 from unittest.mock import Mock, patch
 
 

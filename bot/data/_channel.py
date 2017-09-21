@@ -3,7 +3,7 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Union
 
 from bot import utils
 from bot.coroutine import connection as connectionM
-from source.api import bttv, ffz
+from lib.api import bttv, ffz
 
 
 class Channel:

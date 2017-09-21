@@ -1,6 +1,6 @@
 ﻿from bot import utils
-from source.data import WhisperCommandArgs
-from source.helper.whisper import min_args, permission, send
+from lib.data import WhisperCommandArgs
+from lib.helper.whisper import min_args, permission, send
 from ..library import channel, exit, managebot
 
 

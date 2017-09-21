@@ -3,7 +3,7 @@ import json
 
 import aiohttp
 
-from source.api import bttv
+from lib.api import bttv
 from asynctest.mock import MagicMock, patch
 
 globalEmotes = b'''{

@@ -7,9 +7,9 @@ from datetime import datetime
 from asynctest.mock import CoroutineMock, MagicMock, Mock, PropertyMock, patch
 
 from bot.twitchmessage import IrcMessageTags
-from source import whisper
-from source.database import DatabaseMain
-from source.data.message import Message
+from lib import whisper
+from lib.database import DatabaseMain
+from lib.data.message import Message
 
 
 class TestWhisper(asynctest.TestCase):
@@ -19,25 +19,25 @@ class TestWhisper(asynctest.TestCase):
             'message-id=1;thread-id=1;user-type=;color=#FFFFFF'))
         self.now = datetime(2000, 1, 1)
 
-    @patch('source.whisper.whisperCommand')
+    @patch('lib.whisper.whisperCommand')
     async def test_parse(self, mock_whisperCommand):
         whisper.parse(self.tags, 'botgotsthis', 'Kappa', self.now)
         self.assertTrue(mock_whisperCommand.called)
 
     @asynctest.fail_on(unused_loop=False)
-    @patch('source.whisper.whisperCommand')
+    @patch('lib.whisper.whisperCommand')
     def test_parse_empty(self, mock_whisperCommand):
         whisper.parse(self.tags, 'botgotsthis', '', self.now)
         self.assertFalse(mock_whisperCommand.called)
 
     @asynctest.fail_on(unused_loop=False)
-    @patch('source.whisper.whisperCommand')
+    @patch('lib.whisper.whisperCommand')
     def test_parse_spaces(self, mock_whisperCommand):
         whisper.parse(self.tags, 'botgotsthis', '  ', self.now)
         self.assertFalse(mock_whisperCommand.called)
 
-    @patch('source.database.get_database')
-    @patch('source.whisper.commandsToProcess', autospec=True)
+    @patch('lib.database.get_database')
+    @patch('lib.whisper.commandsToProcess', autospec=True)
     async def test_whisperCommand(self, mock_commands, mock_database):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
@@ -57,8 +57,8 @@ class TestWhisper(asynctest.TestCase):
         self.assertEqual(command3.call_count, 0)
 
     @patch('bot.utils.logException', autospec=True)
-    @patch('source.database.get_database')
-    @patch('source.whisper.commandsToProcess', autospec=True)
+    @patch('lib.database.get_database')
+    @patch('lib.whisper.commandsToProcess', autospec=True)
     async def test_whisperCommand_except(self, mock_commands, mock_database,
                                          mock_log):
         command = CoroutineMock(spec=lambda args: False, side_effect=Exception)
@@ -76,8 +76,8 @@ class TestWhisper(asynctest.TestCase):
         self.assertTrue(mock_log.called)
 
     @patch('bot.utils.logException', autospec=True)
-    @patch('source.database.get_database')
-    @patch('source.whisper.commandsToProcess', autospec=True)
+    @patch('lib.database.get_database')
+    @patch('lib.whisper.commandsToProcess', autospec=True)
     async def test_whisperCommand_database_except(self, mock_commands,
                                                   mock_database, mock_log):
         mock_database.side_effect = Exception

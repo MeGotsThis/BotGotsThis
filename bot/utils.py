@@ -3,7 +3,7 @@ from .coroutine import connection  # noqa: F401
 from datetime import datetime, timedelta
 from types import TracebackType
 from typing import Any, Dict, Iterable, List, Optional, Type, Tuple, Union  # noqa: F401, E501
-from source.api import twitch
+from lib.api import twitch
 import builtins
 import bot
 import bot.coroutine.logging

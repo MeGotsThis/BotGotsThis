@@ -1,4 +1,4 @@
-from source.database import DatabaseOAuth
+from lib.database import DatabaseOAuth
 
 
 class TestOAuth:

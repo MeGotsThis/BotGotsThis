@@ -4,7 +4,7 @@ from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timedelta
 from typing import Dict, Iterable, Mapping, List, Optional, Union, cast  # noqa: F401, E501
-from source import database
+from lib import database
 
 
 async def timeout_user(database_: database.DatabaseMain,

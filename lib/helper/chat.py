@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from functools import partial, wraps
 from typing import Any, Awaitable, Callable, Optional, Tuple, Union, cast
 
-from source import data
+from lib import data
 
 _AnyArgs = Union[data.ChatCommandArgs, data.WhisperCommandArgs,
                  data.ManageBotArgs]

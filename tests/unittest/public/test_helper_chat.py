@@ -5,11 +5,11 @@ from asynctest.mock import MagicMock, Mock, PropertyMock, patch
 
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
-from source.data import ChatCommandArgs
-from source.data.message import Message
-from source.data.permissions import ChatPermissionSet
-from source.database import DatabaseMain
-from source.helper import chat
+from lib.data import ChatCommandArgs
+from lib.data.message import Message
+from lib.data.permissions import ChatPermissionSet
+from lib.database import DatabaseMain
+from lib.helper import chat
 
 
 class TestLibraryChat(asynctest.TestCase):
@@ -335,7 +335,7 @@ class TestLibraryChat(asynctest.TestCase):
             return True
         self.assertIs(await t(self.args), False)
 
-    @patch('source.helper.chat.inCooldown')
+    @patch('lib.helper.chat.inCooldown')
     async def test_cooldown(self, mock_inCooldown):
         mock_inCooldown.return_value = False
 
@@ -345,7 +345,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), True)
         self.assertTrue(mock_inCooldown.called)
 
-    @patch('source.helper.chat.inCooldown')
+    @patch('lib.helper.chat.inCooldown')
     async def test_cooldown_not(self, mock_inCooldown):
         mock_inCooldown.return_value = True
 

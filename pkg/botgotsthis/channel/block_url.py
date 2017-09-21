@@ -8,12 +8,12 @@ import aiohttp
 
 import bot
 from bot import data, utils  # noqa: F401
-from source import database
-from source.api import twitch
-from source.data import ChatCommandArgs
-from source.data.message import Message
-from source.helper.chat import feature, permission
-from source.helper import timeout
+from lib import database
+from lib.api import twitch
+from lib.data import ChatCommandArgs
+from lib.data.message import Message
+from lib.helper.chat import feature, permission
+from lib.helper import timeout
 
 twitchUrlRegex: str = (
     # r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"

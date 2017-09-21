@@ -527,7 +527,7 @@ class TestConnectionConnected(asynctest.TestCase):
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch.object(connection.ConnectionHandler, '_log_read', autospec=True)
-    @patch('source.ircmessage.parseMessage', autospec=True)
+    @patch('lib.ircmessage.parseMessage', autospec=True)
     async def test_read(self, mock_parseMessage,  mock_log_read,
                         mock_logException, mock_globals):
         mock_globals.running = True
@@ -543,7 +543,7 @@ class TestConnectionConnected(asynctest.TestCase):
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch.object(connection.ConnectionHandler, '_log_read', autospec=True)
-    @patch('source.ircmessage.parseMessage', autospec=True)
+    @patch('lib.ircmessage.parseMessage', autospec=True)
     async def test_read_ConnectionError(self, mock_parseMessage, mock_log_read,
                                         mock_logException, mock_globals):
         mock_globals.running = True
@@ -557,7 +557,7 @@ class TestConnectionConnected(asynctest.TestCase):
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch.object(connection.ConnectionHandler, '_log_read', autospec=True)
-    @patch('source.ircmessage.parseMessage', autospec=True)
+    @patch('lib.ircmessage.parseMessage', autospec=True)
     async def test_read_ConnectionReset(self, mock_parseMessage, mock_log_read,
                                         mock_logException, mock_globals):
         mock_globals.running = True
@@ -573,7 +573,7 @@ class TestConnectionConnected(asynctest.TestCase):
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.logException', autospec=True)
     @patch.object(connection.ConnectionHandler, '_log_read', autospec=True)
-    @patch('source.ircmessage.parseMessage', autospec=True)
+    @patch('lib.ircmessage.parseMessage', autospec=True)
     async def test_read_LoginUnsuccessful(
             self, mock_parseMessage, mock_log_read,
             mock_logException, mock_globals):

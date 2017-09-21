@@ -1,6 +1,6 @@
 import unittest
 from datetime import timedelta
-from source.data import timedelta as mtimedelta
+from lib.data import timedelta as mtimedelta
 
 
 class TestDataTimeDelta(unittest.TestCase):

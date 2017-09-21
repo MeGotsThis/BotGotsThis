@@ -7,9 +7,9 @@ import pkgutil
 import types  # noqa: F401
 from itertools import chain
 from importlib.abc import PathEntryFinder  # noqa: F401
-from source import database
-from source.data import timezones
-from source.database import AutoJoinChannel  # noqa: F401
+from lib import database
+from lib.data import timezones
+from lib.database import AutoJoinChannel  # noqa: F401
 from typing import Any, Awaitable, Generator, List, Optional, Tuple  # noqa: F401,E501
 from typing import cast  # noqa: F401,E501
 from . import utils

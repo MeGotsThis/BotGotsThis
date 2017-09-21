@@ -8,7 +8,7 @@ from asynctest.mock import Mock, patch
 from bot import utils
 from bot.coroutine import connection
 from bot.data import Channel, MessagingQueue
-from source.api.twitch import TwitchCommunity
+from lib.api.twitch import TwitchCommunity
 from tests.unittest.mock_class import StrContains
 
 
@@ -386,7 +386,7 @@ class TestUtils(unittest.TestCase):
 
 
 class TestUtilsAsync(asynctest.TestCase):
-    @patch('source.api.twitch.getTwitchIds')
+    @patch('lib.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -402,7 +402,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', '1', now)
 
-    @patch('source.api.twitch.getTwitchIds')
+    @patch('lib.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -418,7 +418,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', None, now)
 
-    @patch('source.api.twitch.getTwitchIds')
+    @patch('lib.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -434,7 +434,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.getTwitchIds')
+    @patch('lib.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -449,7 +449,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', '1', now)
 
-    @patch('source.api.twitch.getTwitchIds')
+    @patch('lib.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -464,7 +464,7 @@ class TestUtilsAsync(asynctest.TestCase):
         self.assertFalse(mock_getIds.called)
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.getTwitchIds')
+    @patch('lib.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -479,7 +479,7 @@ class TestUtilsAsync(asynctest.TestCase):
         self.assertFalse(mock_getIds.called)
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.getTwitchIds')
+    @patch('lib.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -495,7 +495,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', '1', now)
 
-    @patch('source.api.twitch.getTwitchIds')
+    @patch('lib.api.twitch.getTwitchIds')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
@@ -511,7 +511,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_getIds.assert_called_once_with(['botgotsthis'])
         mock_save.assert_called_once_with('botgotsthis', '1', now)
 
-    @patch('source.api.twitch.get_community_by_id')
+    @patch('lib.api.twitch.get_community_by_id')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -532,7 +532,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_save.assert_called_once_with(
             'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
-    @patch('source.api.twitch.get_community_by_id')
+    @patch('lib.api.twitch.get_community_by_id')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -553,7 +553,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_save.assert_called_once_with(
             None, '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
-    @patch('source.api.twitch.get_community_by_id')
+    @patch('lib.api.twitch.get_community_by_id')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -572,7 +572,7 @@ class TestUtilsAsync(asynctest.TestCase):
             '6e940c4a-c42f-47d2-af83-0a2c7e47c421')
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.get_community_by_id')
+    @patch('lib.api.twitch.get_community_by_id')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -592,7 +592,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_save.assert_called_once_with(
             'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
-    @patch('source.api.twitch.get_community_by_id')
+    @patch('lib.api.twitch.get_community_by_id')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -611,7 +611,7 @@ class TestUtilsAsync(asynctest.TestCase):
         self.assertFalse(mock_get.called)
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.get_community_by_id')
+    @patch('lib.api.twitch.get_community_by_id')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -635,7 +635,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_save.assert_called_once_with(
             'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
-    @patch('source.api.twitch.get_community_by_id')
+    @patch('lib.api.twitch.get_community_by_id')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -657,7 +657,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_save.assert_called_once_with(
             'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
-    @patch('source.api.twitch.get_community')
+    @patch('lib.api.twitch.get_community')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -675,7 +675,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_save.assert_called_once_with(
             'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
-    @patch('source.api.twitch.get_community')
+    @patch('lib.api.twitch.get_community')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -691,7 +691,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_get.assert_called_once_with('speedrunning')
         mock_save.assert_called_once_with('Speedrunning', None, now)
 
-    @patch('source.api.twitch.get_community')
+    @patch('lib.api.twitch.get_community')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -707,7 +707,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_get.assert_called_once_with('speedrunning')
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.get_community')
+    @patch('lib.api.twitch.get_community')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -724,7 +724,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_save.assert_called_once_with(
             'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
-    @patch('source.api.twitch.get_community')
+    @patch('lib.api.twitch.get_community')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -740,7 +740,7 @@ class TestUtilsAsync(asynctest.TestCase):
         self.assertFalse(mock_get.called)
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.get_community')
+    @patch('lib.api.twitch.get_community')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -755,7 +755,7 @@ class TestUtilsAsync(asynctest.TestCase):
         self.assertFalse(mock_get.called)
         self.assertFalse(mock_save.called)
 
-    @patch('source.api.twitch.get_community')
+    @patch('lib.api.twitch.get_community')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)
@@ -775,7 +775,7 @@ class TestUtilsAsync(asynctest.TestCase):
         mock_save.assert_called_once_with(
             'Speedrunning', '6e940c4a-c42f-47d2-af83-0a2c7e47c421', now)
 
-    @patch('source.api.twitch.get_community')
+    @patch('lib.api.twitch.get_community')
     @patch('bot.globals', autospec=True)
     @patch('bot.utils.now', autospec=True)
     @patch('bot.utils.saveTwitchCommunity', autospec=True)

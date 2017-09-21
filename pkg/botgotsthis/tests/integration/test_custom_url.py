@@ -3,7 +3,7 @@ import aiohttp
 from asynctest.mock import MagicMock, patch
 
 from tests.unittest.base_custom import TestCustomField
-from source.data.message import Message
+from lib.data.message import Message
 from pkg.botgotsthis.custom import url
 
 

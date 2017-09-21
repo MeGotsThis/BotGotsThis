@@ -4,8 +4,8 @@ import random
 from bot import data, utils  # noqa: F401
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Union, cast  # noqa: F401
-from source.api import twitch
-from source import database
+from lib.api import twitch
+from lib import database
 
 
 async def checkTwitchIds(timestamp: datetime) -> None:

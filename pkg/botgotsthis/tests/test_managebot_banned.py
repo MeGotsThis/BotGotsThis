@@ -2,8 +2,8 @@ import asynctest
 
 from asynctest.mock import Mock, patch
 
-from source.database import DatabaseMain
-from source.data.message import Message
+from lib.database import DatabaseMain
+from lib.data.message import Message
 from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import StrContains, AsyncIterator
 
@@ -112,7 +112,7 @@ class TestManageBotBannedListBannedChannels(asynctest.TestCase):
             await banned.list_banned_channels(self.database, self.send), True)
         self.send.assert_called_once_with(StrContains('no'))
 
-    @patch('source.helper.message.messagesFromItems', autospec=True)
+    @patch('lib.helper.message.messagesFromItems', autospec=True)
     async def test_one(self, mock_messages):
         self.database.listBannedChannels.return_value = AsyncIterator(
             ['botgotsthis'])
@@ -123,7 +123,7 @@ class TestManageBotBannedListBannedChannels(asynctest.TestCase):
                                               StrContains('Banned'))
         self.send.assert_called_once_with('')
 
-    @patch('source.helper.message.messagesFromItems', autospec=True)
+    @patch('lib.helper.message.messagesFromItems', autospec=True)
     async def test_many(self, mock_messages):
         self.database.listBannedChannels.return_value = AsyncIterator(
             ['botgotsthis', 'megotsthis'])

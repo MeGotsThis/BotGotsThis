@@ -5,7 +5,7 @@ from datetime import datetime
 from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
-from source.database import DatabaseMain, AutoRepeatMessage
+from lib.database import DatabaseMain, AutoRepeatMessage
 from pkg.botgotsthis.tasks import repeat
 from tests.unittest.mock_class import AsyncIterator
 
@@ -25,12 +25,12 @@ class TestTasksRepeat(asynctest.TestCase):
             'botgotsthis': self.channel,
             }
 
-        patcher = patch('source.database.get_database')
+        patcher = patch('lib.database.get_database')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database
 
-        patcher = patch('source.helper.timeout.record_timeout')
+        patcher = patch('lib.helper.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 

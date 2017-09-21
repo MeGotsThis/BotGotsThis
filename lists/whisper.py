@@ -3,7 +3,7 @@ from collections import ChainMap
 from typing import Any, List, Mapping, Optional  # noqa: F401
 
 import bot
-from source import data
+from lib import data
 
 WhisperDict = Mapping[str, Optional[data.WhisperCommand]]
 

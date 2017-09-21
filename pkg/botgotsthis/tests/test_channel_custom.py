@@ -6,8 +6,8 @@ from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import IterableMatch, StrContains
 
 # Needs to be imported last
-from source.data import CustomCommand, CommandActionTokens
-from source.data.message import Message
+from lib.data import CustomCommand, CommandActionTokens
+from lib.data.message import Message
 from pkg.botgotsthis.channel import custom
 
 
@@ -25,17 +25,17 @@ class TestChannelCustomCustomCommand(TestChannel):
         self.mock_config.customMessageCooldown = 5
         self.mock_config.customMessageUserCooldown = 30
 
-        patcher = patch('source.helper.chat.inCooldown', autospec=True)
+        patcher = patch('lib.helper.chat.inCooldown', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_channel_cooldown = patcher.start()
         self.mock_channel_cooldown.return_value = False
 
-        patcher = patch('source.helper.chat.in_user_cooldown', autospec=True)
+        patcher = patch('lib.helper.chat.in_user_cooldown', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_user_cooldown = patcher.start()
         self.mock_user_cooldown.return_value = False
 
-        patcher = patch('source.helper.timeout.record_timeout')
+        patcher = patch('lib.helper.timeout.record_timeout')
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 

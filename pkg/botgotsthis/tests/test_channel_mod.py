@@ -1,8 +1,8 @@
 from asynctest.mock import MagicMock, patch
 
 from tests.unittest.base_channel import TestChannel
-from source.data.message import Message
-from source.database import DatabaseTimeout
+from lib.data.message import Message
+from lib.database import DatabaseTimeout
 from tests.unittest.mock_class import StrContains
 
 # Needs to be imported last
@@ -10,8 +10,8 @@ from pkg.botgotsthis.channel import mod
 
 
 class TestChannelMod(TestChannel):
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_status_false(self, mock_update, mock_token):
         self.assertIs(await mod.commandStatus(self.args), False)
         self.permissionSet['moderator'] = True
@@ -27,8 +27,8 @@ class TestChannelMod(TestChannel):
         self.assertFalse(mock_update.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_status(self, mock_update, mock_token):
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'
@@ -41,8 +41,8 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Status', 'Kappa'))
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_status_unset(self, mock_update, mock_token):
         mock_update.return_value = True
         self.permissionSet['broadcaster'] = True
@@ -55,8 +55,8 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Status', 'unset'))
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_status_fail(self, mock_update, mock_token):
         mock_update.return_value = False
         self.permissionSet['broadcaster'] = True
@@ -69,8 +69,8 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Status', 'fail'))
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_game_false(self, mock_update, mock_token):
         self.assertIs(await mod.commandGame(self.args), False)
         self.permissionSet['moderator'] = True
@@ -86,8 +86,8 @@ class TestChannelMod(TestChannel):
         self.assertFalse(mock_update.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_game(self, mock_update, mock_token):
         mock_update.return_value = True
         self.permissionSet['broadcaster'] = True
@@ -101,8 +101,8 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Game', 'Kappa'))
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_game_abbreviation(self, mock_update, mock_token):
         mock_update.return_value = True
         self.permissionSet['moderator'] = True
@@ -116,8 +116,8 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Game', 'Creative'))
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_game_pokemon(self, mock_update, mock_token):
         mock_update.return_value = True
         self.features.append('gamestatusbroadcaster')
@@ -132,8 +132,8 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Game', 'Pokémon Poképark'))
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_game_fail(self, mock_update, mock_token):
         mock_update.return_value = False
         self.features.append('gamestatusbroadcaster')
@@ -148,8 +148,8 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Game', 'fail'))
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_raw_game_false(self, mock_update, mock_token):
         self.assertIs(await mod.commandRawGame(self.args), False)
         self.permissionSet['moderator'] = True
@@ -165,8 +165,8 @@ class TestChannelMod(TestChannel):
         self.assertFalse(mock_update.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_raw_game(self, mock_update, mock_token):
         mock_update.return_value = True
         self.permissionSet['broadcaster'] = True
@@ -179,8 +179,8 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Game', 'Pokemon'))
 
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.update')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.update')
     async def test_raw_game_fail(self, mock_update, mock_token):
         mock_update.return_value = False
         self.permissionSet['broadcaster'] = True
@@ -193,7 +193,7 @@ class TestChannelMod(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Game', 'fail'))
 
-    @patch('source.database.get_database')
+    @patch('lib.database.get_database')
     async def test_purge(self, mock_database):
         database = MagicMock(spec=DatabaseTimeout)
         mock_database.return_value = database
@@ -210,7 +210,7 @@ class TestChannelMod(TestChannel):
             'botgotsthis', 'megotsthis', 'botgotsthis', 'purge', None, 1,
             '!purge MeGotsThis', None)
 
-    @patch('source.database.get_database')
+    @patch('lib.database.get_database')
     async def test_purge_reason(self, mock_database):
         database = MagicMock(spec=DatabaseTimeout)
         mock_database.return_value = database
@@ -226,8 +226,8 @@ class TestChannelMod(TestChannel):
             '!purge MeGotsThis Kappa', 'Kappa')
 
     @patch('bot.globals', autospec=True)
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.set_channel_community')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.set_channel_community')
     async def test_community_false(self, mock_update, mock_token,
                                    mock_globals):
         mock_globals.twitchCommunity = {
@@ -251,8 +251,8 @@ class TestChannelMod(TestChannel):
         self.assertFalse(self.channel.send.called)
 
     @patch('bot.globals', autospec=True)
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.set_channel_community')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.set_channel_community')
     async def test_community(self, mock_update, mock_token, mock_globals):
         mock_globals.twitchCommunity = {
             'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
@@ -271,8 +271,8 @@ class TestChannelMod(TestChannel):
             StrContains('Community', 'Speedrunning'))
 
     @patch('bot.globals', autospec=True)
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.set_channel_community')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.set_channel_community')
     async def test_community_3(self, mock_update, mock_token, mock_globals):
         mock_globals.twitchCommunity = {
             'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421',
@@ -294,8 +294,8 @@ class TestChannelMod(TestChannel):
             StrContains('Community', 'Speedrunning'))
 
     @patch('bot.globals', autospec=True)
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.set_channel_community')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.set_channel_community')
     async def test_community_unset(self, mock_update, mock_token,
                                    mock_globals):
         mock_globals.twitchCommunity = {
@@ -315,8 +315,8 @@ class TestChannelMod(TestChannel):
             StrContains('Community', 'unset'))
 
     @patch('bot.globals', autospec=True)
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.set_channel_community')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.set_channel_community')
     async def test_community_not_exist(self, mock_update, mock_token,
                                        mock_globals):
         mock_globals.twitchCommunity = {
@@ -336,8 +336,8 @@ class TestChannelMod(TestChannel):
             StrContains('Communities', 'not', 'exist'))
 
     @patch('bot.globals', autospec=True)
-    @patch('source.api.oauth.token')
-    @patch('source.api.twitch.set_channel_community')
+    @patch('lib.api.oauth.token')
+    @patch('lib.api.twitch.set_channel_community')
     async def test_community_fail(self, mock_update, mock_token, mock_globals):
         mock_globals.twitchCommunity = {
             'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'

@@ -7,7 +7,7 @@ import asynctest
 
 from datetime import datetime
 from http.client import HTTPResponse
-from source.api import twitch
+from lib.api import twitch
 from tests.unittest.mock_class import StrContains, TypeMatch
 from asynctest.mock import MagicMock, Mock, patch
 
@@ -245,7 +245,7 @@ class TestApiTwitchApiHeaders(asynctest.TestCase):
         self.mock_config = patcher.start()
         self.mock_config.twitchClientId = '0123456789abcdef'
 
-        patcher = patch('source.api.oauth.token')
+        patcher = patch('lib.api.oauth.token')
         self.addCleanup(patcher.stop)
         self.mock_token = patcher.start()
         self.mock_token.return_value = 'abcdef0123456789'
@@ -268,7 +268,7 @@ class TestApiTwitchApiHeaders(asynctest.TestCase):
 
 class TestApiTwitchApiCalls(asynctest.TestCase):
     def setUp(self):
-        patcher = patch('source.api.twitch.get_headers')
+        patcher = patch('lib.api.twitch.get_headers')
         self.addCleanup(patcher.stop)
         self.mock_headers = patcher.start()
         self.mock_headers.return_value = {}
@@ -541,22 +541,22 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_async_response = Mock(spec=aiohttp.ClientResponse)
         self.mock_response = Mock(spec=HTTPResponse)
 
-        patcher = patch('source.api.twitch.get_call')
+        patcher = patch('lib.api.twitch.get_call')
         self.addCleanup(patcher.stop)
         self.mock_get_call = patcher.start()
         self.mock_get_call.return_value = [self.mock_async_response, None]
 
-        patcher = patch('source.api.twitch.post_call')
+        patcher = patch('lib.api.twitch.post_call')
         self.addCleanup(patcher.stop)
         self.mock_post_call = patcher.start()
         self.mock_post_call.return_value = [self.mock_async_response, None]
 
-        patcher = patch('source.api.twitch.put_call')
+        patcher = patch('lib.api.twitch.put_call')
         self.addCleanup(patcher.stop)
         self.mock_put_call = patcher.start()
         self.mock_put_call.return_value = [self.mock_async_response, None]
 
-        patcher = patch('source.api.twitch.delete_call')
+        patcher = patch('lib.api.twitch.delete_call')
         self.addCleanup(patcher.stop)
         self.mock_delete_call = patcher.start()
         self.mock_delete_call.return_value = [self.mock_async_response, None]
@@ -696,7 +696,7 @@ class TestApiTwitch(asynctest.TestCase):
         self.assertFalse(self.mock_put_call.called)
         self.mock_load.assert_called_once_with('botgotsthis')
 
-    @patch('source.api.twitch._handle_streams')
+    @patch('lib.api.twitch._handle_streams')
     async def test_active_streams_no_load(self, mock_handle):
         self.mock_load.return_value = False
         self.assertEqual(await twitch.active_streams(['botgotsthis']), {})
@@ -704,21 +704,21 @@ class TestApiTwitch(asynctest.TestCase):
         self.assertFalse(self.mock_get_call.called)
         self.assertEqual(mock_handle.call_count, 0)
 
-    @patch('source.api.twitch._handle_streams')
+    @patch('lib.api.twitch._handle_streams')
     async def test_active_streams_no_user(self, mock_handle):
         self.assertEqual(await twitch.active_streams(['megotsthis']), {})
         self.mock_load.assert_called_once_with('megotsthis')
         self.assertFalse(self.mock_get_call.called)
         self.assertEqual(mock_handle.call_count, 0)
 
-    @patch('source.api.twitch._handle_streams')
+    @patch('lib.api.twitch._handle_streams')
     async def test_active_streams_404(self, mock_handle):
         self.mock_async_response.status = 404
         self.assertIsNone(await twitch.active_streams(['botgotsthis']))
         self.mock_load.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 0)
 
-    @patch('source.api.twitch._handle_streams')
+    @patch('lib.api.twitch._handle_streams')
     async def test_active_streams_one(self, mock_handle):
         self.mock_async_response.status = 200
         self.mock_get_call.return_value[1] = json.loads(noStreams.decode())
@@ -726,7 +726,7 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_load.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 1)
 
-    @patch('source.api.twitch._handle_streams')
+    @patch('lib.api.twitch._handle_streams')
     async def test_active_streams_too_many(self, mock_handle):
         self.mock_async_response.status = 200
         self.mock_get_call.side_effect = [

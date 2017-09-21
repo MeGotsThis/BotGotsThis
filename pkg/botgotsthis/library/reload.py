@@ -5,13 +5,13 @@ import re
 import sys
 import importlib
 from typing import Iterator, List, Match, Optional, Tuple  # noqa: F401
-from source.data import Send, timezones
+from lib.data import Send, timezones
 
 _reload_lock: asyncio.Lock = asyncio.Lock()
 
 
 def reloadable(module: str) -> bool:
-    include = (module.startswith('source') or module.startswith('lists')
+    include = (module.startswith('lib') or module.startswith('lists')
                or module.startswith('pkg'))
     match: Optional[Match[str]]
     match = re.fullmatch(r'pkg\.([^\.]+)\.autoload(?:\..+)?', module)
@@ -27,24 +27,24 @@ def is_submodule(module: str,
 
 
 def key(module: str) -> Tuple[int, int, bool, str]:
-    if is_submodule(module, 'source.irccommand'):
-        return 95, 0, module == 'source.irccommand', module
-    if module == 'source.channel':
-        return 96, 0, module == 'source.channel', module
-    if module == 'source.whisper':
-        return 97, 0, module == 'source.whisper', module
-    if module == 'source.ircmessage':
-        return 98, 0, module == 'source.ircmessage', module
+    if is_submodule(module, 'lib.irccommand'):
+        return 95, 0, module == 'lib.irccommand', module
+    if module == 'lib.channel':
+        return 96, 0, module == 'lib.channel', module
+    if module == 'lib.whisper':
+        return 97, 0, module == 'lib.whisper', module
+    if module == 'lib.ircmessage':
+        return 98, 0, module == 'lib.ircmessage', module
 
-    if is_submodule(module, 'source.data'):
-        return 0, 0, module == 'source.data', module
-    if is_submodule(module, 'source.database'):
-        return 5, 0, module == 'source.database', module
+    if is_submodule(module, 'lib.data'):
+        return 0, 0, module == 'lib.data', module
+    if is_submodule(module, 'lib.database'):
+        return 5, 0, module == 'lib.database', module
 
-    if is_submodule(module, 'source.api'):
-        return 10, 0, module == 'source.api', module
-    if is_submodule(module, 'source.private.library'):
-        return 15, 0, module == 'source.private.library', module
+    if is_submodule(module, 'lib.api'):
+        return 10, 0, module == 'lib.api', module
+    if is_submodule(module, 'lib.private.library'):
+        return 15, 0, module == 'lib.private.library', module
 
     match: Optional[Match[str]] = re.fullmatch(r'pkg\.(.+)', module)
     if match is not None:
@@ -81,10 +81,10 @@ def key(module: str) -> Tuple[int, int, bool, str]:
     if module.startswith('lists'):
         return 89, 0, module == 'lists', module
 
-    if module == 'source':
-        return 99, 0, module == 'source', module
-    if is_submodule(module, 'source'):
-        return 30, 0, module == 'source', module
+    if module == 'lib':
+        return 99, 0, module == 'lib', module
+    if is_submodule(module, 'lib'):
+        return 30, 0, module == 'lib', module
     return 20, -module.count('.'), False, module
 
 

@@ -233,7 +233,7 @@ class TestChannelAsync(asynctest.TestCase):
         self.channel = Channel('botgotsthis', self.connection)
 
     @patch('bot.utils.now', autospec=True)
-    @patch('source.api.ffz.getBroadcasterEmotes')
+    @patch('lib.api.ffz.getBroadcasterEmotes')
     async def test_updateFfzEmotes(self, mock_getFfzEmotes, mock_now):
         now = datetime(2000, 1, 1)
         emotes = {-1: 'FrankerFaceZ'}
@@ -245,7 +245,7 @@ class TestChannelAsync(asynctest.TestCase):
         self.assertEqual(self.channel.ffzEmotes, emotes)
 
     @patch('bot.utils.now', autospec=True)
-    @patch('source.api.ffz.getBroadcasterEmotes')
+    @patch('lib.api.ffz.getBroadcasterEmotes')
     async def test_updateFfzEmotes_empty(self, mock_getFfzEmotes, mock_now):
         now = datetime(2000, 1, 1)
         emotes = {}
@@ -258,7 +258,7 @@ class TestChannelAsync(asynctest.TestCase):
         self.assertEqual(self.channel.ffzEmotes, emotes)
 
     @patch('bot.utils.now', autospec=True)
-    @patch('source.api.ffz.getBroadcasterEmotes')
+    @patch('lib.api.ffz.getBroadcasterEmotes')
     async def test_updateFfzEmotes_error(self, mock_getFfzEmotes, mock_now):
         now = datetime(2000, 1, 1)
         emotes = {-1: 'FrankerFaceZ'}
@@ -270,7 +270,7 @@ class TestChannelAsync(asynctest.TestCase):
         self.assertEqual(self.channel.ffzEmotes, emotes)
 
     @patch('bot.utils.now', autospec=True)
-    @patch('source.api.bttv.getBroadcasterEmotes')
+    @patch('lib.api.bttv.getBroadcasterEmotes')
     async def test_updateBttvEmotes(self, mock_getBttvEmotes, mock_now):
         now = datetime(2000, 1, 1)
         emotes = {'': 'BetterTwitch.Tv'}
@@ -282,7 +282,7 @@ class TestChannelAsync(asynctest.TestCase):
         self.assertEqual(self.channel.bttvEmotes, emotes)
 
     @patch('bot.utils.now', autospec=True)
-    @patch('source.api.bttv.getBroadcasterEmotes')
+    @patch('lib.api.bttv.getBroadcasterEmotes')
     async def test_updateBttvEmotes_empty(self, mock_getBttvEmotes, mock_now):
         now = datetime(2000, 1, 1)
         emotes = {}
@@ -295,7 +295,7 @@ class TestChannelAsync(asynctest.TestCase):
         self.assertEqual(self.channel.bttvEmotes, emotes)
 
     @patch('bot.utils.now', autospec=True)
-    @patch('source.api.bttv.getBroadcasterEmotes')
+    @patch('lib.api.bttv.getBroadcasterEmotes')
     async def test_updateBttvEmotes_error(self, mock_getBttvEmotes, mock_now):
         now = datetime(2000, 1, 1)
         emotes = {'': 'BetterTwitch.Tv'}

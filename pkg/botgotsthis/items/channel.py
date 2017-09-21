@@ -1,6 +1,6 @@
 ﻿from typing import Iterable, Mapping, Optional
 
-from source import data
+from lib import data
 from ..channel import block_url
 from ..channel import broadcaster
 from ..channel import custom

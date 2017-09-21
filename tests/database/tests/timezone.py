@@ -1,4 +1,4 @@
-from source.database import DatabaseTimeZone
+from lib.database import DatabaseTimeZone
 
 
 class TestTimezone:

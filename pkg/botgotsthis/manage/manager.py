@@ -1,6 +1,6 @@
-﻿from source.data import ManageBotArgs, Send
-from source.database import DatabaseMain
-from source.helper.chat import permission
+﻿from lib.data import ManageBotArgs, Send
+from lib.database import DatabaseMain
+from lib.helper.chat import permission
 
 
 @permission('owner')

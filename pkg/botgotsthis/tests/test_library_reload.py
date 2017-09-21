@@ -15,7 +15,7 @@ def send(messages):
 
 class TestLibraryReloadReloadable(unittest.TestCase):
     def test_source(self):
-        self.assertIs(reload.reloadable('source.ircmessage'), True)
+        self.assertIs(reload.reloadable('lib.ircmessage'), True)
 
     def test_lists(self):
         self.assertIs(reload.reloadable('lists.channel'), True)
@@ -42,10 +42,10 @@ class TestLibraryReloadReloadable(unittest.TestCase):
 
 class TestLibraryReloadIsSubmodule(unittest.TestCase):
     def test(self):
-        self.assertIs(reload.is_submodule('source', 'source'), True)
-        self.assertIs(reload.is_submodule('source.a', 'source'), True)
-        self.assertIs(reload.is_submodule('source', 'abc'), False)
-        self.assertIs(reload.is_submodule('source', 'sourcea'), False)
+        self.assertIs(reload.is_submodule('lib', 'lib'), True)
+        self.assertIs(reload.is_submodule('lib.a', 'lib'), True)
+        self.assertIs(reload.is_submodule('lib', 'abc'), False)
+        self.assertIs(reload.is_submodule('lib', 'sourcea'), False)
 
 
 class TestLibraryReloadKey(unittest.TestCase):
@@ -53,23 +53,23 @@ class TestLibraryReloadKey(unittest.TestCase):
     def test(self, mock_globals):
         mock_globals.pkgs = ['megotsthis', 'botgotsthis']
         order = [
-            'source.data.message',
-            'source.data',
-            'source.database.databasenone',
-            'source.database.sqlite',
-            'source.database',
-            'source.api.twitch',
-            'source.api',
+            'lib.data.message',
+            'lib.data',
+            'lib.database.databasenone',
+            'lib.database.sqlite',
+            'lib.database',
+            'lib.api.twitch',
+            'lib.api',
             'abc.def',
             'abc',
             'zyx',
-            'source.api_longer',
-            'source.channel_longer',
-            'source.data_longer',
-            'source.database_longer',
-            'source.irccommand_longer',
-            'source.something',
-            'source.whisper_longer',
+            'lib.api_longer',
+            'lib.channel_longer',
+            'lib.data_longer',
+            'lib.database_longer',
+            'lib.irccommand_longer',
+            'lib.something',
+            'lib.whisper_longer',
             'pkg.mebotsthis.library',
             'pkg.mebotsthis',
             'pkg.botgotsthis.channel_longer',
@@ -102,12 +102,12 @@ class TestLibraryReloadKey(unittest.TestCase):
             'lists.channel',
             'lists.whisper',
             'lists',
-            'source.irccommand.notice',
-            'source.irccommand',
-            'source.channel',
-            'source.whisper',
-            'source.ircmessage',
-            'source',
+            'lib.irccommand.notice',
+            'lib.irccommand',
+            'lib.channel',
+            'lib.whisper',
+            'lib.ircmessage',
+            'lib',
             ]
         for first, second in zip(order, order[1:]):
             self.assertLess(reload.key(first), reload.key(second),
@@ -150,10 +150,10 @@ class TestLibraryReload(asynctest.TestCase):
 
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
-    @patch('source.data.timezones.load_timezones')
+    @patch('lib.data.timezones.load_timezones')
     async def test_reload_commands(self, mock_load_timezones, mock_reload):
         module = Mock()
-        sys.modules = {'source': module}
+        sys.modules = {'lib': module}
         self.assertIs(await reload.reload_commands(self.send), True)
         self.assertEqual(self.send.call_count, 2)
         mock_reload.assert_called_once_with(module)
@@ -161,7 +161,7 @@ class TestLibraryReload(asynctest.TestCase):
 
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
-    @patch('source.data.timezones.load_timezones')
+    @patch('lib.data.timezones.load_timezones')
     async def test_reload_commands_multiple(self, mock_load_timezones,
                                             mock_reload):
         async def wait(*args):
@@ -175,7 +175,7 @@ class TestLibraryReload(asynctest.TestCase):
             return await reload.reload_commands(self.send)
 
         module = Mock()
-        sys.modules = {'source': module}
+        sys.modules = {'lib': module}
         mock_load_timezones.side_effect = wait
         self.assertEqual(
             await asyncio.gather(call_0(), call_1()),

@@ -1,5 +1,5 @@
 from datetime import datetime
-from source.database import DatabaseTimeout
+from lib.database import DatabaseTimeout
 from tests.unittest.mock_class import TypeMatch
 
 

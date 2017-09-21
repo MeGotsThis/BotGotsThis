@@ -9,9 +9,9 @@ from asynctest.mock import call, patch
 
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
-from source import channel
-from source.database import DatabaseMain
-from source.data.message import Message
+from lib import channel
+from lib.database import DatabaseMain
+from lib.data.message import Message
 
 
 class TestChannel(asynctest.TestCase):
@@ -24,28 +24,28 @@ class TestChannel(asynctest.TestCase):
         self.channel.channel = 'megotsthis'
         self.now = datetime(2000, 1, 1)
 
-    @patch('source.channel.chatCommand')
+    @patch('lib.channel.chatCommand')
     async def test_parse(self, mock_chatCommand):
         channel.parse(self.channel, self.tags, 'botgotsthis', 'Kappa',
                       self.now)
         self.assertTrue(mock_chatCommand.called)
 
     @asynctest.fail_on(unused_loop=False)
-    @patch('source.channel.chatCommand')
+    @patch('lib.channel.chatCommand')
     def test_parse_empty(self, mock_chatCommand):
         channel.parse(self.channel, self.tags, 'botgotsthis', '', self.now)
         self.assertFalse(mock_chatCommand.called)
 
     @asynctest.fail_on(unused_loop=False)
-    @patch('source.channel.chatCommand')
+    @patch('lib.channel.chatCommand')
     def test_parse_spaces(self, mock_chatCommand):
         channel.parse(self.channel, self.tags, 'botgotsthis', '  ', self.now)
         self.assertFalse(mock_chatCommand.called)
 
     @patch('bot.utils.logException', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
-    @patch('source.database.get_database')
-    @patch('source.channel.commandsToProcess', autospec=True)
+    @patch('lib.database.get_database')
+    @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand(self, mock_commands, mock_database, mock_save,
                                mock_log):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
@@ -73,8 +73,8 @@ class TestChannel(asynctest.TestCase):
         self.assertEqual(mock_log.call_count, 0)
 
     @patch('bot.utils.logException', autospec=True)
-    @patch('source.database.get_database')
-    @patch('source.channel.commandsToProcess', autospec=True)
+    @patch('lib.database.get_database')
+    @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand_except(self, mock_commands, mock_database,
                                       mock_log):
         command = CoroutineMock(spec=lambda args: False, side_effect=Exception)
@@ -96,8 +96,8 @@ class TestChannel(asynctest.TestCase):
         self.assertTrue(mock_log.called)
 
     @patch('bot.utils.logException', autospec=True)
-    @patch('source.database.get_database')
-    @patch('source.channel.commandsToProcess', autospec=True)
+    @patch('lib.database.get_database')
+    @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand_database_except(self, mock_commands,
                                                mock_database, mock_log):
         mock_database.side_effect = Exception
@@ -110,8 +110,8 @@ class TestChannel(asynctest.TestCase):
 
     @patch('bot.utils.logException', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
-    @patch('source.database.get_database')
-    @patch('source.channel.commandsToProcess', autospec=True)
+    @patch('lib.database.get_database')
+    @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand_no_tags(self, mock_commands, mock_database,
                                        mock_save, mock_log):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)

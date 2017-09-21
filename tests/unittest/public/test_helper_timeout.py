@@ -4,8 +4,8 @@ import asynctest
 from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
-from source.database import DatabaseMain, DatabaseTimeout, Schema
-from source.helper import timeout
+from lib.database import DatabaseMain, DatabaseTimeout, Schema
+from lib.helper import timeout
 from tests.unittest.mock_class import TypeMatch
 
 
@@ -24,7 +24,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
 
-        patcher = patch('source.database.get_database')
+        patcher = patch('lib.database.get_database')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.dbtimeout
@@ -328,7 +328,7 @@ class TestLibraryTimeoutRecord(asynctest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
 
-        patcher = patch('source.database.get_database')
+        patcher = patch('lib.database.get_database')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database

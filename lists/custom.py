@@ -2,7 +2,7 @@
 from typing import Any, Collection, Iterable, List  # noqa: F401
 
 import bot
-from source import data
+from lib import data
 
 
 def fields() -> Iterable[data.CustomCommandField]:

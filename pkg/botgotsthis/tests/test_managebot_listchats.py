@@ -8,7 +8,7 @@ from pkg.botgotsthis.manage import listchats
 
 
 class TestManageBotListChats(TestManageBot):
-    @patch('source.helper.message.messagesFromItems', autospec=True)
+    @patch('lib.helper.message.messagesFromItems', autospec=True)
     @patch('bot.globals', autospec=True)
     async def test_no_channels(self, mock_globals, mock_messages):
         mock_globals.channels = ''
@@ -16,7 +16,7 @@ class TestManageBotListChats(TestManageBot):
         self.assertFalse(mock_messages.called)
         self.send.assert_called_once_with(StrContains('not', 'in'))
 
-    @patch('source.helper.message.messagesFromItems', autospec=True)
+    @patch('lib.helper.message.messagesFromItems', autospec=True)
     @patch('bot.globals', autospec=True)
     async def test_one_channel(self, mock_globals, mock_messages):
         mock_globals.channels = {'botgotsthis': None}
@@ -26,7 +26,7 @@ class TestManageBotListChats(TestManageBot):
                                               StrContains('Chats'))
         self.send.assert_called_once_with('')
 
-    @patch('source.helper.message.messagesFromItems', autospec=True)
+    @patch('lib.helper.message.messagesFromItems', autospec=True)
     @patch('bot.globals', autospec=True)
     async def test_many_channel(self, mock_globals, mock_messages):
         mock_globals.channels = {'botgotsthis': None,

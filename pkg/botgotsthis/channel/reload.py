@@ -1,5 +1,5 @@
-﻿from source.data import ChatCommandArgs
-from source.helper.chat import permission, ownerChannel, sendPriority
+﻿from lib.data import ChatCommandArgs
+from lib.helper.chat import permission, ownerChannel, sendPriority
 from ..library import reload
 
 

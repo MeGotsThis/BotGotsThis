@@ -5,9 +5,9 @@ from typing import Awaitable, Callable, Dict, List, Optional  # noqa: F401
 import bot
 import lists.custom
 from bot import utils
-from source.data import ChatCommandArgs, CustomCommand, CommandActionTokens  # noqa: F401, E501
-from source.helper import chat, timeout
-from source.helper.chat import min_args, not_feature, permission, ownerChannel
+from lib.data import ChatCommandArgs, CustomCommand, CommandActionTokens  # noqa: F401, E501
+from lib.helper import chat, timeout
+from lib.helper.chat import min_args, not_feature, permission, ownerChannel
 from ..library import custom
 
 

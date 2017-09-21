@@ -1,7 +1,7 @@
 import asyncio
 
 import bot
-import source.ircmessage
+import lib.ircmessage
 
 from collections import deque
 from datetime import datetime, timedelta
@@ -212,7 +212,7 @@ class ConnectionHandler:
                 return
             message: str = ircmsg.decode('utf-8')
             self._log_read(message)
-            source.ircmessage.parseMessage(self, message, utils.now())
+            lib.ircmessage.parseMessage(self, message, utils.now())
         except data.ConnectionReset:
             raise
         except data.LoginUnsuccessful:

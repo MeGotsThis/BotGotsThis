@@ -1,8 +1,8 @@
 ﻿from typing import List  # noqa: F401
 
 import bot
-from source.data import ManageBotArgs
-from source.helper import message
+from lib.data import ManageBotArgs
+from lib.helper import message
 
 
 async def manageListChats(args: ManageBotArgs) -> bool:
