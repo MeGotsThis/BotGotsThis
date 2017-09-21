@@ -1,26 +1,31 @@
-﻿from source import data
-from typing import Collection, Iterable, List  # noqa: F401
-from pkg.botgotsthis.items import custom as publicCustom
-try:
-    from .private import custom as privateCustom
-except ImportError:
-    from .private.default import custom as privateCustom  # type: ignore
+﻿import importlib
+from typing import Any, Collection, Iterable, List  # noqa: F401
+
+import bot
+from source import data
 
 
 def fields() -> Iterable[data.CustomCommandField]:
-    yield from privateCustom.fields()
-    if not privateCustom.disablePublic():
-        yield from publicCustom.fields()
+    pkg: str
+    for pkg in bot.globals.pkgs:
+        custom: Any
+        custom = importlib.import_module('pkg.' + pkg + '.items.custom')
+        yield from custom.fields()
 
 
 def properties() -> Collection[str]:
-    props: List[str] = list(privateCustom.properties())
-    if not privateCustom.disablePublic():
-        props.extend(publicCustom.properties())
+    props: List[str] = []
+    pkg: str
+    for pkg in bot.globals.pkgs:
+        custom: Any
+        custom = importlib.import_module('pkg.' + pkg + '.items.custom')
+        props.extend(custom.properties())
     return props
 
 
 def postProcess() -> Iterable[data.CustomCommandProcess]:
-    if not privateCustom.disablePublic():
-        yield from publicCustom.postProcess()
-    yield from privateCustom.postProcess()
+    pkg: str
+    for pkg in bot.globals.pkgs:
+        custom: Any
+        custom = importlib.import_module('pkg.' + pkg + '.items.custom')
+        yield from custom.postProcess()

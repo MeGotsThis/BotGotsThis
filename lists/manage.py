@@ -1,14 +1,18 @@
-﻿from pkg.botgotsthis.items import manage as publicList
+﻿import importlib
 from collections import ChainMap
+from typing import Any, List, Mapping, Optional  # noqa: F401
+
+import bot
 from source import data
-from typing import Mapping, Optional
-try:
-    from .private import manage as privateList
-except ImportError:
-    from .private.default import manage as privateList  # type: ignore
 
 MethodDict = Mapping[str, Optional[data.ManageBotCommand]]
 
 
 def methods() -> MethodDict:
-    return ChainMap(privateList.methods(), publicList.methods())
+    mthds: List[MethodDict] = []
+    pkg: str
+    for pkg in bot.globals.pkgs:
+        manage: Any
+        manage = importlib.import_module('pkg.' + pkg + '.items.manage')
+        mthds.append(manage.methods())
+    return ChainMap(*mthds)

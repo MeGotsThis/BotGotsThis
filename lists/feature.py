@@ -1,13 +1,17 @@
-﻿from pkg.botgotsthis.items import feature as publicFeature
+﻿import importlib
 from collections import ChainMap
-from typing import Mapping, Optional
-try:
-    from .private import feature as privateFeature
-except ImportError:
-    from .private.default import feature as privateFeature  # type: ignore
+from typing import Any, List, Mapping, Optional  # noqa: F401
+
+import bot
 
 FeatureDict = Mapping[str, Optional[str]]
 
 
 def features() -> FeatureDict:
-    return ChainMap(privateFeature.features(), publicFeature.features())
+    ftrs: List[FeatureDict] = []
+    pkg: str
+    for pkg in bot.globals.pkgs:
+        feature: Any
+        feature = importlib.import_module('pkg.' + pkg + '.items.feature')
+        ftrs.append(feature.methods())
+    return ChainMap(*ftrs)
