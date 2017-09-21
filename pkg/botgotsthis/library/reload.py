@@ -53,7 +53,6 @@ def key(module: str) -> Tuple[int, int, bool, str]:
             pkg: str = '.'.join(subparts[:i])
             if pkg in bot.globals.pkgs:
                 index: int = bot.globals.pkgs.index(pkg)
-                baseMod: str = f'pkg.{pkg}.'
                 if is_submodule(module, f'pkg.{pkg}.library'):
                     return 42, index, module == f'pkg.{pkg}.library', module
                 if is_submodule(module, f'pkg.{pkg}.tasks'):
