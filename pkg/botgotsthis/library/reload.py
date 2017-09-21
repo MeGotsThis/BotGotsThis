@@ -13,10 +13,7 @@ _reload_lock: asyncio.Lock = asyncio.Lock()
 def reloadable(module: str) -> bool:
     include = (module.startswith('source') or module.startswith('lists')
                or module.startswith('pkg'))
-    exclude = module in ['pkg.botgotsthis.library.reload',
-                         'source.private.autoload',
-                         'source.public.autoload']
-    exclude = exclude or module.startswith('source.private.autoload.')
+    exclude = module == 'pkg.botgotsthis.library.reload'
     exclude = exclude or bool(re.fullmatch(r'pkg\.[^\.]+\.autoload(\..+)?',
                                            module))
     return include and not exclude
