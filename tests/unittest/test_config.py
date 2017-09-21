@@ -60,6 +60,9 @@ timezone =
 twitchClientID = 
 twitchSecret = 
 redirectUri = 
+
+[PKG]
+botgotsthis = 1
 '''  # noqa: W291
 
 
@@ -95,7 +98,7 @@ class TestConfigReader(asynctest.TestCase):
     async def test_now(self):
         config = bot._config.BotConfig()
         await config.read_config()
-        self.assertEqual(self.file_mock.read.call_count, 4)
+        self.assertEqual(self.file_mock.read.call_count, 5)
         self.assertIsInstance(config.botnick, str)
         self.assertIsInstance(config.password, str)
         self.assertIsInstance(config.owner, str)
