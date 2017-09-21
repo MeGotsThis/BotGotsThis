@@ -7,10 +7,8 @@ nohup.out
 *.log
 .idea
 *.suo
-config.ini
-twitch.ini
-twitchApi.ini
-database.ini
+*.ini
+!*.dist.ini
 src/*
 pkg/*
 !pkg/botgotsthis

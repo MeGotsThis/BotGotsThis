@@ -2,9 +2,8 @@ import aioodbc  # noqa: F401
 
 from datetime import datetime
 
-from typing import Any, Dict, Optional, List  # noqa: F401
+from typing import Any, Dict, Optional, List, Tuple  # noqa: F401
 
-from source import database  # noqa: F401
 from . import data  # noqa: F401
 from .coroutine import connection  # noqa: F401
 
@@ -92,4 +91,5 @@ class BotGlobals:
         self.globalBttvEmotes: Dict[str, str] = {}
         self.globalBttvEmotesCache: datetime = datetime.min
 
+        self.pkgs: Tuple[str, ...] = tuple()
         self.connectionPools: Dict[str, aioodbc.Pool] = {}

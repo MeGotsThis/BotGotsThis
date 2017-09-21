@@ -23,6 +23,8 @@ async def initializer() -> None:
     await bot.config.read_config()
     bot.globals.displayName = bot.config.botnick
 
+    bot.globals.pkgs = tuple(bot.config.pkgs)
+
     bot.globals.running = True
 
     bot.globals.clusters['aws'] = connection.ConnectionHandler(
