@@ -32,7 +32,7 @@ SELECT abbreviation, gmt_offset
             async for row in await cursor.execute(query):
                 yield row[0], row[1]
 
-    async def zones(self) -> AsyncIterator[Tuple[str, int]]:
+    async def zones(self) -> AsyncIterator[Tuple[int, str]]:
             query: str = '''
 SELECT zone_id, zone_name FROM zone ORDER BY zone_id
 '''
