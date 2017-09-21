@@ -54,6 +54,8 @@ class BotConfig:
             'timezone': 10,
         }
 
+        self.pkgs: List[str] = ['botgotsthis']
+
         self.twitchClientId: str = ''
 
         self.ircLogFolder: str = ''
@@ -141,6 +143,19 @@ class BotConfig:
             if self.ircLogFolder:
                 if not os.path.isdir(self.ircLogFolder):
                     os.mkdir(self.ircLogFolder)
+
+        if os.path.isfile('pkg.ini'):
+            ini = configparser.ConfigParser()
+            async with aiofiles.open('pkg.ini', 'r',
+                                     encoding='utf-8') as file:
+                ini.read_string(await file.read(None))
+
+            self.pkgs.clear()
+            option: str
+            value: str
+            for option, value in ini.items('PKG'):  # type: ignore
+                if ini.getboolean('PKG', option):
+                    self.pkgs.append(option)
 
         if os.path.isfile('database.ini'):
             ini = configparser.ConfigParser()
