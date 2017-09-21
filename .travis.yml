@@ -18,12 +18,6 @@ services:
 install:
   - pip install -r requirements-test.txt
 before_script:
-  - cp $TRAVIS_BUILD_DIR/lists/private/channel.dist.py $TRAVIS_BUILD_DIR/lists/private/channel.py
-  - cp $TRAVIS_BUILD_DIR/lists/private/custom.dist.py $TRAVIS_BUILD_DIR/lists/private/custom.py
-  - cp $TRAVIS_BUILD_DIR/lists/private/feature.dist.py $TRAVIS_BUILD_DIR/lists/private/feature.py
-  - cp $TRAVIS_BUILD_DIR/lists/private/manage.dist.py $TRAVIS_BUILD_DIR/lists/private/manage.py
-  - cp $TRAVIS_BUILD_DIR/lists/private/whisper.dist.py $TRAVIS_BUILD_DIR/lists/private/whisper.py
-  - cp $TRAVIS_BUILD_DIR/source/private/ircmessage.dist.py $TRAVIS_BUILD_DIR/source/private/ircmessage.py
   - psql -U postgres -c 'CREATE ROLE botgotsthis_test'
   - psql -U postgres -c "ALTER ROLE botgotsthis_test WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION BYPASSRLS PASSWORD 'md5b3591780cc0946affe0bb30ed8c31736'"
   - psql -U postgres -c 'CREATE DATABASE botgotsthis_test WITH OWNER = botgotsthis_test'
