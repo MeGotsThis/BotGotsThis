@@ -28,11 +28,16 @@ class TestLibraryReloadReloadable(unittest.TestCase):
         reloadable = reload.reloadable
         self.assertIs(reloadable('pkg.botgotsthis.library.reload'), False)
 
-    def test_autoload(self):
+    @patch('bot.globals', autospec=True)
+    def test_autoload(self, mock_globals):
+        mock_globals.pkgs = ['botgotsthis']
         reloadable = reload.reloadable
         self.assertIs(reloadable('pkg.botgotsthis.autoload'), False)
         self.assertIs(reloadable('pkg.botgotsthis.autoload.test'), False)
         self.assertIs(reloadable('pkg.botgotsthis.autoloadlonger'), True)
+        self.assertIs(reloadable('pkg.megotsthis.autoload'), True)
+        self.assertIs(reloadable('pkg.megotsthis.autoload.test'), True)
+        self.assertIs(reloadable('pkg.megotsthis.autoloadlonger'), True)
 
 
 class TestLibraryReloadIsSubmodule(unittest.TestCase):
@@ -44,7 +49,9 @@ class TestLibraryReloadIsSubmodule(unittest.TestCase):
 
 
 class TestLibraryReloadKey(unittest.TestCase):
-    def test(self):
+    @patch('bot.globals', autospec=True)
+    def test(self, mock_globals):
+        mock_globals.pkgs = ['megotsthis','botgotsthis']
         order = [
             'source.data.message',
             'source.data',
@@ -53,7 +60,9 @@ class TestLibraryReloadKey(unittest.TestCase):
             'source.database',
             'source.api.twitch',
             'source.api',
+            'abc.def',
             'abc',
+            'zyx',
             'source.api_longer',
             'source.channel_longer',
             'source.data_longer',
@@ -61,6 +70,8 @@ class TestLibraryReloadKey(unittest.TestCase):
             'source.irccommand_longer',
             'source.something',
             'source.whisper_longer',
+            'pkg.mebotsthis.library',
+            'pkg.mebotsthis',
             'pkg.botgotsthis.channel_longer',
             'pkg.botgotsthis.custom_longer',
             'pkg.botgotsthis.items_longer',
@@ -69,6 +80,7 @@ class TestLibraryReloadKey(unittest.TestCase):
             'pkg.botgotsthis.something',
             'pkg.botgotsthis.tasks_longer',
             'pkg.botgotsthis.whisper_longer',
+            'pkg.megotsthis.library',
             'pkg.botgotsthis.library.chat',
             'pkg.botgotsthis.library',
             'pkg.botgotsthis.tasks.twitch',
@@ -84,7 +96,9 @@ class TestLibraryReloadKey(unittest.TestCase):
             'pkg.botgotsthis.items.channel',
             'pkg.botgotsthis.items',
             'pkg.botgotsthis.ircmessage',
+            'pkg.megotsthis',
             'pkg.botgotsthis',
+            'pkg',
             'lists.channel',
             'lists.whisper',
             'lists',

@@ -4,7 +4,7 @@ import bot._config
 import re
 import sys
 import importlib
-from typing import Iterator, Tuple  # noqa: F401
+from typing import Iterator, List, Match, Optional, Tuple  # noqa: F401
 from source.data import Send, timezones
 
 _reload_lock: asyncio.Lock = asyncio.Lock()
@@ -13,9 +13,11 @@ _reload_lock: asyncio.Lock = asyncio.Lock()
 def reloadable(module: str) -> bool:
     include = (module.startswith('source') or module.startswith('lists')
                or module.startswith('pkg'))
-    exclude = module == 'pkg.botgotsthis.library.reload'
-    exclude = exclude or bool(re.fullmatch(r'pkg\.[^\.]+\.autoload(\..+)?',
-                                           module))
+    match: Optional[Match[str]]
+    match = re.fullmatch(r'pkg\.([^\.]+)\.autoload(?:\..+)?', module)
+    exclude = (
+        module == 'pkg.botgotsthis.library.reload'
+        or (match is not None and match.group(1) in bot.globals.pkgs))
     return include and not exclude
 
 
@@ -24,55 +26,67 @@ def is_submodule(module: str,
     return module == source or module.startswith(source + '.')
 
 
-def key(module: str) -> Tuple[int, bool, str]:
+def key(module: str) -> Tuple[int, int, bool, str]:
     if is_submodule(module, 'source.irccommand'):
-        return 95, module == 'source.irccommand', module
+        return 95, 0, module == 'source.irccommand', module
     if module == 'source.channel':
-        return 96, module == 'source.channel', module
+        return 96, 0, module == 'source.channel', module
     if module == 'source.whisper':
-        return 97, module == 'source.whisper', module
+        return 97, 0, module == 'source.whisper', module
     if module == 'source.ircmessage':
-        return 98, module == 'source.ircmessage', module
+        return 98, 0, module == 'source.ircmessage', module
 
     if is_submodule(module, 'source.data'):
-        return 0, module == 'source.data', module
+        return 0, 0, module == 'source.data', module
     if is_submodule(module, 'source.database'):
-        return 5, module == 'source.database', module
+        return 5, 0, module == 'source.database', module
 
     if is_submodule(module, 'source.api'):
-        return 10, module == 'source.api', module
+        return 10, 0, module == 'source.api', module
     if is_submodule(module, 'source.private.library'):
-        return 15, module == 'source.private.library', module
+        return 15, 0, module == 'source.private.library', module
 
-    if is_submodule(module, 'pkg.botgotsthis.library'):
-        return 31, module == 'pkg.botgotsthis.library', module
-    if is_submodule(module, 'pkg.botgotsthis.tasks'):
-        return 35, module == 'pkg.botgotsthis.tasks', module
-    if is_submodule(module, 'pkg.botgotsthis.manage'):
-        return 36, module == 'pkg.botgotsthis.manage', module
-    if is_submodule(module, 'pkg.botgotsthis.custom'):
-        return 37, module == 'pkg.botgotsthis.custom', module
-    if is_submodule(module, 'pkg.botgotsthis.channel'):
-        return 38, module == 'pkg.botgotsthis.channel', module
-    if is_submodule(module, 'pkg.botgotsthis.whisper'):
-        return 39, module == 'pkg.botgotsthis.whisper', module
-    if is_submodule(module, 'pkg.botgotsthis.items'):
-        return 47, module == 'pkg.botgotsthis.items', module
-    if module == 'pkg.botgotsthis.ircmessage':
-        return 48, module == 'pkg.botgotsthis.ircmessage', module
-    if module == 'pkg.botgotsthis':
-        return 49, module == 'pkg.botgotsthis', module
-    if is_submodule(module, 'pkg.botgotsthis'):
-        return 30, module == 'pkg.botgotsthis', module
+    match: Optional[Match[str]] = re.fullmatch(r'pkg\.(.+)', module)
+    if match is not None:
+        subparts: List[str] = match.group(1).split('.')
+        for i in range(1, len(subparts) + 1):
+            pkg: str = '.'.join(subparts[:i])
+            if pkg in bot.globals.pkgs:
+                index: int = bot.globals.pkgs.index(pkg)
+                baseMod: str = f'pkg.{pkg}.'
+                if is_submodule(module, f'pkg.{pkg}.library'):
+                    return 42, index, module == f'pkg.{pkg}.library', module
+                if is_submodule(module, f'pkg.{pkg}.tasks'):
+                    return 43, index, module == f'pkg.{pkg}.tasks', module
+                if is_submodule(module, f'pkg.{pkg}.manage'):
+                    return 44, index, module == f'pkg.{pkg}.manage', module
+                if is_submodule(module, f'pkg.{pkg}.custom'):
+                    return 45, index, module == f'pkg.{pkg}.custom', module
+                if is_submodule(module, f'pkg.{pkg}.channel'):
+                    return 46, index, module == f'pkg.{pkg}.channel', module
+                if is_submodule(module, f'pkg.{pkg}.whisper'):
+                    return 47, index, module == f'pkg.{pkg}.whisper', module
+                if is_submodule(module, f'pkg.{pkg}.items'):
+                    return 56, index, module == f'pkg.{pkg}.items', module
+                if module == f'pkg.{pkg}.ircmessage':
+                    return 57, index, module == f'pkg.{pkg}.ircmessage', module
+                if module == f'pkg.{pkg}':
+                    return 58, index, module == f'pkg.{pkg}', module
+                if is_submodule(module, f'pkg.{pkg}'):
+                    return 41, index, module == f'pkg.{pkg}', module
+                break
+        return 40, -len(subparts), False, module
+    if module == 'pkg':
+        return 59, 0, module == 'pkg', module
 
     if module.startswith('lists'):
-        return 89, module == 'lists', module
+        return 89, 0, module == 'lists', module
 
     if module == 'source':
-        return 99, module == 'source', module
+        return 99, 0, module == 'source', module
     if is_submodule(module, 'source'):
-        return 20, module == 'source', module
-    return 20, False, module
+        return 30, 0, module == 'source', module
+    return 20, -module.count('.'), False, module
 
 
 async def full_reload(send: Send) -> bool:
