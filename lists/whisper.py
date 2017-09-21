@@ -1,19 +1,28 @@
-﻿from pkg.botgotsthis.items import whisper as publicList
+﻿import importlib
 from collections import ChainMap
+from typing import Any, List, Mapping, Optional  # noqa: F401
+
+import bot
 from source import data
-from typing import Mapping, Optional
-try:
-    from .private import whisper as privateList
-except ImportError:
-    from .private.default import whisper as privateList  # type: ignore
 
 WhisperDict = Mapping[str, Optional[data.WhisperCommand]]
 
 
 def commands() -> WhisperDict:
-    return ChainMap(privateList.commands(), publicList.commands())
+    cmds: List[WhisperDict] = []
+    pkg: str
+    for pkg in bot.globals.pkgs:
+        whisper: Any
+        whisper = importlib.import_module('pkg.' + pkg + '.items.whisper')
+        cmds.append(whisper.commands())
+    return ChainMap(*cmds)
 
 
 def commandsStartWith() -> WhisperDict:
-    return ChainMap(privateList.commandsStartWith(),
-                    publicList.commandsStartWith())
+    cmds: List[WhisperDict] = []
+    pkg: str
+    for pkg in bot.globals.pkgs:
+        whisper: Any
+        whisper = importlib.import_module('pkg.' + pkg + '.items.whisper')
+        cmds.append(whisper.commandsStartWith())
+    return ChainMap(*cmds)
