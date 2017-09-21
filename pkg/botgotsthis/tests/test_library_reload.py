@@ -33,9 +33,6 @@ class TestLibraryReloadReloadable(unittest.TestCase):
         self.assertIs(reloadable('pkg.botgotsthis.autoload'), False)
         self.assertIs(reloadable('pkg.botgotsthis.autoload.test'), False)
         self.assertIs(reloadable('pkg.botgotsthis.autoloadlonger'), True)
-        self.assertIs(reloadable('source.private.autoload'), False)
-        self.assertIs(reloadable('source.private.autoload.test'), False)
-        self.assertIs(reloadable('source.private.autoloadlonger'), True)
 
 
 class TestLibraryReloadIsSubmodule(unittest.TestCase):
