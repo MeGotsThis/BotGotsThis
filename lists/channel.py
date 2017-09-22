@@ -22,7 +22,9 @@ def commands() -> CommandsDict:
     for pkg in bot.globals.pkgs:
         channel: Any
         channel = importlib.import_module('pkg.' + pkg + '.items.channel')
-        cmds.append(channel.commands())
+        ccommands: CommandsDict = channel.commands()
+        if ccommands:
+            cmds.append(ccommands)
     return ChainMap(*cmds)
 
 
@@ -32,7 +34,9 @@ def commandsStartWith() -> CommandsDict:
     for pkg in bot.globals.pkgs:
         channel: Any
         channel = importlib.import_module('pkg.' + pkg + '.items.channel')
-        cmds.append(channel.commandsStartWith())
+        ccommands: CommandsDict = channel.commandsStartWith()
+        if ccommands:
+            cmds.append(ccommands)
     return ChainMap(*cmds)
 
 

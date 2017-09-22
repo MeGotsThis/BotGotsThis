@@ -14,5 +14,7 @@ def methods() -> MethodDict:
     for pkg in bot.globals.pkgs:
         manage: Any
         manage = importlib.import_module('pkg.' + pkg + '.items.manage')
-        mthds.append(manage.methods())
+        mmethods: MethodDict = manage.methods()
+        if mmethods:
+            mthds.append(mmethods)
     return ChainMap(*mthds)
