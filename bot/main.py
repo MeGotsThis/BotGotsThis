@@ -5,7 +5,6 @@ import bot
 import importlib
 import pkgutil
 import types  # noqa: F401
-from itertools import chain
 from importlib.abc import PathEntryFinder  # noqa: F401
 from lib import database
 from lib.data import timezones
@@ -47,7 +46,7 @@ async def initializer() -> None:
             importer: PathEntryFinder
             modname: str
             ispkg: bool
-            for importer, modname, ispkg in chain(modules):
+            for importer, modname, ispkg in modules:
                 importlib.import_module(modname)
         except ModuleNotFoundError:
             pass
