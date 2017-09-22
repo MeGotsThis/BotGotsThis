@@ -39,15 +39,18 @@ async def initializer() -> None:
     pkg: str
     modules: Generator[Tuple[PathEntryFinder, str, bool], None, None]
     for pkg in bot.globals.pkgs:
-        mod: types.ModuleType
-        mod = importlib.import_module('pkg.' + pkg + '.autoload')
-        modules = pkgutil.walk_packages(path=mod.__path__,  # type: ignore
-                                        prefix=mod.__name__ + '.')
-        importer: PathEntryFinder
-        modname: str
-        ispkg: bool
-        for importer, modname, ispkg in chain(modules):
-            importlib.import_module(modname)
+        try:
+            mod: types.ModuleType
+            mod = importlib.import_module('pkg.' + pkg + '.autoload')
+            modules = pkgutil.walk_packages(path=mod.__path__,  # type: ignore
+                                            prefix=mod.__name__ + '.')
+            importer: PathEntryFinder
+            modname: str
+            ispkg: bool
+            for importer, modname, ispkg in chain(modules):
+                importlib.import_module(modname)
+        except ModuleNotFoundError:
+            pass
 
     utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
     bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
