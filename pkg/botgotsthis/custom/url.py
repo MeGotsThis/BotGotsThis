@@ -1,13 +1,11 @@
 ﻿import re
+from contextlib import suppress
+from typing import Iterator, Match, List, Optional  # noqa: F401
 
 import aiohttp
 
 import bot
-import lists.custom
-
-from contextlib import suppress
-from typing import Iterator, Match, List, Optional  # noqa: F401
-
+import lib.items.custom
 from lib.data import CustomCommandField, CustomFieldArgs  # noqa: F401
 
 
@@ -48,7 +46,7 @@ async def field_replace(args: CustomFieldArgs, match: Match[str]) -> str:
                             default=None,
                             )
     fields: Iterator[CustomCommandField]
-    fields = (f for f in lists.custom.fields() if f is not fieldUrl)
+    fields = (f for f in lib.items.custom.fields() if f is not fieldUrl)
     field: CustomCommandField
     for field in fields:
         replacement: Optional[str] = await field(newargs)

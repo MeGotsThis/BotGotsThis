@@ -3,7 +3,7 @@ from datetime import timedelta
 from typing import Awaitable, Callable, Dict, List, Optional  # noqa: F401
 
 import bot
-import lists.custom
+import lib.items.custom
 from bot import utils
 from lib.data import ChatCommandArgs, CustomCommand, CommandActionTokens  # noqa: F401, E501
 from lib.helper import chat, timeout
@@ -181,7 +181,7 @@ async def command_property(args: ChatCommandArgs,
     if len(parts) < 2:
         parts.append(None)
     property, value = parts
-    if property not in lists.custom.properties():
+    if property not in lib.items.custom.properties():
         args.chat.send(f'''\
 {args.nick} -> The property '{property}' does not exist''')
         return True

@@ -130,7 +130,7 @@ class TestFieldReplace(TestCustomField):
         self.addCleanup(patcher.stop)
         self.mock_fieldUrl = patcher.start()
 
-        patcher = patch('lists.custom')
+        patcher = patch('lib.items.custom')
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.fields.return_value = [self.mock_fieldUrl]

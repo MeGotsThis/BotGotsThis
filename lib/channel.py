@@ -1,16 +1,14 @@
 ﻿import asyncio
-
-import lists.channel
-
 from datetime import datetime
 from typing import Iterator, Mapping, Optional, cast  # noqa: F401
 
+import lib.items.channel
 from bot import data as botData, utils  # noqa: F401
 from bot.twitchmessage import IrcMessageTagsReadOnly
-from .data.message import Message
-from .data.permissions import ChatPermissionSet
 from . import data
 from . import database
+from .data.message import Message
+from .data.permissions import ChatPermissionSet
 
 
 # Set up our commands function
@@ -67,16 +65,16 @@ async def chatCommand(chat: 'botData.Channel',
 
 
 def commandsToProcess(command: str) -> Iterator[data.ChatCommand]:
-    yield from lists.channel.filterMessage()
+    yield from lib.items.channel.filterMessage()
     commands: Mapping[str, Optional[data.ChatCommand]]
-    commands = lists.channel.commands()
+    commands = lib.items.channel.commands()
     if command in commands:
         if commands[command] is not None:
             yield commands[command]
-    commands = lists.channel.commandsStartWith()
+    commands = lib.items.channel.commandsStartWith()
     starting: str
     for starting in commands:
         if command.startswith(starting):
             if commands[starting] is not None:
                 yield commands[starting]
-    yield from lists.channel.processNoCommand()
+    yield from lib.items.channel.processNoCommand()

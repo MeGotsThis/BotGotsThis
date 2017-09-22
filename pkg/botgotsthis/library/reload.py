@@ -11,8 +11,7 @@ _reload_lock: asyncio.Lock = asyncio.Lock()
 
 
 def reloadable(module: str) -> bool:
-    include = (module.startswith('lib') or module.startswith('lists')
-               or module.startswith('pkg'))
+    include = (module.startswith('lib') or module.startswith('pkg'))
     match: Optional[Match[str]]
     match = re.fullmatch(r'pkg\.([^\.]+)\.autoload(?:\..+)?', module)
     exclude = (
@@ -78,8 +77,8 @@ def key(module: str) -> Tuple[int, int, bool, str]:
     if module == 'pkg':
         return 59, 0, module == 'pkg', module
 
-    if module.startswith('lists'):
-        return 89, 0, module == 'lists', module
+    if is_submodule(module, 'lib.items'):
+        return 89, 0, module == 'lib.items', module
 
     if module == 'lib':
         return 99, 0, module == 'lib', module

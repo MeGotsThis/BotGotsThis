@@ -19,7 +19,7 @@ class TestLibraryFeatureFeature(asynctest.TestCase):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-        patcher = patch('lists.feature')
+        patcher = patch('lib.items.feature')
         self.addCleanup(patcher.stop)
         self.mock_feature = patcher.start()
         self.mock_feature.features.return_value = {
@@ -104,7 +104,7 @@ class TestLibraryFeatureAdd(asynctest.TestCase):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-        patcher = patch('lists.feature')
+        patcher = patch('lib.items.feature')
         self.addCleanup(patcher.stop)
         self.mock_feature = patcher.start()
         self.mock_feature.features.return_value = {'feature': 'Feature'}
@@ -139,7 +139,7 @@ class TestLibraryFeatureRemove(asynctest.TestCase):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
 
-        patcher = patch('lists.feature')
+        patcher = patch('lib.items.feature')
         self.addCleanup(patcher.stop)
         self.mock_feature = patcher.start()
         self.mock_feature.features.return_value = {'feature': 'Feature'}

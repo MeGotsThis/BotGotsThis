@@ -25,7 +25,7 @@ class TestLibraryManageBot(asynctest.TestCase):
         self.send = Mock(spec=send)
         self.method = CoroutineMock(spec=method, return_value=True)
 
-        patcher = patch('lists.manage')
+        patcher = patch('lib.items.manage')
         self.addCleanup(patcher.stop)
         self.mock_manage = patcher.start()
         self.mock_manage.methods.return_value = {

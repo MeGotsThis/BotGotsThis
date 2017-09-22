@@ -509,7 +509,7 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.assertFalse(self.database.processCustomCommandProperty.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('lists.custom', autospec=True)
+    @patch('lib.items.custom', autospec=True)
     async def test_command_property_empty(self, mock_list):
         mock_list.properties.return_value = []
         input = CommandActionTokens('', self.broadcaster, '',
@@ -521,7 +521,7 @@ class TestChannelCustomProcessCommand(TestChannel):
             StrContains(self.args.nick, 'someproperty', 'property', 'not',
                         'exist'))
 
-    @patch('lists.custom', autospec=True)
+    @patch('lib.items.custom', autospec=True)
     async def test_command_property(self, mock_list):
         mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',
@@ -535,7 +535,7 @@ class TestChannelCustomProcessCommand(TestChannel):
             StrContains(self.args.nick, 'Kappa', 'someproperty', 'PogChamp',
                         'set'))
 
-    @patch('lists.custom', autospec=True)
+    @patch('lib.items.custom', autospec=True)
     async def test_command_property_no_value(self, mock_list):
         mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',
@@ -548,7 +548,7 @@ class TestChannelCustomProcessCommand(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'someproperty', 'unset'))
 
-    @patch('lists.custom', autospec=True)
+    @patch('lib.items.custom', autospec=True)
     async def test_command_property_dberror(self, mock_list):
         mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',

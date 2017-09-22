@@ -1,16 +1,14 @@
 ﻿import asyncio
-
-import lists.whisper
-
 from datetime import datetime
 from typing import Iterator, Mapping, Optional, cast  # noqa: F401
 
+import lib.items.whisper
 from bot import utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
+from . import data
+from . import database
 from .data.message import Message
 from .data.permissions import WhisperPermissionSet
-from . import database
-from . import data
 
 
 # Set up our commands function
@@ -55,11 +53,11 @@ async def whisperCommand(tags: IrcMessageTagsReadOnly,
 
 def commandsToProcess(command: str) -> Iterator[data.WhisperCommand]:
     commands: Mapping[str, Optional[data.WhisperCommand]]
-    commands = lists.whisper.commands()
+    commands = lib.items.whisper.commands()
     if command in commands:
         if commands[command] is not None:
             yield commands[command]
-    commands = lists.whisper.commandsStartWith()
+    commands = lib.items.whisper.commandsStartWith()
     starting: str
     for starting in commands:
         if command.startswith(starting):
