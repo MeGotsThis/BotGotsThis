@@ -140,7 +140,7 @@ class TestChannel(asynctest.TestCase):
 
 class TestChannelCommandToProcess(unittest.TestCase):
     def setUp(self):
-        patcher = patch('lists.channel', autospec=True)
+        patcher = patch('lib.items.channel', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.filterMessage.return_value = []

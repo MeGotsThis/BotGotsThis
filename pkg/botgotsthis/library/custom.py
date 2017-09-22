@@ -1,6 +1,6 @@
 from typing import Dict, Iterable, List, Optional
 
-import lists.custom
+import lib.items.custom
 from lib.data import ChatCommandArgs, CustomFieldArgs, CustomCommand
 from lib.data import CommandActionTokens, CustomCommandField  # noqa: F401
 from lib.data import CustomCommandProcess, CustomFieldParts  # noqa: F401
@@ -97,7 +97,7 @@ async def create_messages(command: CustomCommand,
         command.broadcaster, command.level, args.message.command,
         messages)
     process: CustomCommandProcess
-    for process in lists.custom.postProcess():
+    for process in lib.items.custom.postProcess():
         await process(processArgument)
     return messages
 
@@ -393,7 +393,7 @@ def split_message(message: str) -> Iterable[CustomFieldParts]:
 
 async def convert_field(args: CustomFieldArgs) -> Optional[str]:
     convert: CustomCommandField
-    for convert in lists.custom.fields():
+    for convert in lib.items.custom.fields():
         result: Optional[str] = await convert(args)
         if result is not None:
             return result

@@ -255,7 +255,7 @@ class TestLibraryCustomCreateMessages(asynctest.TestCase):
         self.mock_format = patcher.start()
         self.mock_format.side_effect = lambda string, format, has: string
 
-        patcher = patch('lists.custom', autospec=True)
+        patcher = patch('lib.items.custom', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.postProcess.return_value = []
@@ -963,7 +963,7 @@ class TestLibraryCustomConvertField(asynctest.TestCase):
                                     Mock(spec=ChatPermissionSet),
                                     datetime(2000, 1, 1))
 
-        patcher = patch('lists.custom', autospec=True)
+        patcher = patch('lib.items.custom', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.fields.return_value = []

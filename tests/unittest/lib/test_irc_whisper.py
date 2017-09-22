@@ -91,7 +91,7 @@ class TestWhisper(asynctest.TestCase):
 
 class TestWhisperCommandToProcess(unittest.TestCase):
     def setUp(self):
-        patcher = patch('lists.whisper', autospec=True)
+        patcher = patch('lib.items.whisper', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_list = patcher.start()
         self.mock_list.commands.return_value = {}

@@ -1,9 +1,6 @@
-import asynctest
-
-import lists.manage  # noqa: F401
-
 from datetime import datetime
 
+import asynctest
 from asynctest.mock import MagicMock, Mock
 
 from lib.data import ManageBotArgs

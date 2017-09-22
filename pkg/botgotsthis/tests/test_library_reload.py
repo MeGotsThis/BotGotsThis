@@ -17,8 +17,8 @@ class TestLibraryReloadReloadable(unittest.TestCase):
     def test_source(self):
         self.assertIs(reload.reloadable('lib.ircmessage'), True)
 
-    def test_lists(self):
-        self.assertIs(reload.reloadable('lists.channel'), True)
+    def test_items(self):
+        self.assertIs(reload.reloadable('lib.items.channel'), True)
 
     def test_bot(self):
         self.assertIs(reload.reloadable('bot.utils'), False)
@@ -99,9 +99,9 @@ class TestLibraryReloadKey(unittest.TestCase):
             'pkg.megotsthis',
             'pkg.botgotsthis',
             'pkg',
-            'lists.channel',
-            'lists.whisper',
-            'lists',
+            'lib.items.channel',
+            'lib.items.whisper',
+            'lib.items',
             'lib.irccommand.notice',
             'lib.irccommand',
             'lib.channel',
