@@ -14,7 +14,9 @@ def commands() -> WhisperDict:
     for pkg in bot.globals.pkgs:
         whisper: Any
         whisper = importlib.import_module('pkg.' + pkg + '.items.whisper')
-        cmds.append(whisper.commands())
+        ccommands: WhisperDict = whisper.commands()
+        if ccommands:
+            cmds.append(ccommands)
     return ChainMap(*cmds)
 
 
@@ -24,5 +26,7 @@ def commandsStartWith() -> WhisperDict:
     for pkg in bot.globals.pkgs:
         whisper: Any
         whisper = importlib.import_module('pkg.' + pkg + '.items.whisper')
-        cmds.append(whisper.commandsStartWith())
+        ccommands: WhisperDict = whisper.commandsStartWith()
+        if ccommands:
+            cmds.append(ccommands)
     return ChainMap(*cmds)
