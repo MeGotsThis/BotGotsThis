@@ -808,7 +808,7 @@ class TesEnsureServer(unittest.TestCase):
         self.mock_globals.channels = {
             'botgotsthis': self.channel
             }
-        self.channel.socket = self.mock_globals.clusters['justin']
+        self.channel.connection = self.mock_globals.clusters['justin']
         self.channel.joinPriority = 0
 
     @patch('bot.utils.joinChannel', autospec=True)
