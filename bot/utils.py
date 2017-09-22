@@ -165,7 +165,8 @@ def ensureServer(channel: str,
     if cluster not in bot.globals.clusters:
         partChannel(channel)
         return ENSURE_CLUSTER_UNKNOWN
-    if bot.globals.clusters[cluster] is bot.globals.channels[channel].socket:
+    cluster_: connection.ConnectionHandler = bot.globals.clusters[cluster]
+    if cluster_ is bot.globals.channels[channel].connection:
         if priority is not None:
             bot.globals.channels[channel].joinPriority = float(min(
                 bot.globals.channels[channel].joinPriority, priority))
