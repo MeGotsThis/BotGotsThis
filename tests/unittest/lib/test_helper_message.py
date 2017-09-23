@@ -4,14 +4,6 @@ from unittest.mock import patch
 from lib.helper import message
 
 
-def send(messages):
-    pass
-
-
-def method(args):
-    return True
-
-
 class TestLibraryMessage(unittest.TestCase):
     def setUp(self):
         patcher = patch('bot.config')
