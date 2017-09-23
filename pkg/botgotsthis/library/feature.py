@@ -4,18 +4,7 @@ import lib.items.feature
 from lib.data import Send
 from lib.data.message import Message
 from lib.database import DatabaseMain
-
-enable: Set[str] = {
-    '',
-    'enable',
-    'yes',
-    '1',
-    }
-disable: Set[str] = {
-    'disable',
-    'no',
-    '0',
-    }
+from lib.helper import parser
 
 
 async def feature(database: DatabaseMain,
@@ -30,9 +19,10 @@ async def feature(database: DatabaseMain,
         send('Unrecognized feature: ' + feature_)
         return True
 
-    if action in enable:
+    response: parser.Response = parser.get_response(action, default=parser.Yes)
+    if response == parser.Yes:
         return await feature_add(database, channel, feature_, send)
-    if action in disable:
+    if response == parser.No:
         return await feature_remove(database, channel, feature_, send)
 
     send('Unrecognized second parameter: ' + action)
