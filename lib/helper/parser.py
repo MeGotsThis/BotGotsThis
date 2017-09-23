@@ -1,6 +1,11 @@
 from enum import Enum
 from typing import List, Set  # noqa: F401
 
+twitchUrlRegex: str = (
+    # r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"
+    r"(?:https?:\/\/)?(?:[-a-zA-Z0-9@:%_\+~#=]+\.)+[a-z]{2,6}\b"
+    r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)")
+
 
 class Response(Enum):
     No = False
