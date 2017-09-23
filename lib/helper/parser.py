@@ -64,8 +64,9 @@ def get_response(argument: str, default: Response=Unknown) -> Response:
 
     if not argument:
         return default
-    if argument in yes:
+    lower: str = argument.lower()
+    if lower in yes:
         return Yes
-    if argument in no:
+    if lower in no:
         return No
     return Unknown
