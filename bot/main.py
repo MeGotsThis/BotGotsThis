@@ -41,13 +41,15 @@ async def initializer() -> None:
         try:
             mod: types.ModuleType
             mod = importlib.import_module('pkg.' + pkg + '.autoload')
-            modules = pkgutil.walk_packages(path=mod.__path__,  # type: ignore
-                                            prefix=mod.__name__ + '.')
-            importer: PathEntryFinder
-            modname: str
-            ispkg: bool
-            for importer, modname, ispkg in modules:
-                importlib.import_module(modname)
+            if hasattr(mod, '__path__'):
+                modules = pkgutil.walk_packages(
+                    path=mod.__path__,  # type: ignore
+                    prefix=mod.__name__ + '.')
+                importer: PathEntryFinder
+                modname: str
+                ispkg: bool
+                for importer, modname, ispkg in modules:
+                    importlib.import_module(modname)
         except ModuleNotFoundError:
             pass
 
