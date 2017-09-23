@@ -42,8 +42,6 @@ def key(module: str) -> Tuple[int, int, bool, str]:
 
     if is_submodule(module, 'lib.api'):
         return 10, 0, module == 'lib.api', module
-    if is_submodule(module, 'lib.private.library'):
-        return 15, 0, module == 'lib.private.library', module
 
     match: Optional[Match[str]] = re.fullmatch(r'pkg\.(.+)', module)
     if match is not None:
@@ -53,7 +51,7 @@ def key(module: str) -> Tuple[int, int, bool, str]:
             if pkg in bot.globals.pkgs:
                 index: int = bot.globals.pkgs.index(pkg)
                 if is_submodule(module, f'pkg.{pkg}.library'):
-                    return 42, index, module == f'pkg.{pkg}.library', module
+                    return 41, index, module == f'pkg.{pkg}.library', module
                 if is_submodule(module, f'pkg.{pkg}.tasks'):
                     return 43, index, module == f'pkg.{pkg}.tasks', module
                 if is_submodule(module, f'pkg.{pkg}.manage'):
@@ -71,7 +69,7 @@ def key(module: str) -> Tuple[int, int, bool, str]:
                 if module == f'pkg.{pkg}':
                     return 58, index, module == f'pkg.{pkg}', module
                 if is_submodule(module, f'pkg.{pkg}'):
-                    return 41, index, module == f'pkg.{pkg}', module
+                    return 42, index, module == f'pkg.{pkg}', module
                 break
         return 40, -len(subparts), False, module
     if module == 'pkg':
