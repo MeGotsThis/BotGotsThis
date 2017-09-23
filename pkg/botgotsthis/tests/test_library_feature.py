@@ -6,6 +6,7 @@ from asynctest.mock import Mock, patch
 
 from lib.data.message import Message
 from lib.database import DatabaseMain
+from lib.helper import parser
 from pkg.botgotsthis.library import feature
 from tests.unittest.mock_class import StrContains
 
@@ -15,6 +16,92 @@ def send(messages):
 
 
 class TestLibraryFeatureFeature(asynctest.TestCase):
+    def setUp(self):
+        self.database = Mock(spec=DatabaseMain)
+        self.send = Mock(spec=send)
+
+        patcher = patch('lib.items.feature')
+        self.addCleanup(patcher.stop)
+        self.mock_feature = patcher.start()
+        self.mock_feature.features.return_value = {
+            'feature': 'Feature',
+            'none': None
+            }
+
+        patcher = patch('lib.helper.parser.get_response')
+        self.addCleanup(patcher.stop)
+        self.mock_response = patcher.start()
+
+        patcher = patch('pkg.botgotsthis.library.feature.feature_add')
+        self.addCleanup(patcher.stop)
+        self.mock_add = patcher.start()
+
+        patcher = patch('pkg.botgotsthis.library.feature.feature_remove')
+        self.addCleanup(patcher.stop)
+        self.mock_remove = patcher.start()
+
+    async def test_add(self):
+        self.mock_add.return_value = True
+        self.mock_response.return_value = parser.Yes
+        self.assertIs(
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature feature'), self.send),
+            True)
+        self.assertFalse(self.send.called)
+        self.assertTrue(self.mock_response.called)
+        self.mock_add.assert_called_once_with(
+            self.database, 'botgotsthis', 'feature', self.send)
+        self.assertFalse(self.mock_remove.called)
+
+    async def test_remove(self):
+        self.mock_remove.return_value = True
+        self.mock_response.return_value = parser.No
+        self.assertIs(
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature feature'), self.send),
+            True)
+        self.assertFalse(self.send.called)
+        self.assertTrue(self.mock_response.called)
+        self.mock_remove.assert_called_once_with(
+            self.database, 'botgotsthis', 'feature', self.send)
+        self.assertFalse(self.mock_add.called)
+
+    async def test_not_existing_feature(self):
+        self.assertIs(
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature does_not_exist'),
+                                  self.send),
+            True)
+        self.send.assert_called_once_with(
+            StrContains('feature', 'does_not_exist'))
+        self.assertFalse(self.mock_response.called)
+        self.assertFalse(self.mock_add.called)
+        self.assertFalse(self.mock_remove.called)
+
+    async def test_feature_none(self):
+        self.assertIs(
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature none'), self.send),
+            True)
+        self.send.assert_called_once_with(StrContains('feature', 'none'))
+        self.assertFalse(self.mock_response.called)
+        self.assertFalse(self.mock_add.called)
+        self.assertFalse(self.mock_remove.called)
+
+    async def test_bad_param(self):
+        self.mock_response.return_value = parser.Unknown
+        self.assertIs(
+            await feature.feature(self.database, 'botgotsthis',
+                                  Message('!feature feature Kappa'),
+                                  self.send),
+            True)
+        self.send.assert_called_once_with(StrContains('parameter', 'kappa'))
+        self.assertTrue(self.mock_response.called)
+        self.assertFalse(self.mock_add.called)
+        self.assertFalse(self.mock_remove.called)
+
+
+class TestLibraryFeatureFeature_OLD(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)
