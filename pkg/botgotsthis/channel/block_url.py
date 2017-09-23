@@ -13,12 +13,7 @@ from lib.api import twitch
 from lib.data import ChatCommandArgs
 from lib.data.message import Message
 from lib.helper.chat import feature, permission
-from lib.helper import timeout
-
-twitchUrlRegex: str = (
-    # r"(?:game:(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*))|"
-    r"(?:https?:\/\/)?(?:[-a-zA-Z0-9@:%_\+~#=]+\.)+[a-z]{2,6}\b"
-    r"(?:[-a-zA-Z0-9@:%_\+.~#?&//=]*)")
+from lib.helper import parser, timeout
 
 
 # This is for banning the users who post a URL with no follows
@@ -26,7 +21,7 @@ twitchUrlRegex: str = (
 @permission('bannable')
 @permission('chatModerator')
 async def filterNoUrlForBots(args: ChatCommandArgs) -> bool:
-    if re.search(twitchUrlRegex, str(args.message)):
+    if re.search(parser.twitchUrlRegex, str(args.message)):
         asyncio.ensure_future(
             check_domain_redirect(
                 args.chat, args.nick, args.message, args.timestamp))
@@ -48,7 +43,7 @@ async def check_domain_redirect(chat: 'data.Channel',
     session: aiohttp.ClientSession
     async with aiohttp.ClientSession() as session:
         match: Match[str]
-        for match in re.finditer(twitchUrlRegex, str(message)):
+        for match in re.finditer(parser.twitchUrlRegex, str(message)):
             originalUrl: str = match.group(0)
             url: str = originalUrl
             if (not url.startswith('http://')
