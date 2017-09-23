@@ -46,6 +46,7 @@ class TestLibraryParserGetResponse(unittest.TestCase):
 
     def test_yes(self):
         self.assertEqual(parser.get_response('yes'), parser.Response.Yes)
+        self.assertEqual(parser.get_response('YES'), parser.Response.Yes)
         self.assertEqual(parser.get_response('y'), parser.Response.Yes)
         self.assertEqual(parser.get_response('true'), parser.Response.Yes)
         self.assertEqual(parser.get_response('t'), parser.Response.Yes)
@@ -56,6 +57,7 @@ class TestLibraryParserGetResponse(unittest.TestCase):
 
     def test_no(self):
         self.assertEqual(parser.get_response('no'), parser.Response.No)
+        self.assertEqual(parser.get_response('NO'), parser.Response.No)
         self.assertEqual(parser.get_response('n'), parser.Response.No)
         self.assertEqual(parser.get_response('false'), parser.Response.No)
         self.assertEqual(parser.get_response('f'), parser.Response.No)
