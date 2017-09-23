@@ -1,4 +1,16 @@
-from typing import List
+from enum import Enum
+from typing import List, Set  # noqa: F401
+
+
+class Response(Enum):
+    No = False
+    Yes = True
+    Unknown = None
+
+
+Yes = Response.Yes
+No = Response.No
+Unknown = Response.Unknown
 
 
 def parseArguments(arguments: str) -> List[str]:
@@ -26,3 +38,34 @@ def parseArguments(arguments: str) -> List[str]:
     if subWord:
         argumentList.append(''.join(subWord))
     return argumentList
+
+
+def get_response(argument: str, default: Response=Unknown) -> Response:
+    yes: Set[str] = {
+        'yes',
+        'y',
+        'true',
+        't',
+        'enable',
+        'e',
+        'on',
+        '1',
+    }
+    no: Set[str] = {
+        'no',
+        'n',
+        'false',
+        'f',
+        'disable',
+        'd',
+        'off',
+        '0',
+    }
+
+    if not argument:
+        return default
+    if argument in yes:
+        return Yes
+    if argument in no:
+        return No
+    return Unknown
