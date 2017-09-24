@@ -7,7 +7,7 @@ from lib.data.message import Message
 from tests.unittest.mock_class import IterableMatch, StrContains
 
 # Needs to be imported last
-from pkg.botgotsthis.channel import wall
+from ..channel import wall
 
 
 class TestChannelWall(TestChannel):
@@ -22,7 +22,7 @@ class TestChannelWall(TestChannel):
         self.mock_config = patcher.start()
         self.mock_config.messageLimit = 100
 
-        patcher = patch('pkg.botgotsthis.channel.wall.process_wall')
+        patcher = patch('pkg.spam.channel.wall.process_wall')
         self.addCleanup(patcher.stop)
         self.mock_process = patcher.start()
 
