@@ -8,7 +8,6 @@ from ..channel import feature
 from ..channel import mod
 from ..channel import owner
 from ..channel import reload
-from ..channel import repeat
 from ..channel import textformat
 
 
@@ -34,7 +33,6 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!leave': broadcaster.commandLeave,
             '!feature': feature.commandFeature,
             '!empty': broadcaster.commandEmpty,
-            '!autorepeat': repeat.commandAutoRepeat,
             '!status': mod.commandStatus,
             '!title': mod.commandStatus,
             '!game': mod.commandGame,
@@ -100,7 +98,6 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
 def commandsStartWith() -> Mapping[str, Optional[data.ChatCommand]]:
     if not hasattr(commandsStartWith, 'commands'):
         setattr(commandsStartWith, 'commands', {
-            '!autorepeat-': repeat.commandAutoRepeat,
             '!settimeoutlevel-': broadcaster.commandSetTimeoutLevel,
             })
     return getattr(commandsStartWith, 'commands')

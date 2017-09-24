@@ -1,5 +1,4 @@
-from .autoload import twitch  # noqa: F401
-from .autoload import emotes  # noqa: F401
+from . import autoload  # noqa: F401
 
 from .items import channel  # noqa: F401
 from .items import whisper  # noqa: F401

@@ -12,6 +12,7 @@ nohup.out
 src/*
 pkg/*
 !pkg/botgotsthis
+!pkg/repeat
 !pkg/spam
 !pkg/base-pkg
 
