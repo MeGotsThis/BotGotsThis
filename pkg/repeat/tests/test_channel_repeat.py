@@ -29,7 +29,8 @@ class TestChannelRepeat(TestChannel):
         mock_process.assert_called_once_with(self.args, None)
 
     async def test_process_false(self):
-        self.assertIs(await channel.process_auto_repeat(self.args, None), False)
+        self.assertIs(await channel.process_auto_repeat(self.args, None),
+                      False)
         self.assertFalse(self.database.listAutoRepeat.called)
         self.assertFalse(self.database.clearAutoRepeat.called)
         self.assertFalse(self.database.removeAutoRepeat.called)
@@ -38,7 +39,8 @@ class TestChannelRepeat(TestChannel):
 
     async def test_process_error(self):
         self.args = self.args._replace(message=Message('!autorepeat abc'))
-        self.assertIs(await channel.process_auto_repeat(self.args, None), False)
+        self.assertIs(await channel.process_auto_repeat(self.args, None),
+                      False)
         self.assertFalse(self.database.listAutoRepeat.called)
         self.assertFalse(self.database.clearAutoRepeat.called)
         self.assertFalse(self.database.removeAutoRepeat.called)
@@ -146,7 +148,8 @@ class TestChannelRepeat(TestChannel):
     async def test_process_name_error(self):
         self.args = self.args._replace(
             message=Message('!autorepeat name=kappa abc'))
-        self.assertIs(await channel.process_auto_repeat(self.args, None), False)
+        self.assertIs(await channel.process_auto_repeat(self.args, None),
+                      False)
         self.assertFalse(self.database.listAutoRepeat.called)
         self.assertFalse(self.database.clearAutoRepeat.called)
         self.assertFalse(self.database.removeAutoRepeat.called)
