@@ -1,7 +1,6 @@
 ﻿from typing import Iterable, Mapping, Optional
 
 from lib import data
-from ..channel import block_url
 from ..channel import broadcaster
 from ..channel import custom
 from ..channel import feature
@@ -11,7 +10,7 @@ from ..channel import reload
 
 
 def filterMessage() -> Iterable[data.ChatCommand]:
-    yield block_url.filterNoUrlForBots
+    return []
 
 
 def commands() -> Mapping[str, Optional[data.ChatCommand]]:
@@ -37,7 +36,6 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!game': mod.commandGame,
             '!setgame': mod.commandRawGame,
             '!community': mod.commandCommunity,
-            '!purge': mod.commandPurge,
             '!permit': mod.commandPermit,
             '!command': custom.commandCommand,
             '!come': broadcaster.commandCome,
