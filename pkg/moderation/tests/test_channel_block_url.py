@@ -1,11 +1,9 @@
 import unittest
+from datetime import datetime
 
 import aiohttp
 import asynctest
 import yarl
-
-from datetime import datetime
-
 from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
@@ -15,10 +13,10 @@ from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import StrContains, TypeMatch
 
 # Needs to be imported last
-from pkg.botgotsthis.channel import block_url
+from ..channel import block_url
 
 
-@patch('pkg.botgotsthis.channel.block_url.check_domain_redirect')
+@patch('pkg.moderation.channel.block_url.check_domain_redirect')
 class TestChannelBlockUrlFilterNoUrl(TestChannel):
     async def test_nomod(self, mock_check):
         self.features.append('nourlredirect')
@@ -69,14 +67,14 @@ class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_except = patcher.start()
 
-        patcher = patch('pkg.botgotsthis.channel.block_url.compare_domains',
+        patcher = patch('pkg.moderation.channel.block_url.compare_domains',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_compare = patcher.start()
         self.mock_compare.return_value = False
 
         patcher = patch(
-            'pkg.botgotsthis.channel.block_url.handle_different_domains')
+            'pkg.moderation.channel.block_url.handle_different_domains')
         self.addCleanup(patcher.stop)
         self.mock_handle = patcher.start()
 

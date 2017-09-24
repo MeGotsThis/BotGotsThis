@@ -1,7 +1,6 @@
-﻿from typing import List, Optional, cast  # noqa: F401
+﻿from typing import List, Optional  # noqa: F401
 
 import bot
-from lib import database
 from lib.api import oauth, twitch
 from lib.data import ChatCommandArgs
 from lib.helper.chat import min_args, permission_not_feature, permission
@@ -90,22 +89,6 @@ Communities not set, they may not exist on Twitch''')
             args.chat.send('Channel Community has been unset')
     else:
         args.chat.send('Channel Community failed to set')
-    return True
-
-
-@permission('moderator')
-@permission('chatModerator')
-@min_args(2)
-async def commandPurge(args: ChatCommandArgs) -> bool:
-    user: str = args.message[1]
-    reason: str = args.message[2:]
-    args.chat.send(f'.timeout {user} 1 {reason}')
-    db_: database.Database
-    async with database.get_database(database.Schema.Timeout) as db_:
-        db: database.DatabaseTimeout = cast(database.DatabaseTimeout, db_)
-        await db.recordTimeout(
-            args.chat.channel, args.message.lower[1], args.nick, 'purge', None,
-            1, str(args.message), reason if reason else None)
     return True
 
 

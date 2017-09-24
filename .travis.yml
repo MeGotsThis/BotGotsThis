@@ -28,6 +28,7 @@ script:
   - python -m unittest discover -s ./tests/integrationtest -t ./ -p test_*.py
   - mypy main.py
   - mypy pkg/botgotsthis/mypy-test.py
+  - mypy pkg/moderation/mypy-test.py
   - mypy pkg/repeat/mypy-test.py
   - mypy pkg/textformat/mypy-test.py
   - mypy pkg/spam/mypy-test.py
