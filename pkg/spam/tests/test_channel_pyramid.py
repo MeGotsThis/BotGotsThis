@@ -7,7 +7,7 @@ from lib.data.message import Message
 from tests.unittest.mock_class import IterableMatch, StrContains
 
 # Needs to be imported last
-from pkg.botgotsthis.channel import pyramid
+from ..channel import pyramid
 
 
 class TestChannelPyramid(TestChannel):
@@ -17,7 +17,7 @@ class TestChannelPyramid(TestChannel):
         self.permissions.globalModerator = False
         self.permissions.chatModerator = False
 
-        patcher = patch('pkg.botgotsthis.channel.pyramid.process_pyramid')
+        patcher = patch('pkg.spam.channel.pyramid.process_pyramid')
         self.addCleanup(patcher.stop)
         self.mock_process = patcher.start()
 

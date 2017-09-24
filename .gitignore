@@ -12,6 +12,7 @@ nohup.out
 src/*
 pkg/*
 !pkg/botgotsthis
+!pkg/spam
 !pkg/base-pkg
 
 # Ignoring sqlite databases
