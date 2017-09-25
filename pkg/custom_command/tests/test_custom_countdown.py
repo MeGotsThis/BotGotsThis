@@ -27,7 +27,7 @@ class TimeZone(tzinfo):
 class TestCustomCommandCustomCountdownParse(unittest.TestCase):
     def setUp(self):
 
-        patcher = patch('pkg.custom_command.custom.countdown.timezones',
+        patcher = patch(countdown.__name__ + '.timezones',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_timezones = patcher.start()
@@ -995,9 +995,8 @@ class TestCustomCommandCustomCountdownFieldCountdown(TestCustomField):
         super().setUp()
         self.args = self.args._replace(field='countdown', param='')
 
-        patcher = patch(
-            'pkg.custom_command.custom.countdown.parse_next_past_cooldown',
-            autospec=True)
+        patcher = patch(countdown.__name__ + '.parse_next_past_cooldown',
+                        autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_parse = patcher.start()
         self.mock_parse.return_value = countdown.NextPastCooldown(None, None,
@@ -1216,9 +1215,8 @@ class TestCustomCommandCustomCountdownFieldSince(TestCustomField):
         super().setUp()
         self.args = self.args._replace(field='since', param='')
 
-        patcher = patch(
-            'pkg.custom_command.custom.countdown.parse_next_past_cooldown',
-            autospec=True)
+        patcher = patch(countdown.__name__ + '.parse_next_past_cooldown',
+                        autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_parse = patcher.start()
         self.mock_parse.return_value = countdown.NextPastCooldown(None, None,
@@ -1433,9 +1431,8 @@ class TestCustomCommandCustomCountdownFieldNext(TestCustomField):
         super().setUp()
         self.args = self.args._replace(field='next', param='')
 
-        patcher = patch(
-            'pkg.custom_command.custom.countdown.parse_next_past_cooldown',
-            autospec=True)
+        patcher = patch(countdown.__name__ + '.parse_next_past_cooldown',
+                        autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_parse = patcher.start()
         self.mock_parse.return_value = countdown.NextPastCooldown(None, None,
@@ -1638,9 +1635,8 @@ class TestCustomCommandCustomCountdownFieldPrevious(TestCustomField):
         super().setUp()
         self.args = self.args._replace(field='previous', param='')
 
-        patcher = patch(
-            'pkg.custom_command.custom.countdown.parse_next_past_cooldown',
-            autospec=True)
+        patcher = patch(countdown.__name__ + '.parse_next_past_cooldown',
+                        autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_parse = patcher.start()
         self.mock_parse.return_value = countdown.NextPastCooldown(None, None,

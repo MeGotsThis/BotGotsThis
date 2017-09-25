@@ -22,7 +22,7 @@ class TestSpamChannelWall(TestChannel):
         self.mock_config = patcher.start()
         self.mock_config.messageLimit = 100
 
-        patcher = patch('pkg.spam.channel.wall.process_wall')
+        patcher = patch(wall.__name__ + '.process_wall')
         self.addCleanup(patcher.stop)
         self.mock_process = patcher.start()
 

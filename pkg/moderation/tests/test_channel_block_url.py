@@ -16,7 +16,7 @@ from tests.unittest.mock_class import StrContains, TypeMatch
 from ..channel import block_url
 
 
-@patch('pkg.moderation.channel.block_url.check_domain_redirect')
+@patch(block_url.__name__ + '.check_domain_redirect')
 class TestModerationChannelBlockUrlFilterNoUrl(TestChannel):
     async def test_nomod(self, mock_check):
         self.features.append('nourlredirect')
@@ -67,14 +67,12 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_except = patcher.start()
 
-        patcher = patch('pkg.moderation.channel.block_url.compare_domains',
-                        autospec=True)
+        patcher = patch(block_url.__name__ + '.compare_domains', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_compare = patcher.start()
         self.mock_compare.return_value = False
 
-        patcher = patch(
-            'pkg.moderation.channel.block_url.handle_different_domains')
+        patcher = patch(block_url.__name__ + '.handle_different_domains')
         self.addCleanup(patcher.stop)
         self.mock_handle = patcher.start()
 

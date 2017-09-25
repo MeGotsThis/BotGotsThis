@@ -4,11 +4,12 @@ from tests.unittest.base_channel import TestChannel
 from lib.data.message import Message
 
 # Needs to be imported last
+from .. import library
 from .. import channel
 
 
 class TestFeatureChannel(TestChannel):
-    @patch('pkg.feature.library.feature')
+    @patch(library.__name__ + '.feature')
     async def test_feature(self, mock_feature):
         self.assertIs(await channel.commandFeature(self.args), False)
         self.assertFalse(mock_feature.called)

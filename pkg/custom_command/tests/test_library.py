@@ -240,17 +240,17 @@ class TestCustomCommandLibraryCustomCreateMessages(asynctest.TestCase):
                                     'botgotsthis', Message('Kappa'),
                                     self.permissions, self.now)
 
-        patcher = patch('pkg.custom_command.library.split_message',
+        patcher = patch(library.__name__ + '.split_message',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_split = patcher.start()
 
-        patcher = patch('pkg.custom_command.library.convert_field')
+        patcher = patch(library.__name__ + '.convert_field')
         self.addCleanup(patcher.stop)
         self.mock_convert = patcher.start()
         self.mock_convert.side_effect = lambda args: args.default
 
-        patcher = patch('pkg.custom_command.library.format', autospec=True)
+        patcher = patch(library.__name__ + '.format', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_format = patcher.start()
         self.mock_format.side_effect = lambda string, format, has: string
