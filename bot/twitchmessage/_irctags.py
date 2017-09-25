@@ -1,6 +1,6 @@
 from collections.abc import Mapping as MappingAbc
 from collections.abc import MutableMapping as MutableMappingAbc
-from typing import Any, Dict, Hashable, Iterable, Iterator, List, Mapping  # noqa: F401, E501
+from typing import Any, Dict, Hashable, Iterable, Iterator, List, Mapping  # noqa: F401,E501
 from typing import NamedTuple, Optional, Sequence, Tuple, Union  # noqa: F401
 
 KeyParam = Union['IrcMessageTagsKey', str]

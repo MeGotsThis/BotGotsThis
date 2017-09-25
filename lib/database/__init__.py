@@ -7,7 +7,7 @@ from typing import Dict, Type  # noqa: F401
 
 from ._base import Database
 from .main import DatabaseMain
-from .main import AutoJoinChannel, AutoRepeatList, AutoRepeatMessage  # noqa: F401, E501
+from .main import AutoJoinChannel, AutoRepeatList, AutoRepeatMessage  # noqa: F401,E501
 from .main import CommandProperty, CommandReturn  # noqa: F401
 from .oauth import DatabaseOAuth
 from .timeout import DatabaseTimeout

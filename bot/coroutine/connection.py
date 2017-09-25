@@ -5,7 +5,7 @@ import lib.ircmessage
 
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Any, Deque, Dict, List, Optional, Tuple, no_type_check  # noqa: F401, E501
+from typing import Any, Deque, Dict, List, Optional, Tuple, no_type_check  # noqa: F401,E501
 
 
 from bot import data, utils

@@ -3,7 +3,7 @@ from bot import data, utils  # noqa: F401
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timedelta
-from typing import Dict, Iterable, Mapping, List, Optional, Union, cast  # noqa: F401, E501
+from typing import Dict, Iterable, Mapping, List, Optional, Union, cast  # noqa: F401,E501
 from lib import database
 
 

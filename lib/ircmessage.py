@@ -1,6 +1,6 @@
 ﻿import importlib
 from datetime import datetime
-from typing import Any, Callable, Dict, Mapping, List, Optional, Union  # noqa: F401, E501
+from typing import Any, Callable, Dict, Mapping, List, Optional, Union  # noqa: F401,E501
 
 import bot
 from bot import data, utils  # noqa: F401

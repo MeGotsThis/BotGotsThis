@@ -2,7 +2,7 @@ import aioodbc.cursor  # noqa: F401
 import pyodbc
 
 from datetime import datetime
-from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple  # noqa: F401, E501
+from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple  # noqa: F401,E501
 from typing import Optional, Sequence, Set, Tuple, TypeVar, Union  # noqa: F401
 from typing import overload
 
@@ -627,20 +627,20 @@ INSERT INTO banned_channels_log
     async def getChatProperty(self,
                               broadcaster: str,
                               property: str) -> Optional[str]: ...
-    @overload  # noqa: F811, E301
+    @overload  # noqa: F811,E301
     async def getChatProperty(self,
                               broadcaster: str,
                               property: str,
                               default: T
                               ) -> Union[str, T]: ...
-    @overload  # noqa: F811, E301
+    @overload  # noqa: F811,E301
     async def getChatProperty(self,
                               broadcaster: str,
                               property: str,
                               default: T,
                               parse: Callable[[str], S]
                               ) -> Union[T, S]: ...
-    async def getChatProperty(self,  # type: ignore  # noqa: F811, E301
+    async def getChatProperty(self,  # type: ignore  # noqa: F811,E301
                               broadcaster,
                               property,
                               default=None,
@@ -662,47 +662,47 @@ SELECT value FROM chat_properties WHERE broadcaster=? AND property=?'''
                                 broadcaster: str,
                                 properties: Sequence[str]
                                 ) -> Mapping[str, Optional[str]]: ...
-    @overload  # noqa: F811, E301
+    @overload  # noqa: F811,E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: T
                                 ) -> Mapping[str, Union[str, T]]: ...
-    @overload  # noqa: F811, E301
+    @overload  # noqa: F811,E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: Mapping[str, T]
                                 ) -> Mapping[str, Union[str, T]]: ...
-    @overload  # noqa: F811, E301
+    @overload  # noqa: F811,E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: T,
                                 parse: Mapping[str, Callable[[str], S]]
                                 ) -> Mapping[str, Union[str, T, S]]: ...
-    @overload  # noqa: F811, E301
+    @overload  # noqa: F811,E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: T,
                                 parse: Callable[[str], S]
                                 ) -> Mapping[str, Union[T, S]]: ...
-    @overload  # noqa: F811, E301
+    @overload  # noqa: F811,E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: Mapping[str, T],
                                 parse: Mapping[str, Callable[[str], S]]
                                 ) -> Mapping[str, Union[str, T, S]]: ...
-    @overload  # noqa: F811, E301
+    @overload  # noqa: F811,E301
     async def getChatProperties(self,
                                 broadcaster: str,
                                 properties: Sequence[str],
                                 default: Mapping[str, T],
                                 parse: Callable[[str], S]
                                 ) -> Mapping[str, Union[T, S]]: ...
-    async def getChatProperties(self,  # type: ignore  # noqa: F811, E301
+    async def getChatProperties(self,  # type: ignore  # noqa: F811,E301
                                 broadcaster,
                                 properties,
                                 default=None,

@@ -1,4 +1,4 @@
-import aioodbc.cursor  # noqa: F401, E501
+import aioodbc.cursor  # noqa: F401,E501
 
 from typing import AsyncIterator, List, Tuple, cast
 
