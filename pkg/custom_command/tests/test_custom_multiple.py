@@ -1,7 +1,7 @@
 from tests.unittest.base_custom import TestCustomProcess
 
 # Needs to be imported last
-from pkg.botgotsthis.custom import multiple
+from ..custom import multiple
 
 
 class TestCustomMultiple(TestCustomProcess):

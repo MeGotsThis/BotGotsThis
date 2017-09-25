@@ -2,7 +2,7 @@ from lib.data.message import Message
 from tests.unittest.base_custom import TestCustomField
 
 # Needs to be imported last
-from pkg.botgotsthis.custom import query
+from ..custom import query
 
 
 class TestCustomQuery(TestCustomField):

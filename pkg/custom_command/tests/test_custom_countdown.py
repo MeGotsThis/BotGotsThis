@@ -10,7 +10,7 @@ from tests.unittest.base_custom import TestCustomField
 # Needs to be imported last
 from lib.data import timezones
 from lib.data.timedelta import format
-from pkg.botgotsthis.custom import countdown
+from ..custom import countdown
 
 
 class TimeZone(tzinfo):
@@ -27,7 +27,7 @@ class TimeZone(tzinfo):
 class TestCustomCountdownParse(unittest.TestCase):
     def setUp(self):
 
-        patcher = patch('pkg.botgotsthis.custom.countdown.timezones',
+        patcher = patch('pkg.custom_command.custom.countdown.timezones',
                         autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_timezones = patcher.start()
@@ -996,7 +996,7 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
         self.args = self.args._replace(field='countdown', param='')
 
         patcher = patch(
-            'pkg.botgotsthis.custom.countdown.parse_next_past_cooldown',
+            'pkg.custom_command.custom.countdown.parse_next_past_cooldown',
             autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_parse = patcher.start()
@@ -1217,7 +1217,7 @@ class TestCustomCountdownFieldSince(TestCustomField):
         self.args = self.args._replace(field='since', param='')
 
         patcher = patch(
-            'pkg.botgotsthis.custom.countdown.parse_next_past_cooldown',
+            'pkg.custom_command.custom.countdown.parse_next_past_cooldown',
             autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_parse = patcher.start()
@@ -1434,7 +1434,7 @@ class TestCustomCountdownFieldNext(TestCustomField):
         self.args = self.args._replace(field='next', param='')
 
         patcher = patch(
-            'pkg.botgotsthis.custom.countdown.parse_next_past_cooldown',
+            'pkg.custom_command.custom.countdown.parse_next_past_cooldown',
             autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_parse = patcher.start()
@@ -1639,7 +1639,7 @@ class TestCustomCountdownFieldPrevious(TestCustomField):
         self.args = self.args._replace(field='previous', param='')
 
         patcher = patch(
-            'pkg.botgotsthis.custom.countdown.parse_next_past_cooldown',
+            'pkg.custom_command.custom.countdown.parse_next_past_cooldown',
             autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_parse = patcher.start()

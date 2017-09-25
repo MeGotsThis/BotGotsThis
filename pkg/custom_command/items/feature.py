@@ -4,6 +4,6 @@
 def features() -> Mapping[str, Optional[str]]:
     if not hasattr(features, 'features'):
         setattr(features, 'features', {
-            'gamestatusbroadcaster': '!game and !status only for broadcaster',
+            'nocustom': 'Disable Custom Commands',
         })
     return getattr(features, 'features')

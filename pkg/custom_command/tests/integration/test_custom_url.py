@@ -4,7 +4,7 @@ from asynctest.mock import MagicMock, patch
 
 from tests.unittest.base_custom import TestCustomField
 from lib.data.message import Message
-from pkg.botgotsthis.custom import url
+from ...custom import url
 
 
 class TestCustomUrl(TestCustomField):
@@ -39,7 +39,7 @@ class TestCustomUrl(TestCustomField):
         patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
-        self.mock_globals.pkgs = ['botgotsthis']
+        self.mock_globals.pkgs = ['custom_command']
 
     async def test_query(self):
         self.args = self.args._replace(param='http://localhost/{query}')
