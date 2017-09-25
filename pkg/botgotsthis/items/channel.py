@@ -2,7 +2,6 @@
 
 from lib import data
 from ..channel import broadcaster
-from ..channel import feature
 from ..channel import mod
 from ..channel import owner
 from ..channel import reload
@@ -27,7 +26,6 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!say': owner.commandSay,
             '!hello': broadcaster.commandHello,
             '!leave': broadcaster.commandLeave,
-            '!feature': feature.commandFeature,
             '!empty': broadcaster.commandEmpty,
             '!permit': mod.commandPermit,
             '!come': broadcaster.commandCome,

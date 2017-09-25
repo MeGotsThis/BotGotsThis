@@ -15,7 +15,7 @@ def send(messages):
     pass
 
 
-class TestLibraryFeatureFeature(asynctest.TestCase):
+class TestFeatureLibrary(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.send = Mock(spec=send)

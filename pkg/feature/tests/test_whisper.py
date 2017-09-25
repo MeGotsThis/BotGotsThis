@@ -6,18 +6,18 @@ from tests.unittest.base_whisper import TestWhisper
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last
-from pkg.botgotsthis.whisper import feature
+from .. import whisper
 
 
-class TestWhisperFeature(TestWhisper):
-    @patch('pkg.botgotsthis.library.feature.feature')
+class TestFeatureWhisper(TestWhisper):
+    @patch('pkg.feature.library.feature')
     async def test_feature(self, mock_feature):
-        self.assertIs(await feature.commandFeature(self.args), False)
+        self.assertIs(await whisper.commandFeature(self.args), False)
         self.assertFalse(mock_feature.called)
         mock_feature.return_value = True
         message = Message('!feature feature')
         args = self.args._replace(message=message)
-        self.assertIs(await feature.commandFeature(args), True)
+        self.assertIs(await whisper.commandFeature(args), True)
         mock_feature.assert_called_once_with(
             self.database, 'botgotsthis', message,
             PartialMatch(bot.utils.whisper, 'botgotsthis'))

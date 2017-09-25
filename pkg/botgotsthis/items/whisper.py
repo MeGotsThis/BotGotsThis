@@ -1,5 +1,5 @@
 ﻿from lib import data
-from ..whisper import broadcaster, feature, owner, reload
+from ..whisper import broadcaster, owner, reload
 from typing import Mapping, Optional
 
 
@@ -21,7 +21,6 @@ def commands() -> Mapping[str, Optional[data.WhisperCommand]]:
             '!empty': broadcaster.commandEmpty,
             '!come': broadcaster.commandCome,
             '!autojoin': broadcaster.commandAutoJoin,
-            '!feature': feature.commandFeature,
             })
     return getattr(commands, 'commands')
 
