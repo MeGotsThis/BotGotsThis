@@ -1,5 +1,6 @@
 ﻿from lib.data import ChatCommandArgs
-from lib.helper.chat import min_args, permission
+from lib.helper.chat import min_args, permission, send
+from ..library import chat
 
 
 @permission('moderator')
@@ -27,4 +28,16 @@ async def commandPermit(args: ChatCommandArgs) -> bool:
         else:
             msg = f'{mod} -> Error'
     args.chat.send(msg)
+    return True
+
+
+@permission('broadcaster')
+async def commandEmpty(args: ChatCommandArgs) -> bool:
+    return chat.empty(args.chat.channel, send(args.chat))
+
+
+@permission('broadcaster')
+async def commandSetTimeoutLevel(args: ChatCommandArgs) -> bool:
+    await chat.set_timeout_level(args.database, args.chat.channel,
+                                 send(args.chat), args.message)
     return True

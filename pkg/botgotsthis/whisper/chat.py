@@ -1,7 +1,7 @@
 ﻿from lib.data import WhisperCommandArgs
 from lib.helper.whisper import send
-from ..library import broadcaster
+from ..library import chat
 
 
 async def commandEmpty(args: WhisperCommandArgs) -> bool:
-    return broadcaster.empty(args.nick, send(args.nick))
+    return chat.empty(args.nick, send(args.nick))
