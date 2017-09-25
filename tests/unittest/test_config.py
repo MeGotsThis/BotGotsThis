@@ -62,7 +62,6 @@ twitchSecret =
 redirectUri = 
 
 [PKG]
-botgotsthis = 1
 '''  # noqa: W291
 
 
