@@ -5,11 +5,12 @@ from lib.data.message import Message
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last
+from ..library import channel, exit, managebot
 from ..channel import owner
 
 
 class TestChannelOwner(TestChannel):
-    @patch('pkg.botgotsthis.library.exit.exit')
+    @patch(exit.__name__ + '.exit')
     async def test_exit(self, mock_exit):
         self.assertIs(await owner.commandExit(self.args), False)
         self.assertFalse(mock_exit.called)
@@ -20,7 +21,7 @@ class TestChannelOwner(TestChannel):
         mock_exit.assert_called_once_with(
             PartialMatch(self.channel.send, priority=0))
 
-    @patch('pkg.botgotsthis.library.channel.say')
+    @patch(channel.__name__ + '.say')
     async def test_say(self, mock_say):
         self.assertIs(await owner.commandSay(self.args), False)
         self.assertFalse(mock_say.called)
@@ -31,7 +32,7 @@ class TestChannelOwner(TestChannel):
         self.assertIs(await owner.commandSay(args), True)
         mock_say.assert_called_once_with('botgotsthis', 'megotsthis', 'Kappa')
 
-    @patch('pkg.botgotsthis.library.channel.join')
+    @patch(channel.__name__ + '.join')
     async def test_join(self, mock_join):
         self.assertIs(await owner.commandJoin(self.args), False)
         self.assertFalse(mock_join.called)
@@ -43,7 +44,7 @@ class TestChannelOwner(TestChannel):
         mock_join.assert_called_once_with(self.database, 'megotsthis',
                                           self.channel.send)
 
-    @patch('pkg.botgotsthis.library.channel.part')
+    @patch(channel.__name__ + '.part')
     async def test_part(self, mock_part):
         self.assertIs(await owner.commandPart(self.args), False)
         self.assertFalse(mock_part.called)
@@ -54,7 +55,7 @@ class TestChannelOwner(TestChannel):
         self.assertIs(await owner.commandPart(args), True)
         mock_part.assert_called_once_with('megotsthis', self.channel.send)
 
-    @patch('pkg.botgotsthis.library.channel.empty_all')
+    @patch(channel.__name__ + '.empty_all')
     async def test_empty_all(self, mock_empty_all):
         self.assertIs(await owner.commandEmptyAll(self.args), False)
         self.assertFalse(mock_empty_all.called)
@@ -64,7 +65,7 @@ class TestChannelOwner(TestChannel):
         self.assertIs(await owner.commandEmptyAll(self.args), True)
         mock_empty_all.assert_called_once_with(self.channel.send)
 
-    @patch('pkg.botgotsthis.library.channel.empty')
+    @patch(channel.__name__ + '.empty')
     async def test_empty(self, mock_empty):
         self.assertIs(await owner.commandEmpty(self.args), False)
         self.assertFalse(mock_empty.called)
@@ -75,7 +76,7 @@ class TestChannelOwner(TestChannel):
         self.assertIs(await owner.commandEmpty(args), True)
         mock_empty.assert_called_once_with('megotsthis', self.channel.send)
 
-    @patch('pkg.botgotsthis.library.managebot.manage_bot')
+    @patch(managebot.__name__ + '.manage_bot')
     async def test_manage_bot(self, mock_manage_bot):
         self.assertIs(await owner.commandManageBot(self.args), False)
         self.assertFalse(mock_manage_bot.called)

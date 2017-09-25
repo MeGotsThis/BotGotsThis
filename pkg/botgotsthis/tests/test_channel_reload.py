@@ -4,11 +4,12 @@ from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last
+from ..library import reload as reload_library
 from ..channel import reload
 
 
 class TestChannelReload(TestChannel):
-    @patch('pkg.botgotsthis.library.reload.full_reload')
+    @patch(reload_library.__name__ + '.full_reload')
     async def test_reload(self, mock_reload):
         self.assertIs(await reload.commandReload(self.args), False)
         self.assertFalse(mock_reload.called)
@@ -19,7 +20,7 @@ class TestChannelReload(TestChannel):
         mock_reload.assert_called_once_with(
             PartialMatch(self.channel.send, priority=0))
 
-    @patch('pkg.botgotsthis.library.reload.reload_commands')
+    @patch(reload_library.__name__ + '.reload_commands')
     async def test_reload_commands(self, mock_reload):
         self.assertIs(await reload.commandReloadCommands(self.args), False)
         self.assertFalse(mock_reload.called)
@@ -30,7 +31,7 @@ class TestChannelReload(TestChannel):
         mock_reload.assert_called_once_with(
             PartialMatch(self.channel.send, priority=0))
 
-    @patch('pkg.botgotsthis.library.reload.reload_config')
+    @patch(reload_library.__name__ + '.reload_config')
     async def test_reload_config(self, mock_reload):
         self.assertIs(await reload.commandReloadConfig(self.args), False)
         self.assertFalse(mock_reload.called)

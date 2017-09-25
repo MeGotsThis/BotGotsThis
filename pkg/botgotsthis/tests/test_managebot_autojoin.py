@@ -35,7 +35,7 @@ class TestManageBotAutoJoin(TestManageBot):
         self.assertFalse(self.send.called)
         self.database.isChannelBannedReason.assert_called_with('no_arg')
 
-    @patch('pkg.botgotsthis.manage.autojoin.reload_server')
+    @patch(autojoin.__name__ + '.reload_server')
     async def test_banned_channel(self, mock_reload):
         self.database.isChannelBannedReason.return_value = 'Reason'
         mock_reload.return_value = True
@@ -44,7 +44,7 @@ class TestManageBotAutoJoin(TestManageBot):
         self.assertIs(await autojoin.manageAutoJoin(args), True)
         self.send.assert_called_once_with(StrContains('banned_channel', 'ban'))
 
-    @patch('pkg.botgotsthis.manage.autojoin.reload_server')
+    @patch(autojoin.__name__ + '.reload_server')
     async def test_banned_channel_blank(self, mock_reload):
         self.database.isChannelBannedReason.return_value = ''
         mock_reload.return_value = True
@@ -53,7 +53,7 @@ class TestManageBotAutoJoin(TestManageBot):
         self.assertIs(await autojoin.manageAutoJoin(args), True)
         self.send.assert_called_once_with(StrContains('banned_channel', 'ban'))
 
-    @patch('pkg.botgotsthis.manage.autojoin.reload_server')
+    @patch(autojoin.__name__ + '.reload_server')
     async def test_reloadserver(self, mock_reload):
         mock_reload.return_value = True
         message = Message('!managebot autojoin reloadserver')
@@ -133,7 +133,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('pkg.botgotsthis.manage.autojoin.auto_join_priority')
+    @patch(autojoin.__name__ + '.auto_join_priority')
     async def test_priority(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis')
@@ -142,7 +142,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('pkg.botgotsthis.manage.autojoin.auto_join_priority')
+    @patch(autojoin.__name__ + '.auto_join_priority')
     async def test_pri(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin pri botgotsthis')
@@ -151,7 +151,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('pkg.botgotsthis.manage.autojoin.auto_join_priority')
+    @patch(autojoin.__name__ + '.auto_join_priority')
     async def test_priority_gibberish(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis abc')
@@ -160,7 +160,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
                                               self.send)
 
-    @patch('pkg.botgotsthis.manage.autojoin.auto_join_priority')
+    @patch(autojoin.__name__ + '.auto_join_priority')
     async def test_priority_integer(self, mock_priority):
         mock_priority.return_value = True
         message = Message('!managebot autojoin priority botgotsthis 1')

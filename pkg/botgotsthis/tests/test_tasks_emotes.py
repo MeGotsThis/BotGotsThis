@@ -57,8 +57,8 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.mock_globals.globalEmoteSets, {})
         mock_emotes.assert_called_once_with()
 
-    @patch('pkg.botgotsthis.tasks.emotes.refreshFfzGlobalEmotes')
-    @patch('pkg.botgotsthis.tasks.emotes.refreshFfzRandomBroadcasterEmotes')
+    @patch(emotes.__name__ + '.refreshFfzGlobalEmotes')
+    @patch(emotes.__name__ + '.refreshFfzRandomBroadcasterEmotes')
     async def test_ffz(self, mock_broadcaster, mock_global):
         await emotes.refreshFrankerFaceZEmotes(self.now)
         mock_broadcaster.assert_called_once_with(self.now)
@@ -158,8 +158,8 @@ class TestTasksEmotes(asynctest.TestCase):
         await emotes.refreshFfzRandomBroadcasterEmotes(timestamp)
         self.assertFalse(mock_choice.called)
 
-    @patch('pkg.botgotsthis.tasks.emotes.refreshBttvGlobalEmotes')
-    @patch('pkg.botgotsthis.tasks.emotes.refreshBttvRandomBroadcasterEmotes')
+    @patch(emotes.__name__ + '.refreshBttvGlobalEmotes')
+    @patch(emotes.__name__ + '.refreshBttvRandomBroadcasterEmotes')
     async def test_bttv(self, mock_broadcaster, mock_global):
         await emotes.refreshBetterTwitchTvEmotes(self.now)
         mock_broadcaster.assert_called_once_with(self.now)

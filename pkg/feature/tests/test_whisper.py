@@ -6,11 +6,12 @@ from tests.unittest.base_whisper import TestWhisper
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last
+from .. import library
 from .. import whisper
 
 
 class TestFeatureWhisper(TestWhisper):
-    @patch('pkg.feature.library.feature')
+    @patch(library.__name__ + '.feature')
     async def test_feature(self, mock_feature):
         self.assertIs(await whisper.commandFeature(self.args), False)
         self.assertFalse(mock_feature.called)
