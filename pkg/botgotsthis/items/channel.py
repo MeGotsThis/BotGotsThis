@@ -2,7 +2,6 @@
 
 from lib import data
 from ..channel import chat
-from ..channel import mod
 from ..channel import owner
 from ..channel import reload
 

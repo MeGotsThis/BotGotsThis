@@ -1,7 +1,7 @@
 ﻿from typing import Iterable, Mapping, Optional
 
 from lib import data
-from ..channel import custom
+from .. import channel
 
 
 def filterMessage() -> Iterable[data.ChatCommand]:
@@ -11,8 +11,8 @@ def filterMessage() -> Iterable[data.ChatCommand]:
 def commands() -> Mapping[str, Optional[data.ChatCommand]]:
     if not hasattr(commands, 'commands'):
         setattr(commands, 'commands', {
-            '!global': custom.commandGlobal,
-            '!command': custom.commandCommand,
+            '!global': channel.commandGlobal,
+            '!command': channel.commandCommand,
             })
     return getattr(commands, 'commands')
 
@@ -22,4 +22,4 @@ def commandsStartWith() -> Mapping[str, Optional[data.ChatCommand]]:
 
 
 def processNoCommand() -> Iterable[data.ChatCommand]:
-    yield custom.customCommands
+    yield channel.customCommands
