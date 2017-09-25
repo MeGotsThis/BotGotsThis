@@ -61,7 +61,7 @@ class TestManageBotAutoJoin(TestManageBot):
         self.assertIs(await autojoin.manageAutoJoin(args), True)
         mock_reload.assert_called_once_with(self.database, self.send)
 
-    @patch('pkg.botgotsthis.library.broadcaster.auto_join_add')
+    @patch('pkg.channel.library.auto_join_add')
     async def test_add(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot autojoin add botgotsthis')
@@ -70,7 +70,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_add.assert_called_once_with(self.database, 'botgotsthis',
                                          self.send)
 
-    @patch('pkg.botgotsthis.library.broadcaster.auto_join_add')
+    @patch('pkg.channel.library.auto_join_add')
     async def test_insert(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot autojoin insert botgotsthis')
@@ -79,7 +79,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_add.assert_called_once_with(self.database, 'botgotsthis',
                                          self.send)
 
-    @patch('pkg.botgotsthis.library.broadcaster.auto_join_add')
+    @patch('pkg.channel.library.auto_join_add')
     async def test_join(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot autojoin join botgotsthis')
@@ -88,7 +88,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_add.assert_called_once_with(self.database, 'botgotsthis',
                                          self.send)
 
-    @patch('pkg.botgotsthis.library.broadcaster.auto_join_delete')
+    @patch('pkg.channel.library.auto_join_delete')
     async def test_delete(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin delete botgotsthis')
@@ -97,7 +97,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('pkg.botgotsthis.library.broadcaster.auto_join_delete')
+    @patch('pkg.channel.library.auto_join_delete')
     async def test_del(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin del botgotsthis')
@@ -106,7 +106,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('pkg.botgotsthis.library.broadcaster.auto_join_delete')
+    @patch('pkg.channel.library.auto_join_delete')
     async def test_remove(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin remove botgotsthis')
@@ -115,7 +115,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('pkg.botgotsthis.library.broadcaster.auto_join_delete')
+    @patch('pkg.channel.library.auto_join_delete')
     async def test_rem(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin rem botgotsthis')
@@ -124,7 +124,7 @@ class TestManageBotAutoJoin(TestManageBot):
         mock_delete.assert_called_once_with(self.database, 'botgotsthis',
                                             self.send)
 
-    @patch('pkg.botgotsthis.library.broadcaster.auto_join_delete')
+    @patch('pkg.channel.library.auto_join_delete')
     async def test_part(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot autojoin part botgotsthis')

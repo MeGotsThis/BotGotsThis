@@ -13,6 +13,7 @@ src/*
 pkg/*
 !pkg/botgotsthis
 !pkg/custom_command
+!pkg/channel
 !pkg/feature
 !pkg/moderation
 !pkg/repeat

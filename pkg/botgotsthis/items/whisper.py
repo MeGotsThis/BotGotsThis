@@ -17,10 +17,7 @@ def commands() -> Mapping[str, Optional[data.WhisperCommand]]:
             '!reload': reload.commandReload,
             '!reloadcommands': reload.commandReloadCommands,
             '!reloadconfig': reload.commandReloadConfig,
-            '!leave': broadcaster.commandLeave,
             '!empty': broadcaster.commandEmpty,
-            '!come': broadcaster.commandCome,
-            '!autojoin': broadcaster.commandAutoJoin,
             })
     return getattr(commands, 'commands')
 
