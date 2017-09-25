@@ -19,7 +19,7 @@ from tests.unittest.mock_class import TypeMatch
 from .. import library
 
 
-class TestLibraryCustomGetCommand(asynctest.TestCase):
+class TestCustomCommandLibraryCustomGetCommand(asynctest.TestCase):
     def setUp(self):
         self.database = Mock(spec=DatabaseMain)
         self.permissions = defaultdict(lambda: False, {'': True})
@@ -225,7 +225,7 @@ class TestLibraryCustomGetCommand(asynctest.TestCase):
             'botgotsthis', '!kappa')
 
 
-class TestLibraryCustomCreateMessages(asynctest.TestCase):
+class TestCustomCommandLibraryCustomCreateMessages(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.tags = IrcMessageTags()
@@ -502,7 +502,7 @@ class TestLibraryCustomCreateMessages(asynctest.TestCase):
         self.assertFalse(mock_process.called)
 
 
-class TestLibraryCustomGetActionCommand(unittest.TestCase):
+class TestCustomCommandLibraryCustomGetActionCommand(unittest.TestCase):
     def test(self):
         message = Message('')
         self.assertIsNone(library.parse_action_message(message, 'botgotsthis'))
@@ -646,7 +646,7 @@ class TestLibraryCustomGetActionCommand(unittest.TestCase):
                 level)
 
 
-class TestLibraryCustomSplitMessage(unittest.TestCase):
+class TestCustomCommandLibraryCustomSplitMessage(unittest.TestCase):
     def test(self):
         self.assertEqual(library.split_message(''), [])
 
@@ -972,7 +972,7 @@ class TestLibraryCustomSplitMessage(unittest.TestCase):
         self.assertRaises(ValueError, library.split_message, '{!}}')
 
 
-class TestLibraryCustomConvertField(asynctest.TestCase):
+class TestCustomCommandLibraryCustomConvertField(asynctest.TestCase):
     def setUp(self):
         self.args = CustomFieldArgs('', None, None, None, None, Message(''),
                                     Mock(spec=Channel), 'botgotsthis',
@@ -1004,7 +1004,7 @@ class TestLibraryCustomConvertField(asynctest.TestCase):
         self.assertEqual(mock_convert.call_count, 1)
 
 
-class TestLibraryCustomFormat(unittest.TestCase):
+class TestCustomCommandLibraryCustomFormat(unittest.TestCase):
     def setUp(self):
         patcher = patch('lib.helper.textformat.format', autospec=True)
         self.addCleanup(patcher.stop)

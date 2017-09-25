@@ -17,7 +17,7 @@ from ..channel import block_url
 
 
 @patch('pkg.moderation.channel.block_url.check_domain_redirect')
-class TestChannelBlockUrlFilterNoUrl(TestChannel):
+class TestModerationChannelBlockUrlFilterNoUrl(TestChannel):
     async def test_nomod(self, mock_check):
         self.features.append('nourlredirect')
         self.assertIs(await block_url.filterNoUrlForBots(self.args), False)
@@ -48,7 +48,7 @@ class TestChannelBlockUrlFilterNoUrl(TestChannel):
         self.assertFalse(mock_check.called)
 
 
-class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
+class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
     def setUp(self):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
@@ -243,7 +243,7 @@ class TestChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
              call(StrContains(str(message)), TypeMatch(datetime))])
 
 
-class TestChannelBlockUrlCompareDomain(unittest.TestCase):
+class TestModerationChannelBlockUrlCompareDomain(unittest.TestCase):
     def setUp(self):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
@@ -320,7 +320,7 @@ class TestChannelBlockUrlCompareDomain(unittest.TestCase):
         self.assertFalse(self.mock_log.called)
 
 
-class TestChannelBlockUrlHandleDifferentDomain(asynctest.TestCase):
+class TestModerationChannelBlockUrlHandleDifferentDomain(asynctest.TestCase):
     def setUp(self):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'

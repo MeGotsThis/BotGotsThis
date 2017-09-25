@@ -8,7 +8,7 @@ from lib.database import DatabaseTimeout
 from ..channel import purge
 
 
-class TestChannelMod(TestChannel):
+class TestModerationChannelPurge(TestChannel):
     @patch('lib.database.get_database')
     async def test_purge(self, mock_database):
         database = MagicMock(spec=DatabaseTimeout)

@@ -5,7 +5,7 @@ from tests.unittest.base_custom import TestCustomField
 from ..custom import params
 
 
-class TestCustomParams(TestCustomField):
+class TestCustomCommandCustomParams(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(message=Message('a b c d e'))

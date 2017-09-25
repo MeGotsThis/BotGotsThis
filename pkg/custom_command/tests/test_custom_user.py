@@ -4,7 +4,7 @@ from tests.unittest.base_custom import TestCustomField
 from ..custom import user
 
 
-class TestCustomUser(TestCustomField):
+class TestCustomCommandCustomUser(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='user', nick='megotsthis')

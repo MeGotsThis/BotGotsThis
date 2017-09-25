@@ -10,7 +10,7 @@ from tests.unittest.mock_class import AsyncIterator
 from .. import tasks
 
 
-class TestTasksRepeat(asynctest.TestCase):
+class TestRepeatTasks(asynctest.TestCase):
     def setUp(self):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'

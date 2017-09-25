@@ -5,7 +5,7 @@ from tests.unittest.base_custom import TestCustomField
 from ..custom import query
 
 
-class TestCustomQuery(TestCustomField):
+class TestCustomCommandCustomQuery(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='query', message=Message('a b c'))
