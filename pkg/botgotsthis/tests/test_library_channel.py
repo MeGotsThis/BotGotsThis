@@ -9,8 +9,8 @@ from bot import utils
 from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
 from lib.database import DatabaseMain
-from pkg.botgotsthis.library import channel
 from tests.unittest.mock_class import StrContains
+from ..library import channel
 
 
 def send(messages):

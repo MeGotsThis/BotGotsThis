@@ -6,8 +6,8 @@ from lib.data import ManageBotArgs
 from lib.data.message import Message
 from lib.data.permissions import ChatPermissionSet
 from lib.database import DatabaseMain
-from pkg.botgotsthis.library import managebot
 from tests.unittest.mock_class import TypeMatch
+from ..library import managebot
 
 
 def send(messages):

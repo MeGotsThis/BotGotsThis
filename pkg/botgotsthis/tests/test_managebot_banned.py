@@ -8,7 +8,7 @@ from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import StrContains, AsyncIterator
 
 # Needs to be imported last
-from pkg.botgotsthis.manage import banned
+from ..manage import banned
 
 
 class TestManageBotBanned(TestManageBot):

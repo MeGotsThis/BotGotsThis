@@ -6,7 +6,7 @@ from tests.unittest.base_whisper import TestWhisper
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last
-from pkg.botgotsthis.whisper import chat
+from ..whisper import chat
 
 
 class TestWhisperBroadcaster(TestWhisper):

@@ -5,7 +5,7 @@ from lib.data.message import Message
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last
-from pkg.botgotsthis.channel import owner
+from ..channel import owner
 
 
 class TestChannelOwner(TestChannel):
