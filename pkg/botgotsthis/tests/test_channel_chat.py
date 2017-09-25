@@ -5,7 +5,7 @@ from tests.unittest.mock_class import StrContains
 from lib.data.message import Message
 
 # Needs to be imported last
-from pkg.botgotsthis.channel import chat
+from ..channel import chat
 
 
 class TestChannelBroadcaster(TestChannel):

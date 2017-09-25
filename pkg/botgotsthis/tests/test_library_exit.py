@@ -1,8 +1,8 @@
 import asynctest
 from bot.data import Channel
-from pkg.botgotsthis.library import exit
 from tests.unittest.mock_class import StrContains, TypeMatch
 from asynctest.mock import Mock, patch
+from ..library import exit
 
 
 def send(messages):

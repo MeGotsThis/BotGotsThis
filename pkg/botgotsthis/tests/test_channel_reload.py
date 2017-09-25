@@ -4,7 +4,7 @@ from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last
-from pkg.botgotsthis.channel import reload
+from ..channel import reload
 
 
 class TestChannelReload(TestChannel):

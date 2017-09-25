@@ -6,7 +6,7 @@ import asynctest
 
 from asynctest.mock import CoroutineMock, Mock, patch
 
-from pkg.botgotsthis.library import reload
+from ..library import reload
 
 
 def send(messages):

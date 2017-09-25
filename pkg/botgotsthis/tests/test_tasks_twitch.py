@@ -1,12 +1,13 @@
+from datetime import datetime, timedelta
+
 import asynctest
+from asynctest.mock import MagicMock, Mock, PropertyMock, call, patch
 
 from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
-from datetime import datetime, timedelta
 from lib.database import DatabaseMain
-from pkg.botgotsthis.tasks import twitch
 from lib.api.twitch import TwitchCommunity, TwitchStatus
-from asynctest.mock import MagicMock, Mock, PropertyMock, call, patch
+from ..tasks import twitch
 
 
 class TestTasksTwitchBase(asynctest.TestCase):

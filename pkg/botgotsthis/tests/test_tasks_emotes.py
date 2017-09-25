@@ -1,8 +1,10 @@
-import asynctest
-from bot.data import Channel
 from datetime import datetime, timedelta
-from pkg.botgotsthis.tasks import emotes
+
+import asynctest
 from asynctest.mock import Mock, patch
+
+from bot.data import Channel
+from ..tasks import emotes
 
 
 class TestTasksEmotes(asynctest.TestCase):

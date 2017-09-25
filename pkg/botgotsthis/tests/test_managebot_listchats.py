@@ -4,7 +4,7 @@ from tests.unittest.base_managebot import TestManageBot
 from tests.unittest.mock_class import StrContains
 
 # Needs to be imported last
-from pkg.botgotsthis.manage import listchats
+from ..manage import listchats
 
 
 class TestManageBotListChats(TestManageBot):

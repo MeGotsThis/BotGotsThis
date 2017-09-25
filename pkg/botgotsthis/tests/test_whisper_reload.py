@@ -5,7 +5,7 @@ from tests.unittest.base_whisper import TestWhisper
 from tests.unittest.mock_class import PartialMatch
 
 # Needs to be imported last
-from pkg.botgotsthis.whisper import reload
+from ..whisper import reload
 
 
 class TestWhisperReload(TestWhisper):

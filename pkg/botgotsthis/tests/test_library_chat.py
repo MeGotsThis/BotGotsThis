@@ -7,8 +7,8 @@ from asynctest.mock import Mock, patch
 from bot.data import Channel
 from lib.data.message import Message
 from lib.database import DatabaseMain
-from pkg.botgotsthis.library import chat
 from tests.unittest.mock_class import StrContains
+from ..library import chat
 
 
 def send(messages):
