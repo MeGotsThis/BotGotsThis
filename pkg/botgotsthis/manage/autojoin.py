@@ -1,10 +1,10 @@
 ﻿from bot import utils
 from contextlib import suppress
 from typing import Optional  # noqa: F401
-from ..library import broadcaster
 from lib.api import twitch
 from lib.database import AutoJoinChannel, DatabaseMain  # noqa: F401
 from lib.data import ManageBotArgs, Send
+from pkg.channel import library as autojoin
 
 
 async def manageAutoJoin(args: ManageBotArgs) -> bool:
@@ -25,10 +25,10 @@ async def manageAutoJoin(args: ManageBotArgs) -> bool:
         return True
 
     if args.message.lower[2] in ['add', 'insert', 'join']:
-        return await broadcaster.auto_join_add(
+        return await autojoin.auto_join_add(
             args.database, args.message.lower[3], args.send)
     if args.message.lower[2] in ['del', 'delete', 'rem', 'remove', 'part']:
-        return await broadcaster.auto_join_delete(
+        return await autojoin.auto_join_delete(
             args.database, args.message.lower[3], args.send)
     if args.message.lower[2] in ['pri', 'priority']:
         priority: int = 0
