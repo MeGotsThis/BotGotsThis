@@ -17,7 +17,7 @@ class TestSpamChannelPyramid(TestChannel):
         self.permissions.globalModerator = False
         self.permissions.chatModerator = False
 
-        patcher = patch('pkg.spam.channel.pyramid.process_pyramid')
+        patcher = patch(pyramid.__name__ + '.process_pyramid')
         self.addCleanup(patcher.stop)
         self.mock_process = patcher.start()
 

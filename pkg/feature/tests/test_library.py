@@ -7,8 +7,8 @@ from asynctest.mock import Mock, patch
 from lib.data.message import Message
 from lib.database import DatabaseMain
 from lib.helper import parser
-from pkg.botgotsthis.library import feature
 from tests.unittest.mock_class import StrContains
+from .. import library
 
 
 def send(messages):
@@ -32,11 +32,11 @@ class TestFeatureLibrary(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_response = patcher.start()
 
-        patcher = patch('pkg.botgotsthis.library.feature.feature_add')
+        patcher = patch(library.__name__ + '.feature_add')
         self.addCleanup(patcher.stop)
         self.mock_add = patcher.start()
 
-        patcher = patch('pkg.botgotsthis.library.feature.feature_remove')
+        patcher = patch(library.__name__ + '.feature_remove')
         self.addCleanup(patcher.stop)
         self.mock_remove = patcher.start()
 
@@ -44,7 +44,7 @@ class TestFeatureLibrary(asynctest.TestCase):
         self.mock_add.return_value = True
         self.mock_response.return_value = parser.Yes
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature feature'), self.send),
             True)
         self.assertFalse(self.send.called)
@@ -57,7 +57,7 @@ class TestFeatureLibrary(asynctest.TestCase):
         self.mock_remove.return_value = True
         self.mock_response.return_value = parser.No
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature feature'), self.send),
             True)
         self.assertFalse(self.send.called)
@@ -68,7 +68,7 @@ class TestFeatureLibrary(asynctest.TestCase):
 
     async def test_not_existing_feature(self):
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature does_not_exist'),
                                   self.send),
             True)
@@ -80,7 +80,7 @@ class TestFeatureLibrary(asynctest.TestCase):
 
     async def test_feature_none(self):
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature none'), self.send),
             True)
         self.send.assert_called_once_with(StrContains('feature', 'none'))
@@ -91,7 +91,7 @@ class TestFeatureLibrary(asynctest.TestCase):
     async def test_bad_param(self):
         self.mock_response.return_value = parser.Unknown
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature feature Kappa'),
                                   self.send),
             True)
@@ -114,18 +114,18 @@ class TestLibraryFeatureFeature_OLD(asynctest.TestCase):
             'none': None
             }
 
-        patcher = patch('pkg.botgotsthis.library.feature.feature_add')
+        patcher = patch(library.__name__ + '.feature_add')
         self.addCleanup(patcher.stop)
         self.mock_add = patcher.start()
 
-        patcher = patch('pkg.botgotsthis.library.feature.feature_remove')
+        patcher = patch(library.__name__ + '.feature_remove')
         self.addCleanup(patcher.stop)
         self.mock_remove = patcher.start()
 
     async def test(self):
         self.mock_add.return_value = True
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature feature'), self.send),
             True)
         self.assertFalse(self.send.called)
@@ -136,7 +136,7 @@ class TestLibraryFeatureFeature_OLD(asynctest.TestCase):
     async def test_add(self):
         self.mock_add.return_value = True
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature feature yes'), self.send),
             True)
         self.assertFalse(self.send.called)
@@ -147,7 +147,7 @@ class TestLibraryFeatureFeature_OLD(asynctest.TestCase):
     async def test_remove(self):
         self.mock_remove.return_value = True
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature feature no'), self.send),
             True)
         self.assertFalse(self.send.called)
@@ -157,7 +157,7 @@ class TestLibraryFeatureFeature_OLD(asynctest.TestCase):
 
     async def test_not_existing_feature(self):
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature does_not_exist'),
                                   self.send),
             True)
@@ -168,7 +168,7 @@ class TestLibraryFeatureFeature_OLD(asynctest.TestCase):
 
     async def test_feature_none(self):
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature none'), self.send),
             True)
         self.send.assert_called_once_with(StrContains('feature', 'none'))
@@ -177,7 +177,7 @@ class TestLibraryFeatureFeature_OLD(asynctest.TestCase):
 
     async def test_bad_param(self):
         self.assertIs(
-            await feature.feature(self.database, 'botgotsthis',
+            await library.feature(self.database, 'botgotsthis',
                                   Message('!feature feature Kappa'),
                                   self.send),
             True)
@@ -199,7 +199,7 @@ class TestLibraryFeatureAdd(asynctest.TestCase):
     async def test(self):
         self.database.hasFeature.return_value = False
         self.assertIs(
-            await feature.feature_add(self.database, 'botgotsthis', 'feature',
+            await library.feature_add(self.database, 'botgotsthis', 'feature',
                                       self.send),
             True)
         self.send.assert_called_once_with(StrContains('Feature', 'enable'))
@@ -211,7 +211,7 @@ class TestLibraryFeatureAdd(asynctest.TestCase):
     async def test_existing(self):
         self.database.hasFeature.return_value = True
         self.assertIs(
-            await feature.feature_add(self.database, 'botgotsthis', 'feature',
+            await library.feature_add(self.database, 'botgotsthis', 'feature',
                                       self.send),
             True)
         self.send.assert_called_once_with(
@@ -234,7 +234,7 @@ class TestLibraryFeatureRemove(asynctest.TestCase):
     async def test(self):
         self.database.hasFeature.return_value = True
         self.assertIs(
-            await feature.feature_remove(self.database, 'botgotsthis',
+            await library.feature_remove(self.database, 'botgotsthis',
                                          'feature', self.send),
             True)
         self.send.assert_called_once_with(StrContains('Feature', 'disable'))
@@ -246,7 +246,7 @@ class TestLibraryFeatureRemove(asynctest.TestCase):
     async def test_existing(self):
         self.database.hasFeature.return_value = False
         self.assertIs(
-            await feature.feature_remove(self.database, 'botgotsthis',
+            await library.feature_remove(self.database, 'botgotsthis',
                                          'feature', self.send),
             True)
         self.send.assert_called_once_with(

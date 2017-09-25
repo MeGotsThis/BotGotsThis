@@ -111,7 +111,7 @@ class TestCustomCommandCustomUrl(TestCustomField):
             'http://localhost/', timeout=1)
         self.assertTrue(self.mock_session.get.called)
 
-    @patch('pkg.custom_command.custom.url.field_replace')
+    @patch(url.__name__ + '.field_replace')
     async def test_field(self, mock_replace):
         mock_replace.side_effect = ['PogChamp', 'FrankerZ']
         self.args = self.args._replace(param='http://localhost/{user}/{query}')
@@ -126,7 +126,7 @@ class TestCustomCommandFieldReplace(TestCustomField):
     def setUp(self):
         super().setUp()
 
-        patcher = patch('pkg.custom_command.custom.url.fieldUrl')
+        patcher = patch(url.__name__ + '.fieldUrl')
         self.addCleanup(patcher.stop)
         self.mock_fieldUrl = patcher.start()
 

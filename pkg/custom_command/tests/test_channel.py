@@ -8,6 +8,7 @@ from tests.unittest.mock_class import IterableMatch, StrContains
 # Needs to be imported last
 from lib.data import CustomCommand, CommandActionTokens
 from lib.data.message import Message
+from .. import library
 from .. import channel
 
 
@@ -39,12 +40,12 @@ class TestCustomCommandChannelCustomCommands(TestChannel):
         self.addCleanup(patcher.stop)
         self.mock_timeout = patcher.start()
 
-        patcher = patch('pkg.custom_command.library.get_command')
+        patcher = patch(library.__name__ + '.get_command')
         self.addCleanup(patcher.stop)
         self.mock_command = patcher.start()
         self.mock_command.return_value = self.command
 
-        patcher = patch('pkg.custom_command.library.create_messages')
+        patcher = patch(library.__name__ + '.create_messages')
         self.addCleanup(patcher.stop)
         self.mock_messages = patcher.start()
         self.mock_messages.return_value = []
@@ -126,7 +127,7 @@ class TestCustomCommandChannelCustomCommand(TestChannel):
     def setUp(self):
         super().setUp()
 
-        patcher = patch('pkg.custom_command.channel.process_command')
+        patcher = patch(channel.__name__ + '.process_command')
         self.addCleanup(patcher.stop)
         self.mock_process = patcher.start()
 
@@ -158,9 +159,8 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         self.args = self.args._replace(message=self.message)
         self.broadcaster = '#global'
 
-        patcher = patch(
-            'pkg.custom_command.library.parse_action_message',
-            autospec=True)
+        patcher = patch(library.__name__ + '.parse_action_message',
+                        autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_input = patcher.start()
         self.mock_input.return_value = None
@@ -215,7 +215,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         self.mock_input.assert_called_once_with(self.message, self.broadcaster)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.insert_command')
+    @patch(channel.__name__ + '.insert_command')
     async def test_add(self, mock_insert):
         mock_insert.return_value = True
         input = CommandActionTokens('add', self.broadcaster, '', '', '')
@@ -226,7 +226,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_insert.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.insert_command')
+    @patch(channel.__name__ + '.insert_command')
     async def test_insert(self, mock_insert):
         mock_insert.return_value = True
         input = CommandActionTokens('insert', self.broadcaster, '', '', '')
@@ -237,7 +237,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_insert.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.insert_command')
+    @patch(channel.__name__ + '.insert_command')
     async def test_new(self, mock_insert):
         mock_insert.return_value = True
         input = CommandActionTokens('new', self.broadcaster, '', '', '')
@@ -248,7 +248,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_insert.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.update_command')
+    @patch(channel.__name__ + '.update_command')
     async def test_update(self, mock_update):
         mock_update.return_value = True
         input = CommandActionTokens('update', self.broadcaster, '', '', '')
@@ -259,7 +259,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_update.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.update_command')
+    @patch(channel.__name__ + '.update_command')
     async def test_edit(self, mock_update):
         mock_update.return_value = True
         input = CommandActionTokens('edit', self.broadcaster, '', '', '')
@@ -270,7 +270,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_update.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.replace_command')
+    @patch(channel.__name__ + '.replace_command')
     async def test_replace(self, mock_replace):
         mock_replace.return_value = True
         input = CommandActionTokens('replace', self.broadcaster, '', '', '')
@@ -281,7 +281,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_replace.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.replace_command')
+    @patch(channel.__name__ + '.replace_command')
     async def test_override(self, mock_replace):
         mock_replace.return_value = True
         input = CommandActionTokens('override', self.broadcaster, '', '', '')
@@ -292,7 +292,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_replace.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.append_command')
+    @patch(channel.__name__ + '.append_command')
     async def test_append(self, mock_append):
         mock_append.return_value = True
         input = CommandActionTokens('append', self.broadcaster, '', '', '')
@@ -303,7 +303,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_append.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.delete_command')
+    @patch(channel.__name__ + '.delete_command')
     async def test_del(self, mock_delete):
         mock_delete.return_value = True
         input = CommandActionTokens('del', self.broadcaster, '', '', '')
@@ -314,7 +314,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_delete.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.delete_command')
+    @patch(channel.__name__ + '.delete_command')
     async def test_delete(self, mock_delete):
         mock_delete.return_value = True
         input = CommandActionTokens('delete', self.broadcaster, '', '', '')
@@ -325,7 +325,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_delete.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.delete_command')
+    @patch(channel.__name__ + '.delete_command')
     async def test_rem(self, mock_delete):
         mock_delete.return_value = True
         input = CommandActionTokens('rem', self.broadcaster, '', '', '')
@@ -336,7 +336,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_delete.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.delete_command')
+    @patch(channel.__name__ + '.delete_command')
     async def test_remove(self, mock_delete):
         mock_delete.return_value = True
         input = CommandActionTokens('remove', self.broadcaster, '', '', '')
@@ -347,7 +347,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_delete.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.command_property')
+    @patch(channel.__name__ + '.command_property')
     async def test_property(self, mock_property):
         mock_property.return_value = True
         input = CommandActionTokens('property', self.broadcaster, '', '', '')
@@ -358,7 +358,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_property.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.raw_command')
+    @patch(channel.__name__ + '.raw_command')
     async def test_raw(self, mock_raw):
         mock_raw.return_value = True
         input = CommandActionTokens('raw', self.broadcaster, '', '', '')
@@ -369,7 +369,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_raw.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.raw_command')
+    @patch(channel.__name__ + '.raw_command')
     async def test_original(self, mock_raw):
         mock_raw.return_value = True
         input = CommandActionTokens('original', self.broadcaster, '', '', '')
@@ -380,7 +380,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_raw.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.level_command')
+    @patch(channel.__name__ + '.level_command')
     async def test_level(self, mock_level):
         mock_level.return_value = True
         input = CommandActionTokens('level', self.broadcaster, '', '', '')
@@ -391,7 +391,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_level.assert_called_once_with(self.args, input)
         self.assertFalse(self.channel.send.called)
 
-    @patch('pkg.custom_command.channel.rename_command')
+    @patch(channel.__name__ + '.rename_command')
     async def test_rename(self, mock_rename):
         mock_rename.return_value = True
         input = CommandActionTokens('rename', self.broadcaster, '', '', '')

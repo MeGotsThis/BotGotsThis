@@ -202,12 +202,12 @@ class TestLibraryBroadcasterAutoJoin(asynctest.TestCase):
         self.database.isChannelBannedReason.return_value = None
         self.send = Mock(spec=send)
 
-        patcher = patch('pkg.channel.library.auto_join_add')
+        patcher = patch(library.__name__ + '.auto_join_add')
         self.addCleanup(patcher.stop)
         self.mock_add = patcher.start()
         self.mock_add.return_value = True
 
-        patcher = patch('pkg.channel.library.auto_join_delete')
+        patcher = patch(library.__name__ + '.auto_join_delete')
         self.addCleanup(patcher.stop)
         self.mock_delete = patcher.start()
         self.mock_delete.return_value = True

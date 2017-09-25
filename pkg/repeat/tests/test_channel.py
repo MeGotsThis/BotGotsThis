@@ -10,7 +10,7 @@ from .. import channel
 
 
 class TestRepeatChannel(TestChannel):
-    @patch('pkg.repeat.channel.process_auto_repeat')
+    @patch(channel.__name__ + '.process_auto_repeat')
     async def test_auto_repeat(self, mock_process):
         self.assertIs(await channel.commandAutoRepeat(self.args), False)
         self.assertFalse(mock_process.called)
@@ -19,7 +19,7 @@ class TestRepeatChannel(TestChannel):
         self.assertIs(await channel.commandAutoRepeat(self.args), True)
         mock_process.assert_called_once_with(self.args, None)
 
-    @patch('pkg.repeat.channel.process_auto_repeat')
+    @patch(channel.__name__ + '.process_auto_repeat')
     async def test_auto_repeat_count(self, mock_process):
         self.assertIs(await channel.commandAutoRepeatCount(self.args), False)
         self.assertFalse(mock_process.called)
