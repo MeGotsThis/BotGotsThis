@@ -156,6 +156,8 @@ class BotConfig:
             for option, value in ini.items('PKG'):  # type: ignore
                 if ini.getboolean('PKG', option):
                     self.pkgs.append(option)
+            if 'botgotsthis' not in self.pkgs:
+                self.pkgs.append('botgotsthis')
 
         if os.path.isfile('database.ini'):
             ini = configparser.ConfigParser()
