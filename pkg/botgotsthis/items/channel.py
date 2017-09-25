@@ -1,7 +1,7 @@
 ﻿from typing import Iterable, Mapping, Optional
 
 from lib import data
-from ..channel import broadcaster
+from ..channel import chat
 from ..channel import mod
 from ..channel import owner
 from ..channel import reload
@@ -24,7 +24,7 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!emptychat': owner.commandEmpty,
             '!emptyall': owner.commandEmptyAll,
             '!say': owner.commandSay,
-            '!empty': broadcaster.commandEmpty,
+            '!empty': chat.commandEmpty,
             '!permit': mod.commandPermit,
             })
     return getattr(commands, 'commands')
@@ -33,7 +33,7 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
 def commandsStartWith() -> Mapping[str, Optional[data.ChatCommand]]:
     if not hasattr(commandsStartWith, 'commands'):
         setattr(commandsStartWith, 'commands', {
-            '!settimeoutlevel-': broadcaster.commandSetTimeoutLevel,
+            '!settimeoutlevel-': chat.commandSetTimeoutLevel,
             })
     return getattr(commandsStartWith, 'commands')
 

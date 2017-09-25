@@ -7,7 +7,7 @@ from asynctest.mock import Mock, patch
 from bot.data import Channel
 from lib.data.message import Message
 from lib.database import DatabaseMain
-from pkg.botgotsthis.library import broadcaster
+from pkg.botgotsthis.library import chat
 from tests.unittest.mock_class import StrContains
 
 
@@ -27,13 +27,13 @@ class TestLibraryBroadcasterEmpty(unittest.TestCase):
         self.mock_globals.channels = {'botgotsthis': self.channel}
 
     def test(self):
-        self.assertIs(broadcaster.empty('botgotsthis', self.send), True)
+        self.assertIs(chat.empty('botgotsthis', self.send), True)
         self.send.assert_called_once_with(
             StrContains('Clear', 'messages', 'botgotsthis'))
         self.channel.clear.assert_called_once_with()
 
     def test_not_existing(self):
-        self.assertIs(broadcaster.empty('megotsthis', self.send), True)
+        self.assertIs(chat.empty('megotsthis', self.send), True)
         self.send.assert_not_called()
         self.channel.clear.assert_not_called()
 
@@ -50,7 +50,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
 
     async def test_1(self):
         self.assertIs(
-            await broadcaster.set_timeout_level(
+            await chat.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-1 1')),
             True)
@@ -61,7 +61,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
 
     async def test_1_default(self):
         self.assertIs(
-            await broadcaster.set_timeout_level(
+            await chat.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-1')),
             True)
@@ -72,7 +72,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
 
     async def test_2(self):
         self.assertIs(
-            await broadcaster.set_timeout_level(
+            await chat.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-2 3600')),
             True)
@@ -83,7 +83,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
 
     async def test_2_default(self):
         self.assertIs(
-            await broadcaster.set_timeout_level(
+            await chat.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-2')),
             True)
@@ -94,7 +94,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
 
     async def test_3(self):
         self.assertIs(
-            await broadcaster.set_timeout_level(
+            await chat.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-3 0')),
             True)
@@ -105,7 +105,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
 
     async def test_3_default(self):
         self.assertIs(
-            await broadcaster.set_timeout_level(
+            await chat.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-3')),
             True)
@@ -116,7 +116,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
 
     async def test_0(self):
         self.assertIs(
-            await broadcaster.set_timeout_level(
+            await chat.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-0')),
             False)
@@ -125,7 +125,7 @@ class TestLibraryBroadcasterSetTimeOutLevel(asynctest.TestCase):
 
     async def test_4(self):
         self.assertIs(
-            await broadcaster.set_timeout_level(
+            await chat.set_timeout_level(
                 self.database, 'botgotsthis', self.send,
                 Message('!settimeoutlevel-4')),
             False)
