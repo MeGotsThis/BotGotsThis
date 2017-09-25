@@ -6,6 +6,7 @@ from tests.unittest.base_whisper import TestWhisper
 from tests.unittest.mock_class import PartialMatch, StrContains
 
 # Needs to be imported last
+from ..library import channel, exit, managebot
 from ..whisper import owner
 
 
@@ -18,7 +19,7 @@ class TestWhisperOwner(TestWhisper):
         mock_whisper.assert_called_once_with(
             'botgotsthis', StrContains('Hello', '!'))
 
-    @patch('pkg.botgotsthis.library.exit.exit')
+    @patch(exit.__name__ + '.exit')
     async def test_exit(self, mock_exit):
         self.assertIs(await owner.commandExit(self.args), False)
         self.assertFalse(mock_exit.called)
@@ -29,7 +30,7 @@ class TestWhisperOwner(TestWhisper):
         mock_exit.assert_called_once_with(
             PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('pkg.botgotsthis.library.channel.say')
+    @patch(channel.__name__ + '.say')
     async def test_say(self, mock_say):
         self.assertIs(await owner.commandSay(self.args), False)
         self.assertFalse(mock_say.called)
@@ -40,7 +41,7 @@ class TestWhisperOwner(TestWhisper):
         self.assertIs(await owner.commandSay(args), True)
         mock_say.assert_called_once_with('botgotsthis', 'megotsthis', 'Kappa')
 
-    @patch('pkg.botgotsthis.library.channel.join')
+    @patch(channel.__name__ + '.join')
     async def test_join(self, mock_join):
         self.assertIs(await owner.commandJoin(self.args), False)
         self.assertFalse(mock_join.called)
@@ -53,7 +54,7 @@ class TestWhisperOwner(TestWhisper):
             self.database, 'megotsthis',
             PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('pkg.botgotsthis.library.channel.part', autospec=True)
+    @patch(channel.__name__ + '.part', autospec=True)
     async def test_part(self, mock_part):
         self.assertIs(await owner.commandPart(self.args), False)
         self.assertFalse(mock_part.called)
@@ -65,7 +66,7 @@ class TestWhisperOwner(TestWhisper):
         mock_part.assert_called_once_with(
             'megotsthis', PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('pkg.botgotsthis.library.channel.empty_all', autospec=True)
+    @patch(channel.__name__ + '.empty_all', autospec=True)
     async def test_empty_all(self, mock_empty_all):
         self.assertIs(await owner.commandEmptyAll(self.args), False)
         self.assertFalse(mock_empty_all.called)
@@ -76,7 +77,7 @@ class TestWhisperOwner(TestWhisper):
         mock_empty_all.assert_called_once_with(
             PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('pkg.botgotsthis.library.channel.empty', autospec=True)
+    @patch(channel.__name__ + '.empty', autospec=True)
     async def test_empty(self, mock_empty):
         self.assertIs(await owner.commandEmpty(self.args), False)
         self.assertFalse(mock_empty.called)
@@ -88,7 +89,7 @@ class TestWhisperOwner(TestWhisper):
         mock_empty.assert_called_once_with(
             'megotsthis', PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
-    @patch('pkg.botgotsthis.library.managebot.manage_bot')
+    @patch(managebot.__name__ + '.manage_bot')
     async def test_manage_bot(self, mock_manage_bot):
         self.assertIs(await owner.commandManageBot(self.args), False)
         self.assertFalse(mock_manage_bot.called)

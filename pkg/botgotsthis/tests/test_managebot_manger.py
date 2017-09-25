@@ -43,7 +43,7 @@ class TestManageBotManager(TestManageBot):
         self.assertIs(await manager.manageManager(args), False)
         self.assertFalse(self.send.called)
 
-    @patch('pkg.botgotsthis.manage.manager.insert_manager')
+    @patch(manager.__name__ + '.insert_manager')
     async def test_add(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot manager add botgotsthis')
@@ -52,7 +52,7 @@ class TestManageBotManager(TestManageBot):
         mock_add.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.manager.insert_manager')
+    @patch(manager.__name__ + '.insert_manager')
     async def test_insert(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot manager insert botgotsthis')
@@ -61,7 +61,7 @@ class TestManageBotManager(TestManageBot):
         mock_add.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.manager.delete_manager')
+    @patch(manager.__name__ + '.delete_manager')
     async def test_delete(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot manager delete botgotsthis')
@@ -70,7 +70,7 @@ class TestManageBotManager(TestManageBot):
         mock_delete.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.manager.delete_manager')
+    @patch(manager.__name__ + '.delete_manager')
     async def test_del(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot manager del botgotsthis')
@@ -79,7 +79,7 @@ class TestManageBotManager(TestManageBot):
         mock_delete.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.manager.delete_manager')
+    @patch(manager.__name__ + '.delete_manager')
     async def test_remove(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot manager remove botgotsthis')
@@ -88,7 +88,7 @@ class TestManageBotManager(TestManageBot):
         mock_delete.assert_called_once_with(
             'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.manager.delete_manager')
+    @patch(manager.__name__ + '.delete_manager')
     async def test_rem(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot manager rem botgotsthis')

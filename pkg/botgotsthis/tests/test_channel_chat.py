@@ -5,6 +5,7 @@ from tests.unittest.mock_class import StrContains
 from lib.data.message import Message
 
 # Needs to be imported last
+from ..library import chat as library_chat
 from ..channel import chat
 
 
@@ -46,7 +47,7 @@ class TestChannelBroadcaster(TestChannel):
             StrContains('botgotsthis', 'mebotsthis', 'unpermitted',
                         'megotsthis'))
 
-    @patch('pkg.botgotsthis.library.chat.empty')
+    @patch(library_chat.__name__ + '.empty')
     async def test_empty(self, mock_empty):
         self.assertIs(await chat.commandEmpty(self.args), False)
         self.assertFalse(mock_empty.called)
@@ -55,7 +56,7 @@ class TestChannelBroadcaster(TestChannel):
         self.assertIs(await chat.commandEmpty(self.args), True)
         mock_empty.assert_called_once_with('botgotsthis', self.channel.send)
 
-    @patch('pkg.botgotsthis.library.chat.set_timeout_level')
+    @patch(library_chat.__name__ + '.set_timeout_level')
     async def test_set_timeout_level(self, mock_set_timeout):
         self.assertIs(await chat.commandSetTimeoutLevel(self.args),
                       False)

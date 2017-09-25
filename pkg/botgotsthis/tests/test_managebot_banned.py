@@ -38,7 +38,7 @@ class TestManageBotBanned(TestManageBot):
         self.send.assert_called_once_with(
             StrContains(self.args.nick, 'Reason', 'specif'))
 
-    @patch('pkg.botgotsthis.manage.banned.list_banned_channels')
+    @patch(banned.__name__ + '.list_banned_channels')
     async def test_list(self, mock_list):
         mock_list.return_value = True
         message = Message('!managebot banned list')
@@ -46,7 +46,7 @@ class TestManageBotBanned(TestManageBot):
         self.assertIs(await banned.manageBanned(args), True)
         mock_list.assert_called_once_with(self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.banned.insert_banned_channel')
+    @patch(banned.__name__ + '.insert_banned_channel')
     async def test_add(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot banned add botgotsthis Kappa')
@@ -55,7 +55,7 @@ class TestManageBotBanned(TestManageBot):
         mock_add.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.banned.insert_banned_channel')
+    @patch(banned.__name__ + '.insert_banned_channel')
     async def test_insert(self, mock_add):
         mock_add.return_value = True
         message = Message('!managebot banned insert botgotsthis Kappa')
@@ -64,7 +64,7 @@ class TestManageBotBanned(TestManageBot):
         mock_add.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.banned.delete_banned_channel')
+    @patch(banned.__name__ + '.delete_banned_channel')
     async def test_delete(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot banned delete botgotsthis Kappa')
@@ -73,7 +73,7 @@ class TestManageBotBanned(TestManageBot):
         mock_delete.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.banned.delete_banned_channel')
+    @patch(banned.__name__ + '.delete_banned_channel')
     async def test_del(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot banned del botgotsthis Kappa')
@@ -82,7 +82,7 @@ class TestManageBotBanned(TestManageBot):
         mock_delete.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.banned.delete_banned_channel')
+    @patch(banned.__name__ + '.delete_banned_channel')
     async def test_remove(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot banned remove botgotsthis Kappa')
@@ -91,7 +91,7 @@ class TestManageBotBanned(TestManageBot):
         mock_delete.assert_called_once_with(
             'botgotsthis', 'Kappa', 'botgotsthis', self.database, self.send)
 
-    @patch('pkg.botgotsthis.manage.banned.delete_banned_channel')
+    @patch(banned.__name__ + '.delete_banned_channel')
     async def test_rem(self, mock_delete):
         mock_delete.return_value = True
         message = Message('!managebot banned rem botgotsthis Kappa')

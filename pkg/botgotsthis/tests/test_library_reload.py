@@ -6,7 +6,7 @@ import asynctest
 
 from asynctest.mock import CoroutineMock, Mock, patch
 
-from ..library import reload
+from pkg.botgotsthis.library import reload
 
 
 def send(messages):
@@ -118,16 +118,16 @@ class TestLibraryReload(asynctest.TestCase):
     def setUp(self):
         self.send = Mock(spec=send)
 
-    @patch('pkg.botgotsthis.library.reload.reload_config')
-    @patch('pkg.botgotsthis.library.reload.reload_commands')
+    @patch(reload.__name__ + '.reload_config')
+    @patch(reload.__name__ + '.reload_commands')
     async def test_full_reload(self, mock_reload_command, mock_reload_config):
         self.assertIs(await reload.full_reload(self.send), True)
         self.assertEqual(self.send.call_count, 2)
         mock_reload_config.assert_called_once_with(self.send)
         mock_reload_command.assert_called_once_with(self.send)
 
-    @patch('pkg.botgotsthis.library.reload.reload_config')
-    @patch('pkg.botgotsthis.library.reload.reload_commands')
+    @patch(reload.__name__ + '.reload_config')
+    @patch(reload.__name__ + '.reload_commands')
     async def test_full_reload_multiple(self, mock_reload_command,
                                         mock_reload_config):
         async def wait(*args):
@@ -186,7 +186,7 @@ class TestLibraryReload(asynctest.TestCase):
 
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
-    @patch('pkg.botgotsthis.library.reload.bot')
+    @patch(reload.__name__ + '.bot')
     async def test_reload_config(self, mock_bot, mock_reload):
         module = Mock()
         originalConfig = mock_bot.config
@@ -202,7 +202,7 @@ class TestLibraryReload(asynctest.TestCase):
 
     @patch.dict('sys.modules', autospec=True)
     @patch('importlib.reload', autospec=True)
-    @patch('pkg.botgotsthis.library.reload.bot')
+    @patch(reload.__name__ + '.bot')
     async def test_reload_config_multiple(self, mock_bot, mock_reload):
         async def wait(*args):
             await asyncio.sleep(0.2)
