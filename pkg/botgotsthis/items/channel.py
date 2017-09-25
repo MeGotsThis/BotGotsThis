@@ -29,15 +29,9 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!leave': broadcaster.commandLeave,
             '!feature': feature.commandFeature,
             '!empty': broadcaster.commandEmpty,
-            '!status': mod.commandStatus,
-            '!title': mod.commandStatus,
-            '!game': mod.commandGame,
-            '!setgame': mod.commandRawGame,
-            '!community': mod.commandCommunity,
             '!permit': mod.commandPermit,
             '!come': broadcaster.commandCome,
             '!autojoin': broadcaster.commandAutoJoin,
-            '!uptime': broadcaster.commandUptime,
             })
     return getattr(commands, 'commands')
 

@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from asynctest.mock import patch
 
 from tests.unittest.base_channel import TestChannel
@@ -65,30 +63,3 @@ class TestChannelBroadcaster(TestChannel):
                       True)
         mock_set_timeout.assert_called_once_with(
             self.database, 'botgotsthis', self.channel.send, self.args.message)
-
-    @patch('lib.api.twitch.server_time')
-    async def test_uptime(self, mock_server_time):
-        self.channel.isStreaming = False
-        self.assertIs(await broadcaster.commandUptime(self.args), True)
-        self.assertFalse(mock_server_time.called)
-        self.channel.send.assert_called_once_with(
-            StrContains('botgotsthis', 'not', 'streaming'))
-
-    @patch('lib.api.twitch.server_time')
-    async def test_uptime_isstreaming(self, mock_server_time):
-        self.channel.isStreaming = True
-        self.channel.streamingSince = self.now
-        mock_server_time.return_value = self.now
-        self.assertIs(await broadcaster.commandUptime(self.args), True)
-        mock_server_time.assert_called_once_with()
-        self.channel.send.assert_called_once_with(
-            StrContains('Uptime', str(timedelta())))
-
-    @patch('lib.api.twitch.server_time')
-    async def test_uptime_server_error(self, mock_server_time):
-        self.channel.isStreaming = True
-        mock_server_time.return_value = None
-        self.assertIs(await broadcaster.commandUptime(self.args), True)
-        mock_server_time.assert_called_once_with()
-        self.channel.send.assert_called_once_with(
-            StrContains('Failed', 'twitch.tv'))
