@@ -61,7 +61,7 @@ async def check_domain_redirect(chat: 'data.Channel',
                         return
             except aiohttp.ClientConnectorError:
                 pass
-            except:
+            except Exception:
                 utils.logException(str(message), timestamp)
 
 

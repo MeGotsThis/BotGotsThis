@@ -119,7 +119,7 @@ def parse_action_message(message: Message,
         text = message[i+1:]
 
         return CommandActionTokens(action, broadcaster, level, command, text)
-    except:
+    except Exception:
         return None
 
 

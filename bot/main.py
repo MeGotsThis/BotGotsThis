@@ -45,10 +45,10 @@ async def initializer() -> None:
                 modules = pkgutil.walk_packages(
                     path=mod.__path__,  # type: ignore
                     prefix=mod.__name__ + '.')
-                importer: PathEntryFinder
+                _importer: PathEntryFinder
                 modname: str
-                ispkg: bool
-                for importer, modname, ispkg in modules:
+                _ispkg: bool
+                for _importer, modname, _ispkg in modules:
                     importlib.import_module(modname)
         except ModuleNotFoundError:
             pass
@@ -91,7 +91,7 @@ def main(argv: Optional[List[str]]=None) -> int:
         loop.run_until_complete(finalizer())
         loop.close()
         return 0
-    except:
+    except Exception:
         bot.globals.running = False
         utils.logException()
         raise

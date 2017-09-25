@@ -174,7 +174,7 @@ class ConnectionHandler:
             self._on_write(command, timestamp, channel=channel)
             self._log_write(command, channel=channel, whisper=whisper,
                             timestamp=timestamp)
-        except:
+        except Exception:
             utils.logException()
             raise
 

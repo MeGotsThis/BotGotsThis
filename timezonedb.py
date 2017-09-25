@@ -19,7 +19,7 @@ with sqlite3.connect(
     try:
         cursor.execute('SELECT updated FROM updated')
         lastUpdated, = cursor.fetchone()
-    except:
+    except Exception:
         lastUpdated = datetime.date.min
     if tzdate > lastUpdated:
         with open('lib/database/sqlite/timezonedb.sql', 'r') as file:

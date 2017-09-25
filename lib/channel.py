@@ -59,7 +59,7 @@ async def chatCommand(chat: 'botData.Channel',
             for command in commandsToProcess(message.command):
                 if await command(arguments):
                     return
-    except:
+    except Exception:
         utils.logException(f'Channel: {chat.channel}\nMessage: {message}',
                            timestamp)
 

@@ -22,7 +22,7 @@ async def join_manager() -> None:
         try:
             join_a_channel()
             await asyncio.sleep(1 / bot.config.joinPerSecond)
-        except:
+        except Exception:
             utils.logException()
     print(f'{utils.now()} Ending {name}')
 

@@ -62,7 +62,7 @@ async def _run_task(task: Callable[[datetime], Awaitable[None]],
                     timestamp: datetime) -> None:
     try:
         await task(timestamp)
-    except:
+    except Exception:
         utils.logException()
 
 

@@ -77,8 +77,8 @@ async def commandRandomPyramid(args: ChatCommandArgs) -> bool:
     elif not args.permissions.globalModerator:
         count = min(count, 20)
     emoteIds: List[int] = list(emotes.keys())
-    i: int
-    for i in range(count):
+    _i: int
+    for _i in range(count):
         rep.append(emotes[random.choice(emoteIds)])
         if len(' '.join(rep)) > bot.config.messageLimit:
             del rep[-1]
