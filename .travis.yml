@@ -29,6 +29,7 @@ script:
   - mypy main.py
   - mypy pkg/botgotsthis/mypy-test.py
   - mypy pkg/custom_command/mypy-test.py
+  - mypy pkg/feature/mypy-test.py
   - mypy pkg/moderation/mypy-test.py
   - mypy pkg/repeat/mypy-test.py
   - mypy pkg/spam/mypy-test.py
