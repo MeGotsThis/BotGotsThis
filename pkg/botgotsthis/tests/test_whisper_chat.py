@@ -10,7 +10,7 @@ from pkg.botgotsthis.whisper import chat
 
 
 class TestWhisperBroadcaster(TestWhisper):
-    @patch('pkg.botgotsthis.library.broadcaster.empty', autospec=True)
+    @patch('pkg.botgotsthis.library.chat.empty', autospec=True)
     async def test_empty(self, mock_empty):
         mock_empty.return_value = True
         self.assertIs(await chat.commandEmpty(self.args), True)
