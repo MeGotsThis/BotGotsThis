@@ -1,8 +1,5 @@
 .mypy_cache
 *.pyc
-source/private/*
-lists/private/*
-tests/*/private/*
 nohup.out
 *.log
 .idea
