@@ -8,14 +8,14 @@ from bot import utils
 from lib.data import ChatCommandArgs, CustomCommand, CommandActionTokens  # noqa: F401, E501
 from lib.helper import chat, timeout
 from lib.helper.chat import min_args, not_feature, permission, ownerChannel
-from ..library import custom
+from . import library
 
 
 @not_feature('nocustom')
 async def customCommands(args: ChatCommandArgs) -> bool:
     command: Optional[CustomCommand]
-    command = await custom.get_command(args.database, args.message.command,
-                                       args.chat.channel, args.permissions)
+    command = await library.get_command(args.database, args.message.command,
+                                        args.chat.channel, args.permissions)
     if command is not None:
         cooldown: timedelta
         cooldown = timedelta(seconds=bot.config.customMessageCooldown)
@@ -27,7 +27,7 @@ async def customCommands(args: ChatCommandArgs) -> bool:
                                  'moderator'):
             return False
 
-        msgs: List[str] = await custom.create_messages(command, args)
+        msgs: List[str] = await library.create_messages(command, args)
         args.chat.send(msgs)
         if args.permissions.chatModerator:
             await timeout.record_timeout(args.chat, args.nick, msgs,
@@ -51,7 +51,7 @@ async def commandCommand(args: ChatCommandArgs) -> bool:
 @min_args(3)
 async def process_command(args: ChatCommandArgs,
                           broadcaster: str) -> bool:
-    input: Optional[CommandActionTokens] = custom.parse_action_message(
+    input: Optional[CommandActionTokens] = library.parse_action_message(
         args.message, broadcaster)
     if input is None:
         return False
@@ -219,12 +219,12 @@ async def raw_command(args: ChatCommandArgs,
 async def level_command(args: ChatCommandArgs,
                         input: CommandActionTokens) -> bool:
     permission: str = input.text.lower()
-    if permission not in custom.permissions:
+    if permission not in library.permissions:
         message = f'{args.nick} -> {input.text} is an invalid permission'
     else:
         successful: bool = await args.database.levelCustomCommand(
             input.broadcaster, input.level, input.command, args.nick,
-            custom.permissions[permission])
+            library.permissions[permission])
         if successful:
             message = f'''\
 {args.nick} -> {input.command} changed permission successfully'''

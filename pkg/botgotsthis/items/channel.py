@@ -2,7 +2,6 @@
 
 from lib import data
 from ..channel import broadcaster
-from ..channel import custom
 from ..channel import feature
 from ..channel import mod
 from ..channel import owner
@@ -25,7 +24,6 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!part': owner.commandPart,
             '!emptychat': owner.commandEmpty,
             '!emptyall': owner.commandEmptyAll,
-            '!global': custom.commandGlobal,
             '!say': owner.commandSay,
             '!hello': broadcaster.commandHello,
             '!leave': broadcaster.commandLeave,
@@ -37,7 +35,6 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!setgame': mod.commandRawGame,
             '!community': mod.commandCommunity,
             '!permit': mod.commandPermit,
-            '!command': custom.commandCommand,
             '!come': broadcaster.commandCome,
             '!autojoin': broadcaster.commandAutoJoin,
             '!uptime': broadcaster.commandUptime,
@@ -54,4 +51,4 @@ def commandsStartWith() -> Mapping[str, Optional[data.ChatCommand]]:
 
 
 def processNoCommand() -> Iterable[data.ChatCommand]:
-    yield custom.customCommands
+    return []

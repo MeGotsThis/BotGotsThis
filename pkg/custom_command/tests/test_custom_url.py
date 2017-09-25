@@ -8,7 +8,7 @@ from lib.data.message import Message
 from tests.unittest.base_custom import TestCustomField
 
 # Needs to be imported last
-from pkg.botgotsthis.custom import url
+from ..custom import url
 
 
 class TestCustomUrl(TestCustomField):
@@ -111,7 +111,7 @@ class TestCustomUrl(TestCustomField):
             'http://localhost/', timeout=1)
         self.assertTrue(self.mock_session.get.called)
 
-    @patch('pkg.botgotsthis.custom.url.field_replace')
+    @patch('pkg.custom_command.custom.url.field_replace')
     async def test_field(self, mock_replace):
         mock_replace.side_effect = ['PogChamp', 'FrankerZ']
         self.args = self.args._replace(param='http://localhost/{user}/{query}')
@@ -126,7 +126,7 @@ class TestFieldReplace(TestCustomField):
     def setUp(self):
         super().setUp()
 
-        patcher = patch('pkg.botgotsthis.custom.url.fieldUrl')
+        patcher = patch('pkg.custom_command.custom.url.fieldUrl')
         self.addCleanup(patcher.stop)
         self.mock_fieldUrl = patcher.start()
 

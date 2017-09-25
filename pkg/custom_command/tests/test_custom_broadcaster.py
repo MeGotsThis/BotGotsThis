@@ -1,7 +1,7 @@
 from tests.unittest.base_custom import TestCustomField
 
 # Needs to be imported last
-from pkg.botgotsthis.custom import broadcaster
+from ..custom import broadcaster
 
 
 class TestCustomBroadcaster(TestCustomField):
