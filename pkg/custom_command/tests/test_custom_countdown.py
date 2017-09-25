@@ -24,7 +24,7 @@ class TimeZone(tzinfo):
         return timedelta()
 
 
-class TestCustomCountdownParse(unittest.TestCase):
+class TestCustomCommandCustomCountdownParse(unittest.TestCase):
     def setUp(self):
 
         patcher = patch('pkg.custom_command.custom.countdown.timezones',
@@ -306,7 +306,7 @@ class TestCustomCountdownParse(unittest.TestCase):
             countdown.parse_date_string('UTC 10:48:23.987654PM 6/15/2000'))
 
 
-class TestCustomCountdownNextDatetime(unittest.TestCase):
+class TestCustomCommandCustomCountdownNextDatetime(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
 
@@ -418,7 +418,7 @@ class TestCustomCountdownNextDatetime(unittest.TestCase):
                                True))
 
 
-class TestCustomCountdownPastDatetime(unittest.TestCase):
+class TesCustomCommandtCustomCountdownPastDatetime(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
 
@@ -538,7 +538,7 @@ class TestCustomCountdownPastDatetime(unittest.TestCase):
                                     None, countdown.Date(2000, 12, 31), True))
 
 
-class TestCustomCountdownParseCooldown(unittest.TestCase):
+class TestCustomCommandCustomCountdownParseCooldown(unittest.TestCase):
     def test_percent(self):
         self.assertEqual(countdown.parse_cooldown('0%'), 0.0)
         self.assertEqual(countdown.parse_cooldown('100%'), 1.0)
@@ -604,7 +604,7 @@ class TestCustomCountdownParseCooldown(unittest.TestCase):
             timedelta(weeks=3, days=6, hours=23, minutes=59, seconds=59))
 
 
-class TestCustomCountdownTestCooldown(unittest.TestCase):
+class TestCustomCommandCustomCountdownTestCooldown(unittest.TestCase):
     def test(self):
         self.assertEqual(
             countdown.test_cooldown(None,
@@ -816,7 +816,7 @@ class TestCustomCountdownTestCooldown(unittest.TestCase):
             math.inf)
 
 
-class TestCustomCountdownParseNextPastCooldown(unittest.TestCase):
+class TestCustomCommandCustomCountdownParseNextPastCooldown(unittest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1, tzinfo=timezones.utc)
 
@@ -990,7 +990,7 @@ class TestCustomCountdownParseNextPastCooldown(unittest.TestCase):
                 -1))
 
 
-class TestCustomCountdownFieldCountdown(TestCustomField):
+class TestCustomCommandCustomCountdownFieldCountdown(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='countdown', param='')
@@ -1211,7 +1211,7 @@ class TestCustomCountdownFieldCountdown(TestCustomField):
         self.assertTrue(self.mock_parse.called)
 
 
-class TestCustomCountdownFieldSince(TestCustomField):
+class TestCustomCommandCustomCountdownFieldSince(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='since', param='')
@@ -1428,7 +1428,7 @@ class TestCustomCountdownFieldSince(TestCustomField):
         self.assertTrue(self.mock_parse.called)
 
 
-class TestCustomCountdownFieldNext(TestCustomField):
+class TestCustomCommandCustomCountdownFieldNext(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='next', param='')
@@ -1633,7 +1633,7 @@ class TestCustomCountdownFieldNext(TestCustomField):
         self.assertTrue(self.mock_parse.called)
 
 
-class TestCustomCountdownFieldPrevious(TestCustomField):
+class TestCustomCommandCustomCountdownFieldPrevious(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='previous', param='')

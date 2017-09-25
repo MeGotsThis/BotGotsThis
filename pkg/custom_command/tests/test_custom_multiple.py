@@ -4,7 +4,7 @@ from tests.unittest.base_custom import TestCustomProcess
 from ..custom import multiple
 
 
-class TestCustomMultiple(TestCustomProcess):
+class TestCustomCommandCustomMultiple(TestCustomProcess):
     def setUp(self):
         super().setUp()
         property_return = [True, None]

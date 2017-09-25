@@ -11,7 +11,7 @@ from tests.unittest.base_custom import TestCustomField
 from ..custom import url
 
 
-class TestCustomUrl(TestCustomField):
+class TestCustomCommandCustomUrl(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='url',
@@ -122,7 +122,7 @@ class TestCustomUrl(TestCustomField):
         self.assertTrue(self.mock_session.get.called)
 
 
-class TestFieldReplace(TestCustomField):
+class TestCustomCommandFieldReplace(TestCustomField):
     def setUp(self):
         super().setUp()
 

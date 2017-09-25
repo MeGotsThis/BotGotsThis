@@ -4,7 +4,7 @@ from tests.unittest.base_custom import TestCustomField
 from ..custom import broadcaster
 
 
-class TestCustomBroadcaster(TestCustomField):
+class TestCustomCommandCustomBroadcaster(TestCustomField):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(field='broadcaster')

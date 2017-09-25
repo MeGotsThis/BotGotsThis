@@ -10,7 +10,7 @@ from tests.unittest.mock_class import IterableMatch, StrContains
 from ..channel import pyramid
 
 
-class TestChannelPyramid(TestChannel):
+class TestSpamChannelPyramid(TestChannel):
     def setUp(self):
         super().setUp()
         self.permissions.broadcaster = False

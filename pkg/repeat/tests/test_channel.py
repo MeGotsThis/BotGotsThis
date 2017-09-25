@@ -9,7 +9,7 @@ from tests.unittest.mock_class import AsyncIterator, StrContains
 from .. import channel
 
 
-class TestChannelRepeat(TestChannel):
+class TestRepeatChannel(TestChannel):
     @patch('pkg.repeat.channel.process_auto_repeat')
     async def test_auto_repeat(self, mock_process):
         self.assertIs(await channel.commandAutoRepeat(self.args), False)

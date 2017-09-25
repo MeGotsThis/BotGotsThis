@@ -10,7 +10,7 @@ from tests.unittest.mock_class import IterableMatch, StrContains
 from ..channel import wall
 
 
-class TestChannelWall(TestChannel):
+class TestSpamChannelWall(TestChannel):
     def setUp(self):
         super().setUp()
         self.permissions.broadcaster = False

@@ -11,7 +11,7 @@ from lib.data.message import Message
 from .. import channel
 
 
-class TestChannelCustomCustomCommand(TestChannel):
+class TestCustomCommandChannelCustomCommands(TestChannel):
     def setUp(self):
         super().setUp()
         self.args = self.args._replace(message=Message('Kappa'))
@@ -122,7 +122,7 @@ class TestChannelCustomCustomCommand(TestChannel):
             self.channel, 'botgotsthis', [], 'Kappa', 'custom')
 
 
-class TestChannelCustomCommand(TestChannel):
+class TestCustomCommandChannelCustomCommand(TestChannel):
     def setUp(self):
         super().setUp()
 
@@ -151,7 +151,7 @@ class TestChannelCustomCommand(TestChannel):
         self.mock_process.assert_called_once_with(self.args, '#global')
 
 
-class TestChannelCustomProcessCommand(TestChannel):
+class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     def setUp(self):
         super().setUp()
         self.message = Message('!commmand test !someCommand')
