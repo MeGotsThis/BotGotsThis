@@ -24,7 +24,7 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!emptyall': owner.commandEmptyAll,
             '!say': owner.commandSay,
             '!empty': chat.commandEmpty,
-            '!permit': mod.commandPermit,
+            '!permit': chat.commandPermit,
             })
     return getattr(commands, 'commands')
 
