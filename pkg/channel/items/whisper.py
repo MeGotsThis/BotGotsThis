@@ -1,14 +1,15 @@
-﻿from lib import data
-from ..whisper import broadcaster
-from typing import Mapping, Optional
+﻿from typing import Mapping, Optional
+
+from lib import data
+from .. import whisper
 
 
 def commands() -> Mapping[str, Optional[data.WhisperCommand]]:
     if not hasattr(commands, 'commands'):
         setattr(commands, 'commands', {
-            '!leave': broadcaster.commandLeave,
-            '!come': broadcaster.commandCome,
-            '!autojoin': broadcaster.commandAutoJoin,
+            '!leave': whisper.commandLeave,
+            '!come': whisper.commandCome,
+            '!autojoin': whisper.commandAutoJoin,
             })
     return getattr(commands, 'commands')
 
