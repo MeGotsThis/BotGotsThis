@@ -1,7 +1,7 @@
 ﻿from typing import Iterable, Mapping, Optional
 
 from lib import data
-from ..channel import broadcaster
+from .. import channel
 
 
 def filterMessage() -> Iterable[data.ChatCommand]:
@@ -11,10 +11,10 @@ def filterMessage() -> Iterable[data.ChatCommand]:
 def commands() -> Mapping[str, Optional[data.ChatCommand]]:
     if not hasattr(commands, 'commands'):
         setattr(commands, 'commands', {
-            '!hello': broadcaster.commandHello,
-            '!leave': broadcaster.commandLeave,
-            '!come': broadcaster.commandCome,
-            '!autojoin': broadcaster.commandAutoJoin,
+            '!hello': channel.commandHello,
+            '!leave': channel.commandLeave,
+            '!come': channel.commandCome,
+            '!autojoin': channel.commandAutoJoin,
             })
     return getattr(commands, 'commands')
 
