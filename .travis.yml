@@ -31,6 +31,7 @@ script:
   - mypy pkg/custom_command/mypy-test.py
   - mypy pkg/moderation/mypy-test.py
   - mypy pkg/repeat/mypy-test.py
-  - mypy pkg/textformat/mypy-test.py
   - mypy pkg/spam/mypy-test.py
+  - mypy pkg/textformat/mypy-test.py
+  - mypy pkg/twitch/mypy-test.py
   - flake8

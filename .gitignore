@@ -15,8 +15,9 @@ pkg/*
 !pkg/custom_command
 !pkg/moderation
 !pkg/repeat
-!pkg/textformat
 !pkg/spam
+!pkg/textformat
+!pkg/twitch
 !pkg/base-pkg
 
 # Ignoring sqlite databases

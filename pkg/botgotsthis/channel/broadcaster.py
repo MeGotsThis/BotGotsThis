@@ -1,9 +1,5 @@
-﻿from datetime import datetime, timedelta  # noqa: F401
-from typing import Optional  # noqa: F401
-
-from lib.api import twitch
-from lib.data import ChatCommandArgs
-from lib.helper.chat import cooldown, permission, ownerChannel, send
+﻿from lib.data import ChatCommandArgs
+from lib.helper.chat import permission, ownerChannel, send
 from ..library import broadcaster
 
 
@@ -38,21 +34,4 @@ async def commandAutoJoin(args: ChatCommandArgs) -> bool:
 async def commandSetTimeoutLevel(args: ChatCommandArgs) -> bool:
     await broadcaster.set_timeout_level(args.database, args.chat.channel,
                                         send(args.chat), args.message)
-    return True
-
-
-@cooldown(timedelta(seconds=60), 'uptime')
-async def commandUptime(args: ChatCommandArgs) -> bool:
-    if not args.chat.isStreaming:
-        channel: str = args.chat.channel
-        args.chat.send(f'''\
-{channel} is currently not streaming or has not been for a minute''')
-    else:
-        currentTime: Optional[datetime]
-        currentTime = await twitch.server_time()
-        if currentTime is not None:
-            uptime: timedelta = currentTime - args.chat.streamingSince
-            args.chat.send(f'Uptime: {uptime}')
-        else:
-            args.chat.send('Failed to get information from twitch.tv')
     return True
