@@ -13,7 +13,7 @@ def features() -> FeatureDict:
     for pkg in bot.globals.pkgs:
         feature: Any
         feature = importlib.import_module('pkg.' + pkg + '.items.feature')
-        ffeatures: FeatureDict = feature.methods()
+        ffeatures: FeatureDict = feature.features()
         if ffeatures:
             ftrs.append(ffeatures)
     return ChainMap(*ftrs)
