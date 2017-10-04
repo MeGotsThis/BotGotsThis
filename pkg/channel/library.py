@@ -76,7 +76,7 @@ async def auto_join_add(database: DatabaseMain,
     result: bool = await database.saveAutoJoin(channel, 0, cluster)
     priority: Union[int, float] = await database.getAutoJoinsPriority(channel)
     if result is False:
-        database.setAutoJoinServer(channel, cluster)
+        await database.setAutoJoinServer(channel, cluster)
 
     wasInChat: bool = not utils.joinChannel(channel, priority, cluster)
     rejoin: int = 0

@@ -57,7 +57,7 @@ async def reload_server(database: DatabaseMain,
     async for autojoin in database.getAutoJoinsChats():
         cluster: Optional[str] = await twitch.chat_server(autojoin.broadcaster)
         if cluster is not None and autojoin.cluster != cluster:
-            database.setAutoJoinServer(autojoin.broadcaster, cluster)
+            await database.setAutoJoinServer(autojoin.broadcaster, cluster)
             utils.ensureServer(autojoin.broadcaster, autojoin.priority,
                                cluster)
             print(f'{utils.now()} Set Server for {autojoin.broadcaster}')
