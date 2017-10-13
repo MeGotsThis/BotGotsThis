@@ -1,6 +1,6 @@
 # BotGotsThis
 
-This is a Twitch.tv bot written by MeGotsThis. The bot is built to have a modular packaging system.
+This is a Twitch.tv bot written by MeGotsThis. The bot is built to have a modular packaging system. This runs on twitch.tv IRC server. The bot has full support for IRC v3 tags. You can read more about it [here](https://dev.twitch.tv/docs/irc)
 
 # Requirements
 
@@ -10,11 +10,12 @@ This is a Twitch.tv bot written by MeGotsThis. The bot is built to have a modula
 # Setup
 
 1. Run pip on requirements.txt
-2. Rename any of *.dist.ini to *.ini and fill in any configuration
-3. Setting up the database:
+2. Get your OAuth token from [here](https://twitchapps.com/tmi/)
+3. Rename any of *.dist.ini to *.ini and fill in any configuration
+4. Setting up the database:
     1. Run /lib/database/\*/*.sql to setup the tables to the proper database software
     2. Run /lib/database/gamesabbreviation.sql to populate the game_abbreviations table
-4. Run main.py
+5. Run main.py
 
 # Extra modules
 
