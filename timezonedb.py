@@ -8,7 +8,7 @@ import urllib.request
 import zipfile
 
 ini = configparser.ConfigParser()
-ini.read('config.ini')
+ini.read('database.ini')
 
 response = urllib.request.urlopen('http://timezonedb.com/date.txt')
 tzdate = datetime.date(*[int(i) for i in response.read().decode().split('-')])

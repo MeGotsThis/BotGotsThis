@@ -25,7 +25,6 @@ script:
   - python -m unittest discover -s ./tests/unittest -t ./ -p test_*.py
   - python -m unittest discover -s ./pkg -t ./ -p test_*.py
   - python -m unittest discover -s ./tests/database -t ./ -p test_*.py
-  - python -m unittest discover -s ./tests/integrationtest -t ./ -p test_*.py
   - mypy main.py
   - mypy pkg/botgotsthis/mypy-test.py
   - mypy pkg/channel/mypy-test.py
