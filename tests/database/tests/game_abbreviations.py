@@ -1,7 +1,10 @@
-class TestGameAbbreviation:
-    async def tearDown(self):
-        await self.execute(['''DROP TABLE game_abbreviations'''])
-        await super().tearDown()
+from ._drop_tables import TestDropTables
+
+
+class TestGameAbbreviation(TestDropTables):
+    async def setUpInsert(self):
+        await self.execute('INSERT INTO game_abbreviations VALUES (?, ?)',
+                           ('kappa', 'FrankerZ'))
 
     async def test_not_existing(self):
         self.assertIsNone(await self.database.getFullGameTitle('kappahd'))

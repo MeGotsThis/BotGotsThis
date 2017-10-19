@@ -1,13 +1,16 @@
+import os
+
 from tests.database.postgres.test_database import TestPostgres
+from lib import database
 from tests.database.tests.auto_join import TestAutoJoin
 
 
 class TestPostgresAutoJoin(TestAutoJoin, TestPostgres):
     async def setUp(self):
         await super().setUp()
-        await self.execute('''
-CREATE TABLE auto_join (
-    broadcaster VARCHAR NOT NULL PRIMARY KEY,
-    priority INT NOT NULL DEFAULT 0,
-    cluster VARCHAR NOT NULL DEFAULT 'main'
-)''')
+        sqlFile = os.path.join(
+            os.path.dirname(database.__file__),
+            'postgres',
+            'database.sql')
+        with open(sqlFile) as f:
+            await self.execute(f.read())

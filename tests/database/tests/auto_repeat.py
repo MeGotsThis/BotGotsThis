@@ -1,13 +1,10 @@
 from datetime import datetime, timedelta
 from lib.database import AutoRepeatList, AutoRepeatMessage
 from tests.unittest.mock_class import DateTimeNear
+from ._drop_tables import TestDropTables
 
 
-class TestAutoRepeat:
-    async def tearDown(self):
-        await self.execute('''DROP TABLE auto_repeat''')
-        await super().tearDown()
-
+class TestAutoRepeat(TestDropTables):
     async def test_empty(self):
         self.assertEqual(
             [r async for r in self.database.getAutoRepeatToSend()], [])

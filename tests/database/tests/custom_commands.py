@@ -1,14 +1,9 @@
 from datetime import datetime
 from tests.unittest.mock_class import TypeMatch
+from ._drop_tables import TestDropTables
 
 
-class TestCustomCommands:
-    async def tearDown(self):
-        await self.execute(['''DROP TABLE custom_command_properties''',
-                            '''DROP TABLE custom_commands''',
-                            '''DROP TABLE custom_commands_history'''])
-        await super().tearDown()
-
+class TestCustomCommands(TestDropTables):
     async def test_get_commands(self):
         self.assertEqual(
             await self.database.getChatCommands('botgotsthis', 'kappa'),

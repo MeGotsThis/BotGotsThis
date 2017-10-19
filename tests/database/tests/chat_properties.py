@@ -1,8 +1,7 @@
-class TestChatProperties:
-    async def tearDown(self):
-        await self.execute('''DROP TABLE chat_properties''')
-        await super().tearDown()
+from ._drop_tables import TestDropTables
 
+
+class TestChatProperties(TestDropTables):
     async def test_get_property(self):
         self.assertIsNone(
             await self.database.getChatProperty('botgotsthis', 'kappa'))

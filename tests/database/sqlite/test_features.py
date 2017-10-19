@@ -1,13 +1,16 @@
+import os
+
 from tests.database.sqlite.test_database import TestSqlite
+from lib import database
 from tests.database.tests.features import TestFeatures
 
 
 class TestSqliteFeatures(TestFeatures, TestSqlite):
     async def setUp(self):
         await super().setUp()
-        await self.execute('''
-CREATE TABLE chat_features (
-    broadcaster VARCHAR NOT NULL,
-    feature VARCHAR NOT NULL,
-    PRIMARY KEY (broadcaster, feature)
-)''')
+        sqlFile = os.path.join(
+            os.path.dirname(database.__file__),
+            'sqlite',
+            'database.sql')
+        with open(sqlFile) as f:
+            await self.execute(f.read())

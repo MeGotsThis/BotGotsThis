@@ -1,18 +1,17 @@
+import os
+
 from tests.database.sqlite.test_database import TestSqlite
+from lib import database
 from tests.database.tests.bot_managers import TestBotManagers
 
 
 class TestSqliteBotManagers(TestBotManagers, TestSqlite):
     async def setUp(self):
         await super().setUp()
-        await self.execute(['''
-CREATE TABLE bot_managers (
-    twitchUser VARCHAR NOT NULL PRIMARY KEY
-)''', '''
-CREATE TABLE bot_managers_log (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    twitchUser VARCHAR NOT NULL,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    actionLog VARCHAR NOT NULL
-)''', '''
-INSERT INTO bot_managers VALUES ('megotsthis')'''])
+        sqlFile = os.path.join(
+            os.path.dirname(database.__file__),
+            'sqlite',
+            'database.sql')
+        with open(sqlFile) as f:
+            await self.execute(f.read())
+        await self.setUpInsert()

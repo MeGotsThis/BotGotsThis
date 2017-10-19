@@ -1,19 +1,16 @@
+import os
+
 from tests.database.sqlite.test_database import TestSqlite
+from lib import database
 from tests.database.tests.auto_repeat import TestAutoRepeat
 
 
 class TestSqliteAutoRepeat(TestAutoRepeat, TestSqlite):
     async def setUp(self):
         await super().setUp()
-        await self.execute('''
-CREATE TABLE auto_repeat (
-    broadcaster VARCHAR NOT NULL,
-    name VARCHAR NOT NULL,
-    message VARCHAR NOT NULL,
-    numLeft INTEGER,
-    duration REAL NOT NULL,
-    lastSent TIMESTAMP NOT NULL,
-    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (broadcaster, name)
-);
-''')
+        sqlFile = os.path.join(
+            os.path.dirname(database.__file__),
+            'sqlite',
+            'database.sql')
+        with open(sqlFile) as f:
+            await self.execute(f.read())

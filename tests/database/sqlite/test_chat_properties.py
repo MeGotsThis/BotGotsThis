@@ -1,14 +1,16 @@
+import os
+
 from tests.database.sqlite.test_database import TestSqlite
+from lib import database
 from tests.database.tests.chat_properties import TestChatProperties
 
 
 class TestSqliteChatProperties(TestChatProperties, TestSqlite):
     async def setUp(self):
         await super().setUp()
-        await self.execute('''
-CREATE TABLE chat_properties (
-    broadcaster VARCHAR NOT NULL,
-    property VARCHAR NOT NULL,
-    value VARCHAR NOT NULL,
-    PRIMARY KEY (broadcaster, property)
-)''')
+        sqlFile = os.path.join(
+            os.path.dirname(database.__file__),
+            'postgres',
+            'database.sql')
+        with open(sqlFile) as f:
+            await self.execute(f.read())

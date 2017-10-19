@@ -1,12 +1,12 @@
 from datetime import datetime
 from tests.unittest.mock_class import TypeMatch
+from ._drop_tables import TestDropTables
 
 
-class TestBotManagers:
-    async def tearDown(self):
-        await self.execute(['''DROP TABLE bot_managers''',
-                            '''DROP TABLE bot_managers_log'''])
-        await super().tearDown()
+class TestBotManagers(TestDropTables):
+    async def setUpInsert(self):
+        await self.execute('''
+INSERT INTO bot_managers VALUES ('megotsthis')''')
 
     async def test_is_bot_manager_true(self):
         self.assertIs(await self.database.isBotManager('megotsthis'), True)

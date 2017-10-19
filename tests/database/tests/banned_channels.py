@@ -1,13 +1,9 @@
 from datetime import datetime
 from tests.unittest.mock_class import TypeMatch
+from ._drop_tables import TestDropTables
 
 
-class TestBannedChannels:
-    async def tearDown(self):
-        await self.execute(['''DROP TABLE banned_channels''',
-                            '''DROP TABLE banned_channels_log'''])
-        await super().tearDown()
-
+class TestBannedChannels(TestDropTables):
     async def test_list(self):
         self.assertEqual([b async for b in self.database.listBannedChannels()],
                          [])

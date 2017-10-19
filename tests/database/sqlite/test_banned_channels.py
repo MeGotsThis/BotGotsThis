@@ -1,22 +1,16 @@
+import os
+
 from tests.database.sqlite.test_database import TestSqlite
+from lib import database
 from tests.database.tests.banned_channels import TestBannedChannels
 
 
 class TestSqliteBannedChannels(TestBannedChannels, TestSqlite):
     async def setUp(self):
         await super().setUp()
-        await self.execute(['''
-CREATE TABLE banned_channels (
-    broadcaster VARCHAR NOT NULL PRIMARY KEY,
-    currentTime TIMESTAMP NOT NULL,
-    reason VARCHAR NOT NULL,
-    who VARCHAR NOT NULL
-)''', '''
-CREATE TABLE banned_channels_log (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    broadcaster VARCHAR NOT NULL,
-    currentTime TIMESTAMP NOT NULL,
-    reason VARCHAR NOT NULL,
-    who VARCHAR NOT NULL,
-    actionLog VARCHAR NOT NULL
-)'''])
+        sqlFile = os.path.join(
+            os.path.dirname(database.__file__),
+            'sqlite',
+            'database.sql')
+        with open(sqlFile) as f:
+            await self.execute(f.read())

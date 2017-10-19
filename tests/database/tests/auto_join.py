@@ -1,12 +1,9 @@
 import math
 from lib.database import AutoJoinChannel
+from ._drop_tables import TestDropTables
 
 
-class TestAutoJoin:
-    async def tearDown(self):
-        await self.execute('''DROP TABLE auto_join''')
-        await super().tearDown()
-
+class TestAutoJoin(TestDropTables):
     async def test_chats_empty(self):
         self.assertEqual([c async for c in self.database.getAutoJoinsChats()],
                          [])

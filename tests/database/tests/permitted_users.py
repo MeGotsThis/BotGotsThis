@@ -1,12 +1,12 @@
 from datetime import datetime
 from tests.unittest.mock_class import TypeMatch
+from ._drop_tables import TestDropTables
 
 
-class TestPermittedUsers:
-    async def tearDown(self):
-        await self.execute(['''DROP TABLE permitted_users''',
-                            '''DROP TABLE permitted_users_log'''])
-        await super().tearDown()
+class TestPermittedUsers(TestDropTables):
+    async def setUpInsert(self):
+        await self.execute(['''
+INSERT INTO permitted_users VALUES ('botgotsthis', 'megotsthis')'''])
 
     async def test_is_permitted_true(self):
         self.assertIs(
