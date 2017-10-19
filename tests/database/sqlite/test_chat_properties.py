@@ -10,7 +10,7 @@ class TestSqliteChatProperties(TestChatProperties, TestSqlite):
         await super().setUp()
         sqlFile = os.path.join(
             os.path.dirname(database.__file__),
-            'postgres',
+            'sqlite',
             'database.sql')
         with open(sqlFile) as f:
             await self.execute(f.read())
