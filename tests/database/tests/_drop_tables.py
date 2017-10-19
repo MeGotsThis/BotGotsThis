@@ -1,7 +1,3 @@
-import math
-from lib.database import AutoJoinChannel
-
-
 class TestDropTables:
     async def tearDown(self):
         await self.execute('''DROP TABLE IF EXISTS auto_join''')
