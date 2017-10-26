@@ -23,7 +23,10 @@ INSERT INTO timezone VALUES ('399','PST','2140678800','-28800','0')
 
     async def tearDown(self):
         await self.execute(['''DROP TABLE zone''',
-                            '''DROP TABLE timezone'''])
+                            '''DROP TABLE timezone''',
+                            '''DROP TABLE country''',
+                            '''DROP TABLE updated''',
+                            ])
         await super().tearDown()
 
     async def test_timezone_names(self):
