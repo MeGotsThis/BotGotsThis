@@ -103,7 +103,7 @@ async def loadTwitchCommunityId(id: str,
         else:
             if timestamp < cacheTime + timedelta(days=1):
                 return True
-    community: Any  # Optional[twitch.TwitchCommunity]
+    community: Optional[twitch.TwitchCommunity]
     community = await twitch.get_community_by_id(id)
     if community is None:
         return False
@@ -124,7 +124,7 @@ async def loadTwitchCommunity(name: str,
         else:
             if timestamp < cacheTime + timedelta(days=1):
                 return True
-    community: Any  # Optional[twitch.TwitchCommunity]
+    community: Optional[twitch.TwitchCommunity]
     community = await twitch.get_community(lname)
     if community is None:
         return False

@@ -4,7 +4,7 @@ import pyodbc
 
 from typing import Optional, Type, TYPE_CHECKING
 if TYPE_CHECKING:
-    from typing import TracebackType  # noqa: F401
+    from types import TracebackType  # noqa: F401
 
 
 class Database:

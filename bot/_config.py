@@ -153,7 +153,7 @@ class BotConfig:
             self.pkgs.clear()
             option: str
             _value: str
-            for option, _value in ini.items('PKG'):  # type: ignore
+            for option, _value in ini.items('PKG'):
                 if ini.getboolean('PKG', option):
                     self.pkgs.append(option)
             if 'botgotsthis' not in self.pkgs:
