@@ -1,16 +1,18 @@
 ﻿# Import some necessary libraries.
 import asyncio
-import aioodbc
-import bot
 import importlib
 import pkgutil
 import types  # noqa: F401
 from importlib.abc import PathEntryFinder  # noqa: F401
+from typing import Any, Awaitable, Generator, List, Optional, Tuple  # noqa: F401,E501
+from typing import cast  # noqa: F401,E501
+
+import aioodbc
+
+import bot
 from lib import database
 from lib.data import timezones
 from lib.database import AutoJoinChannel  # noqa: F401
-from typing import Any, Awaitable, Generator, List, Optional, Tuple  # noqa: F401,E501
-from typing import cast  # noqa: F401,E501
 from . import utils
 from .coroutine import background, connection, join, logging
 
