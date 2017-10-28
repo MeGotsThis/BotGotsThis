@@ -56,6 +56,12 @@ oauth =
 timeout =
 timezone =
 
+
+[REDIS]
+host = localhost
+port = 6379
+connections =
+
 [twitch]
 twitchClientID = 
 twitchSecret = 

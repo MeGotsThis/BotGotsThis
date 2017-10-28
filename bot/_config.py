@@ -3,7 +3,7 @@ import os
 
 import aiofiles
 
-from typing import Dict, List  # noqa: F401
+from typing import Dict, List, Optional, Union  # noqa: F401
 
 
 class BotConfig:
@@ -52,6 +52,14 @@ class BotConfig:
             'oauth': 10,
             'timeout': 10,
             'timezone': 10,
+        }
+
+        self.redis: Dict[str, Optional[Union[str, int]]] = {
+            'host': 'localhost',
+            'port': 6379,
+            'db': 0,
+            'password': None,
+            'connections': 10,
         }
 
         self.pkgs: List[str] = ['botgotsthis']
@@ -171,6 +179,20 @@ class BotConfig:
                     i = int(ini['CONNECTIONS'][s])
                     if i:
                         self.connections[s] = i
+
+            if ini['REDIS']['host'] and ini['REDIS']['port']:
+                self.redis['host'] = ini['REDIS']['host']
+                self.redis['port'] = ini['REDIS']['port']
+
+                if 'db' in ini['REDIS']:
+                    self.redis['db'] = int(ini['REDIS']['db'])
+
+                if 'password' in ini['REDIS']:
+                    self.redis['password'] = ini['REDIS']['password']
+
+                if ini['REDIS']['connections']:
+                    i = int(ini['REDIS']['connections'])
+                    self.redis['connections'] = i
 
         if os.path.isfile('twitchApi.ini'):
             ini = configparser.ConfigParser()
