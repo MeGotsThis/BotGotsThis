@@ -8,6 +8,7 @@ from typing import Any, Awaitable, Generator, List, Optional, Tuple  # noqa: F40
 from typing import cast  # noqa: F401,E501
 
 import aioodbc
+import aioredis
 
 import bot
 from lib import database
@@ -27,6 +28,13 @@ async def initializer() -> None:
 
     bot.globals.clusters['aws'] = connection.ConnectionHandler(
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
+
+    bot.globals.redisPool = await aioredis.create_pool(
+        (bot.config.redis['host'], bot.config.redis['port']),
+        db=bot.config.redis['db'], password=bot.config.redis['password'],
+        minsize=bot.config.redis['connections'],
+        maxsize=bot.config.redis['connections'],
+    )
 
     schema: database.Schema
     for schema in database.Schema:

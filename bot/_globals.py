@@ -1,4 +1,5 @@
 import aioodbc  # noqa: F401
+import aioredis  # noqa: F401
 
 from datetime import datetime
 
@@ -93,3 +94,5 @@ class BotGlobals:
 
         self.pkgs: Tuple[str, ...] = tuple()
         self.connectionPools: Dict[str, aioodbc.Pool] = {}
+
+        self.redisPool: aioredis.ConnectionsPool
