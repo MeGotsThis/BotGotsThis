@@ -57,7 +57,7 @@ class BotConfig:
         self.redis: Dict[str, Optional[Union[str, int]]] = {
             'host': 'localhost',
             'port': 6379,
-            'db': 0,
+            'db': None,
             'password': None,
             'connections': 10,
         }
