@@ -93,9 +93,9 @@ async def create_messages(command: CustomCommand,
         return [str(command.message)]
     messages: List[str] = [''.join(messageParts)]
     processArgument: CustomProcessArgs = CustomProcessArgs(
-        args.database, args.chat, args.tags, args.nick, args.permissions,
-        command.broadcaster, command.level, args.message.command,
-        messages)
+        args.data, args.database, args.chat, args.tags, args.nick,
+        args.permissions, command.broadcaster, command.level,
+        args.message.command, messages)
     process: CustomCommandProcess
     for process in lib.items.custom.postProcess():
         await process(processArgument)

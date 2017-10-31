@@ -4,6 +4,7 @@ import asynctest
 from asynctest.mock import MagicMock, Mock, patch
 
 from bot.twitchmessage import IrcMessageTags
+from lib.cache import CacheStore
 from lib.data import WhisperCommandArgs
 from lib.data.message import Message
 from lib.data.permissions import WhisperPermissionSet
@@ -15,10 +16,12 @@ class TestLibraryWhisper(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.tags = IrcMessageTags()
+        self.data = Mock(spec=CacheStore)
         self.database = Mock(spec=DatabaseMain)
         self.permissions = MagicMock(spec=WhisperPermissionSet)
-        self.args = WhisperCommandArgs(self.database, 'botgotsthis',
-                                       Message(''), self.permissions, self.now)
+        self.args = WhisperCommandArgs(
+            self.data, self.database, 'botgotsthis', Message(''),
+            self.permissions, self.now)
 
     @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.whisper', autospec=True)

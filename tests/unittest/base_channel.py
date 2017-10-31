@@ -8,6 +8,7 @@ from asynctest.mock import MagicMock, Mock
 
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
+from lib.cache import CacheStore
 from lib.data import ChatCommandArgs
 from lib.data.message import Message
 from lib.data.permissions import ChatPermissionSet
@@ -21,6 +22,7 @@ class TestChannel(asynctest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
+        self.data = Mock(spec=CacheStore)
         self.database = Mock(spec=DatabaseMain)
         self.features = []
         self.database.hasFeature.side_effect = lambda c, f: f in self.features
@@ -42,6 +44,6 @@ class TestChannel(asynctest.TestCase):
         self.permissions.inOwnerChannel = False
         self.permissions.__getitem__.side_effect = \
             lambda k: self.permissionSet[k]
-        self.args = ChatCommandArgs(self.database, self.channel, self.tags,
-                                    'botgotsthis', Message(''),
-                                    self.permissions, self.now)
+        self.args = ChatCommandArgs(
+            self.data, self.database, self.channel, self.tags, 'botgotsthis',
+            Message(''), self.permissions, self.now)
