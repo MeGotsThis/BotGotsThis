@@ -3,6 +3,7 @@ from datetime import datetime
 import asynctest
 from asynctest.mock import MagicMock, Mock
 
+from lib.cache import CacheStore
 from lib.data import ManageBotArgs
 from lib.data.message import Message
 from lib.data.permissions import ChatPermissionSet
@@ -17,6 +18,7 @@ class TestManageBot(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
         self.send = Mock(spec=send)
+        self.data = Mock(spec=CacheStore)
         self.database = Mock(spec=DatabaseMain)
         self.permissionSet = {
             'owner': False,
@@ -35,5 +37,5 @@ class TestManageBot(asynctest.TestCase):
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.permissions.__getitem__.side_effect = \
             lambda k: self.permissionSet[k]
-        self.args = ManageBotArgs(self.database, self.permissions, self.send,
-                                  'botgotsthis', Message(''))
+        self.args = ManageBotArgs(self.data, self.database, self.permissions,
+                                  self.send, 'botgotsthis', Message(''))

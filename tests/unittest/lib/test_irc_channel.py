@@ -10,6 +10,7 @@ from asynctest.mock import call, patch
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from lib import channel
+from lib.cache import CacheStore
 from lib.database import DatabaseMain
 from lib.data.message import Message
 
@@ -44,14 +45,19 @@ class TestChannel(asynctest.TestCase):
 
     @patch('bot.utils.logException', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
+    @patch('lib.cache.get_cache')
     @patch('lib.database.get_database')
     @patch('lib.channel.commandsToProcess', autospec=True)
-    async def test_chatCommand(self, mock_commands, mock_database, mock_save,
-                               mock_log):
+    async def test_chatCommand(self, mock_commands, mock_database, mock_data,
+                               mock_save, mock_log):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
         mock_commands.return_value = [command1, command2, command3]
+        data = MagicMock(spec=CacheStore)
+        data.__aenter__.return_value = data
+        data.__aexit__.return_value = True
+        mock_data.return_value = data
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database
         database.isPermittedUser.return_value = False
@@ -73,12 +79,18 @@ class TestChannel(asynctest.TestCase):
         self.assertEqual(mock_log.call_count, 0)
 
     @patch('bot.utils.logException', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    @patch('lib.cache.get_cache')
     @patch('lib.database.get_database')
     @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand_except(self, mock_commands, mock_database,
-                                      mock_log):
+                                      mock_data, mock_save, mock_log):
         command = CoroutineMock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
+        data = MagicMock(spec=CacheStore)
+        data.__aenter__.return_value = data
+        data.__aexit__.return_value = False
+        mock_data.return_value = data
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database
         database.isPermittedUser.return_value = False
@@ -89,6 +101,7 @@ class TestChannel(asynctest.TestCase):
         type(message).command = PropertyMock(return_value='Kappa')
         await channel.chatCommand(self.channel, self.tags, 'botgotsthis',
                                   message, self.now)
+        self.assertTrue(mock_save.called)
         self.assertEqual(database.isPermittedUser.call_count, 1)
         self.assertEqual(database.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
@@ -96,28 +109,59 @@ class TestChannel(asynctest.TestCase):
         self.assertTrue(mock_log.called)
 
     @patch('bot.utils.logException', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    @patch('lib.cache.get_cache')
     @patch('lib.database.get_database')
     @patch('lib.channel.commandsToProcess', autospec=True)
-    async def test_chatCommand_database_except(self, mock_commands,
-                                               mock_database, mock_log):
-        mock_database.side_effect = Exception
+    async def test_chatCommand_data_except(
+            self, mock_commands, mock_database, mock_data, mock_save,
+            mock_log):
+        mock_data.side_effect = Exception
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
         await channel.chatCommand(self.channel, self.tags, 'botgotsthis',
                                   message, self.now)
+        self.assertTrue(mock_save.called)
+        self.assertFalse(mock_database.called)
         self.assertFalse(mock_commands.called)
         self.assertTrue(mock_log.called)
 
     @patch('bot.utils.logException', autospec=True)
     @patch('bot.utils.saveTwitchId', autospec=True)
+    @patch('lib.cache.get_cache')
+    @patch('lib.database.get_database')
+    @patch('lib.channel.commandsToProcess', autospec=True)
+    async def test_chatCommand_database_except(
+            self, mock_commands, mock_database, mock_data, mock_save,
+            mock_log):
+        data = MagicMock(spec=CacheStore)
+        data.__aenter__.return_value = data
+        data.__aexit__.return_value = False
+        mock_data.return_value = data
+        mock_database.side_effect = Exception
+        message = Mock(spec=Message)
+        type(message).command = PropertyMock(return_value='Kappa')
+        await channel.chatCommand(self.channel, self.tags, 'botgotsthis',
+                                  message, self.now)
+        self.assertTrue(mock_save.called)
+        self.assertFalse(mock_commands.called)
+        self.assertTrue(mock_log.called)
+
+    @patch('bot.utils.logException', autospec=True)
+    @patch('bot.utils.saveTwitchId', autospec=True)
+    @patch('lib.cache.get_cache')
     @patch('lib.database.get_database')
     @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand_no_tags(self, mock_commands, mock_database,
-                                       mock_save, mock_log):
+                                       mock_data, mock_save, mock_log):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
         mock_commands.return_value = [command1, command2, command3]
+        data = MagicMock(spec=CacheStore)
+        data.__aenter__.return_value = data
+        data.__aexit__.return_value = True
+        mock_data.return_value = data
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database
         database.isPermittedUser.return_value = False

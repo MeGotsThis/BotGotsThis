@@ -7,6 +7,7 @@ from asynctest.mock import MagicMock, Mock
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
 from datetime import datetime
+from lib.cache import CacheStore
 from lib.data import CustomFieldArgs, CustomProcessArgs
 from lib.data.message import Message
 from lib.data.permissions import ChatPermissionSet
@@ -28,6 +29,7 @@ class TestCustomProcess(asynctest.TestCase):
         self.tags = IrcMessageTags()
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
+        self.data = Mock(spec=CacheStore)
         self.database = Mock(spec=DatabaseMain)
         self.permissionSet = {
             'owner': False,
@@ -46,5 +48,5 @@ class TestCustomProcess(asynctest.TestCase):
             lambda k: self.permissionSet[k]
         self.messages = ['Kappa']
         self.args = CustomProcessArgs(
-            self.database, self.channel, self.tags, 'botgotsthis',
+            self.data, self.database, self.channel, self.tags, 'botgotsthis',
             self.permissions, 'botgotsthis', '', 'kappa', self.messages)

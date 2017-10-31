@@ -1,6 +1,7 @@
-from bot import data  # noqa: F401
+from bot import data as botData  # noqa: F401
 from .message import Message
 from .permissions import ChatPermissionSet, WhisperPermissionSet
+from ..cache import CacheStore
 from ..database import DatabaseMain
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from datetime import datetime
@@ -12,8 +13,9 @@ Send = Callable[[Union[str, Iterable[str]]], None]
 
 
 class ChatCommandArgs(NamedTuple):
+    data: CacheStore
     database: DatabaseMain
-    chat: 'data.Channel'
+    chat: 'botData.Channel'
     tags: IrcMessageTagsReadOnly
     nick: str
     message: Message
@@ -22,6 +24,7 @@ class ChatCommandArgs(NamedTuple):
 
 
 class WhisperCommandArgs(NamedTuple):
+    data: CacheStore
     database: DatabaseMain
     nick: str
     message: Message
@@ -43,8 +46,9 @@ class CustomFieldArgs(NamedTuple):
 
 
 class CustomProcessArgs(NamedTuple):
+    data: CacheStore
     database: DatabaseMain
-    chat: 'data.Channel'
+    chat: 'botData.Channel'
     tags: IrcMessageTagsReadOnly
     nick: str
     permissions: ChatPermissionSet
@@ -55,6 +59,7 @@ class CustomProcessArgs(NamedTuple):
 
 
 class ManageBotArgs(NamedTuple):
+    data: CacheStore
     database: DatabaseMain
     permissions: Union[ChatPermissionSet, WhisperPermissionSet]
     send: Send

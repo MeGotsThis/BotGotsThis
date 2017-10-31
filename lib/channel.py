@@ -6,6 +6,7 @@ import lib.items.channel
 from bot import data as botData, utils  # noqa: F401
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from . import data
+from . import cache
 from . import database
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
@@ -37,6 +38,7 @@ async def chatCommand(chat: 'botData.Channel',
     permissions: ChatPermissionSet
     arguments: data.ChatCommandArgs
     command: data.ChatCommand
+    cacheStore: cache.CacheStore
     db: database.Database
     try:
         if tags is not None:
@@ -45,7 +47,8 @@ async def chatCommand(chat: 'botData.Channel',
                                    timestamp)
             if 'user-id' in tags:
                 utils.saveTwitchId(nick, str(tags['user-id']), timestamp)
-        async with database.get_database() as db:
+        async with cache.get_cache() as cacheStore, \
+                database.get_database() as db:
             databaseObj: database.DatabaseMain
             databaseObj = cast(database.DatabaseMain, db)
             permitted = await databaseObj.isPermittedUser(chat.channel, nick)
@@ -54,8 +57,8 @@ async def chatCommand(chat: 'botData.Channel',
                                             manager)
 
             arguments = data.ChatCommandArgs(
-                databaseObj, chat, tags, nick, message, permissions,
-                timestamp)
+                cacheStore, databaseObj, chat, tags, nick, message,
+                permissions, timestamp)
             for command in commandsToProcess(message.command):
                 if await command(arguments):
                     return

@@ -46,5 +46,6 @@ async def commandEmpty(args: WhisperCommandArgs) -> bool:
 @min_args(2)
 @permission('manager')
 async def commandManageBot(args: WhisperCommandArgs) -> bool:
-    return await managebot.manage_bot(args.database, args.permissions,
-                                      send(args.nick), args.nick, args.message)
+    return await managebot.manage_bot(
+        args.data, args.database, args.permissions, send(args.nick),
+        args.nick, args.message)

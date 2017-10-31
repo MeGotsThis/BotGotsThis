@@ -8,6 +8,7 @@ from asynctest.mock import CoroutineMock, MagicMock, Mock, PropertyMock, patch
 
 from bot.twitchmessage import IrcMessageTags
 from lib import whisper
+from lib.cache import CacheStore
 from lib.database import DatabaseMain
 from lib.data.message import Message
 
@@ -36,13 +37,19 @@ class TestWhisper(asynctest.TestCase):
         whisper.parse(self.tags, 'botgotsthis', '  ', self.now)
         self.assertFalse(mock_whisperCommand.called)
 
+    @patch('lib.cache.get_cache')
     @patch('lib.database.get_database')
     @patch('lib.whisper.commandsToProcess', autospec=True)
-    async def test_whisperCommand(self, mock_commands, mock_database):
+    async def test_whisperCommand(self, mock_commands, mock_database,
+                                  mock_data):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
         mock_commands.return_value = [command1, command2, command3]
+        data = MagicMock(spec=CacheStore)
+        data.__aenter__.return_value = data
+        data.__aexit__.return_value = True
+        mock_data.return_value = data
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database
         database.__aexit__.return_value = True
@@ -57,12 +64,17 @@ class TestWhisper(asynctest.TestCase):
         self.assertEqual(command3.call_count, 0)
 
     @patch('bot.utils.logException', autospec=True)
+    @patch('lib.cache.get_cache')
     @patch('lib.database.get_database')
     @patch('lib.whisper.commandsToProcess', autospec=True)
     async def test_whisperCommand_except(self, mock_commands, mock_database,
-                                         mock_log):
+                                         mock_data, mock_log):
         command = CoroutineMock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
+        data = MagicMock(spec=CacheStore)
+        data.__aenter__.return_value = data
+        data.__aexit__.return_value = False
+        mock_data.return_value = data
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database
         database.__aexit__.return_value = False

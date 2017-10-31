@@ -5,6 +5,7 @@ from datetime import datetime
 from asynctest.mock import MagicMock, Mock
 
 from bot.data import Channel
+from lib.cache import CacheStore
 from lib.data import WhisperCommandArgs
 from lib.data.message import Message
 from lib.data.permissions import WhisperPermissionSet
@@ -17,6 +18,7 @@ class TestWhisper(asynctest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
+        self.data = Mock(spec=CacheStore)
         self.database = Mock(spec=DatabaseMain)
         self.permissionSet = {
             'owner': False,
@@ -28,5 +30,6 @@ class TestWhisper(asynctest.TestCase):
         self.permissions = MagicMock(spec=WhisperPermissionSet)
         self.permissions.__getitem__.side_effect = \
             lambda k: self.permissionSet[k]
-        self.args = WhisperCommandArgs(self.database, 'botgotsthis',
-                                       Message(''), self.permissions, self.now)
+        self.args = WhisperCommandArgs(
+            self.data, self.database, 'botgotsthis', Message(''),
+            self.permissions, self.now)
