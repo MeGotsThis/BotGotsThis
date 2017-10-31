@@ -9,6 +9,7 @@ from asynctest.mock import CoroutineMock, MagicMock, Mock, call, patch
 
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
+from lib.cache import CacheStore
 from lib.data import ChatCommandArgs, CommandActionTokens
 from lib.data import CustomCommand, CustomFieldArgs, CustomFieldParts
 from lib.data import CustomProcessArgs
@@ -231,14 +232,15 @@ class TestCustomCommandLibraryCustomCreateMessages(asynctest.TestCase):
         self.tags = IrcMessageTags()
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
+        self.data = Mock(spec=CacheStore)
         self.database = Mock(spec=DatabaseMain)
         self.database.hasFeature.return_value = False
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.command = CustomCommand('Kappa KappaRoss KappaPride',
                                      '#global', '')
-        self.args = ChatCommandArgs(self.database, self.channel, self.tags,
-                                    'botgotsthis', Message('Kappa'),
-                                    self.permissions, self.now)
+        self.args = ChatCommandArgs(
+            self.data, self.database, self.channel, self.tags, 'botgotsthis',
+            Message('Kappa'), self.permissions, self.now)
 
         patcher = patch(library.__name__ + '.split_message',
                         autospec=True)

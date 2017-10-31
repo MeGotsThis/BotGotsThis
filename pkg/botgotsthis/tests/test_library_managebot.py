@@ -2,6 +2,7 @@ import asynctest
 
 from asynctest.mock import CoroutineMock, Mock, patch
 
+from lib.cache import CacheStore
 from lib.data import ManageBotArgs
 from lib.data.message import Message
 from lib.data.permissions import ChatPermissionSet
@@ -20,6 +21,7 @@ def method(args):
 
 class TestLibraryManageBot(asynctest.TestCase):
     def setUp(self):
+        self.data = Mock(spec=CacheStore)
         self.database = Mock(spec=DatabaseMain)
         self.permissions = Mock(spec=ChatPermissionSet)
         self.send = Mock(spec=send)
@@ -36,8 +38,9 @@ class TestLibraryManageBot(asynctest.TestCase):
     async def test(self):
         message = Message('!managebot method')
         self.assertIs(
-            await managebot.manage_bot(self.database, self.permissions,
-                                       self.send, 'managebot', message),
+            await managebot.manage_bot(
+                self.data, self.database, self.permissions, self.send,
+                'managebot', message),
             True)
         self.assertFalse(self.send.called)
         self.method.assert_called_once_with(TypeMatch(ManageBotArgs))
@@ -45,8 +48,9 @@ class TestLibraryManageBot(asynctest.TestCase):
     async def test_not_existing(self):
         message = Message('!managebot not_existing')
         self.assertIs(
-            await managebot.manage_bot(self.database, self.permissions,
-                                       self.send, 'managebot', message),
+            await managebot.manage_bot(
+                self.data, self.database, self.permissions, self.send,
+                'managebot', message),
             False)
         self.assertFalse(self.send.called)
         self.assertFalse(self.method.called)
@@ -54,8 +58,9 @@ class TestLibraryManageBot(asynctest.TestCase):
     async def test_none(self):
         message = Message('!managebot none')
         self.assertIs(
-            await managebot.manage_bot(self.database, self.permissions,
-                                       self.send, 'managebot', message),
+            await managebot.manage_bot(
+                self.data, self.database, self.permissions, self.send,
+                'managebot', message),
             False)
         self.assertFalse(self.send.called)
         self.assertFalse(self.method.called)
