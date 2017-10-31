@@ -9,19 +9,23 @@ class CacheStore:
                  pool: aioredis.ConnectionsPool) -> None:
         self._pool: aioredis.ConnectionsPool = pool
         self._connection: Optional[aioredis.RedisConnection] = None
+        self._redis: Optional[aioredis.Redis] = None
 
     @property
-    def connection(self) -> aioredis.RedisConnection:
-        if self._connection is None:
+    def redis(self) -> aioredis.Redis:
+        if self._redis is None:
             raise ConnectionError('CacheStore not connected')
-        return self._connection
+        return self._redis
 
     async def open(self) -> None:
         self._connection = await self._pool.acquire()
+        self._redis = aioredis.Redis(self._connection)
 
     async def close(self) -> None:
-        if self.connection is not None:
-            self._pool.release(self.connection)
+        if self._connection is not None:
+            self._pool.release(self._connection)
+            self._connection = None
+            self._redis = None
 
     async def __aenter__(self) -> 'CacheStore':
         await self.open()
