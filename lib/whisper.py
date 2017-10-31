@@ -42,7 +42,7 @@ async def whisperCommand(tags: IrcMessageTagsReadOnly,
                 database.get_database() as db:
             databaseObj: database.DatabaseMain
             databaseObj = cast(database.DatabaseMain, db)
-            manager = await databaseObj.isBotManager(nick)
+            manager = await cacheStore.isBotManager(nick)
             permissions = WhisperPermissionSet(tags, nick, manager)
 
             arguments = data.WhisperCommandArgs(

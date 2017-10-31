@@ -58,6 +58,7 @@ class TestWhisper(asynctest.TestCase):
         type(message).command = PropertyMock(return_value='Kappa')
         await whisper.whisperCommand(self.tags, 'botgotsthis', message,
                                      self.now)
+        self.assertEqual(data.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command1.call_count, 1)
         self.assertEqual(command2.call_count, 1)
@@ -83,15 +84,36 @@ class TestWhisper(asynctest.TestCase):
         type(message).command = PropertyMock(return_value='Kappa')
         await whisper.whisperCommand(self.tags, 'botgotsthis', message,
                                      self.now)
+        self.assertEqual(data.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command.call_count, 1)
         self.assertTrue(mock_log.called)
 
     @patch('bot.utils.logException', autospec=True)
+    @patch('lib.cache.get_cache')
     @patch('lib.database.get_database')
     @patch('lib.whisper.commandsToProcess', autospec=True)
-    async def test_whisperCommand_database_except(self, mock_commands,
-                                                  mock_database, mock_log):
+    async def test_whisperCommand_data_except(
+            self, mock_commands, mock_database, mock_data, mock_log):
+        mock_data.side_effect = Exception
+        message = Mock(spec=Message)
+        type(message).command = PropertyMock(return_value='Kappa')
+        await whisper.whisperCommand(self.tags, 'botgotsthis', message,
+                                     self.now)
+        self.assertFalse(mock_database.called)
+        self.assertFalse(mock_commands.called)
+        self.assertTrue(mock_log.called)
+
+    @patch('bot.utils.logException', autospec=True)
+    @patch('lib.cache.get_cache')
+    @patch('lib.database.get_database')
+    @patch('lib.whisper.commandsToProcess', autospec=True)
+    async def test_whisperCommand_database_except(
+            self, mock_commands, mock_database, mock_data, mock_log):
+        data = MagicMock(spec=CacheStore)
+        data.__aenter__.return_value = data
+        data.__aexit__.return_value = False
+        mock_data.return_value = data
         mock_database.side_effect = Exception
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')

@@ -8,6 +8,10 @@ class TestBotManagers(TestDropTables):
         await self.execute('''
 INSERT INTO bot_managers VALUES ('megotsthis')''')
 
+    async def test_get_bot_managers(self):
+        self.assertEqual([m async for m in self.database.getBotManagers()],
+                         ['megotsthis'])
+
     async def test_is_bot_manager_true(self):
         self.assertIs(await self.database.isBotManager('megotsthis'), True)
 
