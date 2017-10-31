@@ -821,6 +821,13 @@ INSERT INTO permitted_users_log
             await self.commit()
             return True
 
+    async def getBotManagers(self) -> AsyncIterator[str]:
+        query: str = '''SELECT twitchUser FROM bot_managers'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            async for manager, in await cursor.execute(query):
+                yield manager
+
     async def isBotManager(self, user: str) -> bool:
         query: str = '''SELECT 1 FROM bot_managers WHERE twitchUser=?'''
         cursor: aioodbc.cursor.Cursor

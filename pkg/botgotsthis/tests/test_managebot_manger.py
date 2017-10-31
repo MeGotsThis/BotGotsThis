@@ -50,7 +50,7 @@ class TestManageBotManager(TestManageBot):
         args = self.args._replace(message=message)
         self.assertIs(await manager.manageManager(args), True)
         mock_add.assert_called_once_with(
-            'botgotsthis', self.database, self.send)
+            'botgotsthis', self.data, self.send)
 
     @patch(manager.__name__ + '.insert_manager')
     async def test_insert(self, mock_add):
@@ -59,7 +59,7 @@ class TestManageBotManager(TestManageBot):
         args = self.args._replace(message=message)
         self.assertIs(await manager.manageManager(args), True)
         mock_add.assert_called_once_with(
-            'botgotsthis', self.database, self.send)
+            'botgotsthis', self.data, self.send)
 
     @patch(manager.__name__ + '.delete_manager')
     async def test_delete(self, mock_delete):
@@ -68,7 +68,7 @@ class TestManageBotManager(TestManageBot):
         args = self.args._replace(message=message)
         self.assertIs(await manager.manageManager(args), True)
         mock_delete.assert_called_once_with(
-            'botgotsthis', self.database, self.send)
+            'botgotsthis', self.data, self.send)
 
     @patch(manager.__name__ + '.delete_manager')
     async def test_del(self, mock_delete):
@@ -77,7 +77,7 @@ class TestManageBotManager(TestManageBot):
         args = self.args._replace(message=message)
         self.assertIs(await manager.manageManager(args), True)
         mock_delete.assert_called_once_with(
-            'botgotsthis', self.database, self.send)
+            'botgotsthis', self.data, self.send)
 
     @patch(manager.__name__ + '.delete_manager')
     async def test_remove(self, mock_delete):
@@ -86,7 +86,7 @@ class TestManageBotManager(TestManageBot):
         args = self.args._replace(message=message)
         self.assertIs(await manager.manageManager(args), True)
         mock_delete.assert_called_once_with(
-            'botgotsthis', self.database, self.send)
+            'botgotsthis', self.data, self.send)
 
     @patch(manager.__name__ + '.delete_manager')
     async def test_rem(self, mock_delete):
@@ -95,7 +95,7 @@ class TestManageBotManager(TestManageBot):
         args = self.args._replace(message=message)
         self.assertIs(await manager.manageManager(args), True)
         mock_delete.assert_called_once_with(
-            'botgotsthis', self.database, self.send)
+            'botgotsthis', self.data, self.send)
 
 
 class TestManageBotManagerInsertManager(asynctest.TestCase):

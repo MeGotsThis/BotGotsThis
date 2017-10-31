@@ -3,7 +3,7 @@ import bot
 import aioodbc  # noqa: F401
 
 from enum import Enum
-from typing import Dict, Type  # noqa: F401
+from typing import cast, Dict, Type  # noqa: F401
 
 from ._base import Database
 from .main import DatabaseMain
@@ -33,3 +33,8 @@ def get_database(schema: Schema=Schema.Main) -> Database:
         connectionPool = bot.globals.connectionPools[schema.value]
         return databases[schema](connectionPool)
     raise ValueError()
+
+
+def get_main_database() -> DatabaseMain:
+    db: Database = get_database(Schema.Main)
+    return cast(DatabaseMain, db)
