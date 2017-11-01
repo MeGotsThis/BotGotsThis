@@ -515,17 +515,20 @@ INSERT INTO custom_command_properties
             except pyodbc.Error:
                 return False
 
+    async def getFeatures(self, broadcaster: str) -> AsyncIterator[str]:
+        query: str = '''
+SELECT feature FROM chat_features WHERE broadcaster=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            async for feature, in await cursor.execute(query, (broadcaster,)):
+                yield feature
+
     async def hasFeature(self,
                          broadcaster: str,
                          feature: str) -> bool:
         if self.features is None:
-            query: str = '''
-SELECT feature FROM chat_features WHERE broadcaster=?
-'''
-            cursor: aioodbc.cursor.Cursor
-            async with await self.cursor() as cursor:
-                await cursor.execute(query, (broadcaster,))
-                self.features = {f async for f, in cursor}
+            self.features = {f async for f in self.getFeatures(broadcaster)}
         return feature in self.features
 
     async def addFeature(self,

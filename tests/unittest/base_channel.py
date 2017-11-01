@@ -23,6 +23,7 @@ class TestChannel(asynctest.TestCase):
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
         self.data = Mock(spec=CacheStore)
+        self.data.hasFeature.side_effect = lambda c, f: f in self.features
         self.database = Mock(spec=DatabaseMain)
         self.features = []
         self.database.hasFeature.side_effect = lambda c, f: f in self.features

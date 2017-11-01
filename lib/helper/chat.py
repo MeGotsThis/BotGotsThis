@@ -61,7 +61,7 @@ def feature(featureKey: str) -> _AnyDecorator:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
                               *pargs: Any, **kwargs: Any) -> bool:
-            hasFeature: bool = await args.database.hasFeature(
+            hasFeature: bool = await args.data.hasFeature(
                 args.chat.channel, featureKey)
             if not hasFeature:
                 return False
@@ -75,7 +75,7 @@ def not_feature(featureKey: str) -> _AnyDecorator:
         @wraps(func)
         async def chatCommand(args: data.ChatCommandArgs,
                               *pargs: Any, **kwargs: Any) -> bool:
-            hasFeature: bool = await args.database.hasFeature(
+            hasFeature: bool = await args.data.hasFeature(
                 args.chat.channel, featureKey)
             if hasFeature:
                 return False
@@ -94,7 +94,7 @@ def permission_feature(*levelFeatures: Tuple[str, str]) -> _AnyDecorator:
             for level, featureKey in levelFeatures:
                 hasPermission: bool = level is None or args.permissions[level]
                 hasFeature: bool = (featureKey is None
-                                    or await args.database.hasFeature(
+                                    or await args.data.hasFeature(
                                         args.chat.channel, featureKey))
                 if hasPermission and hasFeature:
                     break
@@ -115,7 +115,7 @@ def permission_not_feature(*levelFeatures: Tuple[str, str]) -> _AnyDecorator:
             for level, featureKey in levelFeatures:
                 hasPermission: bool = level is None or args.permissions[level]
                 hasFeature: bool = (featureKey is None
-                                    or not await args.database.hasFeature(
+                                    or not await args.data.hasFeature(
                                         args.chat.channel, featureKey))
                 if hasPermission and hasFeature:
                     break
