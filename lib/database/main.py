@@ -763,6 +763,15 @@ INSERT INTO chat_properties (broadcaster, property, value) VALUES (?, ?, ?)
             await self.commit()
             return cursor.rowcount != 0
 
+    async def getPermittedUsers(self, broadcaster: str) -> AsyncIterator[str]:
+        query: str = '''
+SELECT twitchUser FROM permitted_users WHERE broadcaster=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            async for user, in await cursor.execute(query, (broadcaster,)):
+                yield user
+
     async def isPermittedUser(self,
                               broadcaster: str,
                               user: str) -> bool:

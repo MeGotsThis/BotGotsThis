@@ -8,6 +8,11 @@ class TestPermittedUsers(TestDropTables):
         await self.execute(['''
 INSERT INTO permitted_users VALUES ('botgotsthis', 'megotsthis')'''])
 
+    async def test_permitted_users(self):
+        self.assertEqual([m async for m
+                          in self.database.getPermittedUsers('botgotsthis')],
+                         ['megotsthis'])
+
     async def test_is_permitted_true(self):
         self.assertIs(
             await self.database.isPermittedUser('botgotsthis', 'megotsthis'),
