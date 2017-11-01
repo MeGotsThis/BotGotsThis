@@ -4,7 +4,7 @@ from tests.unittest.mock_class import AsyncIterator
 from .base_cache_store import TestCacheStore
 
 
-class TestCacheBotMangers(TestCacheStore):
+class TestCacheFeatures(TestCacheStore):
     async def setUp(self):
         await super().setUp()
 
