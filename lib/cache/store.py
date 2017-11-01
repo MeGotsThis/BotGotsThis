@@ -4,9 +4,10 @@ from typing import Optional, Type
 import aioredis
 
 from ._bot_mangers import BotManagersMixin
+from ._permitted_users import PermittedUsersMixin
 
 
-class CacheStore(BotManagersMixin):
+class CacheStore(PermittedUsersMixin, BotManagersMixin):
     def __init__(self,
                  pool: aioredis.ConnectionsPool) -> None:
         self._pool: aioredis.ConnectionsPool = pool

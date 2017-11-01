@@ -57,11 +57,11 @@ class TestChannel(asynctest.TestCase):
         data = MagicMock(spec=CacheStore)
         data.__aenter__.return_value = data
         data.__aexit__.return_value = True
+        data.isPermittedUser.return_value = False
+        data.isBotManager.return_value = False
         mock_data.return_value = data
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database
-        database.isPermittedUser.return_value = False
-        database.isBotManager.return_value = False
         database.__aexit__.return_value = True
         mock_database.return_value = database
         message = Mock(spec=Message)
@@ -70,7 +70,7 @@ class TestChannel(asynctest.TestCase):
                                   message, self.now)
         mock_save.assert_has_calls([call('megotsthis', '2', self.now),
                                     call('botgotsthis', '1', self.now)])
-        self.assertEqual(database.isPermittedUser.call_count, 1)
+        self.assertEqual(data.isPermittedUser.call_count, 1)
         self.assertEqual(data.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command1.call_count, 1)
@@ -90,11 +90,11 @@ class TestChannel(asynctest.TestCase):
         data = MagicMock(spec=CacheStore)
         data.__aenter__.return_value = data
         data.__aexit__.return_value = False
+        data.isPermittedUser.return_value = False
+        data.isBotManager.return_value = False
         mock_data.return_value = data
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database
-        database.isPermittedUser.return_value = False
-        database.isBotManager.return_value = False
         database.__aexit__.return_value = False
         mock_database.return_value = database
         message = Mock(spec=Message)
@@ -102,7 +102,7 @@ class TestChannel(asynctest.TestCase):
         await channel.chatCommand(self.channel, self.tags, 'botgotsthis',
                                   message, self.now)
         self.assertTrue(mock_save.called)
-        self.assertEqual(database.isPermittedUser.call_count, 1)
+        self.assertEqual(data.isPermittedUser.call_count, 1)
         self.assertEqual(data.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command.call_count, 1)
@@ -161,11 +161,11 @@ class TestChannel(asynctest.TestCase):
         data = MagicMock(spec=CacheStore)
         data.__aenter__.return_value = data
         data.__aexit__.return_value = True
+        data.isPermittedUser.return_value = False
+        data.isBotManager.return_value = False
         mock_data.return_value = data
         database = MagicMock(spec=DatabaseMain)
         database.__aenter__.return_value = database
-        database.isPermittedUser.return_value = False
-        database.isBotManager.return_value = False
         database.__aexit__.return_value = True
         mock_database.return_value = database
         message = Mock(spec=Message)
@@ -173,7 +173,7 @@ class TestChannel(asynctest.TestCase):
         await channel.chatCommand(self.channel, None, 'botgotsthis', message,
                                   self.now)
         self.assertFalse(mock_save.called)
-        self.assertEqual(database.isPermittedUser.call_count, 1)
+        self.assertEqual(data.isPermittedUser.call_count, 1)
         self.assertEqual(data.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
         self.assertEqual(command1.call_count, 1)

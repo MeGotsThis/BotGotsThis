@@ -12,37 +12,37 @@ from ..channel import chat
 class TestChannelBroadcaster(TestChannel):
     async def test_permit(self):
         self.channel.channel = 'megotsthis'
-        self.database.isPermittedUser.return_value = False
+        self.data.isPermittedUser.return_value = False
         self.assertIs(await chat.commandPermit(self.args), False)
         self.assertFalse(self.channel.send.called)
-        self.assertFalse(self.database.isPermittedUser.called)
-        self.assertFalse(self.database.addPermittedUser.called)
-        self.assertFalse(self.database.removePermittedUser.called)
+        self.assertFalse(self.data.isPermittedUser.called)
+        self.assertFalse(self.data.addPermittedUser.called)
+        self.assertFalse(self.data.removePermittedUser.called)
 
     async def test_permit_add(self):
         self.channel.channel = 'megotsthis'
-        self.database.isPermittedUser.return_value = False
-        self.database.addPermittedUser.return_value = True
+        self.data.isPermittedUser.return_value = False
+        self.data.addPermittedUser.return_value = True
         self.permissionSet['moderator'] = True
         args = self.args._replace(message=Message('!permit MeBotsThis'))
         self.assertIs(await chat.commandPermit(args), True)
-        self.assertTrue(self.database.isPermittedUser.called)
-        self.assertTrue(self.database.addPermittedUser.called)
-        self.assertFalse(self.database.removePermittedUser.called)
+        self.assertTrue(self.data.isPermittedUser.called)
+        self.assertTrue(self.data.addPermittedUser.called)
+        self.assertFalse(self.data.removePermittedUser.called)
         self.channel.send.assert_called_once_with(
             StrContains('botgotsthis', 'mebotsthis', 'permitted',
                         'megotsthis'))
 
     async def test_permit_remove(self):
         self.channel.channel = 'megotsthis'
-        self.database.isPermittedUser.return_value = True
-        self.database.removePermittedUser.return_value = True
+        self.data.isPermittedUser.return_value = True
+        self.data.removePermittedUser.return_value = True
         self.permissionSet['moderator'] = True
         args = self.args._replace(message=Message('!permit MeBotsThis'))
         self.assertIs(await chat.commandPermit(args), True)
-        self.assertTrue(self.database.isPermittedUser.called)
-        self.assertTrue(self.database.removePermittedUser.called)
-        self.assertFalse(self.database.addPermittedUser.called)
+        self.assertTrue(self.data.isPermittedUser.called)
+        self.assertTrue(self.data.removePermittedUser.called)
+        self.assertFalse(self.data.addPermittedUser.called)
         self.channel.send.assert_called_once_with(
             StrContains('botgotsthis', 'mebotsthis', 'unpermitted',
                         'megotsthis'))
