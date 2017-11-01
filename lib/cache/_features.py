@@ -6,7 +6,7 @@ from .. import database
 
 
 class FeaturesMixin(AbcCacheStore):
-    def __init__(self):
+    def __init__(self) -> None:
         self._features: Dict[str, Set[str]] = {}
 
     def _featuresKey(self, broadcaster: str) -> str:
@@ -30,7 +30,7 @@ class FeaturesMixin(AbcCacheStore):
                 self._features[broadcaster] = await self.loadFeatures(
                     broadcaster)
             else:
-                self._features = set(json.loads(value))
+                self._features[broadcaster] = set(json.loads(value))
         return feature in self._features[broadcaster]
 
     async def resetFeatures(self, broadcaster: str) -> None:
