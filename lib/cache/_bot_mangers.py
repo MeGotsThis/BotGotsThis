@@ -6,14 +6,19 @@ from .. import database
 
 
 class BotManagersMixin(AbcCacheStore):
+    async def loadBotManagers(self) -> List[str]:
+        managers: List[str]
+        db: database.DatabaseMain
+        async with database.get_main_database() as db:
+            managers = [m async for m in db.getBotManagers()]
+        await self.redis.setex('managers', 3600, json.dumps(managers))
+        return managers
+
     async def isBotManager(self, user: str) -> bool:
         managers: List[str]
         value: Optional[str] = await self.redis.get('managers')
         if value is None:
-            db: database.DatabaseMain
-            async with database.get_main_database() as db:
-                managers = [m async for m in db.getBotManagers()]
-            await self.redis.setex('managers', 3600, json.dumps(managers))
+            managers = await self.loadBotManagers()
         else:
             managers = json.loads(value)
         return user in managers

@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Optional, Set  # noqa: F401
+from typing import Dict, Optional, Set  # noqa: F401
 
 from ._abc import AbcCacheStore
 from .. import database
@@ -12,18 +12,23 @@ class FeaturesMixin(AbcCacheStore):
     def _featuresKey(self, broadcaster: str) -> str:
         return f'twitch:{broadcaster}:features'
 
+    async def loadFeatures(self, broadcaster: str) -> Set[str]:
+        key: str = self._featuresKey(broadcaster)
+        features: Set[str]
+        db: database.DatabaseMain
+        async with database.get_main_database() as db:
+            features = {feature async for feature
+                        in db.getFeatures(broadcaster)}
+        await self.redis.setex(key, 3600, json.dumps(list(features)))
+        return features
+
     async def hasFeature(self, broadcaster: str, feature: str) -> bool:
         key: str = self._featuresKey(broadcaster)
         value: Optional[str] = await self.redis.get(key)
         if broadcaster not in self._features:
             if value is None:
-                db: database.DatabaseMain
-                async with database.get_main_database() as db:
-                    self._features[broadcaster] = {
-                        feature async for feature
-                        in db.getFeatures(broadcaster)}
-                data: List[str] = list(self._features[broadcaster])
-                await self.redis.setex(key, 3600, json.dumps(data))
+                self._features[broadcaster] = await self.loadFeatures(
+                    broadcaster)
             else:
                 self._features = set(json.loads(value))
         return feature in self._features[broadcaster]

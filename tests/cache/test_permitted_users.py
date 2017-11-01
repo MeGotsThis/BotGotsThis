@@ -14,6 +14,13 @@ class TestCachePermittedUsers(TestCacheStore):
         self.channel = 'megotsthis'
         self.key = f'twitch:{self.channel}:permitted'
 
+    async def test_load(self):
+        self.assertEqual(
+            await self.data.loadPermittedUsers(self.channel),
+            ['botgotsthis'])
+        self.assertTrue(self.dbmain.getPermittedUsers.called)
+        self.assertIsNotNone(await self.redis.get(self.key))
+
     async def test(self):
         self.assertTrue(
             await self.data.isPermittedUser(self.channel, 'botgotsthis'))
@@ -25,14 +32,14 @@ class TestCachePermittedUsers(TestCacheStore):
         self.assertIsNotNone(await self.redis.get(self.key))
 
     async def test_reset(self):
-        await self.data.isPermittedUser(self.channel, 'botgotsthis')
+        await self.data.loadPermittedUsers(self.channel)
         self.assertIsNotNone(await self.redis.get(self.key))
         await self.data.resetPermittedUsers(self.channel)
         self.assertIsNone(await self.redis.get(self.key))
 
     async def test_add(self):
         self.dbmain.addPermittedUser.return_value = True
-        await self.data.isPermittedUser(self.channel, 'botgotsthis')
+        await self.data.loadPermittedUsers(self.channel)
         self.assertIsNotNone(await self.redis.get(self.key))
         self.assertIs(
             await self.data.addPermittedUser(self.channel, 'megotsthis',
@@ -43,7 +50,7 @@ class TestCachePermittedUsers(TestCacheStore):
 
     async def test_add_false(self):
         self.dbmain.addPermittedUser.return_value = False
-        await self.data.isPermittedUser(self.channel, 'botgotsthis')
+        await self.data.loadPermittedUsers(self.channel)
         self.assertIsNotNone(await self.redis.get(self.key))
         self.assertIs(
             await self.data.addPermittedUser(self.channel, 'megotsthis',
@@ -54,7 +61,7 @@ class TestCachePermittedUsers(TestCacheStore):
 
     async def test_remove(self):
         self.dbmain.removePermittedUser.return_value = True
-        await self.data.isPermittedUser(self.channel, 'botgotsthis')
+        await self.data.loadPermittedUsers(self.channel)
         self.assertIsNotNone(await self.redis.get(self.key))
         self.assertIs(
             await self.data.removePermittedUser(self.channel, 'megotsthis',
@@ -65,7 +72,7 @@ class TestCachePermittedUsers(TestCacheStore):
 
     async def test_remove_false(self):
         self.dbmain.removePermittedUser.return_value = False
-        await self.data.isPermittedUser(self.channel, 'botgotsthis')
+        await self.data.loadPermittedUsers(self.channel)
         self.assertIsNotNone(await self.redis.get(self.key))
         self.assertIs(
             await self.data.removePermittedUser(self.channel, 'megotsthis',

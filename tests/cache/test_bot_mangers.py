@@ -11,6 +11,13 @@ class TestCacheBotMangers(TestCacheStore):
         self.dbmain.getBotManagers.return_value = AsyncIterator(
             ['botgotsthis'])
 
+    async def test_load(self):
+        self.assertEqual(
+            await self.data.loadBotManagers(),
+            ['botgotsthis'])
+        self.assertTrue(self.dbmain.getBotManagers.called)
+        self.assertIsNotNone(await self.redis.get('managers'))
+
     async def test(self):
         self.assertTrue(await self.data.isBotManager('botgotsthis'))
         self.assertTrue(self.dbmain.getBotManagers.called)
@@ -20,14 +27,14 @@ class TestCacheBotMangers(TestCacheStore):
         self.assertIsNotNone(await self.redis.get('managers'))
 
     async def test_reset(self):
-        await self.data.isBotManager('botgotsthis')
+        await self.data.loadBotManagers()
         self.assertIsNotNone(await self.redis.get('managers'))
         await self.data.resetBotManagers()
         self.assertIsNone(await self.redis.get('managers'))
 
     async def test_add(self):
         self.dbmain.addBotManager.return_value = True
-        await self.data.isBotManager('botgotsthis')
+        await self.data.loadBotManagers()
         self.assertIsNotNone(await self.redis.get('managers'))
         self.assertIs(await self.data.addBotManager('megotsthis'), True)
         self.assertIsNone(await self.redis.get('managers'))
@@ -35,7 +42,7 @@ class TestCacheBotMangers(TestCacheStore):
 
     async def test_add_false(self):
         self.dbmain.addBotManager.return_value = False
-        await self.data.isBotManager('botgotsthis')
+        await self.data.loadBotManagers()
         self.assertIsNotNone(await self.redis.get('managers'))
         self.assertIs(await self.data.addBotManager('megotsthis'), False)
         self.assertIsNotNone(await self.redis.get('managers'))
@@ -43,7 +50,7 @@ class TestCacheBotMangers(TestCacheStore):
 
     async def test_remove(self):
         self.dbmain.removeBotManager.return_value = True
-        await self.data.isBotManager('botgotsthis')
+        await self.data.loadBotManagers()
         self.assertIsNotNone(await self.redis.get('managers'))
         self.assertIs(await self.data.removeBotManager('megotsthis'), True)
         self.assertIsNone(await self.redis.get('managers'))
@@ -51,7 +58,7 @@ class TestCacheBotMangers(TestCacheStore):
 
     async def test_remove_false(self):
         self.dbmain.removeBotManager.return_value = False
-        await self.data.isBotManager('botgotsthis')
+        await self.data.loadBotManagers()
         self.assertIsNotNone(await self.redis.get('managers'))
         self.assertIs(await self.data.removeBotManager('megotsthis'), False)
         self.assertIsNotNone(await self.redis.get('managers'))
