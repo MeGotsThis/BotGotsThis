@@ -2,6 +2,13 @@ from ._drop_tables import TestDropTables
 
 
 class TestFeatures(TestDropTables):
+    async def test_get_features(self):
+        await self.execute('INSERT INTO chat_features VALUES (?, ?)',
+                           ('botgotsthis', 'feature'))
+        self.assertEqual([feature async for feature
+                          in self.database.getFeatures('botgotsthis')],
+                         ['feature'])
+
     async def test_has(self):
         self.assertIs(await self.database.hasFeature('botgotsthis', 'feature'),
                       False)

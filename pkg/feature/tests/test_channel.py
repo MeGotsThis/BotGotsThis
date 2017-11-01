@@ -19,5 +19,5 @@ class TestFeatureChannel(TestChannel):
         message = Message('!feature feature')
         args = self.args._replace(message=message)
         self.assertIs(await channel.commandFeature(args), True)
-        mock_feature.assert_called_once_with(self.database, 'botgotsthis',
+        mock_feature.assert_called_once_with(self.data, 'botgotsthis',
                                              message, self.channel.send)

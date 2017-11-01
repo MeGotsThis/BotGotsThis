@@ -20,5 +20,5 @@ class TestFeatureWhisper(TestWhisper):
         args = self.args._replace(message=message)
         self.assertIs(await whisper.commandFeature(args), True)
         mock_feature.assert_called_once_with(
-            self.database, 'botgotsthis', message,
+            self.data, 'botgotsthis', message,
             PartialMatch(bot.utils.whisper, 'botgotsthis'))

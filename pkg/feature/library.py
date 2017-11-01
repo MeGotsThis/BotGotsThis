@@ -1,13 +1,13 @@
 ﻿from typing import Mapping, Optional, Set  # noqa: F401
 
 import lib.items.feature
+from lib.cache import CacheStore
 from lib.data import Send
 from lib.data.message import Message
-from lib.database import DatabaseMain
 from lib.helper import parser
 
 
-async def feature(database: DatabaseMain,
+async def feature(data: CacheStore,
                   channel: str,
                   message: Message,
                   send: Send) -> bool:
@@ -21,21 +21,21 @@ async def feature(database: DatabaseMain,
 
     response: parser.Response = parser.get_response(action, default=parser.Yes)
     if response == parser.Yes:
-        return await feature_add(database, channel, feature_, send)
+        return await feature_add(data, channel, feature_, send)
     if response == parser.No:
-        return await feature_remove(database, channel, feature_, send)
+        return await feature_remove(data, channel, feature_, send)
 
     send('Unrecognized second parameter: ' + action)
     return True
 
 
-async def feature_add(database: DatabaseMain,
+async def feature_add(data: CacheStore,
                       channel: str,
                       feature_: str,
                       send: Send) -> bool:
-    hasFeature: bool = await database.hasFeature(channel, feature_)
+    hasFeature: bool = await data.hasFeature(channel, feature_)
     if not hasFeature:
-        await database.addFeature(channel, feature_)
+        await data.addFeature(channel, feature_)
 
     theFeature: str = lib.items.feature.features()[feature_]
     msg: str
@@ -46,13 +46,13 @@ async def feature_add(database: DatabaseMain,
     return True
 
 
-async def feature_remove(database: DatabaseMain,
+async def feature_remove(data: CacheStore,
                          channel: str,
                          feature_: str,
                          send: Send) -> bool:
-    hasFeature: bool = await database.hasFeature(channel, feature_)
+    hasFeature: bool = await data.hasFeature(channel, feature_)
     if hasFeature:
-        await database.removeFeature(channel, feature_)
+        await data.removeFeature(channel, feature_)
 
     theFeature: str = lib.items.feature.features()[feature_]
     msg: str

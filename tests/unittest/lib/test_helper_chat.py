@@ -94,54 +94,54 @@ class TestLibraryChat(asynctest.TestCase):
         ownerProperty.assert_called_once_with()
 
     async def test_feature(self):
-        self.database.hasFeature.return_value = True
+        self.data.hasFeature.return_value = True
 
         @chat.feature('')
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
 
     async def test_feature_not(self):
-        self.database.hasFeature.return_value = False
+        self.data.hasFeature.return_value = False
 
         @chat.feature('')
         async def t(args):
             return True
         self.assertIs(await t(self.args), False)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
 
     async def test_not_feature(self):
-        self.database.hasFeature.return_value = False
+        self.data.hasFeature.return_value = False
 
         @chat.not_feature('')
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
 
     async def test_not_feature_not(self):
-        self.database.hasFeature.return_value = True
+        self.data.hasFeature.return_value = True
 
         @chat.not_feature('')
         async def t(args):
             return True
         self.assertIs(await t(self.args), False)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
 
     async def test_permission_feature(self):
-        self.database.hasFeature.return_value = True
+        self.data.hasFeature.return_value = True
         self.permissions.__getitem__.return_value = True
 
         @chat.permission_feature(('', ''))
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
         self.permissions.__getitem__.assert_called_once_with('')
 
     async def test_permission_feature_not_permission(self):
-        self.database.hasFeature.return_value = True
+        self.data.hasFeature.return_value = True
         self.permissions.__getitem__.return_value = False
 
         @chat.permission_feature(('', ''))
@@ -150,7 +150,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), False)
 
     async def test_permission_feature_not_feature(self):
-        self.database.hasFeature.return_value = False
+        self.data.hasFeature.return_value = False
         self.permissions.__getitem__.return_value = True
 
         @chat.permission_feature(('', ''))
@@ -159,7 +159,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), False)
 
     async def test_permission_feature_not(self):
-        self.database.hasFeature.return_value = False
+        self.data.hasFeature.return_value = False
         self.permissions.__getitem__.return_value = False
 
         @chat.permission_feature(('', ''))
@@ -168,13 +168,13 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), False)
 
     async def test_permission_feature_none_permission(self):
-        self.database.hasFeature.return_value = True
+        self.data.hasFeature.return_value = True
 
         @chat.permission_feature((None, ''))
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
         self.permissions.__getitem__.assert_not_called()
 
     async def test_permission_feature_none_feature(self):
@@ -184,17 +184,17 @@ class TestLibraryChat(asynctest.TestCase):
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_not_called()
+        self.data.hasFeature.assert_not_called()
         self.permissions.__getitem__.assert_called_once_with('')
 
     async def test_permission_feature_none_permission_not(self):
-        self.database.hasFeature.return_value = False
+        self.data.hasFeature.return_value = False
 
         @chat.permission_feature((None, ''))
         async def t(args):
             return True
         self.assertIs(await t(self.args), False)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
         self.permissions.__getitem__.assert_not_called()
 
     async def test_permission_feature_none_feature_not(self):
@@ -204,7 +204,7 @@ class TestLibraryChat(asynctest.TestCase):
         async def t(args):
             return True
         self.assertIs(await t(self.args), False)
-        self.database.hasFeature.assert_not_called()
+        self.data.hasFeature.assert_not_called()
         self.permissions.__getitem__.assert_called_once_with('')
 
     async def test_permission_feature_none_permission_feature(self):
@@ -212,11 +212,11 @@ class TestLibraryChat(asynctest.TestCase):
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_not_called()
+        self.data.hasFeature.assert_not_called()
         self.permissions.__getitem__.assert_not_called()
 
     async def test_permission_feature_multiple(self):
-        self.database.hasFeature.side_effect = [False, True]
+        self.data.hasFeature.side_effect = [False, True]
         self.permissions.__getitem__.side_effect = [False, True]
 
         @chat.permission_feature(('', ''), ('', ''))
@@ -225,7 +225,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), True)
 
     async def test_permission_feature_multiple_not(self):
-        self.database.hasFeature.side_effect = [False, True]
+        self.data.hasFeature.side_effect = [False, True]
         self.permissions.__getitem__.side_effect = [True, False]
 
         @chat.permission_feature(('', ''), ('', ''))
@@ -234,18 +234,18 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), False)
 
     async def test_permission_not_feature(self):
-        self.database.hasFeature.return_value = False
+        self.data.hasFeature.return_value = False
         self.permissions.__getitem__.return_value = True
 
         @chat.permission_not_feature(('', ''))
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
         self.permissions.__getitem__.assert_called_once_with('')
 
     async def test_permission_not_feature_not_permission(self):
-        self.database.hasFeature.return_value = False
+        self.data.hasFeature.return_value = False
         self.permissions.__getitem__.return_value = False
 
         @chat.permission_not_feature(('', ''))
@@ -254,7 +254,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), False)
 
     async def test_permission_not_feature_not_feature(self):
-        self.database.hasFeature.return_value = True
+        self.data.hasFeature.return_value = True
         self.permissions.__getitem__.return_value = True
 
         @chat.permission_not_feature(('', ''))
@@ -263,7 +263,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), False)
 
     async def test_permission_not_feature_not(self):
-        self.database.hasFeature.return_value = True
+        self.data.hasFeature.return_value = True
         self.permissions.__getitem__.return_value = False
 
         @chat.permission_not_feature(('', ''))
@@ -272,13 +272,13 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), False)
 
     async def test_permission_not_feature_none_permission(self):
-        self.database.hasFeature.return_value = False
+        self.data.hasFeature.return_value = False
 
         @chat.permission_not_feature((None, ''))
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
         self.permissions.__getitem__.assert_not_called()
 
     async def test_permission_not_feature_none_feature(self):
@@ -288,17 +288,17 @@ class TestLibraryChat(asynctest.TestCase):
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_not_called()
+        self.data.hasFeature.assert_not_called()
         self.permissions.__getitem__.assert_called_once_with('')
 
     async def test_permission_not_feature_none_permission_not(self):
-        self.database.hasFeature.return_value = True
+        self.data.hasFeature.return_value = True
 
         @chat.permission_not_feature((None, ''))
         async def t(args):
             return True
         self.assertIs(await t(self.args), False)
-        self.database.hasFeature.assert_called_once_with('botgotsthis', '')
+        self.data.hasFeature.assert_called_once_with('botgotsthis', '')
         self.permissions.__getitem__.assert_not_called()
 
     async def test_permission_not_feature_none_feature_not(self):
@@ -308,7 +308,7 @@ class TestLibraryChat(asynctest.TestCase):
         async def t(args):
             return True
         self.assertIs(await t(self.args), False)
-        self.database.hasFeature.assert_not_called()
+        self.data.hasFeature.assert_not_called()
         self.permissions.__getitem__.assert_called_once_with('')
 
     async def test_permission_not_feature_none_permission_feature(self):
@@ -316,11 +316,11 @@ class TestLibraryChat(asynctest.TestCase):
         async def t(args):
             return True
         self.assertIs(await t(self.args), True)
-        self.database.hasFeature.assert_not_called()
+        self.data.hasFeature.assert_not_called()
         self.permissions.__getitem__.assert_not_called()
 
     async def test_permission_not_feature_multiple(self):
-        self.database.hasFeature.side_effect = [True, False]
+        self.data.hasFeature.side_effect = [True, False]
         self.permissions.__getitem__.side_effect = [False, True]
 
         @chat.permission_not_feature(('', ''), ('', ''))
@@ -329,7 +329,7 @@ class TestLibraryChat(asynctest.TestCase):
         self.assertIs(await t(self.args), True)
 
     async def test_permission_not_feature_multiple_not(self):
-        self.database.hasFeature.side_effect = [True, False]
+        self.data.hasFeature.side_effect = [True, False]
         self.permissions.__getitem__.side_effect = [True, False]
 
         @chat.permission_not_feature(('', ''), ('', ''))
