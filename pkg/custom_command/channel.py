@@ -14,7 +14,7 @@ from . import library
 @not_feature('nocustom')
 async def customCommands(args: ChatCommandArgs) -> bool:
     command: Optional[CustomCommand]
-    command = await library.get_command(args.database, args.message.command,
+    command = await library.get_command(args.data, args.message.command,
                                         args.chat.channel, args.permissions)
     if command is not None:
         cooldown: timedelta
@@ -99,7 +99,7 @@ async def process_command(args: ChatCommandArgs,
 async def insert_command(args: ChatCommandArgs,
                          input: CommandActionTokens) -> bool:
     message: str
-    successful: bool = await args.database.insertCustomCommand(
+    successful: bool = await args.data.insertCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)
     if successful:
         message = f'{args.nick} -> {input.command} was added successfully'
@@ -114,7 +114,7 @@ existing command'''
 async def update_command(args: ChatCommandArgs,
                          input: CommandActionTokens) -> bool:
     message: str
-    successful: bool = await args.database.updateCustomCommand(
+    successful: bool = await args.data.updateCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)
     if successful:
         message = f'{args.nick} -> {input.command} was updated successfully'
@@ -129,7 +129,7 @@ might not exist'''
 async def append_command(args: ChatCommandArgs,
                          input: CommandActionTokens) -> bool:
     message: str
-    successful: bool = await args.database.appendCustomCommand(
+    successful: bool = await args.data.appendCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)
     if successful:
         message = f'''\
@@ -145,7 +145,7 @@ might not exist'''
 async def replace_command(args: ChatCommandArgs,
                           input: CommandActionTokens) -> bool:
     message: str
-    successful: bool = await args.database.replaceCustomCommand(
+    successful: bool = await args.data.replaceCustomCommand(
         input.broadcaster, input.level, input.command, input.text, args.nick)
     if successful:
         message = f'{args.nick} -> {input.command} was replaced successfully'
@@ -160,7 +160,7 @@ might not exist'''
 async def delete_command(args: ChatCommandArgs,
                          input: CommandActionTokens) -> bool:
     message: str
-    successful: bool = await args.database.deleteCustomCommand(
+    successful: bool = await args.data.deleteCustomCommand(
         input.broadcaster, input.level, input.command, args.nick)
     if successful:
         message = f'{args.nick} -> {input.command} was removed successfully'
@@ -185,7 +185,7 @@ async def command_property(args: ChatCommandArgs,
         args.chat.send(f'''\
 {args.nick} -> The property '{property}' does not exist''')
         return True
-    if await args.database.processCustomCommandProperty(
+    if await args.data.processCustomCommandProperty(
             input.broadcaster, input.level, input.command, property,
             value):
         if value is None:
@@ -205,7 +205,7 @@ async def command_property(args: ChatCommandArgs,
 async def raw_command(args: ChatCommandArgs,
                       input: CommandActionTokens) -> bool:
     command: Optional[str]
-    command = await args.database.getCustomCommand(
+    command = await args.data.getCustomCommand(
         input.broadcaster, input.level, input.command)
     message: str
     if command is None:
@@ -222,7 +222,7 @@ async def level_command(args: ChatCommandArgs,
     if permission not in library.permissions:
         message = f'{args.nick} -> {input.text} is an invalid permission'
     else:
-        successful: bool = await args.database.levelCustomCommand(
+        successful: bool = await args.data.levelCustomCommand(
             input.broadcaster, input.level, input.command, args.nick,
             library.permissions[permission])
         if successful:
@@ -243,7 +243,7 @@ async def rename_command(args: ChatCommandArgs,
     if not newCommand:
         message = f'{args.nick} -> Please specify a command to rename to'
     else:
-        successful: bool = await args.database.renameCustomCommand(
+        successful: bool = await args.data.renameCustomCommand(
             input.broadcaster, input.level, input.command, args.nick,
             newCommand)
         if successful:

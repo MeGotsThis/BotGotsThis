@@ -9,6 +9,17 @@ class TestCustomCommands(TestDropTables):
             await self.database.getChatCommands('botgotsthis', 'kappa'),
             {'#global': {}, 'botgotsthis': {}})
 
+    async def test_get_custom_commands(self):
+        now = datetime(2000, 1, 1)
+        await self.execute('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
+        self.assertEqual(
+            [row async for row
+             in self.database.getCustomCommands('botgotsthis')],
+            [('kappa', '', 'Kappa')])
+
     async def test_get_broadacaster(self):
         now = datetime(2000, 1, 1)
         await self.execute('''
@@ -507,6 +518,20 @@ INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
             await self.row('SELECT * FROM custom_commands_history'),
             (1, 'botgotsthis', '', 'pogchamp', 'PogChamp', 'rename', 'kappa',
              'botgotsthis', TypeMatch(datetime)))
+
+    async def test_get_command_properties(self):
+        now = datetime(2000, 1, 1)
+        await self.execute('''
+INSERT INTO custom_commands VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                           ('botgotsthis', '', 'kappa', None, 'Kappa',
+                            'botgotsthis', now, 'botgotsthis', now))
+        await self.execute('''
+INSERT INTO custom_command_properties VALUES (?, ?, ?, ?, ?)''',
+                           ('botgotsthis', '', 'kappa', 'kappa', 'Kappa'))
+        self.assertEqual(
+            [row async for row
+             in self.database.getCustomCommandProperties('botgotsthis')],
+            [('kappa', '', 'kappa', 'Kappa')])
 
     async def test_get_property_no_command(self):
         self.assertIsNone(

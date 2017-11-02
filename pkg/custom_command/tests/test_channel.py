@@ -64,7 +64,7 @@ class TestCustomCommandChannelCustomCommands(TestChannel):
         self.mock_command.return_value = None
         self.assertIs(await channel.customCommands(self.args), False)
         self.mock_command.assert_called_once_with(
-            self.database, 'kappa', 'botgotsthis', self.permissions)
+            self.data, 'kappa', 'botgotsthis', self.permissions)
         self.assertFalse(self.mock_messages.called)
         self.assertFalse(self.mock_channel_cooldown.called)
         self.assertFalse(self.mock_user_cooldown.called)
@@ -74,7 +74,7 @@ class TestCustomCommandChannelCustomCommands(TestChannel):
     async def test(self):
         self.assertIs(await channel.customCommands(self.args), True)
         self.mock_command.assert_called_once_with(
-            self.database, 'kappa', 'botgotsthis', self.permissions)
+            self.data, 'kappa', 'botgotsthis', self.permissions)
         self.mock_channel_cooldown.assert_called_once_with(
             self.args, timedelta(seconds=5), 'customCommand', 'moderator')
         self.mock_user_cooldown.assert_called_once_with(
@@ -87,7 +87,7 @@ class TestCustomCommandChannelCustomCommands(TestChannel):
         self.mock_channel_cooldown.return_value = True
         self.assertIs(await channel.customCommands(self.args), False)
         self.mock_command.assert_called_once_with(
-            self.database, 'kappa', 'botgotsthis', self.permissions)
+            self.data, 'kappa', 'botgotsthis', self.permissions)
         self.mock_channel_cooldown.assert_called_once_with(
             self.args, timedelta(seconds=5), 'customCommand', 'moderator')
         self.assertFalse(self.mock_user_cooldown.called)
@@ -99,7 +99,7 @@ class TestCustomCommandChannelCustomCommands(TestChannel):
         self.mock_user_cooldown.return_value = True
         self.assertIs(await channel.customCommands(self.args), False)
         self.mock_command.assert_called_once_with(
-            self.database, 'kappa', 'botgotsthis', self.permissions)
+            self.data, 'kappa', 'botgotsthis', self.permissions)
         self.mock_channel_cooldown.assert_called_once_with(
             self.args, timedelta(seconds=5), 'customCommand', 'moderator')
         self.mock_user_cooldown.assert_called_once_with(
@@ -112,7 +112,7 @@ class TestCustomCommandChannelCustomCommands(TestChannel):
         self.permissions.chatModerator = True
         self.assertIs(await channel.customCommands(self.args), True)
         self.mock_command.assert_called_once_with(
-            self.database, 'kappa', 'botgotsthis', self.permissions)
+            self.data, 'kappa', 'botgotsthis', self.permissions)
         self.mock_channel_cooldown.assert_called_once_with(
             self.args, timedelta(seconds=5), 'customCommand', 'moderator')
         self.mock_user_cooldown.assert_called_once_with(
@@ -405,9 +405,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_insert_command(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.insertCustomCommand.return_value = True
+        self.data.insertCustomCommand.return_value = True
         self.assertIs(await channel.insert_command(self.args, input), True)
-        self.database.insertCustomCommand.assert_called_once_with(
+        self.data.insertCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'PogChamp', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'add', 'success'))
@@ -415,9 +415,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_insert_command_dberror(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.insertCustomCommand.return_value = False
+        self.data.insertCustomCommand.return_value = False
         self.assertIs(await channel.insert_command(self.args, input), True)
-        self.database.insertCustomCommand.assert_called_once_with(
+        self.data.insertCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'PogChamp', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'add', 'not', 'success'))
@@ -425,9 +425,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_update_command(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.updateCustomCommand.return_value = True
+        self.data.updateCustomCommand.return_value = True
         self.assertIs(await channel.update_command(self.args, input), True)
-        self.database.updateCustomCommand.assert_called_once_with(
+        self.data.updateCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'PogChamp', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'update', 'success'))
@@ -435,9 +435,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_update_command_dberror(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.updateCustomCommand.return_value = False
+        self.data.updateCustomCommand.return_value = False
         self.assertIs(await channel.update_command(self.args, input), True)
-        self.database.updateCustomCommand.assert_called_once_with(
+        self.data.updateCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'PogChamp', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'update', 'not', 'success'))
@@ -445,9 +445,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_append_command(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.appendCustomCommand.return_value = True
+        self.data.appendCustomCommand.return_value = True
         self.assertIs(await channel.append_command(self.args, input), True)
-        self.database.appendCustomCommand.assert_called_once_with(
+        self.data.appendCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'PogChamp', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'append', 'success'))
@@ -455,9 +455,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_append_command_dberror(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.appendCustomCommand.return_value = False
+        self.data.appendCustomCommand.return_value = False
         self.assertIs(await channel.append_command(self.args, input), True)
-        self.database.appendCustomCommand.assert_called_once_with(
+        self.data.appendCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'PogChamp', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'append', 'not', 'success'))
@@ -465,9 +465,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_replace_command(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.replaceCustomCommand.return_value = True
+        self.data.replaceCustomCommand.return_value = True
         self.assertIs(await channel.replace_command(self.args, input), True)
-        self.database.replaceCustomCommand.assert_called_once_with(
+        self.data.replaceCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'PogChamp', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'replace', 'success'))
@@ -475,9 +475,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_replace_command_dberror(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.replaceCustomCommand.return_value = False
+        self.data.replaceCustomCommand.return_value = False
         self.assertIs(await channel.replace_command(self.args, input), True)
-        self.database.replaceCustomCommand.assert_called_once_with(
+        self.data.replaceCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'PogChamp', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'replace', 'not', 'success'))
@@ -485,9 +485,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_delete_command(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.deleteCustomCommand.return_value = True
+        self.data.deleteCustomCommand.return_value = True
         self.assertIs(await channel.delete_command(self.args, input), True)
-        self.database.deleteCustomCommand.assert_called_once_with(
+        self.data.deleteCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'remove', 'success'))
@@ -495,9 +495,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_delete_command_dberror(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.deleteCustomCommand.return_value = False
+        self.data.deleteCustomCommand.return_value = False
         self.assertIs(await channel.delete_command(self.args, input), True)
-        self.database.deleteCustomCommand.assert_called_once_with(
+        self.data.deleteCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'botgotsthis')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'remove', 'not', 'success'))
@@ -507,7 +507,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         self.assertIs(await channel.command_property(self.args, input), False)
         self.permissionSet['broadcaster'] = True
         self.assertIs(await channel.command_property(self.args, input), False)
-        self.assertFalse(self.database.processCustomCommandProperty.called)
+        self.assertFalse(self.data.processCustomCommandProperty.called)
         self.assertFalse(self.channel.send.called)
 
     @patch('lib.items.custom', autospec=True)
@@ -517,7 +517,7 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
                                     'Kappa', 'someproperty PogChamp')
         self.permissionSet['broadcaster'] = True
         self.assertIs(await channel.command_property(self.args, input), True)
-        self.assertFalse(self.database.processCustomCommandProperty.called)
+        self.assertFalse(self.data.processCustomCommandProperty.called)
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'someproperty', 'property', 'not',
                         'exist'))
@@ -527,10 +527,10 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'someproperty PogChamp')
-        self.database.processCustomCommandProperty.return_value = True
+        self.data.processCustomCommandProperty.return_value = True
         self.permissionSet['broadcaster'] = True
         self.assertIs(await channel.command_property(self.args, input), True)
-        self.database.processCustomCommandProperty.assert_called_once_with(
+        self.data.processCustomCommandProperty.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'someproperty', 'PogChamp')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'someproperty', 'PogChamp',
@@ -541,10 +541,10 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'someproperty')
-        self.database.processCustomCommandProperty.return_value = True
+        self.data.processCustomCommandProperty.return_value = True
         self.permissionSet['broadcaster'] = True
         self.assertIs(await channel.command_property(self.args, input), True)
-        self.database.processCustomCommandProperty.assert_called_once_with(
+        self.data.processCustomCommandProperty.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'someproperty', None)
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'someproperty', 'unset'))
@@ -554,10 +554,10 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_list.properties.return_value = ['someproperty']
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'someproperty PogChamp')
-        self.database.processCustomCommandProperty.return_value = False
+        self.data.processCustomCommandProperty.return_value = False
         self.permissionSet['broadcaster'] = True
         self.assertIs(await channel.command_property(self.args, input), True)
-        self.database.processCustomCommandProperty.assert_called_once_with(
+        self.data.processCustomCommandProperty.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'someproperty', 'PogChamp')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'someproperty', 'not'))
@@ -568,9 +568,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_config.messageLimit = 100
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.getCustomCommand.return_value = 'KappaRoss KappaPride'
+        self.data.getCustomCommand.return_value = 'KappaRoss KappaPride'
         self.assertIs(await channel.raw_command(self.args, input), True)
-        self.database.getCustomCommand.assert_called_once_with(
+        self.data.getCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa')
         mock_whisper.assert_called_once_with(
             'botgotsthis',
@@ -583,10 +583,10 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_config.messageLimit = 20
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.getCustomCommand.return_value = (
+        self.data.getCustomCommand.return_value = (
             'Kappa   Keepo KappaRoss KappaPride')
         self.assertIs(await channel.raw_command(self.args, input), True)
-        self.database.getCustomCommand.assert_called_once_with(
+        self.data.getCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa')
         mock_whisper.assert_called_once_with(
             'botgotsthis',
@@ -599,9 +599,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
         mock_config.messageLimit = 100
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.getCustomCommand.return_value = None
+        self.data.getCustomCommand.return_value = None
         self.assertIs(await channel.raw_command(self.args, input), True)
-        self.database.getCustomCommand.assert_called_once_with(
+        self.data.getCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'not', 'exist'))
@@ -610,9 +610,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_level_command(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'mod')
-        self.database.levelCustomCommand.return_value = True
+        self.data.levelCustomCommand.return_value = True
         self.assertIs(await channel.level_command(self.args, input), True)
-        self.database.levelCustomCommand.assert_called_once_with(
+        self.data.levelCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'botgotsthis', 'moderator')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'change', 'success'))
@@ -620,9 +620,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_level_command_capitals(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'BrOaDcAsTeR')
-        self.database.levelCustomCommand.return_value = True
+        self.data.levelCustomCommand.return_value = True
         self.assertIs(await channel.level_command(self.args, input), True)
-        self.database.levelCustomCommand.assert_called_once_with(
+        self.data.levelCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'botgotsthis', 'broadcaster')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'change', 'success'))
@@ -630,9 +630,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_level_command_unknown_level(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp DansGame')
-        self.database.levelCustomCommand.return_value = True
+        self.data.levelCustomCommand.return_value = True
         self.assertIs(await channel.level_command(self.args, input), True)
-        self.assertFalse(self.database.levelCustomCommand.called)
+        self.assertFalse(self.data.levelCustomCommand.called)
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'PogChamp DansGame', 'invalid',
                         'permission'))
@@ -640,9 +640,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_level_command_dberror(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'moderator')
-        self.database.levelCustomCommand.return_value = False
+        self.data.levelCustomCommand.return_value = False
         self.assertIs(await channel.level_command(self.args, input), True)
-        self.database.levelCustomCommand.assert_called_once_with(
+        self.data.levelCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'botgotsthis', 'moderator')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'change', 'not', 'success'))
@@ -650,9 +650,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_rename_command(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.renameCustomCommand.return_value = True
+        self.data.renameCustomCommand.return_value = True
         self.assertIs(await channel.rename_command(self.args, input), True)
-        self.database.renameCustomCommand.assert_called_once_with(
+        self.data.renameCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'botgotsthis', 'PogChamp')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'rename', 'success',
@@ -661,9 +661,9 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_rename_command_multiple(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp DansGame')
-        self.database.renameCustomCommand.return_value = True
+        self.data.renameCustomCommand.return_value = True
         self.assertIs(await channel.rename_command(self.args, input), True)
-        self.database.renameCustomCommand.assert_called_once_with(
+        self.data.renameCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'botgotsthis', 'PogChamp')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'rename', 'success',
@@ -672,16 +672,16 @@ class TestCustomCommandChannelCustomProcessCommand(TestChannel):
     async def test_rename_command_blank(self):
         input = CommandActionTokens('', self.broadcaster, '', 'Kappa', '')
         self.assertIs(await channel.rename_command(self.args, input), True)
-        self.assertFalse(self.database.renameCustomCommand.called)
+        self.assertFalse(self.data.renameCustomCommand.called)
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'specify', 'command', 'rename'))
 
     async def test_rename_command_dberror(self):
         input = CommandActionTokens('', self.broadcaster, '',
                                     'Kappa', 'PogChamp')
-        self.database.renameCustomCommand.return_value = False
+        self.data.renameCustomCommand.return_value = False
         self.assertIs(await channel.rename_command(self.args, input), True)
-        self.database.renameCustomCommand.assert_called_once_with(
+        self.data.renameCustomCommand.assert_called_once_with(
             self.broadcaster, '', 'Kappa', 'botgotsthis', 'PogChamp')
         self.channel.send.assert_called_once_with(
             StrContains(self.args.nick, 'Kappa', 'rename', 'not', 'success',
