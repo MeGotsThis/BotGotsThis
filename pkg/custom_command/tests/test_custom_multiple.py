@@ -9,7 +9,7 @@ class TestCustomCommandCustomMultiple(TestCustomProcess):
         super().setUp()
         property_return = [True, None]
         self.property_return = property_return
-        self.database.getCustomCommandProperty.side_effect = property_return
+        self.data.getCustomCommandProperty.side_effect = property_return
 
     async def test(self):
         self.property_return[0] = False

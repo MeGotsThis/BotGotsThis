@@ -139,6 +139,21 @@ SELECT broadcaster, permission, fullMessage
                 commands[row[0]][row[1]] = row[2]
             return commands
 
+    async def getCustomCommands(self, broadcaster: str
+                                ) -> AsyncIterator[Tuple[str, str, str]]:
+        query: str = '''
+SELECT command, permission, fullMessage FROM custom_commands
+    WHERE broadcaster=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
+            command: str
+            permission: str
+            message: str
+            async for command, permission, message in cursor:
+                yield command, permission, message
+
     async def getCustomCommand(self,
                                broadcaster: str,
                                permission: str,
@@ -423,6 +438,23 @@ INSERT INTO custom_commands_history
                                            'rename', command.lower(), user))
             await self.commit()
             return True
+
+    async def getCustomCommandProperties(
+            self, broadcaster: str
+            ) -> AsyncIterator[Tuple[str, str, str, str]]:
+        query: str = '''
+SELECT command, permission, property, value FROM custom_command_properties
+    WHERE broadcaster=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
+            command: str
+            permission: str
+            property: str
+            value: str
+            async for command, permission, property, value in cursor:
+                yield command, permission, property, value
 
     async def getCustomCommandProperty(
             self,

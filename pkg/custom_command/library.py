@@ -1,13 +1,13 @@
 from typing import Dict, Iterable, List, Optional
 
 import lib.items.custom
+from lib.cache import CacheStore
 from lib.data import ChatCommandArgs, CustomFieldArgs, CustomCommand
 from lib.data import CommandActionTokens, CustomCommandField  # noqa: F401
 from lib.data import CustomCommandProcess, CustomFieldParts  # noqa: F401
 from lib.data import CustomProcessArgs
 from lib.data.message import Message
 from lib.data.permissions import ChatPermissionSet
-from lib.database import DatabaseMain
 from lib.helper import textformat
 
 permissions: Dict[Optional[str], str] = {
@@ -45,13 +45,13 @@ permissionsOrder: List[str] = [
     'admin', 'staff', 'manager', 'owner']
 
 
-async def get_command(database: DatabaseMain,
+async def get_command(data: CacheStore,
                       command: str,
                       channel: str,
                       permissions: ChatPermissionSet
                       ) -> Optional[CustomCommand]:
     commands: Dict[str, Dict[str, str]]
-    commands = await database.getChatCommands(channel, command)
+    commands = await data.getChatCommands(channel, command)
     permission: str
     broadcaster: str
     message: str
@@ -67,8 +67,7 @@ async def get_command(database: DatabaseMain,
 async def create_messages(command: CustomCommand,
                           args: ChatCommandArgs) -> List[str]:
     textFormat: bool
-    textFormat = await args.database.hasFeature(args.chat.channel,
-                                                'textconvert')
+    textFormat = await args.data.hasFeature(args.chat.channel, 'textconvert')
     messageParts: List[str] = []
     try:
         parts: CustomFieldParts

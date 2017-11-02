@@ -3,12 +3,12 @@ from lib.data import CustomProcessArgs
 
 
 async def propertyMultipleLines(args: CustomProcessArgs) -> None:
-    if not await args.database.getCustomCommandProperty(
+    if not await args.data.getCustomCommandProperty(
             args.broadcaster, args.level, args.command, 'multiple'):
         return
 
     value: Optional[Union[str, Dict[str, str]]]
-    value = await args.database.getCustomCommandProperty(
+    value = await args.data.getCustomCommandProperty(
         args.broadcaster, args.level, args.command, 'delimiter')
     delimiter: str = (value if isinstance(value, str) else '') or '&&'
 
