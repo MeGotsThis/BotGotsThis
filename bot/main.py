@@ -13,7 +13,7 @@ import aioredis
 import bot
 from lib import database
 from lib.data import timezones
-from lib.database import AutoJoinChannel  # noqa: F401
+from lib.data import AutoJoinChannel  # noqa: F401
 from . import utils
 from .coroutine import background, connection, join, logging
 

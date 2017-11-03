@@ -1,5 +1,5 @@
 import math
-from lib.database import AutoJoinChannel
+from lib.data import AutoJoinChannel
 from ._drop_tables import TestDropTables
 
 

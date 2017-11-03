@@ -6,7 +6,7 @@ from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
 from lib.cache import CacheStore
-from lib.database import AutoRepeatMessage
+from lib.data import AutoRepeatMessage
 from tests.unittest.mock_class import AsyncIterator
 from .. import tasks
 
