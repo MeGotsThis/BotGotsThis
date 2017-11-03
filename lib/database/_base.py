@@ -2,9 +2,8 @@ import aioodbc
 import aioodbc.cursor
 import pyodbc
 
-from typing import Optional, Type, TYPE_CHECKING
-if TYPE_CHECKING:
-    from types import TracebackType  # noqa: F401
+from typing import Optional, Type
+from types import TracebackType  # noqa: F401
 
 
 class Database:
