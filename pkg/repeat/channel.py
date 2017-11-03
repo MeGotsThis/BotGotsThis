@@ -52,7 +52,7 @@ async def process_auto_repeat(args: ChatCommandArgs,
     if secondArg == 'list':
         repeats: List[AutoRepeatList]
         repeats = [repeat async for repeat
-                   in args.database.listAutoRepeat(args.chat.channel)]
+                   in args.data.listAutoRepeat(args.chat.channel)]
         if not repeats:
             args.chat.send('No Active Auto Repeats')
         else:
@@ -65,7 +65,7 @@ Name: {name}, Duration: {repeat.duration} minutes, Message: {repeat.message}\
 ''')
         return True
     elif secondArg == 'clear':
-        await args.database.clearAutoRepeat(args.chat.channel)
+        await args.data.clearAutoRepeat(args.chat.channel)
         return True
     elif secondArg == 'off':
         pass
@@ -76,9 +76,9 @@ Name: {name}, Duration: {repeat.duration} minutes, Message: {repeat.message}\
             return False
 
     if minutesDuration <= 0 or count == 0 or not message:
-        await args.database.removeAutoRepeat(args.chat.channel, name)
+        await args.data.removeAutoRepeat(args.chat.channel, name)
         return True
 
-    await args.database.setAutoRepeat(args.chat.channel, name, message, count,
-                                      minutesDuration)
+    await args.data.setAutoRepeat(args.chat.channel, name, message, count,
+                                  minutesDuration)
     return True

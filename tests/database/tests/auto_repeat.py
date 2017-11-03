@@ -1,10 +1,20 @@
 from datetime import datetime, timedelta
-from lib.database import AutoRepeatList, AutoRepeatMessage
+from lib.database import AutoRepeatList, AutoRepeatMessage, RepeatData
 from tests.unittest.mock_class import DateTimeNear
 from ._drop_tables import TestDropTables
 
 
 class TestAutoRepeat(TestDropTables):
+    async def test_get_all(self):
+        dt = datetime.utcnow()
+        dt -= timedelta(microseconds=dt.microsecond)
+        await self.execute(
+            "INSERT INTO auto_repeat VALUES (?, ?, ?, ?, ?, ?, ?)",
+            ('botgotsthis', '', 'Kappa', None, 5, dt, dt))
+        self.assertEqual(
+            [r async for r in self.database.getAutoRepeats()],
+            [RepeatData('botgotsthis', '', 'Kappa', None, 5, dt)])
+
     async def test_empty(self):
         self.assertEqual(
             [r async for r in self.database.getAutoRepeatToSend()], [])

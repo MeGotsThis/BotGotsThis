@@ -3,6 +3,7 @@ from typing import Optional, Type
 
 import aioredis
 
+from ._auto_repeat import AutoRepeatMixin
 from ._bot_mangers import BotManagersMixin
 from ._chat_properties import ChatPropertiesMixin
 from ._custom_commands import CustomCommandsMixin
@@ -11,7 +12,7 @@ from ._permitted_users import PermittedUsersMixin
 
 
 class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
-                 BotManagersMixin, CustomCommandsMixin):
+                 BotManagersMixin, CustomCommandsMixin, AutoRepeatMixin):
     def __init__(self,
                  pool: aioredis.ConnectionsPool) -> None:
         super().__init__()

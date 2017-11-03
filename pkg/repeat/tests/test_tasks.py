@@ -5,7 +5,8 @@ from datetime import datetime
 from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
-from lib.database import DatabaseMain, AutoRepeatMessage
+from lib.cache import CacheStore
+from lib.database import AutoRepeatMessage
 from tests.unittest.mock_class import AsyncIterator
 from .. import tasks
 
@@ -15,8 +16,8 @@ class TestRepeatTasks(asynctest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.channel.isMod = False
-        self.database = MagicMock(spec=DatabaseMain)
-        self.database.__aenter__.return_value = self.database
+        self.data = MagicMock(spec=CacheStore)
+        self.data.__aenter__.return_value = self.data
 
         patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
@@ -25,10 +26,10 @@ class TestRepeatTasks(asynctest.TestCase):
             'botgotsthis': self.channel,
             }
 
-        patcher = patch('lib.database.get_database')
+        patcher = patch('lib.cache.get_cache')
         self.addCleanup(patcher.stop)
-        self.mock_database = patcher.start()
-        self.mock_database.return_value = self.database
+        self.mock_data = patcher.start()
+        self.mock_data.return_value = self.data
 
         patcher = patch('lib.helper.timeout.record_timeout')
         self.addCleanup(patcher.stop)
@@ -37,37 +38,37 @@ class TestRepeatTasks(asynctest.TestCase):
         self.now = datetime(2000, 1, 1)
 
     async def test_empty(self):
-        self.database.getAutoRepeatToSend.return_value = AsyncIterator([])
+        self.data.getAutoRepeatToSend.return_value = AsyncIterator([])
         await tasks.autoRepeatMessage(self.now)
-        self.assertFalse(self.database.sentAutoRepeat.called)
+        self.assertFalse(self.data.sentAutoRepeat.called)
         self.assertFalse(self.mock_timeout.called)
         self.assertFalse(self.channel.send.called)
 
     async def test_no_channel(self):
-        self.database.getAutoRepeatToSend.return_value = AsyncIterator([
+        self.data.getAutoRepeatToSend.return_value = AsyncIterator([
             AutoRepeatMessage('megotsthis', '', 'Kappa')
             ])
         await tasks.autoRepeatMessage(self.now)
-        self.assertFalse(self.database.sentAutoRepeat.called)
+        self.assertFalse(self.data.sentAutoRepeat.called)
         self.assertFalse(self.mock_timeout.called)
         self.assertFalse(self.channel.send.called)
 
     async def test(self):
-        self.database.getAutoRepeatToSend.return_value = AsyncIterator([
+        self.data.getAutoRepeatToSend.return_value = AsyncIterator([
             AutoRepeatMessage('botgotsthis', '', 'Kappa'),
             ])
         await tasks.autoRepeatMessage(self.now)
-        self.database.sentAutoRepeat.assert_called_once_with('botgotsthis', '')
+        self.data.sentAutoRepeat.assert_called_once_with('botgotsthis', '')
         self.assertFalse(self.mock_timeout.called)
         self.channel.send.assert_called_once_with('Kappa')
 
     async def test_multiple(self):
-        self.database.getAutoRepeatToSend.return_value = AsyncIterator([
+        self.data.getAutoRepeatToSend.return_value = AsyncIterator([
             AutoRepeatMessage('botgotsthis', '', 'Kappa'),
             AutoRepeatMessage('botgotsthis', 'Kappa', 'Keepo'),
             ])
         await tasks.autoRepeatMessage(self.now)
-        self.database.sentAutoRepeat.assert_has_calls(
+        self.data.sentAutoRepeat.assert_has_calls(
             [call('botgotsthis', ''), call('botgotsthis', 'Kappa')])
         self.assertFalse(self.mock_timeout.called)
         self.channel.send.assert_has_calls(
@@ -75,11 +76,11 @@ class TestRepeatTasks(asynctest.TestCase):
 
     async def test_mod(self):
         self.channel.isMod = True
-        self.database.getAutoRepeatToSend.return_value = AsyncIterator([
+        self.data.getAutoRepeatToSend.return_value = AsyncIterator([
             AutoRepeatMessage('botgotsthis', '', 'Kappa'),
             ])
         await tasks.autoRepeatMessage(self.now)
-        self.database.sentAutoRepeat.assert_called_once_with('botgotsthis', '')
+        self.data.sentAutoRepeat.assert_called_once_with('botgotsthis', '')
         self.mock_timeout.assert_called_once_with(
             self.channel, None, 'Kappa', None, 'autorepeat')
         self.channel.send.assert_called_once_with('Kappa')

@@ -32,6 +32,15 @@ class AutoRepeatList(NamedTuple):
     last: datetime
 
 
+class RepeatData(NamedTuple):
+    broadcaster: str
+    name: str
+    message: str
+    remaining: Optional[int]
+    duration: float
+    last: datetime
+
+
 CommandProperty = Union[str, Sequence[str]]
 CommandReturn = Union[str, Dict[str, str]]
 
@@ -930,6 +939,25 @@ INSERT INTO bot_managers_log
             await cursor.execute(history, (user, 'remove'))
             await self.commit()
             return True
+
+    async def getAutoRepeats(self) -> AsyncIterator[RepeatData]:
+        query: str = '''
+SELECT broadcaster, name, message, numLeft, duration, lastSent
+    FROM auto_repeat
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            row: Tuple[str, str, str, Optional[int], float, datetime]
+            broadcaster: str
+            name: str
+            message: str
+            count: Optional[int]
+            duration: float
+            last: datetime
+            async for (broadcaster, name, message, count, duration,
+                       last) in await cursor.execute(query):
+                yield RepeatData(broadcaster, name, message, count, duration,
+                                 last)
 
     async def getAutoRepeatToSend(self) -> AsyncIterator[AutoRepeatMessage]:
         query: str
