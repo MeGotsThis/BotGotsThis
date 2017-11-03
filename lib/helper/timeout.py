@@ -5,9 +5,10 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 from typing import Dict, Iterable, Mapping, List, Optional, Union, cast  # noqa: F401,E501
 from lib import database
+from lib.cache import CacheStore
 
 
-async def timeout_user(database_: database.DatabaseMain,
+async def timeout_user(dataCache: CacheStore,
                        chat: 'data.Channel',
                        user: str,
                        module: str,
@@ -23,7 +24,7 @@ async def timeout_user(database_: database.DatabaseMain,
                 'timeoutLength1': bot.config.moderatorDefaultTimeout[1],
                 'timeoutLength2': bot.config.moderatorDefaultTimeout[2],
                 }
-    chatProp = await database_.getChatProperties(chat.channel, properties,
+    chatProp = await dataCache.getChatProperties(chat.channel, properties,
                                                  defaults, int)
     timeouts = [chatProp['timeoutLength0'],
                 chatProp['timeoutLength1'],
@@ -91,8 +92,7 @@ async def record_timeout(chat: 'data.Channel',
                         reason = parts[3]
         if who is not None:
             db: database.Database
-            async with database.get_database(
-                    database.Schema.Timeout) as db:
+            async with database.get_database(database.Schema.Timeout) as db:
                 db_: database.DatabaseTimeout
                 db_ = cast(database.DatabaseTimeout, db)
                 await db_.recordTimeout(chat.channel, who, user, module, None,

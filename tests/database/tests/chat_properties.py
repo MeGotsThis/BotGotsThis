@@ -2,6 +2,15 @@ from ._drop_tables import TestDropTables
 
 
 class TestChatProperties(TestDropTables):
+    async def test_get_all_properties(self):
+        await self.execute('INSERT INTO chat_properties VALUES (?, ?, ?)',
+                           ('botgotsthis', 'kappa', 'Kappa'))
+        self.assertEqual(
+            [(property, value) async for (property, value)
+             in self.database.getAllChatProperties('botgotsthis')],
+            [('kappa', 'Kappa')]
+        )
+
     async def test_get_property(self):
         self.assertIsNone(
             await self.database.getChatProperty('botgotsthis', 'kappa'))

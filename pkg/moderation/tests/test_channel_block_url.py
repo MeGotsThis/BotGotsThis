@@ -6,9 +6,9 @@ import asynctest
 import yarl
 from asynctest.mock import MagicMock, Mock, call, patch
 
+from lib.cache import CacheStore
 from bot.data import Channel
 from lib.data.message import Message
-from lib.database import DatabaseMain
 from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import StrContains, TypeMatch
 
@@ -246,7 +246,6 @@ class TestModerationChannelBlockUrlCompareDomain(unittest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.channel.ircChannel = '#botgotsthis'
-        self.database = Mock(spec=DatabaseMain)
         self.message = Message('')
         self.now = datetime(2000, 1, 1)
 
@@ -326,14 +325,14 @@ class TestModerationChannelBlockUrlHandleDifferentDomain(asynctest.TestCase):
         self.message = Message('')
         self.now = datetime(2000, 1, 1)
 
-        self.database = MagicMock(spec=DatabaseMain)
-        self.database.__aenter__.return_value = self.database
-        self.database.__aexit__.return_value = False
+        self.data = MagicMock(spec=CacheStore)
+        self.data.__aenter__.return_value = self.data
+        self.data.__aexit__.return_value = False
 
-        patcher = patch('lib.database.get_database')
+        patcher = patch('lib.cache.get_cache')
         self.addCleanup(patcher.stop)
-        self.mock_database = patcher.start()
-        self.mock_database.return_value = self.database
+        self.mock_cache = patcher.start()
+        self.mock_cache.return_value = self.data
 
         patcher = patch('lib.helper.timeout.timeout_user')
         self.addCleanup(patcher.stop)
@@ -342,7 +341,7 @@ class TestModerationChannelBlockUrlHandleDifferentDomain(asynctest.TestCase):
     async def test(self):
         await block_url.handle_different_domains(self.channel, 'megotsthis',
                                                  self.message)
-        self.mock_database.assert_called_once_with()
+        self.mock_cache.assert_called_once_with()
         self.mock_timeout.assert_called_once_with(
-            self.database, self.channel, 'megotsthis', 'redirectUrl', 1, '',
+            self.data, self.channel, 'megotsthis', 'redirectUrl', 1, '',
             'Blocked Redirected URL')
