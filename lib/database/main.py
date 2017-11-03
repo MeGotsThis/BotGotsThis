@@ -658,6 +658,19 @@ INSERT INTO banned_channels_log
             await self.commit()
             return True
 
+    async def getAllChatProperties(self, broadcaster: str
+                                   ) -> AsyncIterator[Tuple[str, str]]:
+        query: str = '''
+SELECT property, value FROM chat_properties WHERE broadcaster=?
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            await cursor.execute(query, (broadcaster,))
+            property: str
+            value: str
+            async for property, value in cursor:
+                yield property, value
+
     @overload
     async def getChatProperty(self,
                               broadcaster: str,

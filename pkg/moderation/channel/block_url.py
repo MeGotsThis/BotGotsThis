@@ -8,7 +8,7 @@ import aiohttp
 
 import bot
 from bot import data, utils  # noqa: F401
-from lib import database
+from lib import cache
 from lib.api import twitch
 from lib.data import ChatCommandArgs
 from lib.data.message import Message
@@ -89,9 +89,7 @@ def compare_domains(originalUrl: str,
 async def handle_different_domains(chat: 'data.Channel',
                                    nick: str,
                                    message: Message) -> None:
-    db: database.Database
-    async with database.get_database() as db:
-        database_: database.DatabaseMain
-        database_ = cast(database.DatabaseMain, db)
-        await timeout.timeout_user(database_, chat, nick, 'redirectUrl', 1,
+    dataCache: cache.CacheStore
+    async with cache.get_cache() as dataCache:
+        await timeout.timeout_user(dataCache, chat, nick, 'redirectUrl', 1,
                                    str(message), 'Blocked Redirected URL')

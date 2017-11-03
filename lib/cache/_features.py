@@ -7,6 +7,7 @@ from .. import database
 
 class FeaturesMixin(AbcCacheStore):
     def __init__(self) -> None:
+        super().__init__()
         self._features: Dict[str, Set[str]] = {}
 
     def _featuresKey(self, broadcaster: str) -> str:

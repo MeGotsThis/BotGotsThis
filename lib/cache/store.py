@@ -4,13 +4,14 @@ from typing import Optional, Type
 import aioredis
 
 from ._bot_mangers import BotManagersMixin
+from ._chat_properties import ChatPropertiesMixin
 from ._custom_commands import CustomCommandsMixin
 from ._features import FeaturesMixin
 from ._permitted_users import PermittedUsersMixin
 
 
-class CacheStore(FeaturesMixin, PermittedUsersMixin, BotManagersMixin,
-                 CustomCommandsMixin):
+class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
+                 BotManagersMixin, CustomCommandsMixin):
     def __init__(self,
                  pool: aioredis.ConnectionsPool) -> None:
         super().__init__()

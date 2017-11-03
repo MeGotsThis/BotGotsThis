@@ -4,7 +4,8 @@ import asynctest
 from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
-from lib.database import DatabaseMain, DatabaseTimeout, Schema
+from lib.cache import CacheStore
+from lib.database import DatabaseTimeout, Schema
 from lib.helper import timeout
 from tests.unittest.mock_class import TypeMatch
 
@@ -12,10 +13,10 @@ from tests.unittest.mock_class import TypeMatch
 class TestLibraryTimeoutUser(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
-        self.database = MagicMock(spec=DatabaseMain)
         self.dbtimeout = MagicMock(spec=DatabaseTimeout)
         self.dbtimeout.__aenter__.return_value = self.dbtimeout
-        self.database.getChatProperties.return_value = {
+        self.data = MagicMock(spec=CacheStore)
+        self.data.getChatProperties.return_value = {
             'timeoutLength0': 60,
             'timeoutLength1': 3600,
             'timeoutLength2': 86400,
@@ -44,9 +45,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.mock_now = patcher.start()
 
     async def test(self):
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest')
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -64,9 +65,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.assertFalse(self.mock_whisper.called)
 
     async def test_reason(self):
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest', reason='Kappa')
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -85,9 +86,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             'Kappa')
 
     async def test_message(self):
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest', message='Kappa')
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -106,9 +107,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.assertFalse(self.mock_whisper.called)
 
     async def test_base_level_1(self):
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest', base_level=1)
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -127,9 +128,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.assertFalse(self.mock_whisper.called)
 
     async def test_base_level_2(self):
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest', base_level=2)
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -149,9 +150,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.assertFalse(self.mock_whisper.called)
 
     async def test_base_level_3(self):
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest', base_level=3)
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -171,9 +172,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.assertFalse(self.mock_whisper.called)
 
     async def test_base_level_negative(self):
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest', base_level=-1)
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -191,14 +192,14 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.assertFalse(self.mock_whisper.called)
 
     async def test_override(self):
-        self.database.getChatProperties.return_value = {
+        self.data.getChatProperties.return_value = {
             'timeoutLength0': 1,
             'timeoutLength1': 1,
             'timeoutLength2': 1,
             }
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest')
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -216,14 +217,14 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.assertFalse(self.mock_whisper.called)
 
     async def test_ban(self):
-        self.database.getChatProperties.return_value = {
+        self.data.getChatProperties.return_value = {
             'timeoutLength0': 0,
             'timeoutLength1': 0,
             'timeoutLength2': 0,
             }
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest')
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -246,9 +247,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
                 'megotsthis': (self.now - timedelta(seconds=1), 0)
                 }
             }
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest')
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -272,9 +273,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
                 'megotsthis': (self.now - timedelta(seconds=1), 1)
                 }
             }
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest')
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
@@ -299,9 +300,9 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
                 'megotsthis': (self.now - timedelta(seconds=1), 2)
                 }
             }
-        await timeout.timeout_user(self.database, self.channel, 'megotsthis',
+        await timeout.timeout_user(self.data, self.channel, 'megotsthis',
                                    'unittest')
-        self.database.getChatProperties.assert_called_once_with(
+        self.data.getChatProperties.assert_called_once_with(
             'botgotsthis',
             ['timeoutLength0', 'timeoutLength1', 'timeoutLength2'],
             TypeMatch(dict), int)
