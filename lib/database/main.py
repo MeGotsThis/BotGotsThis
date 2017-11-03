@@ -1,48 +1,16 @@
 import aioodbc.cursor  # noqa: F401
 import pyodbc
 
-from datetime import datetime
+from datetime import datetime  # noqa: F401
 from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple  # noqa: F401,E501
 from typing import Optional, Sequence, Set, Tuple, TypeVar, Union  # noqa: F401
 from typing import overload
 
 from ._base import Database
+from .. import data
 
 T = TypeVar('T')
 S = TypeVar('S')
-
-
-class AutoJoinChannel(NamedTuple):
-    broadcaster: str
-    priority: Union[int, float]
-    cluster: str
-
-
-class AutoRepeatMessage(NamedTuple):
-    broadcaster: str
-    name: str
-    message: str
-
-
-class AutoRepeatList(NamedTuple):
-    name: str
-    message: str
-    remaining: Optional[int]
-    duration: float
-    last: datetime
-
-
-class RepeatData(NamedTuple):
-    broadcaster: str
-    name: str
-    message: str
-    remaining: Optional[int]
-    duration: float
-    last: datetime
-
-
-CommandProperty = Union[str, Sequence[str]]
-CommandReturn = Union[str, Dict[str, str]]
 
 
 class DatabaseMain(Database):
@@ -51,7 +19,7 @@ class DatabaseMain(Database):
         super().__init__(pool)
         self.features: Optional[Set[str]] = None
 
-    async def getAutoJoinsChats(self) -> AsyncIterator[AutoJoinChannel]:
+    async def getAutoJoinsChats(self) -> 'AsyncIterator[data.AutoJoinChannel]':
         query: str = '''
 SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
 '''
@@ -59,7 +27,7 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
         async with await self.cursor() as cursor:
             r: Tuple[Any, ...]
             async for r in await cursor.execute(query):
-                yield AutoJoinChannel(*r)
+                yield data.AutoJoinChannel(*r)
 
     async def getAutoJoinsPriority(self, broadcaster: str
                                    ) -> Union[int, float]:
@@ -470,8 +438,8 @@ SELECT command, permission, property, value FROM custom_command_properties
             broadcaster: str,
             permission: str,
             command: str,
-            property: Optional[CommandProperty]=None
-            ) -> Optional[CommandReturn]:
+            property: 'Optional[data.CommandProperty]'=None
+            ) -> 'Optional[data.CommandReturn]':
         query: str
         cursor: aioodbc.cursor.Cursor
         p: str
@@ -940,7 +908,7 @@ INSERT INTO bot_managers_log
             await self.commit()
             return True
 
-    async def getAutoRepeats(self) -> AsyncIterator[RepeatData]:
+    async def getAutoRepeats(self) -> 'AsyncIterator[data.RepeatData]':
         query: str = '''
 SELECT broadcaster, name, message, numLeft, duration, lastSent
     FROM auto_repeat
@@ -956,10 +924,11 @@ SELECT broadcaster, name, message, numLeft, duration, lastSent
             last: datetime
             async for (broadcaster, name, message, count, duration,
                        last) in await cursor.execute(query):
-                yield RepeatData(broadcaster, name, message, count, duration,
-                                 last)
+                yield data.RepeatData(broadcaster, name, message, count,
+                                      duration, last)
 
-    async def getAutoRepeatToSend(self) -> AsyncIterator[AutoRepeatMessage]:
+    async def getAutoRepeatToSend(self
+                                  ) -> 'AsyncIterator[data.AutoRepeatMessage]':
         query: str
         if self.isSqlite:
             query = '''
@@ -976,10 +945,10 @@ SELECT broadcaster, name, message FROM auto_repeat
             row: Tuple[Any, ...]
             async for row in await cursor.execute(query):
                 broadcaster, name, message = row
-                yield AutoRepeatMessage(broadcaster, name, message)
+                yield data.AutoRepeatMessage(broadcaster, name, message)
 
     async def listAutoRepeat(self, broadcaster: str
-                             ) -> AsyncIterator[AutoRepeatList]:
+                             ) -> 'AsyncIterator[data.AutoRepeatList]':
         query: str = '''
 SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
     WHERE broadcaster=?
@@ -994,7 +963,7 @@ SELECT name, message, numLeft, duration, lastSent FROM auto_repeat
                 duration: float
                 last: datetime
                 name, message, count, duration, last = row
-                yield AutoRepeatList(name, message, count, duration, last)
+                yield data.AutoRepeatList(name, message, count, duration, last)
 
     async def clearAutoRepeat(self, broadcaster: str) -> bool:
         query: str = '''DELETE FROM auto_repeat WHERE broadcaster=?'''

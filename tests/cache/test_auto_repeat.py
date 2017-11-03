@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import bot  # noqa: F401
 
-from lib.database import AutoRepeatMessage, AutoRepeatList, RepeatData
+from lib.data import AutoRepeatMessage, AutoRepeatList, RepeatData
 from tests.unittest.mock_class import AsyncIterator
 from .base_cache_store import TestCacheStore
 

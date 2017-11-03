@@ -5,7 +5,8 @@ from io import StringIO
 
 from asynctest.mock import Mock, patch
 
-from lib.database import AutoJoinChannel, DatabaseMain
+from lib.database import DatabaseMain
+from lib.data import AutoJoinChannel
 from lib.data.message import Message
 from tests.unittest.base_managebot import TestManageBot, send
 from tests.unittest.mock_class import AsyncIterator, StrContains

@@ -2,7 +2,7 @@ from asynctest.mock import call, patch
 
 from tests.unittest.base_channel import TestChannel
 from lib.data.message import Message
-from lib.database import AutoRepeatList
+from lib.data import AutoRepeatList
 from tests.unittest.mock_class import AsyncIterator, StrContains
 
 # Needs to be imported last

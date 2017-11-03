@@ -4,13 +4,12 @@ from typing import AsyncIterator, List, Optional, Tuple  # noqa: F401
 
 from bot import utils
 from ._abc import AbcCacheStore
-from .. import database
-from ..database.main import AutoRepeatList, AutoRepeatMessage, RepeatData
+from .. import data, database
 
 
 class AutoRepeatMixin(AbcCacheStore):
-    async def loadAutoRepeats(self) -> List[RepeatData]:
-        repeats: List[RepeatData]
+    async def loadAutoRepeats(self) -> 'List[data.RepeatData]':
+        repeats: List[data.RepeatData]
         db: database.DatabaseMain
         async with database.get_main_database() as db:
             repeats = [r async for r in db.getAutoRepeats()]
@@ -20,37 +19,39 @@ class AutoRepeatMixin(AbcCacheStore):
                         for repeat in repeats]))
         return repeats
 
-    async def _getAutoRepeats(self) -> List[RepeatData]:
+    async def _getAutoRepeats(self) -> 'List[data.RepeatData]':
         value: Optional[str] = await self.redis.get('autorepeat')
         if value is None:
             return await self.loadAutoRepeats()
         else:
             isoFormat: str = '%Y-%m-%dT%H:%M:%S.%fZ'
             return [
-                RepeatData(repeat[0], repeat[1], repeat[2], repeat[3],
-                           repeat[4], datetime.strptime(repeat[5], isoFormat))
+                data.RepeatData(
+                    repeat[0], repeat[1], repeat[2], repeat[3], repeat[4],
+                    datetime.strptime(repeat[5], isoFormat))
                 for repeat in json.loads(value)]
 
     async def getAutoRepeatToSend(self, timestamp: Optional[datetime]=None
-                                  ) -> AsyncIterator[AutoRepeatMessage]:
+                                  ) -> 'AsyncIterator[data.AutoRepeatMessage]':
         now: datetime = timestamp or utils.now()
-        repeats: List[RepeatData] = await self._getAutoRepeats()
-        repeat: RepeatData
+        repeats: List[data.RepeatData] = await self._getAutoRepeats()
+        repeat: data.RepeatData
         for repeat in repeats:
             if repeat.last + timedelta(minutes=repeat.duration) > now:
                 continue
-            yield AutoRepeatMessage(repeat.broadcaster, repeat.name,
-                                    repeat.message)
+            yield data.AutoRepeatMessage(repeat.broadcaster, repeat.name,
+                                         repeat.message)
 
     async def listAutoRepeat(self, broadcaster: str
-                             ) -> AsyncIterator[AutoRepeatList]:
-        repeats: List[RepeatData] = await self._getAutoRepeats()
-        repeat: RepeatData
+                             ) -> 'AsyncIterator[data.AutoRepeatList]':
+        repeats: List[data.RepeatData] = await self._getAutoRepeats()
+        repeat: data.RepeatData
         for repeat in repeats:
             if repeat.broadcaster != broadcaster:
                 continue
-            yield AutoRepeatList(repeat.name, repeat.message, repeat.remaining,
-                                 repeat.duration, repeat.last)
+            yield data.AutoRepeatList(
+                repeat.name, repeat.message, repeat.remaining, repeat.duration,
+                repeat.last)
 
     async def resetAutoRepeats(self) -> None:
         await self.redis.delete('autorepeat')

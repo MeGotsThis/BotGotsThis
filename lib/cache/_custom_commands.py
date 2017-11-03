@@ -3,7 +3,7 @@ import json
 from typing import Dict, List, Optional, Tuple  # noqa: F401
 
 from ._abc import AbcCacheStore
-from .. import database
+from .. import data, database  # noqa: F401
 
 CommandData = Tuple[str, Dict[str, str]]
 CommandDict = Dict[str, CommandData]
@@ -95,8 +95,8 @@ class CustomCommandsMixin(AbcCacheStore):
             broadcaster: str,
             permission: str,
             command: str,
-            property: Optional[database.CommandProperty]=None
-            ) -> Optional[database.CommandReturn]:
+            property: 'Optional[data.CommandProperty]'=None
+            ) -> 'Optional[data.CommandReturn]':
         commandData: CommandsDict = await self._getCommands(broadcaster)
         if property is None:
             if command not in commandData:

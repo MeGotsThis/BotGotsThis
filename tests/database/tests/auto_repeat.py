@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from lib.database import AutoRepeatList, AutoRepeatMessage, RepeatData
+from lib.data import AutoRepeatList, AutoRepeatMessage, RepeatData
 from tests.unittest.mock_class import DateTimeNear
 from ._drop_tables import TestDropTables
 
