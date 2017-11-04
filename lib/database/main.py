@@ -2,47 +2,24 @@ import aioodbc.cursor  # noqa: F401
 import pyodbc
 
 from datetime import datetime  # noqa: F401
-from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple  # noqa: F401,E501
+from typing import Any, AsyncIterator, Callable, Dict, Mapping  # noqa: F401,E501
 from typing import Optional, Sequence, Set, Tuple, TypeVar, Union  # noqa: F401
 from typing import overload
 
 from ._auto_join import AutoJoinMixin
 from ._base import Database
+from ._game_abbreviations import GameAbbreviationsMixin
 from .. import data
 
 T = TypeVar('T')
 S = TypeVar('S')
 
 
-class DatabaseMain(AutoJoinMixin, Database):
+class DatabaseMain(AutoJoinMixin, GameAbbreviationsMixin, Database):
     def __init__(self,
                  pool: aioodbc.Pool) -> None:
         super().__init__(pool)
         self.features: Optional[Set[str]] = None
-
-    async def getGameAbbreviations(self) -> AsyncIterator[Tuple[str, str]]:
-        query: str = '''
-SELECT abbreviation, twitchGame
-    FROM game_abbreviations
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            async for abbr, game in await cursor.execute(query):
-                yield abbr, game
-
-    async def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
-        query: str = '''
-SELECT DISTINCT twitchGame, LOWER(twitchGame)=? AS isGame
-    FROM game_abbreviations
-    WHERE LOWER(abbreviation)=?
-        OR LOWER(twitchGame)=?
-    ORDER BY isGame DESC
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (abbreviation.lower(), ) * 3)
-            game: Optional[Tuple[str]] = await cursor.fetchone()
-            return game and game[0]
 
     async def getChatCommands(self,
                               broadcaster: str,
