@@ -2,8 +2,8 @@
 from contextlib import suppress
 from typing import Optional  # noqa: F401
 from lib.api import twitch
-from lib.database import DatabaseMain  # noqa: F401
-from lib.data import AutoJoinChannel, ManageBotArgs, Send
+from lib.database import DatabaseMain
+from lib.data import AutoJoinChannel, ManageBotArgs, Send  # noqa: F401
 from pkg.channel import library as autojoin
 
 
