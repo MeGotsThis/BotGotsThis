@@ -1,7 +1,6 @@
 import json
-from typing import AsyncIterator, Dict, List, Optional  # noqa: F401
+from typing import Dict, Optional
 
-from bot import utils
 from ._abc import AbcCacheStore
 from .. import database
 
