@@ -1,5 +1,4 @@
 import aioodbc.cursor  # noqa: F401
-import pyodbc
 
 from datetime import datetime  # noqa: F401
 from typing import Any, AsyncIterator  # noqa: F401
@@ -7,6 +6,7 @@ from typing import Optional, Tuple  # noqa: F401
 
 from ._auto_join import AutoJoinMixin
 from ._banned_channels import BannedChannelsMixin
+from ._bot_managers import BotManagersMixin
 from ._base import Database
 from ._chat_properties import ChatPropertiesMixin
 from ._custom_commands import CustomCommandsMixin
@@ -18,60 +18,7 @@ from .. import data
 
 class DatabaseMain(AutoJoinMixin, GameAbbreviationsMixin, CustomCommandsMixin,
                    FeaturesMixin, BannedChannelsMixin, ChatPropertiesMixin,
-                   PermittedUsersMixin, Database):
-    async def getBotManagers(self) -> AsyncIterator[str]:
-        query: str = '''SELECT twitchUser FROM bot_managers'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            async for manager, in await cursor.execute(query):
-                yield manager
-
-    async def isBotManager(self, user: str) -> bool:
-        query: str = '''SELECT 1 FROM bot_managers WHERE twitchUser=?'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (user,))
-            return bool(await cursor.fetchone())
-
-    async def addBotManager(self, user: str) -> bool:
-        query: str = '''
-INSERT INTO bot_managers (twitchUser) VALUES (?)
-'''
-        history: str = '''
-INSERT INTO bot_managers_log
-    (twitchUser, created, actionLog)
-    VALUES (?, CURRENT_TIMESTAMP, ?)
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            try:
-                await cursor.execute(query, (user,))
-            except pyodbc.Error:
-                return False
-
-            await cursor.execute(history, (user, 'add'))
-            await self.commit()
-            return True
-
-    async def removeBotManager(self, user: str) -> bool:
-        query: str = '''
-DELETE FROM bot_managers WHERE twitchUser=?
-'''
-        history: str = '''
-INSERT INTO bot_managers_log
-    (twitchUser, created, actionLog)
-    VALUES (?, CURRENT_TIMESTAMP, ?)
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (user,))
-            if cursor.rowcount == 0:
-                return False
-
-            await cursor.execute(history, (user, 'remove'))
-            await self.commit()
-            return True
-
+                   PermittedUsersMixin, BotManagersMixin, Database):
     async def getAutoRepeats(self) -> 'AsyncIterator[data.RepeatData]':
         query: str = '''
 SELECT broadcaster, name, message, numLeft, duration, lastSent
