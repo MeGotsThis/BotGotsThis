@@ -12,79 +12,13 @@ from ._chat_properties import ChatPropertiesMixin
 from ._custom_commands import CustomCommandsMixin
 from ._features import FeaturesMixin
 from ._game_abbreviations import GameAbbreviationsMixin
+from ._permitted_users import PermittedUsersMixin
 from .. import data
 
 
 class DatabaseMain(AutoJoinMixin, GameAbbreviationsMixin, CustomCommandsMixin,
                    FeaturesMixin, BannedChannelsMixin, ChatPropertiesMixin,
-                   Database):
-    async def getPermittedUsers(self, broadcaster: str) -> AsyncIterator[str]:
-        query: str = '''
-SELECT twitchUser FROM permitted_users WHERE broadcaster=?
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            async for user, in await cursor.execute(query, (broadcaster,)):
-                yield user
-
-    async def isPermittedUser(self,
-                              broadcaster: str,
-                              user: str) -> bool:
-        query: str = '''
-SELECT 1 FROM permitted_users WHERE broadcaster=? AND twitchUser=?
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (broadcaster, user,))
-            return bool(await cursor.fetchone())
-
-    async def addPermittedUser(self,
-                               broadcaster: str,
-                               user: str,
-                               moderator: str) -> bool:
-        query: str = '''
-INSERT INTO permitted_users (broadcaster, twitchUser) VALUES (?, ?)
-'''
-        history: str = '''
-INSERT INTO permitted_users_log
-    (broadcaster, twitchUser, moderator, created, actionLog)
-    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            try:
-                await cursor.execute(query, (broadcaster, user))
-            except pyodbc.Error:
-                return False
-
-            await cursor.execute(history, (broadcaster, user, moderator,
-                                           'add'))
-            await self.commit()
-            return True
-
-    async def removePermittedUser(self,
-                                  broadcaster: str,
-                                  user: str,
-                                  moderator: str) -> bool:
-        query: str = '''
-DELETE FROM permitted_users WHERE broadcaster=? AND twitchUser=?
-'''
-        history: str = '''
-INSERT INTO permitted_users_log
-    (broadcaster, twitchUser, moderator, created, actionLog)
-    VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?)
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (broadcaster, user))
-            if cursor.rowcount == 0:
-                return False
-
-            await cursor.execute(history, (broadcaster, user, moderator,
-                                           'remove'))
-            await self.commit()
-            return True
-
+                   PermittedUsersMixin, Database):
     async def getBotManagers(self) -> AsyncIterator[str]:
         query: str = '''SELECT twitchUser FROM bot_managers'''
         cursor: aioodbc.cursor.Cursor
