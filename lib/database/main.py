@@ -6,6 +6,7 @@ from typing import Any, AsyncIterator, Callable, Dict, Mapping, NamedTuple  # no
 from typing import Optional, Sequence, Set, Tuple, TypeVar, Union  # noqa: F401
 from typing import overload
 
+from ._auto_join import AutoJoinMixin
 from ._base import Database
 from .. import data
 
@@ -13,77 +14,11 @@ T = TypeVar('T')
 S = TypeVar('S')
 
 
-class DatabaseMain(Database):
+class DatabaseMain(AutoJoinMixin, Database):
     def __init__(self,
                  pool: aioodbc.Pool) -> None:
         super().__init__(pool)
         self.features: Optional[Set[str]] = None
-
-    async def getAutoJoinsChats(self) -> 'AsyncIterator[data.AutoJoinChannel]':
-        query: str = '''
-SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            r: Tuple[Any, ...]
-            async for r in await cursor.execute(query):
-                yield data.AutoJoinChannel(*r)
-
-    async def getAutoJoinsPriority(self, broadcaster: str
-                                   ) -> Union[int, float]:
-        query: str = '''SELECT priority FROM auto_join WHERE broadcaster=?'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (broadcaster,))
-            autoJoinRow: Optional[Tuple[int]] = await cursor.fetchone()
-            if autoJoinRow is not None:
-                return int(autoJoinRow[0])
-            else:
-                return float('inf')
-
-    async def saveAutoJoin(self,
-                           broadcaster: str,
-                           priority: Union[int, float] = 0,
-                           cluster: str = 'aws') -> bool:
-        query: str = '''
-INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            try:
-                await cursor.execute(query, (broadcaster, priority, cluster))
-                await self.commit()
-                return True
-            except pyodbc.Error:
-                return False
-
-    async def discardAutoJoin(self, broadcaster: str) -> bool:
-        query: str = '''DELETE FROM auto_join WHERE broadcaster=?'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (broadcaster,))
-            await self.commit()
-            return cursor.rowcount != 0
-
-    async def setAutoJoinPriority(self,
-                                  broadcaster: str,
-                                  priority: Union[int, float]) -> bool:
-        query: str = '''UPDATE auto_join SET priority=? WHERE broadcaster=?'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (priority, broadcaster))
-            await self.commit()
-            return cursor.rowcount != 0
-
-    async def setAutoJoinServer(self,
-                                broadcaster: str,
-                                cluster: str = 'aws') -> bool:
-        query: str = '''UPDATE auto_join SET cluster=? WHERE broadcaster=?'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (cluster, broadcaster))
-            await self.commit()
-            return cursor.rowcount != 0
 
     async def getGameAbbreviations(self) -> AsyncIterator[Tuple[str, str]]:
         query: str = '''
