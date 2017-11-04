@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timedelta
-from typing import AsyncIterator, List, Optional, Tuple  # noqa: F401
+from typing import AsyncIterator, List, Optional  # noqa: F401
 
 from bot import utils
 from ._abc import AbcCacheStore

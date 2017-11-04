@@ -8,11 +8,13 @@ from ._bot_mangers import BotManagersMixin
 from ._chat_properties import ChatPropertiesMixin
 from ._custom_commands import CustomCommandsMixin
 from ._features import FeaturesMixin
+from ._game_abbreviations import GameAbbreviationsMixin
 from ._permitted_users import PermittedUsersMixin
 
 
 class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
-                 BotManagersMixin, CustomCommandsMixin, AutoRepeatMixin):
+                 BotManagersMixin, CustomCommandsMixin, AutoRepeatMixin,
+                 GameAbbreviationsMixin):
     def __init__(self,
                  pool: aioredis.ConnectionsPool) -> None:
         super().__init__()
