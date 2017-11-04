@@ -85,6 +85,16 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
             await self.commit()
             return cursor.rowcount != 0
 
+    async def getGameAbbreviations(self) -> AsyncIterator[Tuple[str, str]]:
+        query: str = '''
+SELECT abbreviation, twitchGame
+    FROM game_abbreviations
+'''
+        cursor: aioodbc.cursor.Cursor
+        async with await self.cursor() as cursor:
+            async for abbr, game in await cursor.execute(query):
+                yield abbr, game
+
     async def getFullGameTitle(self, abbreviation: str) -> Optional[str]:
         query: str = '''
 SELECT DISTINCT twitchGame, LOWER(twitchGame)=? AS isGame

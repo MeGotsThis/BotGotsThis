@@ -6,6 +6,11 @@ class TestGameAbbreviation(TestDropTables):
         await self.execute('INSERT INTO game_abbreviations VALUES (?, ?)',
                            ('kappa', 'FrankerZ'))
 
+    async def test_get_all(self):
+        self.assertEqual(
+            [r async for r in self.database.getGameAbbreviations()],
+            [('kappa', 'FrankerZ')])
+
     async def test_not_existing(self):
         self.assertIsNone(await self.database.getFullGameTitle('kappahd'))
 
