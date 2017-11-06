@@ -22,8 +22,7 @@ async def commandSay(args: ChatCommandArgs) -> bool:
 @ownerChannel
 @permission('admin')
 async def commandJoin(args: ChatCommandArgs) -> bool:
-    return await channel.join(args.database, args.message.lower[1],
-                              send(args.chat))
+    return await channel.join(args.message.lower[1], send(args.chat))
 
 
 @min_args(2)

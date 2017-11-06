@@ -3,7 +3,7 @@ import unittest
 
 import asynctest
 
-from asynctest.mock import Mock, patch
+from asynctest.mock import MagicMock, Mock, patch
 
 from bot import utils
 from bot.coroutine.connection import ConnectionHandler
@@ -19,7 +19,9 @@ def send(messages):
 
 class TestLibraryChannelJoin(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseMain)
+        self.database = MagicMock(spec=DatabaseMain)
+        self.database.__aenter__.return_value = self.database
+        self.database.__aexit__.return_value = False
         self.send = Mock(spec=send)
 
         patcher = patch('bot.globals', autospec=True)
@@ -30,6 +32,11 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         patcher = patch('lib.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_chat_server = patcher.start()
+
+        patcher = patch('lib.database.get_main_database')
+        self.addCleanup(patcher.stop)
+        self.mock_database = patcher.start()
+        self.mock_database.return_value = self.database
 
         patcher = patch('bot.utils.joinChannel', autospec=True)
         self.addCleanup(patcher.stop)
@@ -45,7 +52,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = True
         self.assertIs(
-            await channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join('botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('Join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -60,7 +67,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.database.getAutoJoinsPriority.return_value = math.inf
         self.mock_chat_server.return_value = ''
         self.assertIs(
-            await channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join('botgotsthis', self.send), True)
         self.send.assert_called_once_with(
             StrContains('Unknown', 'server', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
@@ -77,7 +84,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_chat_server.return_value = 'twitch'
         self.mock_join.return_value = True
         self.assertIs(
-            await channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join('botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('Join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -94,7 +101,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.return_value = False
         self.mock_ensure.return_value = utils.ENSURE_CORRECT
         self.assertIs(
-            await channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join('botgotsthis', self.send), True)
         self.send.assert_called_once_with(
             StrContains('Already', 'join', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
@@ -112,7 +119,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.return_value = False
         self.mock_ensure.return_value = utils.ENSURE_REJOIN
         self.assertIs(
-            await channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join('botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('botgotsthis', 'server'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -129,7 +136,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.return_value = False
         self.mock_ensure.return_value = utils.ENSURE_CLUSTER_UNKNOWN
         self.assertIs(
-            await channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join('botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('error', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')
@@ -146,7 +153,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.mock_join.return_value = False
         self.mock_ensure.return_value = utils.ENSURE_NOT_JOINED
         self.assertIs(
-            await channel.join(self.database, 'botgotsthis', self.send), True)
+            await channel.join('botgotsthis', self.send), True)
         self.send.assert_called_once_with(StrContains('error', 'botgotsthis'))
         self.database.isChannelBannedReason.assert_called_once_with(
             'botgotsthis')

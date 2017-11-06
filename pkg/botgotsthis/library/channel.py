@@ -2,21 +2,23 @@
 
 import bot
 from bot import utils
+from lib import database
 from lib.api import twitch
 from lib.data import Send
-from lib.database import DatabaseMain
 from lib.helper import timeout
 
 
-async def join(database: DatabaseMain,
-               channel: str,
+async def join(channel: str,
                send: Send) -> bool:
-    bannedWithReason: Optional[str]
-    bannedWithReason = await database.isChannelBannedReason(channel)
-    if bannedWithReason is not None:
-        send('Chat ' + channel + ' is banned from joining')
-        return True
-    priority: Union[int, float] = await database.getAutoJoinsPriority(channel)
+    priority: Union[int, float]
+    db: database.DatabaseMain
+    async with database.get_main_database() as db:
+        bannedWithReason: Optional[str]
+        bannedWithReason = await db.isChannelBannedReason(channel)
+        if bannedWithReason is not None:
+            send('Chat ' + channel + ' is banned from joining')
+            return True
+        priority = await db.getAutoJoinsPriority(channel)
 
     cluster: Optional[str] = await twitch.chat_server(channel)
     if cluster not in bot.globals.clusters:

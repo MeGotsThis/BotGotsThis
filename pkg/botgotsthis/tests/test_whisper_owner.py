@@ -51,8 +51,7 @@ class TestWhisperOwner(TestWhisper):
         args = self.args._replace(message=Message('!join MeGotsThis'))
         self.assertIs(await owner.commandJoin(args), True)
         mock_join.assert_called_once_with(
-            self.database, 'megotsthis',
-            PartialMatch(bot.utils.whisper, 'botgotsthis'))
+            'megotsthis', PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
     @patch(channel.__name__ + '.part', autospec=True)
     async def test_part(self, mock_part):

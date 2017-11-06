@@ -23,8 +23,7 @@ async def commandSay(args: WhisperCommandArgs) -> bool:
 
 @min_args(2)
 async def commandJoin(args: WhisperCommandArgs) -> bool:
-    return await channel.join(args.database, args.message.lower[1],
-                              send(args.nick))
+    return await channel.join(args.message.lower[1], send(args.nick))
 
 
 @min_args(2)
