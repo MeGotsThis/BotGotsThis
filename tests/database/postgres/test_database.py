@@ -13,7 +13,7 @@ from lib.database import DatabaseMain
 class TestPostgres(asynctest.TestCase):
     async def setUp(self):
         if platform.system() == 'Windows':
-            self.driver = 'PostgreSQL ODBC Driver(UNICODE)'
+            self.driver = 'PostgreSQL Unicode(x64)'
         else:
             self.driver = 'PostgreSQL UNICODE'
         self.connectionString = f'''\
