@@ -50,5 +50,4 @@ async def commandEmpty(args: ChatCommandArgs) -> bool:
 @permission('manager')
 async def commandManageBot(args: ChatCommandArgs) -> bool:
     return await managebot.manage_bot(
-        args.data, args.database, args.permissions, send(args.chat),
-        args.nick, args.message)
+        args.data, args.permissions, send(args.chat), args.nick, args.message)

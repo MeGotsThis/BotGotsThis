@@ -39,8 +39,7 @@ class TestLibraryManageBot(asynctest.TestCase):
         message = Message('!managebot method')
         self.assertIs(
             await managebot.manage_bot(
-                self.data, self.database, self.permissions, self.send,
-                'managebot', message),
+                self.data, self.permissions, self.send, 'managebot', message),
             True)
         self.assertFalse(self.send.called)
         self.method.assert_called_once_with(TypeMatch(ManageBotArgs))
@@ -49,8 +48,7 @@ class TestLibraryManageBot(asynctest.TestCase):
         message = Message('!managebot not_existing')
         self.assertIs(
             await managebot.manage_bot(
-                self.data, self.database, self.permissions, self.send,
-                'managebot', message),
+                self.data, self.permissions, self.send, 'managebot', message),
             False)
         self.assertFalse(self.send.called)
         self.assertFalse(self.method.called)
@@ -59,8 +57,7 @@ class TestLibraryManageBot(asynctest.TestCase):
         message = Message('!managebot none')
         self.assertIs(
             await managebot.manage_bot(
-                self.data, self.database, self.permissions, self.send,
-                'managebot', message),
+                self.data, self.permissions, self.send, 'managebot', message),
             False)
         self.assertFalse(self.send.called)
         self.assertFalse(self.method.called)

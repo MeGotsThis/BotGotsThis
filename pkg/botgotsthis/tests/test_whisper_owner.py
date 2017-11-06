@@ -99,6 +99,6 @@ class TestWhisperOwner(TestWhisper):
         args = self.args._replace(message=message)
         self.assertIs(await owner.commandManageBot(args), True)
         mock_manage_bot.assert_called_once_with(
-            self.data, self.database, self.permissions,
+            self.data, self.permissions,
             PartialMatch(bot.utils.whisper, 'botgotsthis'), 'botgotsthis',
             message)

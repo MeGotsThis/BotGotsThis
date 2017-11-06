@@ -60,7 +60,6 @@ class CustomProcessArgs(NamedTuple):
 
 class ManageBotArgs(NamedTuple):
     data: 'cache.CacheStore'
-    database: 'databaseM.DatabaseMain'
     permissions: Union[ChatPermissionSet, WhisperPermissionSet]
     send: Send
     nick: str

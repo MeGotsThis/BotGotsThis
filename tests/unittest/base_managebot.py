@@ -39,8 +39,8 @@ class TestManageBot(asynctest.TestCase):
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.permissions.__getitem__.side_effect = \
             lambda k: self.permissionSet[k]
-        self.args = ManageBotArgs(self.data, self.database, self.permissions,
-                                  self.send, 'botgotsthis', Message(''))
+        self.args = ManageBotArgs(self.data, self.permissions, self.send,
+                                  'botgotsthis', Message(''))
 
         patcher = patch('lib.database.get_main_database')
         self.mock_database = patcher.start()
