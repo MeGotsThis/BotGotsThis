@@ -86,5 +86,5 @@ class TestChannelOwner(TestChannel):
         args = self.args._replace(message=message)
         self.assertIs(await owner.commandManageBot(args), True)
         mock_manage_bot.assert_called_once_with(
-            self.data, self.database, self.permissions, self.channel.send,
+            self.data, self.permissions, self.channel.send,
             'botgotsthis', message)
