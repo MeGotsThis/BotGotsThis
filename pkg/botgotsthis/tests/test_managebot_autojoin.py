@@ -3,7 +3,7 @@ import asynctest
 from datetime import datetime
 from io import StringIO
 
-from asynctest.mock import Mock, patch
+from asynctest.mock import MagicMock, Mock, patch
 
 from lib.database import DatabaseMain
 from lib.data import AutoJoinChannel
@@ -61,7 +61,7 @@ class TestManageBotAutoJoin(TestManageBot):
         message = Message('!managebot autojoin reloadserver')
         args = self.args._replace(message=message)
         self.assertIs(await autojoin.manageAutoJoin(args), True)
-        mock_reload.assert_called_once_with(self.database, self.send)
+        mock_reload.assert_called_once_with(self.send)
 
     @patch(library.__name__ + '.auto_join_add')
     async def test_add(self, mock_add):
@@ -141,8 +141,7 @@ class TestManageBotAutoJoin(TestManageBot):
         message = Message('!managebot autojoin priority botgotsthis')
         args = self.args._replace(message=message)
         self.assertIs(await autojoin.manageAutoJoin(args), True)
-        mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
-                                              self.send)
+        mock_priority.assert_called_once_with('botgotsthis', 0, self.send)
 
     @patch(autojoin.__name__ + '.auto_join_priority')
     async def test_pri(self, mock_priority):
@@ -150,8 +149,7 @@ class TestManageBotAutoJoin(TestManageBot):
         message = Message('!managebot autojoin pri botgotsthis')
         args = self.args._replace(message=message)
         self.assertIs(await autojoin.manageAutoJoin(args), True)
-        mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
-                                              self.send)
+        mock_priority.assert_called_once_with('botgotsthis', 0, self.send)
 
     @patch(autojoin.__name__ + '.auto_join_priority')
     async def test_priority_gibberish(self, mock_priority):
@@ -159,8 +157,7 @@ class TestManageBotAutoJoin(TestManageBot):
         message = Message('!managebot autojoin priority botgotsthis abc')
         args = self.args._replace(message=message)
         self.assertIs(await autojoin.manageAutoJoin(args), True)
-        mock_priority.assert_called_once_with(self.database, 'botgotsthis', 0,
-                                              self.send)
+        mock_priority.assert_called_once_with('botgotsthis', 0, self.send)
 
     @patch(autojoin.__name__ + '.auto_join_priority')
     async def test_priority_integer(self, mock_priority):
@@ -168,20 +165,24 @@ class TestManageBotAutoJoin(TestManageBot):
         message = Message('!managebot autojoin priority botgotsthis 1')
         args = self.args._replace(message=message)
         self.assertIs(await autojoin.manageAutoJoin(args), True)
-        mock_priority.assert_called_once_with(self.database, 'botgotsthis', 1,
-                                              self.send)
+        mock_priority.assert_called_once_with('botgotsthis', 1, self.send)
 
 
 class TestManageBotAutoJoinAutoJoinPriority(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseMain)
+        self.database = MagicMock(spec=DatabaseMain)
+        self.database.__aenter__.return_value = self.database
+        self.database.__aexit__.return_value = False
         self.send = Mock(spec=send)
+
+        patcher = patch('lib.database.get_main_database')
+        self.mock_database = patcher.start()
+        self.mock_database.return_value = self.database
 
     async def test(self):
         self.database.setAutoJoinPriority.return_value = True
         self.assertIs(
-            await autojoin.auto_join_priority(self.database, 'botgotsthis', 0,
-                                              self.send),
+            await autojoin.auto_join_priority('botgotsthis', 0, self.send),
             True)
         self.database.setAutoJoinPriority.assert_called_once_with(
             'botgotsthis', 0)
@@ -191,8 +192,7 @@ class TestManageBotAutoJoinAutoJoinPriority(asynctest.TestCase):
     async def test_not_existing(self):
         self.database.setAutoJoinPriority.return_value = False
         self.assertIs(
-            await autojoin.auto_join_priority(self.database, 'botgotsthis', 0,
-                                              self.send),
+            await autojoin.auto_join_priority('botgotsthis', 0, self.send),
             True)
         self.database.setAutoJoinPriority.assert_called_once_with(
             'botgotsthis', 0)
@@ -201,7 +201,9 @@ class TestManageBotAutoJoinAutoJoinPriority(asynctest.TestCase):
 
 class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
     def setUp(self):
-        self.database = Mock(spec=DatabaseMain)
+        self.database = MagicMock(spec=DatabaseMain)
+        self.database.__aenter__.return_value = self.database
+        self.database.__aexit__.return_value = False
         self.send = Mock(spec=send)
 
         patcher = patch('sys.stdout', new_callable=StringIO)
@@ -211,6 +213,10 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
         patcher = patch('lib.api.twitch.chat_server')
         self.addCleanup(patcher.stop)
         self.mock_server = patcher.start()
+
+        patcher = patch('lib.database.get_main_database')
+        self.mock_database = patcher.start()
+        self.mock_database.return_value = self.database
 
         patcher = patch('bot.utils.ensureServer', autospec=True)
         self.addCleanup(patcher.stop)
@@ -227,8 +233,7 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
             AutoJoinChannel('botgotsthis', 0, ''),
             ])
         self.mock_server.return_value = ''
-        self.assertIs(await autojoin.reload_server(self.database, self.send),
-                      True)
+        self.assertIs(await autojoin.reload_server(self.send), True)
         self.database.getAutoJoinsChats.assert_called_once_with()
         self.assertFalse(self.database.setAutoJoinServer.called)
         self.assertFalse(self.mock_ensure.called)
@@ -242,8 +247,7 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
             AutoJoinChannel('botgotsthis', 0, ''),
             ])
         self.mock_server.return_value = None
-        self.assertIs(await autojoin.reload_server(self.database, self.send),
-                      True)
+        self.assertIs(await autojoin.reload_server(self.send), True)
         self.database.getAutoJoinsChats.assert_called_once_with()
         self.assertFalse(self.database.setAutoJoinServer.called)
         self.assertFalse(self.mock_ensure.called)
@@ -257,8 +261,7 @@ class TestManageBotAutoJoinReloadServer(asynctest.TestCase):
             AutoJoinChannel('botgotsthis', 0, ''),
             ])
         self.mock_server.return_value = 'twitch'
-        self.assertIs(await autojoin.reload_server(self.database, self.send),
-                      True)
+        self.assertIs(await autojoin.reload_server(self.send), True)
         self.database.getAutoJoinsChats.assert_called_once_with()
         self.database.setAutoJoinServer.assert_called_once_with('botgotsthis',
                                                                 'twitch')
