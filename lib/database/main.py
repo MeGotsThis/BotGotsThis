@@ -1,3 +1,5 @@
+from typing import cast
+
 from ._auto_join import AutoJoinMixin
 from ._auto_repeat import AutoRepeatMixin
 from ._banned_channels import BannedChannelsMixin
@@ -14,4 +16,5 @@ class DatabaseMain(AutoJoinMixin, GameAbbreviationsMixin, CustomCommandsMixin,
                    FeaturesMixin, BannedChannelsMixin, ChatPropertiesMixin,
                    PermittedUsersMixin, BotManagersMixin, AutoRepeatMixin,
                    Database):
-    pass
+    async def __aenter__(self) -> 'DatabaseMain':
+        return cast(DatabaseMain, await super().__aenter__())
