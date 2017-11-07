@@ -2,7 +2,7 @@ import asynctest
 
 import bot  # noqa: F401
 
-from asynctest.mock import MagicMock, Mock
+from asynctest.mock import MagicMock, Mock, patch
 
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
@@ -30,7 +30,9 @@ class TestCustomProcess(asynctest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
         self.data = Mock(spec=CacheStore)
-        self.database = Mock(spec=DatabaseMain)
+        self.database = MagicMock(spec=DatabaseMain)
+        self.database.__aenter__.return_value = self.database
+        self.database.__aexit__.return_value = False
         self.permissionSet = {
             'owner': False,
             'inOwnerChannel': False,
@@ -48,5 +50,9 @@ class TestCustomProcess(asynctest.TestCase):
             lambda k: self.permissionSet[k]
         self.messages = ['Kappa']
         self.args = CustomProcessArgs(
-            self.data, self.database, self.channel, self.tags, 'botgotsthis',
+            self.data, self.channel, self.tags, 'botgotsthis',
             self.permissions, 'botgotsthis', '', 'kappa', self.messages)
+
+        patcher = patch('lib.database.get_main_database')
+        self.mock_database = patcher.start()
+        self.mock_database.return_value = self.database

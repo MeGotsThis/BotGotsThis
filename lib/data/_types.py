@@ -47,7 +47,6 @@ class CustomFieldArgs(NamedTuple):
 
 class CustomProcessArgs(NamedTuple):
     data: 'cache.CacheStore'
-    database: 'databaseM.DatabaseMain'
     chat: 'botData.Channel'
     tags: IrcMessageTagsReadOnly
     nick: str
