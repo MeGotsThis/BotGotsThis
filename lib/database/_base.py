@@ -31,6 +31,7 @@ class Database:
 
     async def close(self) -> None:
         if self.connection is not None:
+            await self.connection.rollback()
             await self._pool.release(self.connection)
 
     async def __aenter__(self) -> 'Database':
