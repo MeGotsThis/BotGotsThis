@@ -1,10 +1,9 @@
 import asyncio
 import json
-from typing import Dict, List, Optional, Tuple  # noqa: F401
+from typing import Dict, List, Optional, Sequence, Tuple, overload  # noqa: F401,E501
 
 from ._abc import AbcCacheStore
 from ..database import DatabaseMain
-from .. import data  # noqa: F401
 
 CommandData = Tuple[str, Dict[str, str]]
 CommandDict = Dict[str, CommandData]
@@ -91,13 +90,28 @@ class CustomCommandsMixin(AbcCacheStore):
             return None
         return commandData[command][permission][0]
 
+    @overload  # noqa: F811,E301
+    async def getCustomCommandProperty(
+            self,
+            broadcaster: str,
+            permission: str,
+            command: str) -> Dict[str, str]: ...
+    @overload  # noqa: F811,E301
     async def getCustomCommandProperty(
             self,
             broadcaster: str,
             permission: str,
             command: str,
-            property: 'Optional[data.CommandProperty]'=None
-            ) -> 'Optional[data.CommandReturn]':
+            property: Sequence[str]) -> Dict[str, str]: ...
+    @overload  # noqa: F811,E301
+    async def getCustomCommandProperty(
+            self,
+            broadcaster: str,
+            permission: str,
+            command: str,
+            property: str) -> Optional[str]: ...
+    async def getCustomCommandProperty(  # type: ignore  # noqa: F811,E301
+            self, broadcaster, permission, command, property=None):
         commandData: CommandsDict = await self._getCommands(broadcaster)
         if property is None:
             if command not in commandData:

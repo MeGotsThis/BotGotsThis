@@ -7,4 +7,3 @@ from ._types import CustomCommand, CommandActionTokens, CustomFieldParts  # noqa
 
 from ._data_types import AutoJoinChannel  # noqa: F401,E501
 from ._data_types import AutoRepeatMessage, AutoRepeatList, RepeatData  # noqa: F401,E501
-from ._data_types import CommandProperty, CommandReturn  # noqa: F401,E501
