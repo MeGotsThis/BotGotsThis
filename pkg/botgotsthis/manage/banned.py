@@ -2,9 +2,8 @@
 
 import bot
 from bot import utils
-from lib import database as databaseM
 from lib.data import ManageBotArgs, Send
-from lib.database import DatabaseMain  # noqa: F401
+from lib.database import DatabaseMain
 from lib.helper import message
 
 needReason: List[str] = ['add', 'insert', 'del', 'delete', 'rem', 'remove',
@@ -35,7 +34,7 @@ async def manageBanned(args: ManageBotArgs) -> bool:
 async def list_banned_channels(send: Send) -> bool:
     bannedChannels: Iterable[str]
     db: DatabaseMain
-    async with databaseM.get_main_database() as db:
+    async with DatabaseMain.acquire() as db:
         bannedChannels = [channel async for channel
                           in db.listBannedChannels()]
     if bannedChannels:
@@ -54,7 +53,7 @@ async def insert_banned_channel(channel: str,
         return True
     result: bool
     db: DatabaseMain
-    async with databaseM.get_main_database() as db:
+    async with DatabaseMain.acquire() as db:
         bannedWithReason: Optional[str]
         bannedWithReason = await db.isChannelBannedReason(channel)
         if bannedWithReason is not None:
@@ -80,7 +79,7 @@ async def delete_banned_channel(channel: str,
                                 send: Send) -> bool:
     result: bool
     db: DatabaseMain
-    async with databaseM.get_main_database() as db:
+    async with DatabaseMain.acquire() as db:
         bannedWithReason: Optional[str]
         bannedWithReason = await db.isChannelBannedReason(channel)
         if bannedWithReason is None:

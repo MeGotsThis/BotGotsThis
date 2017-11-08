@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, Mapping, Optional, Sequence, TypeVar  # 
 from typing import Union, overload
 
 from ._abc import AbcCacheStore
-from .. import database
+from ..database import DatabaseMain
 
 T = TypeVar('T')
 S = TypeVar('S')
@@ -20,8 +20,8 @@ class ChatPropertiesMixin(AbcCacheStore):
     async def loadChatProperties(self, broadcaster: str) -> Dict[str, str]:
         key: str = self._propertiesKey(broadcaster)
         properties: Dict[str, str]
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             properties = {property: value async for (property, value)
                           in db.getAllChatProperties(broadcaster)}
         await self.redis.setex(key, 3600, json.dumps(properties))
@@ -153,8 +153,8 @@ class ChatPropertiesMixin(AbcCacheStore):
                               property: str,
                               value: Optional[str]=None) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.setChatProperty(broadcaster, property, value)
         if val:
             await self.resetChatProperties(broadcaster)

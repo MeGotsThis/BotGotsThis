@@ -2,14 +2,14 @@ import json
 from typing import List, Optional  # noqa: F401
 
 from ._abc import AbcCacheStore
-from .. import database
+from ..database import DatabaseMain
 
 
 class BotManagersMixin(AbcCacheStore):
     async def loadBotManagers(self) -> List[str]:
         managers: List[str]
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             managers = [m async for m in db.getBotManagers()]
         await self.redis.setex('managers', 3600, json.dumps(managers))
         return managers
@@ -28,8 +28,8 @@ class BotManagersMixin(AbcCacheStore):
 
     async def addBotManager(self, user: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.addBotManager(user)
         if val:
             await self.resetBotManagers()
@@ -37,8 +37,8 @@ class BotManagersMixin(AbcCacheStore):
 
     async def removeBotManager(self, user: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.removeBotManager(user)
         if val:
             await self.resetBotManagers()

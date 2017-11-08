@@ -42,7 +42,7 @@ class TestLibraryBroadcasterCome(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_ensure = patcher.start()
 
-        patcher = patch('lib.database.get_main_database')
+        patcher = patch.object(DatabaseMain, 'acquire')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database
@@ -211,7 +211,7 @@ class TestLibraryBroadcasterAutoJoin(asynctest.TestCase):
         self.database.isChannelBannedReason.return_value = None
         self.send = Mock(spec=send)
 
-        patcher = patch('lib.database.get_main_database')
+        patcher = patch.object(DatabaseMain, 'acquire')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database

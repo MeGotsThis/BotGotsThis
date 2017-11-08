@@ -2,14 +2,14 @@ import json
 from typing import Dict, Optional
 
 from ._abc import AbcCacheStore
-from .. import database
+from ..database import DatabaseMain
 
 
 class GameAbbreviationsMixin(AbcCacheStore):
     async def loadGameAbbreviations(self) -> Dict[str, str]:
         gameAbbreviations: Dict[str, str]
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             gameAbbreviations = {abbr: game async for (abbr, game)
                                  in db.getGameAbbreviations()}
         await self.redis.setex('game-abbreviation', 3600,

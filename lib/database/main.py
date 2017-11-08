@@ -1,5 +1,6 @@
 from typing import cast
 
+import bot
 from ._auto_join import AutoJoinMixin
 from ._auto_repeat import AutoRepeatMixin
 from ._banned_channels import BannedChannelsMixin
@@ -18,3 +19,7 @@ class DatabaseMain(AutoJoinMixin, GameAbbreviationsMixin, CustomCommandsMixin,
                    Database):
     async def __aenter__(self) -> 'DatabaseMain':
         return cast(DatabaseMain, await super().__aenter__())
+
+    @staticmethod
+    def acquire() -> 'DatabaseMain':
+        return DatabaseMain(bot.globals.connectionPools['main'])

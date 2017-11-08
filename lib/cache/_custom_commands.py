@@ -3,7 +3,8 @@ import json
 from typing import Dict, List, Optional, Tuple  # noqa: F401
 
 from ._abc import AbcCacheStore
-from .. import data, database  # noqa: F401
+from ..database import DatabaseMain
+from .. import data  # noqa: F401
 
 CommandData = Tuple[str, Dict[str, str]]
 CommandDict = Dict[str, CommandData]
@@ -16,13 +17,13 @@ class CustomCommandsMixin(AbcCacheStore):
 
     async def _getCustomCommands(self,
                                  broadcaster: str,
-                                 db: database.DatabaseMain
+                                 db: DatabaseMain
                                  ) -> List[Tuple[str, str, str]]:
         return [row async for row in db.getCustomCommands(broadcaster)]
 
     async def _getCustomCommandProperties(self,
                                           broadcaster: str,
-                                          db: database.DatabaseMain
+                                          db: DatabaseMain
                                           ) -> List[Tuple[str, str, str, str]]:
         return [row async for row
                 in db.getCustomCommandProperties(broadcaster)]
@@ -32,8 +33,8 @@ class CustomCommandsMixin(AbcCacheStore):
         commands: CommandsDict = {}
         commandData: List[Tuple[str, str, str]]
         propertyData: List[Tuple[str, str, str, str]]
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             commandData, propertyData = await asyncio.gather(
                 self._getCustomCommands(broadcaster, db),
                 self._getCustomCommandProperties(broadcaster, db),
@@ -132,8 +133,8 @@ class CustomCommandsMixin(AbcCacheStore):
                                   fullMessage: str,
                                   user: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.insertCustomCommand(
                 broadcaster, permission, command, fullMessage, user)
         if val:
@@ -147,8 +148,8 @@ class CustomCommandsMixin(AbcCacheStore):
                                   fullMessage: str,
                                   user: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.updateCustomCommand(
                 broadcaster, permission, command, fullMessage, user)
         if val:
@@ -162,8 +163,8 @@ class CustomCommandsMixin(AbcCacheStore):
                                   message: str,
                                   user: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.appendCustomCommand(
                 broadcaster, permission, command, message, user)
         if val:
@@ -177,8 +178,8 @@ class CustomCommandsMixin(AbcCacheStore):
                                    fullMessage: str,
                                    user: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.replaceCustomCommand(
                 broadcaster, permission, command, fullMessage, user)
         if val:
@@ -191,8 +192,8 @@ class CustomCommandsMixin(AbcCacheStore):
                                   command: str,
                                   user: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.deleteCustomCommand(
                 broadcaster, permission, command, user)
         if val:
@@ -206,8 +207,8 @@ class CustomCommandsMixin(AbcCacheStore):
                                  user: str,
                                  new_permission: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.levelCustomCommand(
                 broadcaster, permission, command, user, new_permission)
         if val:
@@ -221,8 +222,8 @@ class CustomCommandsMixin(AbcCacheStore):
                                   user: str,
                                   new_command: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.renameCustomCommand(
                 broadcaster, permission, command, user, new_command)
         if val:
@@ -236,8 +237,8 @@ class CustomCommandsMixin(AbcCacheStore):
                                            property: str,
                                            value: Optional[str]=None) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.processCustomCommandProperty(
                 broadcaster, permission, command, property, value)
         if val:

@@ -2,7 +2,7 @@ import json
 from typing import Dict, Optional, Set  # noqa: F401
 
 from ._abc import AbcCacheStore
-from .. import database
+from ..database import DatabaseMain
 
 
 class FeaturesMixin(AbcCacheStore):
@@ -16,8 +16,8 @@ class FeaturesMixin(AbcCacheStore):
     async def loadFeatures(self, broadcaster: str) -> Set[str]:
         key: str = self._featuresKey(broadcaster)
         features: Set[str]
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             features = {feature async for feature
                         in db.getFeatures(broadcaster)}
         await self.redis.setex(key, 3600, json.dumps(list(features)))
@@ -44,8 +44,8 @@ class FeaturesMixin(AbcCacheStore):
                          broadcaster: str,
                          feature: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.addFeature(broadcaster, feature)
         if val:
             await self.resetFeatures(broadcaster)
@@ -55,8 +55,8 @@ class FeaturesMixin(AbcCacheStore):
                             broadcaster: str,
                             feature: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.removeFeature(broadcaster, feature)
         if val:
             await self.resetFeatures(broadcaster)

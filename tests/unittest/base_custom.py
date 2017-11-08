@@ -53,7 +53,7 @@ class TestCustomProcess(asynctest.TestCase):
             self.data, self.channel, self.tags, 'botgotsthis',
             self.permissions, 'botgotsthis', '', 'kappa', self.messages)
 
-        patcher = patch('lib.database.get_main_database')
+        patcher = patch.object(DatabaseMain, 'acquire')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database
