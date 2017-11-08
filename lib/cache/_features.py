@@ -25,8 +25,8 @@ class FeaturesMixin(AbcCacheStore):
 
     async def hasFeature(self, broadcaster: str, feature: str) -> bool:
         key: str = self._featuresKey(broadcaster)
-        value: Optional[str] = await self.redis.get(key)
         if broadcaster not in self._features:
+            value: Optional[str] = await self.redis.get(key)
             if value is None:
                 self._features[broadcaster] = await self.loadFeatures(
                     broadcaster)
