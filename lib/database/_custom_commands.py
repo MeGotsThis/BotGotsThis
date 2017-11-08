@@ -1,23 +1,13 @@
-from typing import Any, AsyncIterator, Dict, Optional, Tuple  # noqa: F401
+from typing import Any, AsyncIterator, Dict, Optional, Sequence, Tuple  # noqa: F401,E501
+from typing import overload
 
 import aioodbc.cursor  # noqa: F401
 import pyodbc
 
 from ._base import Database
-from .. import data
 
 
 class CustomCommandsMixin(Database):
-    async def getAutoJoinsChats(self) -> 'AsyncIterator[data.AutoJoinChannel]':
-        query: str = '''
-SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
-'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            r: Tuple[Any, ...]
-            async for r in await cursor.execute(query):
-                yield data.AutoJoinChannel(*r)
-
     async def getChatCommands(self,
                               broadcaster: str,
                               command: str) -> Dict[str, Dict[str, str]]:
@@ -352,13 +342,28 @@ SELECT command, permission, property, value FROM custom_command_properties
             async for command, permission, property, value in cursor:
                 yield command, permission, property, value
 
+    @overload  # noqa: F811,E301
+    async def getCustomCommandProperty(
+            self,
+            broadcaster: str,
+            permission: str,
+            command: str) -> Dict[str, str]: ...
+    @overload  # noqa: F811,E301
     async def getCustomCommandProperty(
             self,
             broadcaster: str,
             permission: str,
             command: str,
-            property: 'Optional[data.CommandProperty]'=None
-            ) -> 'Optional[data.CommandReturn]':
+            property: Sequence[str]) -> Dict[str, str]: ...
+    @overload  # noqa: F811,E301
+    async def getCustomCommandProperty(
+            self,
+            broadcaster: str,
+            permission: str,
+            command: str,
+            property: str) -> Optional[str]: ...
+    async def getCustomCommandProperty(  # type: ignore  # noqa: F811,E301
+            self, broadcaster, permission, command, property=None):
         query: str
         cursor: aioodbc.cursor.Cursor
         p: str

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, NamedTuple, Optional, Sequence, Union
+from typing import NamedTuple, Optional, Union
 
 
 class AutoJoinChannel(NamedTuple):
@@ -29,7 +29,3 @@ class RepeatData(NamedTuple):
     remaining: Optional[int]
     duration: float
     last: datetime
-
-
-CommandProperty = Union[str, Sequence[str]]
-CommandReturn = Union[str, Dict[str, str]]
