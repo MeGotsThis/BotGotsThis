@@ -11,6 +11,8 @@ from lib.database import DatabaseMain
 
 
 class TestPostgres(asynctest.TestCase):
+    POOL_SIZE = 1
+
     async def setUp(self):
         if platform.system() == 'Windows':
             self.driver = 'PostgreSQL Unicode(x64)'
@@ -19,12 +21,23 @@ class TestPostgres(asynctest.TestCase):
         self.connectionString = f'''\
 Driver={self.driver};Server=localhost;Port=5432;\
 Database=botgotsthis_test;Uid=botgotsthis_test;Pwd=botgotsthis_test'''
-        self.pool = await aioodbc.create_pool(minsize=1, maxsize=1,
+        self.pool = await aioodbc.create_pool(minsize=self.POOL_SIZE,
+                                              maxsize=self.POOL_SIZE,
                                               dsn=self.connectionString)
         databaseClass = getattr(self, 'DatabaseClass', DatabaseMain)
         self.database = databaseClass(self.pool)
         await self.database.connect()
         self.cursor = await self.database.cursor()
+
+        patcher = asynctest.patch('bot.globals', autospec=True)
+        self.addCleanup(patcher.stop)
+        mock_globals = patcher.start()
+        mock_globals.connectionPools = {
+            'main': self.pool,
+            'oauth': self.pool,
+            'timeout': self.pool,
+            'timezone': self.pool,
+        }
 
     async def tearDown(self):
         await self.cursor.close()

@@ -11,19 +11,34 @@ from lib.database import DatabaseMain
 
 
 class TestSqlite(asynctest.TestCase):
+    POOL_SIZE = 1
+
     async def setUp(self):
         if platform.system() == 'Windows':
             self.connectionString = '''\
-Driver=SQLite3 ODBC Driver;Database=:memory:;FKSupport=true;'''
+Driver=SQLite3 ODBC Driver;\
+Database=file:botgotsthis.db?mode=memory&cache=shared;FKSupport=true;'''
         else:
             self.connectionString = '''\
-Driver=SQLite3;Database=:memory:;FKSupport=true;'''
-        self.pool = await aioodbc.create_pool(minsize=1, maxsize=1,
+Driver=SQLite3;\
+Database=file:botgotsthis.db?mode=memory&cache=shared;FKSupport=true;'''
+        self.pool = await aioodbc.create_pool(minsize=self.POOL_SIZE,
+                                              maxsize=self.POOL_SIZE,
                                               dsn=self.connectionString)
         databaseClass = getattr(self, 'DatabaseClass', DatabaseMain)
         self.database = databaseClass(self.pool)
         await self.database.connect()
         self.cursor = await self.database.cursor()
+
+        patcher = asynctest.patch('bot.globals', autospec=True)
+        self.addCleanup(patcher.stop)
+        mock_globals = patcher.start()
+        mock_globals.connectionPools = {
+            'main': self.pool,
+            'oauth': self.pool,
+            'timeout': self.pool,
+            'timezone': self.pool,
+        }
 
     async def tearDown(self):
         await self.cursor.close()
