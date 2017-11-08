@@ -38,6 +38,6 @@ async def commandEmpty(args: ChatCommandArgs) -> bool:
 
 @permission('broadcaster')
 async def commandSetTimeoutLevel(args: ChatCommandArgs) -> bool:
-    await chat.set_timeout_level(args.database, args.chat.channel,
-                                 send(args.chat), args.message)
+    await chat.set_timeout_level(args.data, args.chat.channel, send(args.chat),
+                                 args.message)
     return True

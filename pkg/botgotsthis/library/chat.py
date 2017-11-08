@@ -1,8 +1,8 @@
 ﻿import bot
 from typing import Dict, Optional  # noqa: F401
+from lib.cache import CacheStore
 from lib.data import Send
 from lib.data.message import Message
-from lib.database import DatabaseMain
 
 
 def empty(channel: str,
@@ -14,7 +14,7 @@ def empty(channel: str,
     return True
 
 
-async def set_timeout_level(database: DatabaseMain,
+async def set_timeout_level(data: CacheStore,
                             channel: str,
                             send: Send,
                             message: Message) -> bool:
@@ -39,7 +39,7 @@ async def set_timeout_level(database: DatabaseMain,
     timeout: int = bot.config.moderatorDefaultTimeout[int(k) - 1]
     default: str = f'{timeout} seconds' if timeout else 'Banned'
     saveValue: Optional[str] = str(value) if value is not None else None
-    await database.setChatProperty(channel, propertyDict[k], saveValue)
+    await data.setChatProperty(channel, propertyDict[k], saveValue)
     if value is None:
         send(f'''\
 Setting the timeout length for {ordinal[k]} offense to defaulted amount \

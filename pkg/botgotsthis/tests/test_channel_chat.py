@@ -66,4 +66,4 @@ class TestChannelBroadcaster(TestChannel):
         self.assertIs(await chat.commandSetTimeoutLevel(self.args),
                       True)
         mock_set_timeout.assert_called_once_with(
-            self.database, 'botgotsthis', self.channel.send, self.args.message)
+            self.data, 'botgotsthis', self.channel.send, self.args.message)
