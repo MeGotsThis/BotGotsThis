@@ -5,7 +5,6 @@ import pkgutil
 import types  # noqa: F401
 from importlib.abc import PathEntryFinder  # noqa: F401
 from typing import Any, Awaitable, Generator, List, Optional, Tuple  # noqa: F401,E501
-from typing import cast  # noqa: F401,E501
 
 import aioodbc
 import aioredis
@@ -36,14 +35,14 @@ async def initializer() -> None:
         maxsize=bot.config.redis['connections'],
     )
 
-    schema: database.Schema
-    for schema in database.Schema:
+    schema: str
+    for schema in bot.config.database:
         pool: aioodbc.Pool
         pool = await aioodbc.create_pool(
-            minsize=bot.config.connections[schema.value],
-            maxsize=bot.config.connections[schema.value],
-            dsn=bot.config.database[schema.value])
-        bot.globals.connectionPools[schema.value] = pool
+            minsize=bot.config.connections[schema],
+            maxsize=bot.config.connections[schema],
+            dsn=bot.config.database[schema])
+        bot.globals.connectionPools[schema] = pool
 
     pkg: str
     modules: Generator[Tuple[PathEntryFinder, str, bool], None, None]
@@ -68,20 +67,19 @@ async def initializer() -> None:
     if bot.config.owner:
         utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
 
-    db: database.Database
-    async with database.get_database() as db:
-        databaseObj: database.DatabaseMain = cast(database.DatabaseMain, db)
+    db: database.DatabaseMain
+    async with database.DatabaseMain.acquire() as db:
         autojoin: AutoJoinChannel
-        async for autoJoin in databaseObj.getAutoJoinsChats():
+        async for autoJoin in db.getAutoJoinsChats():
             utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
                               autoJoin.cluster)
 
 
 async def finalizer() -> None:
-    schema: database.Schema
-    for schema in database.Schema:
-        bot.globals.connectionPools[schema.value].close()
-        await bot.globals.connectionPools[schema.value].wait_closed()
+    schema: str
+    for schema in bot.config.database:
+        bot.globals.connectionPools[schema].close()
+        await bot.globals.connectionPools[schema].wait_closed()
 
 
 def main(argv: Optional[List[str]]=None) -> int:

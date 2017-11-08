@@ -1,11 +1,19 @@
+from typing import Any, Optional, Tuple, cast  # noqa: F401
+
 import aioodbc.cursor  # noqa: F401
 
-from typing import Any, Optional, Tuple  # noqa: F401
-
+import bot
 from ._base import Database
 
 
 class DatabaseOAuth(Database):
+    async def __aenter__(self) -> 'DatabaseOAuth':
+        return cast(DatabaseOAuth, await super().__aenter__())
+
+    @staticmethod
+    def acquire() -> 'DatabaseOAuth':
+        return DatabaseOAuth(bot.globals.connectionPools['oauth'])
+
     async def getOAuthToken(self, broadcaster: str) -> Optional[str]:
         query: str = 'SELECT token FROM oauth_tokens WHERE broadcaster=?'
         cursor: aioodbc.cursor.Cursor

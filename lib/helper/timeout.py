@@ -3,9 +3,9 @@ from bot import data, utils  # noqa: F401
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime, timedelta
-from typing import Dict, Iterable, Mapping, List, Optional, Union, cast  # noqa: F401,E501
-from lib import database
+from typing import Dict, Iterable, Mapping, List, Optional, Union  # noqa: F401
 from lib.cache import CacheStore
+from lib.database import DatabaseTimeout
 
 
 async def timeout_user(dataCache: CacheStore,
@@ -52,11 +52,10 @@ async def timeout_user(dataCache: CacheStore,
     else:
         chat.send(f'.ban {user} {theReason}', 0)
 
-    db: database.Database
-    async with database.get_database(database.Schema.Timeout) as db:
-        db_: database.DatabaseTimeout = cast(database.DatabaseTimeout, db)
-        await db_.recordTimeout(chat.channel, user, None, module, level,
-                                length, message, reason)
+    db: DatabaseTimeout
+    async with DatabaseTimeout.acquire() as db:
+        await db.recordTimeout(chat.channel, user, None, module, level, length,
+                               message, reason)
 
 
 async def record_timeout(chat: 'data.Channel',
@@ -91,9 +90,7 @@ async def record_timeout(chat: 'data.Channel',
                     if len(parts) >= 4:
                         reason = parts[3]
         if who is not None:
-            db: database.Database
-            async with database.get_database(database.Schema.Timeout) as db:
-                db_: database.DatabaseTimeout
-                db_ = cast(database.DatabaseTimeout, db)
-                await db_.recordTimeout(chat.channel, who, user, module, None,
-                                        length, source_message, reason)
+            db: DatabaseTimeout
+            async with DatabaseTimeout.acquire() as db:
+                await db.recordTimeout(chat.channel, who, user, module, None,
+                                       length, source_message, reason)
