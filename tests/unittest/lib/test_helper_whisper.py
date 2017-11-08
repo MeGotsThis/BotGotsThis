@@ -20,8 +20,7 @@ class TestLibraryWhisper(asynctest.TestCase):
         self.database = Mock(spec=DatabaseMain)
         self.permissions = MagicMock(spec=WhisperPermissionSet)
         self.args = WhisperCommandArgs(
-            self.data, self.database, 'botgotsthis', Message(''),
-            self.permissions, self.now)
+            self.data, 'botgotsthis', Message(''), self.permissions, self.now)
 
     @asynctest.fail_on(unused_loop=False)
     @patch('bot.utils.whisper', autospec=True)
