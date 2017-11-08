@@ -30,5 +30,5 @@ class TestWhisperBroadcaster(TestWhisper):
         mock_autojoin.return_value = True
         self.assertIs(await whisper.commandAutoJoin(self.args), True)
         mock_autojoin.assert_called_once_with(
-             'botgotsthis', PartialMatch(bot.utils.whisper, 'botgotsthis'),
+            'botgotsthis', PartialMatch(bot.utils.whisper, 'botgotsthis'),
             self.args.message)
