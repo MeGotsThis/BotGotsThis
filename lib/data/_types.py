@@ -14,7 +14,6 @@ Send = Callable[[Union[str, Iterable[str]]], None]
 
 class ChatCommandArgs(NamedTuple):
     data: 'cache.CacheStore'
-    database: 'databaseM.DatabaseMain'
     chat: 'botData.Channel'
     tags: IrcMessageTagsReadOnly
     nick: str
