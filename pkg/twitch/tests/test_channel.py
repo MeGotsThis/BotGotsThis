@@ -119,7 +119,7 @@ class TestTwitchChannel(TestChannel):
     async def test_game(self, mock_update, mock_token):
         mock_update.return_value = True
         self.permissionSet['broadcaster'] = True
-        self.database.getFullGameTitle.return_value = None
+        self.data.getFullGameTitle.return_value = None
         mock_token.return_value = 'oauth:'
         args = self.args._replace(message=Message('!game Kappa'))
         self.assertIs(await channel.commandGame(args), True)
@@ -134,7 +134,7 @@ class TestTwitchChannel(TestChannel):
     async def test_game_abbreviation(self, mock_update, mock_token):
         mock_update.return_value = True
         self.permissionSet['moderator'] = True
-        self.database.getFullGameTitle.return_value = 'Creative'
+        self.data.getFullGameTitle.return_value = 'Creative'
         mock_token.return_value = 'oauth:'
         args = self.args._replace(message=Message('!game Kappa'))
         self.assertIs(await channel.commandGame(args), True)
@@ -150,7 +150,7 @@ class TestTwitchChannel(TestChannel):
         mock_update.return_value = True
         self.features.append('gamestatusbroadcaster')
         self.permissionSet['broadcaster'] = True
-        self.database.getFullGameTitle.return_value = None
+        self.data.getFullGameTitle.return_value = None
         mock_token.return_value = 'oauth:'
         args = self.args._replace(message=Message('!game Pokemon Pokepark'))
         self.assertIs(await channel.commandGame(args), True)
@@ -166,7 +166,7 @@ class TestTwitchChannel(TestChannel):
         mock_update.return_value = False
         self.features.append('gamestatusbroadcaster')
         self.permissionSet['broadcaster'] = True
-        self.database.getFullGameTitle.return_value = None
+        self.data.getFullGameTitle.return_value = None
         mock_token.return_value = 'oauth:'
         args = self.args._replace(message=Message('!game Pokemon Pokepark'))
         self.assertIs(await channel.commandGame(args), True)
