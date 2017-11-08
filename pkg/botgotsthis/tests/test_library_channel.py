@@ -33,7 +33,7 @@ class TestLibraryChannelJoin(asynctest.TestCase):
         self.addCleanup(patcher.stop)
         self.mock_chat_server = patcher.start()
 
-        patcher = patch('lib.database.get_main_database')
+        patcher = patch.object(DatabaseMain, 'acquire')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database

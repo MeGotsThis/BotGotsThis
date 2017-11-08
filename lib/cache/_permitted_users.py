@@ -2,7 +2,7 @@ import json
 from typing import List, Optional  # noqa: F401
 
 from ._abc import AbcCacheStore
-from .. import database
+from ..database import DatabaseMain
 
 
 class PermittedUsersMixin(AbcCacheStore):
@@ -12,8 +12,8 @@ class PermittedUsersMixin(AbcCacheStore):
     async def loadPermittedUsers(self, broadcaster: str) -> List[str]:
         key: str = self._permittedKey(broadcaster)
         permittedUsers: List[str]
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             permittedUsers = [user async for user
                               in db.getPermittedUsers(broadcaster)]
         await self.redis.setex(key, 600, json.dumps(permittedUsers))
@@ -38,8 +38,8 @@ class PermittedUsersMixin(AbcCacheStore):
                                user: str,
                                moderator: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.addPermittedUser(broadcaster, user, moderator)
         if val:
             await self.resetPermittedUsers(broadcaster)
@@ -50,8 +50,8 @@ class PermittedUsersMixin(AbcCacheStore):
                                   user: str,
                                   moderator: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.removePermittedUser(broadcaster, user, moderator)
         if val:
             await self.resetPermittedUsers(broadcaster)

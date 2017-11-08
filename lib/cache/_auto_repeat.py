@@ -4,14 +4,15 @@ from typing import AsyncIterator, List, Optional  # noqa: F401
 
 from bot import utils
 from ._abc import AbcCacheStore
-from .. import data, database
+from ..database import DatabaseMain
+from .. import data
 
 
 class AutoRepeatMixin(AbcCacheStore):
     async def loadAutoRepeats(self) -> 'List[data.RepeatData]':
         repeats: List[data.RepeatData]
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             repeats = [r async for r in db.getAutoRepeats()]
         await self.redis.setex(
             'autorepeat', 600,
@@ -58,8 +59,8 @@ class AutoRepeatMixin(AbcCacheStore):
 
     async def clearAutoRepeat(self, broadcaster: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.clearAutoRepeat(broadcaster)
         if val:
             await self.resetAutoRepeats()
@@ -69,8 +70,8 @@ class AutoRepeatMixin(AbcCacheStore):
                              broadcaster: str,
                              name: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.sentAutoRepeat(broadcaster, name)
         if val:
             await self.resetAutoRepeats()
@@ -83,8 +84,8 @@ class AutoRepeatMixin(AbcCacheStore):
                             count: Optional[int],
                             minutes: float) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.setAutoRepeat(broadcaster, name, message, count,
                                          minutes)
         if val:
@@ -95,8 +96,8 @@ class AutoRepeatMixin(AbcCacheStore):
                                broadcaster: str,
                                name: str) -> bool:
         val: bool
-        db: database.DatabaseMain
-        async with database.get_main_database() as db:
+        db: DatabaseMain
+        async with DatabaseMain.acquire() as db:
             val = await db.removeAutoRepeat(broadcaster, name)
         if val:
             await self.resetAutoRepeats()

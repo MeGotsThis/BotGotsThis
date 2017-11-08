@@ -2,18 +2,18 @@
 import bot
 from bot import utils
 from typing import Dict, List, Optional, Union  # noqa: F401
-from lib import database
 from lib.api import twitch
 from lib.data import Send
 from lib.data.message import Message
+from lib.database import DatabaseMain
 
 
 async def come(channel: str,
                send: Send) -> bool:
     bannedWithReason: Optional[str]
     priority: Union[float, int]
-    db: database.DatabaseMain
-    async with database.get_main_database() as db:
+    db: DatabaseMain
+    async with DatabaseMain.acquire() as db:
         bannedWithReason = await db.isChannelBannedReason(channel)
         if bannedWithReason is not None:
             send(f'Chat {channel} is banned from joining')
@@ -50,8 +50,8 @@ async def leave(channel: str,
 async def auto_join(channel: str,
                     send: Send,
                     message: Message) -> bool:
-    db: database.DatabaseMain
-    async with database.get_main_database() as db:
+    db: DatabaseMain
+    async with DatabaseMain.acquire() as db:
         bannedWithReason: Optional[str]
         bannedWithReason = await db.isChannelBannedReason(channel)
         if bannedWithReason is not None:
@@ -66,7 +66,7 @@ async def auto_join(channel: str,
         return await auto_join_add(db, channel, send)
 
 
-async def auto_join_add(db: database.DatabaseMain,
+async def auto_join_add(db: DatabaseMain,
                         channel: str,
                         send: Send) -> bool:
     cluster: Optional[str] = await twitch.chat_server(channel)
@@ -108,7 +108,7 @@ Auto join for {channel} is already enabled and already in chat''')
     return True
 
 
-async def auto_join_delete(db: database.DatabaseMain,
+async def auto_join_delete(db: DatabaseMain,
                            channel: str,
                            send: Send) -> bool:
     result: bool = await db.discardAutoJoin(channel)

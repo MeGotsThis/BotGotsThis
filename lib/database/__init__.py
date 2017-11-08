@@ -31,8 +31,3 @@ def get_database(schema: Schema=Schema.Main) -> Database:
         connectionPool = bot.globals.connectionPools[schema.value]
         return databases[schema](connectionPool)
     raise ValueError()
-
-
-def get_main_database() -> DatabaseMain:
-    db: Database = get_database(Schema.Main)
-    return cast(DatabaseMain, db)

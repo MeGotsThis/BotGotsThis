@@ -22,7 +22,7 @@ class TestCacheStore(asynctest.TestCase):
         self.dbmain.__aenter__.return_value = self.dbmain
         self.dbmain.__aexit__.return_value = False
 
-        patcher = patch('lib.database.get_main_database')
+        patcher = patch.object(DatabaseMain, 'acquire')
         self.addCleanup(patcher.stop)
         self.mock_dbmain = patcher.start()
         self.mock_dbmain.return_value = self.dbmain

@@ -2,17 +2,17 @@
 
 import bot
 from bot import utils
-from lib import database
 from lib.api import twitch
 from lib.data import Send
+from lib.database import DatabaseMain
 from lib.helper import timeout
 
 
 async def join(channel: str,
                send: Send) -> bool:
     priority: Union[int, float]
-    db: database.DatabaseMain
-    async with database.get_main_database() as db:
+    db: DatabaseMain
+    async with DatabaseMain.acquire() as db:
         bannedWithReason: Optional[str]
         bannedWithReason = await db.isChannelBannedReason(channel)
         if bannedWithReason is not None:
