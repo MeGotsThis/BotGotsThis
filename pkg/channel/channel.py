@@ -11,7 +11,7 @@ async def commandHello(args: ChatCommandArgs) -> bool:
 
 @ownerChannel
 async def commandCome(args: ChatCommandArgs) -> bool:
-    return await library.come(args.database, args.nick, send(args.chat))
+    return await library.come(args.nick, send(args.chat))
 
 
 @permission('broadcaster')
@@ -21,5 +21,4 @@ async def commandLeave(args: ChatCommandArgs) -> bool:
 
 @ownerChannel
 async def commandAutoJoin(args: ChatCommandArgs) -> bool:
-    return await library.auto_join(args.database, args.nick, send(args.chat),
-                                   args.message)
+    return await library.auto_join(args.nick, send(args.chat), args.message)

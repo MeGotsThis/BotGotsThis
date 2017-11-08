@@ -2,21 +2,23 @@
 import bot
 from bot import utils
 from typing import Dict, List, Optional, Union  # noqa: F401
+from lib import database
 from lib.api import twitch
 from lib.data import Send
 from lib.data.message import Message
-from lib.database import DatabaseMain
 
 
-async def come(database: DatabaseMain,
-               channel: str,
+async def come(channel: str,
                send: Send) -> bool:
     bannedWithReason: Optional[str]
-    bannedWithReason = await database.isChannelBannedReason(channel)
-    if bannedWithReason is not None:
-        send(f'Chat {channel} is banned from joining')
-        return True
-    priority: Union[float, int] = await database.getAutoJoinsPriority(channel)
+    priority: Union[float, int]
+    db: database.DatabaseMain
+    async with database.get_main_database() as db:
+        bannedWithReason = await db.isChannelBannedReason(channel)
+        if bannedWithReason is not None:
+            send(f'Chat {channel} is banned from joining')
+            return True
+        priority = await db.getAutoJoinsPriority(channel)
     cluster: Optional[str] = await twitch.chat_server(channel)
     joinResult: Optional[bool] = utils.joinChannel(channel, priority, cluster)
     if joinResult is None:
@@ -45,25 +47,26 @@ async def leave(channel: str,
     return True
 
 
-async def auto_join(database: DatabaseMain,
-                    channel: str,
+async def auto_join(channel: str,
                     send: Send,
                     message: Message) -> bool:
-    bannedWithReason: Optional[str]
-    bannedWithReason = await database.isChannelBannedReason(channel)
-    if bannedWithReason is not None:
-        send(f'Chat {channel} is banned from joining')
-        return True
+    db: database.DatabaseMain
+    async with database.get_main_database() as db:
+        bannedWithReason: Optional[str]
+        bannedWithReason = await db.isChannelBannedReason(channel)
+        if bannedWithReason is not None:
+            send(f'Chat {channel} is banned from joining')
+            return True
 
-    if len(message) >= 2:
-        removeMsgs: List[str] = ['0', 'false', 'no', 'remove', 'rem', 'delete',
-                                 'del', 'leave', 'part']
-        if message.lower[1] in removeMsgs:
-            return await auto_join_delete(database, channel, send)
-    return await auto_join_add(database, channel, send)
+        if len(message) >= 2:
+            removeMsgs: List[str] = ['0', 'false', 'no', 'remove', 'rem',
+                                     'delete', 'del', 'leave', 'part']
+            if message.lower[1] in removeMsgs:
+                return await auto_join_delete(db, channel, send)
+        return await auto_join_add(db, channel, send)
 
 
-async def auto_join_add(database: DatabaseMain,
+async def auto_join_add(db: database.DatabaseMain,
                         channel: str,
                         send: Send) -> bool:
     cluster: Optional[str] = await twitch.chat_server(channel)
@@ -73,10 +76,10 @@ async def auto_join_add(database: DatabaseMain,
     if cluster not in bot.globals.clusters:
         send(f'Auto join for {channel} failed due to unsupported chat server')
         return True
-    result: bool = await database.saveAutoJoin(channel, 0, cluster)
-    priority: Union[int, float] = await database.getAutoJoinsPriority(channel)
+    result: bool = await db.saveAutoJoin(channel, 0, cluster)
+    priority: Union[int, float] = await db.getAutoJoinsPriority(channel)
     if result is False:
-        await database.setAutoJoinServer(channel, cluster)
+        await db.setAutoJoinServer(channel, cluster)
 
     wasInChat: bool = not utils.joinChannel(channel, priority, cluster)
     rejoin: int = 0
@@ -105,10 +108,10 @@ Auto join for {channel} is already enabled and already in chat''')
     return True
 
 
-async def auto_join_delete(database: DatabaseMain,
+async def auto_join_delete(db: database.DatabaseMain,
                            channel: str,
                            send: Send) -> bool:
-    result: bool = await database.discardAutoJoin(channel)
+    result: bool = await db.discardAutoJoin(channel)
     if result:
         send(f'Auto join for {channel} is now disabled')
     else:
