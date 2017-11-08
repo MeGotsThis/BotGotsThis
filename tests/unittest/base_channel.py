@@ -4,7 +4,7 @@ import bot  # noqa: F401
 
 from datetime import datetime
 
-from asynctest.mock import MagicMock, Mock
+from asynctest.mock import MagicMock, Mock, patch
 
 from bot.data import Channel
 from bot.twitchmessage import IrcMessageTags
@@ -24,7 +24,9 @@ class TestChannel(asynctest.TestCase):
         self.channel.sessionData = {}
         self.data = Mock(spec=CacheStore)
         self.data.hasFeature.side_effect = lambda c, f: f in self.features
-        self.database = Mock(spec=DatabaseMain)
+        self.database = MagicMock(spec=DatabaseMain)
+        self.database.__aenter__.return_value = self.database
+        self.database.__aexit__.return_value = False
         self.features = []
         self.database.hasFeature.side_effect = lambda c, f: f in self.features
         self.permissionSet = {
@@ -46,5 +48,10 @@ class TestChannel(asynctest.TestCase):
         self.permissions.__getitem__.side_effect = \
             lambda k: self.permissionSet[k]
         self.args = ChatCommandArgs(
-            self.data, self.database, self.channel, self.tags, 'botgotsthis',
-            Message(''), self.permissions, self.now)
+            self.data, self.channel, self.tags, 'botgotsthis', Message(''),
+            self.permissions, self.now)
+
+        patcher = patch('lib.database.get_main_database')
+        self.addCleanup(patcher.stop)
+        self.mock_database = patcher.start()
+        self.mock_database.return_value = self.database

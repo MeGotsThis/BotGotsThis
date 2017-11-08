@@ -241,7 +241,7 @@ class TestCustomCommandLibraryCustomCreateMessages(asynctest.TestCase):
         self.command = CustomCommand('Kappa KappaRoss KappaPride',
                                      '#global', '')
         self.args = ChatCommandArgs(
-            self.data, self.database, self.channel, self.tags, 'botgotsthis',
+            self.data, self.channel, self.tags, 'botgotsthis',
             Message('Kappa'), self.permissions, self.now)
 
         patcher = patch(library.__name__ + '.split_message',

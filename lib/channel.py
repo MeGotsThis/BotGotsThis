@@ -7,7 +7,6 @@ from bot import data as botData, utils  # noqa: F401
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from . import data
 from . import cache
-from . import database
 from .data.message import Message
 from .data.permissions import ChatPermissionSet
 
@@ -39,7 +38,6 @@ async def chatCommand(chat: 'botData.Channel',
     arguments: data.ChatCommandArgs
     command: data.ChatCommand
     cacheStore: cache.CacheStore
-    db: database.Database
     try:
         if tags is not None:
             if 'room-id' in tags:
@@ -47,10 +45,7 @@ async def chatCommand(chat: 'botData.Channel',
                                    timestamp)
             if 'user-id' in tags:
                 utils.saveTwitchId(nick, str(tags['user-id']), timestamp)
-        async with cache.get_cache() as cacheStore, \
-                database.get_database() as db:
-            databaseObj: database.DatabaseMain
-            databaseObj = cast(database.DatabaseMain, db)
+        async with cache.get_cache() as cacheStore:
             permitted, manager = await asyncio.gather(
                 cacheStore.isPermittedUser(chat.channel, nick),
                 cacheStore.isBotManager(nick))
@@ -58,8 +53,7 @@ async def chatCommand(chat: 'botData.Channel',
                                             manager)
 
             arguments = data.ChatCommandArgs(
-                cacheStore, databaseObj, chat, tags, nick, message,
-                permissions, timestamp)
+                cacheStore, chat, tags, nick, message, permissions, timestamp)
             for command in commandsToProcess(message.command):
                 if await command(arguments):
                     return

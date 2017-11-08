@@ -23,8 +23,8 @@ class TestLibraryChat(asynctest.TestCase):
         self.database = Mock(spec=DatabaseMain)
         self.permissions = MagicMock(spec=ChatPermissionSet)
         self.args = ChatCommandArgs(
-            self.data, self.database, self.channel, self.tags, 'botgotsthis',
-            Message(''), self.permissions, self.now)
+            self.data, self.channel, self.tags, 'botgotsthis', Message(''),
+            self.permissions, self.now)
 
     @asynctest.fail_on(unused_loop=False)
     def test_send(self):
