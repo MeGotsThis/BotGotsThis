@@ -21,8 +21,7 @@ class TestChannelBroadcaster(TestChannel):
         mock_come.return_value = True
         self.permissions.inOwnerChannel = True
         self.assertIs(await channel.commandCome(self.args), True)
-        mock_come.assert_called_once_with(self.database, 'botgotsthis',
-                                          self.channel.send)
+        mock_come.assert_called_once_with('botgotsthis', self.channel.send)
 
     @patch('pkg.channel.library.leave')
     async def test_leave(self, mock_leave):
@@ -41,4 +40,4 @@ class TestChannelBroadcaster(TestChannel):
         self.permissions.inOwnerChannel = True
         self.assertIs(await channel.commandAutoJoin(self.args), True)
         mock_autojoin.assert_called_once_with(
-            self.database, 'botgotsthis', self.channel.send, self.args.message)
+            'botgotsthis', self.channel.send, self.args.message)

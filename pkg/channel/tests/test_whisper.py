@@ -16,8 +16,7 @@ class TestWhisperBroadcaster(TestWhisper):
         mock_come.return_value = True
         self.assertIs(await whisper.commandCome(self.args), True)
         mock_come.assert_called_once_with(
-            self.database, 'botgotsthis',
-            PartialMatch(bot.utils.whisper, 'botgotsthis'))
+            'botgotsthis', PartialMatch(bot.utils.whisper, 'botgotsthis'))
 
     @patch(library.__name__ + '.leave')
     async def test_leave(self, mock_leave):
@@ -31,5 +30,5 @@ class TestWhisperBroadcaster(TestWhisper):
         mock_autojoin.return_value = True
         self.assertIs(await whisper.commandAutoJoin(self.args), True)
         mock_autojoin.assert_called_once_with(
-            self.database, 'botgotsthis',
-            PartialMatch(bot.utils.whisper, 'botgotsthis'), self.args.message)
+             'botgotsthis', PartialMatch(bot.utils.whisper, 'botgotsthis'),
+            self.args.message)

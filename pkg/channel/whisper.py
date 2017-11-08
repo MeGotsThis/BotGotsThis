@@ -4,7 +4,7 @@ from . import library
 
 
 async def commandCome(args: WhisperCommandArgs) -> bool:
-    return await library.come(args.database, args.nick, send(args.nick))
+    return await library.come(args.nick, send(args.nick))
 
 
 async def commandLeave(args: WhisperCommandArgs) -> bool:
@@ -12,5 +12,4 @@ async def commandLeave(args: WhisperCommandArgs) -> bool:
 
 
 async def commandAutoJoin(args: WhisperCommandArgs) -> bool:
-    return await library.auto_join(args.database, args.nick, send(args.nick),
-                                   args.message)
+    return await library.auto_join(args.nick, send(args.nick), args.message)
