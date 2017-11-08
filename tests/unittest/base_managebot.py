@@ -43,5 +43,6 @@ class TestManageBot(asynctest.TestCase):
                                   'botgotsthis', Message(''))
 
         patcher = patch('lib.database.get_main_database')
+        self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database
