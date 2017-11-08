@@ -9,7 +9,6 @@ from asynctest.mock import CoroutineMock, MagicMock, Mock, PropertyMock, patch
 from bot.twitchmessage import IrcMessageTags
 from lib import whisper
 from lib.cache import CacheStore
-from lib.database import DatabaseMain
 from lib.data.message import Message
 
 
@@ -38,10 +37,8 @@ class TestWhisper(asynctest.TestCase):
         self.assertFalse(mock_whisperCommand.called)
 
     @patch('lib.cache.get_cache')
-    @patch('lib.database.get_database')
     @patch('lib.whisper.commandsToProcess', autospec=True)
-    async def test_whisperCommand(self, mock_commands, mock_database,
-                                  mock_data):
+    async def test_whisperCommand(self, mock_commands, mock_data):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
@@ -50,10 +47,6 @@ class TestWhisper(asynctest.TestCase):
         data.__aenter__.return_value = data
         data.__aexit__.return_value = True
         mock_data.return_value = data
-        database = MagicMock(spec=DatabaseMain)
-        database.__aenter__.return_value = database
-        database.__aexit__.return_value = True
-        mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
         await whisper.whisperCommand(self.tags, 'botgotsthis', message,
@@ -66,20 +59,15 @@ class TestWhisper(asynctest.TestCase):
 
     @patch('bot.utils.logException', autospec=True)
     @patch('lib.cache.get_cache')
-    @patch('lib.database.get_database')
     @patch('lib.whisper.commandsToProcess', autospec=True)
-    async def test_whisperCommand_except(self, mock_commands, mock_database,
-                                         mock_data, mock_log):
+    async def test_whisperCommand_except(self, mock_commands, mock_data,
+                                         mock_log):
         command = CoroutineMock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
         data = MagicMock(spec=CacheStore)
         data.__aenter__.return_value = data
         data.__aexit__.return_value = False
         mock_data.return_value = data
-        database = MagicMock(spec=DatabaseMain)
-        database.__aenter__.return_value = database
-        database.__aexit__.return_value = False
-        mock_database.return_value = database
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
         await whisper.whisperCommand(self.tags, 'botgotsthis', message,
@@ -91,30 +79,10 @@ class TestWhisper(asynctest.TestCase):
 
     @patch('bot.utils.logException', autospec=True)
     @patch('lib.cache.get_cache')
-    @patch('lib.database.get_database')
     @patch('lib.whisper.commandsToProcess', autospec=True)
     async def test_whisperCommand_data_except(
-            self, mock_commands, mock_database, mock_data, mock_log):
+            self, mock_commands, mock_data, mock_log):
         mock_data.side_effect = Exception
-        message = Mock(spec=Message)
-        type(message).command = PropertyMock(return_value='Kappa')
-        await whisper.whisperCommand(self.tags, 'botgotsthis', message,
-                                     self.now)
-        self.assertFalse(mock_database.called)
-        self.assertFalse(mock_commands.called)
-        self.assertTrue(mock_log.called)
-
-    @patch('bot.utils.logException', autospec=True)
-    @patch('lib.cache.get_cache')
-    @patch('lib.database.get_database')
-    @patch('lib.whisper.commandsToProcess', autospec=True)
-    async def test_whisperCommand_database_except(
-            self, mock_commands, mock_database, mock_data, mock_log):
-        data = MagicMock(spec=CacheStore)
-        data.__aenter__.return_value = data
-        data.__aexit__.return_value = False
-        mock_data.return_value = data
-        mock_database.side_effect = Exception
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
         await whisper.whisperCommand(self.tags, 'botgotsthis', message,

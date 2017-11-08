@@ -2,7 +2,7 @@ import asynctest
 
 from datetime import datetime
 
-from asynctest.mock import MagicMock, Mock
+from asynctest.mock import MagicMock, Mock, patch
 
 from bot.data import Channel
 from lib.cache import CacheStore
@@ -19,7 +19,9 @@ class TestWhisper(asynctest.TestCase):
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
         self.data = Mock(spec=CacheStore)
-        self.database = Mock(spec=DatabaseMain)
+        self.database = MagicMock(spec=DatabaseMain)
+        self.database.__aenter__.return_value = self.database
+        self.database.__aexit__.return_value = False
         self.permissionSet = {
             'owner': False,
             'manager': False,
@@ -31,5 +33,10 @@ class TestWhisper(asynctest.TestCase):
         self.permissions.__getitem__.side_effect = \
             lambda k: self.permissionSet[k]
         self.args = WhisperCommandArgs(
-            self.data, self.database, 'botgotsthis', Message(''),
+            self.data, 'botgotsthis', Message(''),
             self.permissions, self.now)
+
+        patcher = patch('lib.database.get_main_database')
+        self.addCleanup(patcher.stop)
+        self.mock_database = patcher.start()
+        self.mock_database.return_value = self.database

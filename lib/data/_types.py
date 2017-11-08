@@ -24,7 +24,6 @@ class ChatCommandArgs(NamedTuple):
 
 class WhisperCommandArgs(NamedTuple):
     data: 'cache.CacheStore'
-    database: 'databaseM.DatabaseMain'
     nick: str
     message: Message
     permissions: WhisperPermissionSet

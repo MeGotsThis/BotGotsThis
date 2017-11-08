@@ -7,7 +7,6 @@ from bot import utils
 from bot.twitchmessage import IrcMessageTagsReadOnly
 from . import data
 from . import cache
-from . import database
 from .data.message import Message
 from .data.permissions import WhisperPermissionSet
 
@@ -36,17 +35,13 @@ async def whisperCommand(tags: IrcMessageTagsReadOnly,
     arguments: data.WhisperCommandArgs
     command: data.WhisperCommand
     cacheStore: cache.CacheStore
-    db: database.Database
     try:
-        async with cache.get_cache() as cacheStore,\
-                database.get_database() as db:
-            databaseObj: database.DatabaseMain
-            databaseObj = cast(database.DatabaseMain, db)
+        async with cache.get_cache() as cacheStore:
             manager = await cacheStore.isBotManager(nick)
             permissions = WhisperPermissionSet(tags, nick, manager)
 
             arguments = data.WhisperCommandArgs(
-                cacheStore, databaseObj, nick, message, permissions, timestamp)
+                cacheStore, nick, message, permissions, timestamp)
             for command in commandsToProcess(message.command):
                 if await command(arguments):
                     return
