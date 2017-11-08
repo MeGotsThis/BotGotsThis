@@ -5,7 +5,7 @@ from asynctest.mock import MagicMock, Mock, call, patch
 
 from bot.data import Channel
 from lib.cache import CacheStore
-from lib.database import DatabaseTimeout, Schema
+from lib.database import DatabaseTimeout
 from lib.helper import timeout
 from tests.unittest.mock_class import TypeMatch
 
@@ -25,7 +25,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
         self.channel.channel = 'botgotsthis'
         self.channel.sessionData = {}
 
-        patcher = patch('lib.database.get_database')
+        patcher = patch.object(DatabaseTimeout, 'acquire')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.dbtimeout
@@ -59,7 +59,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             self.channel.sessionData['timeouts']['unittest']['megotsthis'],
             (self.now, 0))
         self.channel.send.assert_called_once_with('.timeout megotsthis 60 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 60, None, None)
         self.assertFalse(self.mock_whisper.called)
@@ -80,7 +80,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             (self.now, 0))
         self.channel.send.assert_called_once_with(
             '.timeout megotsthis 60 Kappa', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 60, None,
             'Kappa')
@@ -100,7 +100,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             self.channel.sessionData['timeouts']['unittest']['megotsthis'],
             (self.now, 0))
         self.channel.send.assert_called_once_with('.timeout megotsthis 60 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 60, 'Kappa',
             None)
@@ -122,7 +122,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             (self.now, 1))
         self.channel.send.assert_called_once_with(
             '.timeout megotsthis 3600 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 1, 3600, None, None)
         self.assertFalse(self.mock_whisper.called)
@@ -143,7 +143,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             (self.now, 2))
         self.channel.send.assert_called_once_with(
             '.timeout megotsthis 86400 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 2, 86400, None,
             None)
@@ -165,7 +165,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             (self.now, 2))
         self.channel.send.assert_called_once_with(
             '.timeout megotsthis 86400 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 2, 86400, None,
             None)
@@ -186,7 +186,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             self.channel.sessionData['timeouts']['unittest']['megotsthis'],
             (self.now, 0))
         self.channel.send.assert_called_once_with('.timeout megotsthis 60 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 60, None, None)
         self.assertFalse(self.mock_whisper.called)
@@ -211,7 +211,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             self.channel.sessionData['timeouts']['unittest']['megotsthis'],
             (self.now, 0))
         self.channel.send.assert_called_once_with('.timeout megotsthis 1 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 1, None, None)
         self.assertFalse(self.mock_whisper.called)
@@ -236,7 +236,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             self.channel.sessionData['timeouts']['unittest']['megotsthis'],
             (self.now, 0))
         self.channel.send.assert_called_once_with('.ban megotsthis ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 0, 0, None, None)
         self.assertFalse(self.mock_whisper.called)
@@ -262,7 +262,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             (self.now, 1))
         self.channel.send.assert_called_once_with(
             '.timeout megotsthis 3600 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 1, 3600, None, None)
         self.assertFalse(self.mock_whisper.called)
@@ -288,7 +288,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             (self.now, 2))
         self.channel.send.assert_called_once_with(
             '.timeout megotsthis 86400 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 2, 86400, None,
             None)
@@ -315,7 +315,7 @@ class TestLibraryTimeoutUser(asynctest.TestCase):
             (self.now, 2))
         self.channel.send.assert_called_once_with(
             '.timeout megotsthis 86400 ', 0)
-        self.mock_database.assert_called_once_with(Schema.Timeout)
+        self.mock_database.assert_called_once_with()
         self.dbtimeout.recordTimeout.assert_called_once_with(
             'botgotsthis', 'megotsthis', None, 'unittest', 2, 86400, None,
             None)
@@ -329,7 +329,7 @@ class TestLibraryTimeoutRecord(asynctest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
 
-        patcher = patch('lib.database.get_database')
+        patcher = patch.object(DatabaseTimeout, 'acquire')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
         self.mock_database.return_value = self.database

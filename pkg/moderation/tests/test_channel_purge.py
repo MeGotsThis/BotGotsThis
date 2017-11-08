@@ -9,7 +9,7 @@ from ..channel import purge
 
 
 class TestModerationChannelPurge(TestChannel):
-    @patch('lib.database.get_database')
+    @patch.object(DatabaseTimeout, 'acquire')
     async def test_purge(self, mock_database):
         database = MagicMock(spec=DatabaseTimeout)
         mock_database.return_value = database
@@ -26,7 +26,7 @@ class TestModerationChannelPurge(TestChannel):
             'botgotsthis', 'megotsthis', 'botgotsthis', 'purge', None, 1,
             '!purge MeGotsThis', None)
 
-    @patch('lib.database.get_database')
+    @patch.object(DatabaseTimeout, 'acquire')
     async def test_purge_reason(self, mock_database):
         database = MagicMock(spec=DatabaseTimeout)
         mock_database.return_value = database

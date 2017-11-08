@@ -1,12 +1,20 @@
+from typing import Optional, cast
+
 import aioodbc.cursor  # noqa: F401
 import pyodbc
 
-from typing import Optional
-
+import bot
 from ._base import Database
 
 
 class DatabaseTimeout(Database):
+    async def __aenter__(self) -> 'DatabaseTimeout':
+        return cast(DatabaseTimeout, await super().__aenter__())
+
+    @staticmethod
+    def acquire() -> 'DatabaseTimeout':
+        return DatabaseTimeout(bot.globals.connectionPools['timeout'])
+
     async def recordTimeout(self,
                             broadcaster: str,
                             user: str,

@@ -297,7 +297,7 @@ class TestTasksTwitchChatServer(TestTasksTwitchBase):
         self.socket_property = PropertyMock(return_value=self.connection1)
         type(self.channel).connection = self.socket_property
 
-        patcher = patch('lib.database.get_database')
+        patcher = patch.object(DatabaseMain, 'acquire')
         self.addCleanup(patcher.stop)
         self.mock_database = patcher.start()
 

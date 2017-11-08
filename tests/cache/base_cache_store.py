@@ -5,19 +5,11 @@ from asynctest import MagicMock, patch
 import bot  # noqa: F401
 
 from lib.cache import CacheStore
-from lib.database import Database, DatabaseMain
+from lib.database import DatabaseMain
 
 
 class TestCacheStore(asynctest.TestCase):
     async def setUp(self):
-        self.database = MagicMock(spec=Database)
-        self.database.__aenter__.side_effect = lambda: self.database
-        self.database.__aexit__.return_value = False
-
-        patcher = patch('lib.database.get_database')
-        self.mock_database = patcher.start()
-        self.mock_database.return_value = self.database
-
         self.dbmain = MagicMock(spec=DatabaseMain)
         self.dbmain.__aenter__.return_value = self.dbmain
         self.dbmain.__aexit__.return_value = False

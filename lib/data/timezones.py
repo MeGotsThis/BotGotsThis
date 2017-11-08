@@ -2,9 +2,9 @@
 
 from abc import ABCMeta, abstractmethod
 from datetime import datetime, timedelta, tzinfo
-from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, cast  # noqa: F401,E501
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple  # noqa: F401,E501
 
-from lib import database
+from lib.database import DatabaseTimeZone
 
 
 class Transition(NamedTuple):
@@ -211,10 +211,8 @@ async def load_timezones() -> None:
         BasicTimeZone(-720, 'UTC-12'),
     ]
 
-    _db: database.Database
-    db: database.DatabaseTimeZone
-    async with database.get_database(database.Schema.TimeZone) as _db:
-        db = cast(database.DatabaseTimeZone, _db)
+    db: DatabaseTimeZone
+    async with DatabaseTimeZone.acquire() as db:
         row: Tuple[Any, ...]
         async for row in db.timezone_names():
             timezones.append(BasicTimeZone(row[1] // 60, row[0]))

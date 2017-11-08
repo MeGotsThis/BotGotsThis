@@ -1,11 +1,19 @@
-import aioodbc.cursor  # noqa: F401,E501
-
 from typing import AsyncIterator, List, Tuple, cast
 
+import aioodbc.cursor  # noqa: F401,E501
+
+import bot
 from ._base import Database
 
 
 class DatabaseTimeZone(Database):
+    async def __aenter__(self) -> 'DatabaseTimeZone':
+        return cast(DatabaseTimeZone, await super().__aenter__())
+
+    @staticmethod
+    def acquire() -> 'DatabaseTimeZone':
+        return DatabaseTimeZone(bot.globals.connectionPools['timezone'])
+
     async def timezone_names(self) -> AsyncIterator[Tuple[str, int]]:
         '''
         For the abbreviation conflicts of: CST, CDT, AMT, AST, GST, IST,
