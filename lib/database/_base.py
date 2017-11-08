@@ -41,7 +41,7 @@ class Database:
     async def __aexit__(self,
                         type: Optional[Type[BaseException]],
                         value: Optional[BaseException],
-                        traceback: 'Optional[TracebackType]') -> None:
+                        traceback: Optional[TracebackType]) -> None:
         await self.close()
 
     @property
