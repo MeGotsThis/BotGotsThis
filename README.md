@@ -6,6 +6,7 @@ This is a Twitch.tv bot written by MeGotsThis. The bot is built to have a modula
 
 - [Python 3.6](https://www.python.org/) or higher
 - Postgres 9.5 or higher or SQLite 3
+- Redis
 
 # Setup
 
