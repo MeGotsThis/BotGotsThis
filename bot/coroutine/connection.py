@@ -5,11 +5,11 @@ import lib.ircmessage
 
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Any, Deque, Dict, List, Optional, Tuple, no_type_check  # noqa: F401,E501
+from typing import Any, Deque, Dict, List, Optional, Tuple  # noqa: F401
 
 
 from bot import data, utils
-from bot.data._messaging_queue import WhisperMessage
+from bot.data._messaging_queue import ChatMessage, WhisperMessage  # noqa: F401
 from bot.coroutine import join
 from bot.twitchmessage import IrcMessage, IrcMessageParams
 
@@ -241,12 +241,10 @@ class ConnectionHandler:
         file: str = f'{bot.config.botnick}-{self.name}.log'
         utils.logIrcMessage(file, '< ' + message)
 
-    # TODO: mypy fix in the future
-    @no_type_check
     def _log_write(self,
                    command: IrcMessage, *,
                    channel: 'Optional[data.Channel]'=None,
-                   whisper: 'Optional[data.WhisperMessage]'=None,
+                   whisper: 'Optional[WhisperMessage]'=None,
                    timestamp: Optional[datetime]=None) -> None:
         timestamp = timestamp or utils.now()
         if command.command == 'PASS':
@@ -278,8 +276,6 @@ class ConnectionHandler:
         for file, log in zip(files, logs):
             utils.logIrcMessage(file, log, timestamp)
 
-    # TODO: mypy fix in the future
-    @no_type_check
     def queue_write(self,
                     message: IrcMessage, *,
                     channel: 'Optional[data.Channel]'=None,
@@ -287,7 +283,7 @@ class ConnectionHandler:
                     prepend: bool=False) -> None:
         if not isinstance(message, IrcMessage):
             raise TypeError()
-        kwargs: dict = {}
+        kwargs: Dict[str, Any] = {}
         if channel:
             if not isinstance(channel, data.Channel):
                 raise TypeError()
@@ -298,7 +294,7 @@ class ConnectionHandler:
             kwargs['whisper'] = whisper
         if channel and whisper:
             raise ValueError()
-        item: Tuple[Tuple[IrcMessage], dict]
+        item: Tuple[Tuple[IrcMessage], Dict[str, Any]]
         item = (message,), kwargs
         if prepend:
             self.writeQueue.appendleft(item)
@@ -318,11 +314,9 @@ class ConnectionHandler:
         join.on_part(channel.channel)
         print(f'{utils.now()} Parted {channel.channel}')
 
-    # TODO: mypy fix in the future
-    @no_type_check
     def flush_writes(self) -> None:
         self.messaging.cleanOldTimestamps()
-        whisperMessage: data.WhisperMessage
+        whisperMessage: WhisperMessage
         for whisperMessage in iter(self.messaging.popWhisper, None):
             ircMsg: str = f'.w {whisperMessage.nick} {whisperMessage.message}'
             ircMsg = ircMsg[:bot.config.messageLimit]
@@ -335,7 +329,7 @@ class ConnectionHandler:
                     whisper=whisperMessage)
             except ValueError:
                 utils.logException()
-        nessage: data.ChatMessage
+        nessage: ChatMessage
         for message in iter(self.messaging.popChat, None):
             try:
                 self.queue_write(
