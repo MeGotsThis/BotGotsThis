@@ -27,11 +27,12 @@ class FeaturesMixin(AbcCacheStore):
         key: str = self._featuresKey(broadcaster)
         if broadcaster not in self._features:
             value: Optional[str] = await self.redis.get(key)
+            features: Set[str]
             if value is None:
-                self._features[broadcaster] = await self.loadFeatures(
-                    broadcaster)
+                features = await self.loadFeatures(broadcaster)
             else:
-                self._features[broadcaster] = set(json.loads(value))
+                features = set(json.loads(value))
+            self._features[broadcaster] = features
         return feature in self._features[broadcaster]
 
     async def resetFeatures(self, broadcaster: str) -> None:
