@@ -10,11 +10,12 @@ from ._custom_commands import CustomCommandsMixin
 from ._features import FeaturesMixin
 from ._game_abbreviations import GameAbbreviationsMixin
 from ._permitted_users import PermittedUsersMixin
+from ._twitch_api import TwitchApisMixin
 
 
 class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
                  BotManagersMixin, CustomCommandsMixin, AutoRepeatMixin,
-                 GameAbbreviationsMixin):
+                 GameAbbreviationsMixin, TwitchApisMixin):
     def __init__(self,
                  pool: aioredis.ConnectionsPool) -> None:
         super().__init__()
