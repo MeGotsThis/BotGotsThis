@@ -1,7 +1,7 @@
 ﻿import asyncio
 import re
 from datetime import datetime
-from typing import Match, cast  # noqa: F401
+from typing import Match  # noqa: F401
 from urllib.parse import ParseResult, urlparse  # noqa: F401
 
 import aiohttp
@@ -9,7 +9,6 @@ import aiohttp
 import bot
 from bot import data, utils  # noqa: F401
 from lib import cache
-from lib.api import twitch
 from lib.data import ChatCommandArgs
 from lib.data.message import Message
 from lib.helper.chat import feature, permission
@@ -32,8 +31,10 @@ async def check_domain_redirect(chat: 'data.Channel',
                                 nick: str,
                                 message: Message,
                                 timestamp: datetime) -> None:
-    if await twitch.num_followers(nick):
-        return
+    dataCache: cache.CacheStore
+    async with cache.get_cache() as dataCache:
+        if await dataCache.twitch_num_followers(nick):
+            return
 
     # Record all urls with users of no follows
     utils.logIrcMessage(f'{chat.ircChannel}#blockurl.log',

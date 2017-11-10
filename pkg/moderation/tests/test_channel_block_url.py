@@ -55,9 +55,14 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.channel.ircChannel = '#botgotsthis'
         self.now = datetime(2000, 1, 1)
 
-        patcher = patch('lib.api.twitch.num_followers')
+        self.data = MagicMock(spec=CacheStore)
+        self.data.__aenter__.return_value = self.data
+        self.data.__aexit__.return_value = False
+
+        patcher = patch('lib.cache.get_cache')
         self.addCleanup(patcher.stop)
-        self.mock_followers = patcher.start()
+        self.mock_cache = patcher.start()
+        self.mock_cache.return_value = self.data
 
         patcher = patch('bot.utils.logIrcMessage', autospec=True)
         self.addCleanup(patcher.stop)
@@ -92,11 +97,11 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.mock_clientsession.return_value = self.mock_session
 
     async def test_followers(self):
-        self.mock_followers.return_value = 1
+        self.data.twitch_num_followers.return_value = 1
         message = Message('twitch.tv')
         await block_url.check_domain_redirect(self.channel, 'botgotsthis',
                                               message, self.now)
-        self.mock_followers.assert_called_once_with('botgotsthis')
+        self.data.twitch_num_followers.assert_called_once_with('botgotsthis')
         self.assertFalse(self.mock_log.called)
         self.assertFalse(self.mock_except.called)
         self.assertFalse(self.mock_clientsession.called)
@@ -105,13 +110,13 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.assertFalse(self.mock_handle.called)
 
     async def test(self):
-        self.mock_followers.return_value = 0
+        self.data.twitch_num_followers.return_value = 0
         self.mock_compare.return_value = True
         message = Message('twitch.tv')
         self.mock_response.url = yarl.URL('http://megotsthis.com')
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
+        self.data.twitch_num_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
@@ -126,12 +131,12 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     async def test_same_domain(self):
-        self.mock_followers.return_value = 0
+        self.data.twitch_num_followers.return_value = 0
         message = Message('twitch.tv')
         self.mock_response.url = yarl.URL('http://twitch.tv')
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
+        self.data.twitch_num_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
@@ -145,12 +150,12 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     async def test_no_dns(self):
-        self.mock_followers.return_value = 0
+        self.data.twitch_num_followers.return_value = 0
         message = Message('twitch.tv')
         self.mock_session.get.side_effect = aiohttp.ClientConnectorError
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
+        self.data.twitch_num_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
@@ -162,12 +167,12 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     async def test_exception(self):
-        self.mock_followers.return_value = 0
+        self.data.twitch_num_followers.return_value = 0
         message = Message('twitch.tv')
         self.mock_session.get.side_effect = Exception
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
+        self.data.twitch_num_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
@@ -180,12 +185,12 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
                                                  TypeMatch(datetime))
 
     async def test_multiple(self):
-        self.mock_followers.return_value = 0
+        self.data.twitch_num_followers.return_value = 0
         message = Message('https://twitch.tv megotsthis.com')
         self.mock_response.url = yarl.URL('http://twitch.tv')
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
+        self.data.twitch_num_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
@@ -201,13 +206,13 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     async def test_multiple_first_match(self):
-        self.mock_followers.return_value = 0
+        self.data.twitch_num_followers.return_value = 0
         self.mock_compare.side_effect = [True, False]
         message = Message('https://twitch.tv megotsthis.com')
         self.mock_response.url = yarl.URL('http://twitch.tv')
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
+        self.data.twitch_num_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
@@ -221,14 +226,14 @@ class TestModerationChannelBlockUrlCheckDomainRedirect(asynctest.TestCase):
         self.assertFalse(self.mock_except.called)
 
     async def test_multiple_exception(self):
-        self.mock_followers.return_value = 0
+        self.data.twitch_num_followers.return_value = 0
         message = Message('twitch.tv megotsthis.com twitch.tv')
         self.mock_response.url = yarl.URL('http://twitch.tv')
         self.mock_session.get.side_effect = [
             Exception, self.mock_response, Exception]
         await block_url.check_domain_redirect(self.channel, 'megotsthis',
                                               message, self.now)
-        self.mock_followers.assert_called_once_with('megotsthis')
+        self.data.twitch_num_followers.assert_called_once_with('megotsthis')
         self.mock_log.assert_called_once_with(
             StrContains('botgotsthis', 'blockurl'),
             StrContains('megotsthis', str(message)), self.now)
