@@ -57,39 +57,6 @@ def clearAllChat() -> None:
         c.messaging.clearAllChat()
 
 
-async def loadTwitchId(channel: str,
-                       timestamp: Optional[datetime]=None) -> bool:
-    if timestamp is None:
-        timestamp = now()
-    if channel in bot.globals.twitchId:
-        cacheTime: datetime = bot.globals.twitchIdCache[channel]
-        if bot.globals.twitchId[channel] is None:
-            if timestamp < cacheTime + timedelta(hours=1):
-                return True
-        else:
-            if timestamp < cacheTime + timedelta(days=1):
-                return True
-    ids: Optional[Dict[str, str]] = await twitch.getTwitchIds([channel])
-    if ids is None:
-        return False
-    if channel in ids:
-        saveTwitchId(channel, ids[channel], timestamp)
-    else:
-        saveTwitchId(channel, None, timestamp)
-    return True
-
-
-def saveTwitchId(channel: str,
-                 id: Optional[str],
-                 timestamp: Optional[datetime]=None) -> None:
-    if timestamp is None:
-        timestamp = now()
-    bot.globals.twitchId[channel] = id
-    if id is not None:
-        bot.globals.twitchIdName[id] = channel
-    bot.globals.twitchIdCache[channel] = timestamp
-
-
 async def loadTwitchCommunityId(id: str,
                                 timestamp: Optional[datetime]=None) -> bool:
     if timestamp is None:

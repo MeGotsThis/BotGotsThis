@@ -1,6 +1,6 @@
 ﻿import asyncio
 from datetime import datetime
-from typing import Iterator, Mapping, Optional, cast  # noqa: F401
+from typing import Awaitable, Iterator, List, Mapping, Optional  # noqa: F401
 
 import lib.items.channel
 from bot import data as botData, utils  # noqa: F401
@@ -39,16 +39,19 @@ async def chatCommand(chat: 'botData.Channel',
     command: data.ChatCommand
     cacheStore: cache.CacheStore
     try:
-        if tags is not None:
-            if 'room-id' in tags:
-                utils.saveTwitchId(chat.channel, str(tags['room-id']),
-                                   timestamp)
-            if 'user-id' in tags:
-                utils.saveTwitchId(nick, str(tags['user-id']), timestamp)
         async with cache.get_cache() as cacheStore:
-            permitted, manager = await asyncio.gather(
+            extraTasks: List[Awaitable[bool]] = []
+            if tags is not None:
+                if 'room-id' in tags:
+                    extraTasks.append(
+                        cacheStore.twitch_save_id(str(tags['room-id']),
+                                                  chat.channel))
+                if 'user-id' in tags:
+                    extraTasks.append(
+                        cacheStore.twitch_save_id(str(tags['user-id']), nick))
+            permitted, manager, *_ = await asyncio.gather(
                 cacheStore.isPermittedUser(chat.channel, nick),
-                cacheStore.isBotManager(nick))
+                cacheStore.isBotManager(nick), *extraTasks)
             permissions = ChatPermissionSet(tags, nick, chat, permitted,
                                             manager)
 

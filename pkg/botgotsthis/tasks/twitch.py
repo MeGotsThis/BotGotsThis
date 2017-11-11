@@ -1,9 +1,11 @@
-﻿import bot
+﻿import asyncio
+import bot
 import copy
 import random
 from bot import data, utils  # noqa: F401
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Union  # noqa: F401
+from typing import Awaitable, Dict, List, Optional, Union  # noqa: F401
+from lib import cache
 from lib.api import twitch
 from lib.database import DatabaseMain
 
@@ -11,32 +13,29 @@ from lib.database import DatabaseMain
 async def checkTwitchIds(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
-    twitchIds: Dict[str, Optional[str]] = copy.copy(bot.globals.twitchId)
-    channels: List[str] = [c for c in bot.globals.channels
-                           if c not in twitchIds]
-    cacheDuration: timedelta = timedelta(hours=1)
-    channels += [c for c in twitchIds
-                 if c not in channels
-                 if bot.globals.twitchIdCache[c] + cacheDuration <= timestamp]
-    if not channels:
-        return
+    dataCache: cache.CacheStore
+    async with cache.get_cache() as dataCache:
+        channels: List[str] = list(bot.globals.channels.keys())
+        hasCache: List[bool] = await asyncio.gather(
+            *map(dataCache.twitch_has_id, channels)
+        )
+        channels = [c for c, b in zip(channels, hasCache) if not b]
+        if not channels:
+            return
 
-    ids: Optional[Dict[str, str]] = await twitch.getTwitchIds(channels)
-    if ids is None:
-        return
-    channel: str
-    id: str
-    for channel, id in ids.items():
-        utils.saveTwitchId(channel, id, timestamp)
-    for channel in bot.globals.channels:
-        if channel in ids:
-            continue
-        if channel in bot.globals.twitchIdCache:
-            cacheExpired: datetime
-            cacheExpired = bot.globals.twitchIdCache[channel] + cacheDuration
-            if cacheExpired >= timestamp:
+        ids: Optional[Dict[str, str]] = await twitch.getTwitchIds(channels)
+        if ids is None:
+            return
+        tasks: List[Awaitable[bool]] = []
+        channel: str
+        id: str
+        for channel, id in ids.items():
+            tasks.append(dataCache.twitch_save_id(id, channel))
+        for channel in channels:
+            if channel in ids:
                 continue
-        utils.saveTwitchId(channel, None, timestamp)
+            tasks.append(dataCache.twitch_save_id(None, channel))
+        await asyncio.gather(*tasks)
 
 
 async def checkStreamsAndChannel(timestamp: datetime) -> None:

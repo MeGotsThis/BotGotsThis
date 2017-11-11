@@ -43,11 +43,9 @@ class TestChannel(asynctest.TestCase):
         self.assertFalse(mock_chatCommand.called)
 
     @patch('bot.utils.logException', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
     @patch('lib.cache.get_cache')
     @patch('lib.channel.commandsToProcess', autospec=True)
-    async def test_chatCommand(self, mock_commands, mock_data, mock_save,
-                               mock_log):
+    async def test_chatCommand(self, mock_commands, mock_data, mock_log):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
@@ -62,8 +60,9 @@ class TestChannel(asynctest.TestCase):
         type(message).command = PropertyMock(return_value='Kappa')
         await channel.chatCommand(self.channel, self.tags, 'botgotsthis',
                                   message, self.now)
-        mock_save.assert_has_calls([call('megotsthis', '2', self.now),
-                                    call('botgotsthis', '1', self.now)])
+        data.twitch_save_id.assert_has_calls([
+            call('2', 'megotsthis'),
+            call('1', 'botgotsthis')])
         self.assertEqual(data.isPermittedUser.call_count, 1)
         self.assertEqual(data.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
@@ -73,11 +72,10 @@ class TestChannel(asynctest.TestCase):
         self.assertEqual(mock_log.call_count, 0)
 
     @patch('bot.utils.logException', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
     @patch('lib.cache.get_cache')
     @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand_except(self, mock_commands, mock_data,
-                                      mock_save, mock_log):
+                                      mock_log):
         command = CoroutineMock(spec=lambda args: False, side_effect=Exception)
         mock_commands.return_value = [command, command]
         data = MagicMock(spec=CacheStore)
@@ -90,7 +88,7 @@ class TestChannel(asynctest.TestCase):
         type(message).command = PropertyMock(return_value='Kappa')
         await channel.chatCommand(self.channel, self.tags, 'botgotsthis',
                                   message, self.now)
-        self.assertTrue(mock_save.called)
+        self.assertTrue(data.twitch_save_id.called)
         self.assertEqual(data.isPermittedUser.call_count, 1)
         self.assertEqual(data.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
@@ -98,26 +96,23 @@ class TestChannel(asynctest.TestCase):
         self.assertTrue(mock_log.called)
 
     @patch('bot.utils.logException', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
     @patch('lib.cache.get_cache')
     @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand_data_except(
-            self, mock_commands, mock_data, mock_save, mock_log):
+            self, mock_commands, mock_data, mock_log):
         mock_data.side_effect = Exception
         message = Mock(spec=Message)
         type(message).command = PropertyMock(return_value='Kappa')
         await channel.chatCommand(self.channel, self.tags, 'botgotsthis',
                                   message, self.now)
-        self.assertTrue(mock_save.called)
         self.assertFalse(mock_commands.called)
         self.assertTrue(mock_log.called)
 
     @patch('bot.utils.logException', autospec=True)
-    @patch('bot.utils.saveTwitchId', autospec=True)
     @patch('lib.cache.get_cache')
     @patch('lib.channel.commandsToProcess', autospec=True)
     async def test_chatCommand_no_tags(self, mock_commands, mock_data,
-                                       mock_save, mock_log):
+                                       mock_log):
         command1 = CoroutineMock(spec=lambda args: False, return_value=False)
         command2 = CoroutineMock(spec=lambda args: False, return_value=True)
         command3 = CoroutineMock(spec=lambda args: False, return_value=False)
@@ -132,7 +127,7 @@ class TestChannel(asynctest.TestCase):
         type(message).command = PropertyMock(return_value='Kappa')
         await channel.chatCommand(self.channel, None, 'botgotsthis', message,
                                   self.now)
-        self.assertFalse(mock_save.called)
+        self.assertFalse(data.twitch_save_id.called)
         self.assertEqual(data.isPermittedUser.call_count, 1)
         self.assertEqual(data.isBotManager.call_count, 1)
         self.assertEqual(mock_commands.call_count, 1)
