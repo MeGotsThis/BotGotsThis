@@ -5,6 +5,7 @@ from asynctest.mock import MagicMock, Mock, PropertyMock, call, patch
 
 from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
+from lib.cache import CacheStore
 from lib.database import DatabaseMain
 from lib.api.twitch import TwitchCommunity, TwitchStatus
 from ..tasks import twitch
@@ -13,6 +14,10 @@ from ..tasks import twitch
 class TestTasksTwitchBase(asynctest.TestCase):
     def setUp(self):
         self.now = datetime(2000, 1, 1)
+
+        self.data = MagicMock(spec=CacheStore)
+        self.data.__aenter__.return_value = self.data
+        self.data.__aexit__.return_value = True
 
         self.channel = Mock(spec=Channel)
         self.channel.channel = 'botgotsthis'
@@ -23,18 +28,15 @@ class TestTasksTwitchBase(asynctest.TestCase):
         self.mock_globals.channels = {'botgotsthis': self.channel}
         self.mock_globals.globalSessionData = {}
 
+        patcher = patch('lib.cache.get_cache')
+        self.addCleanup(patcher.stop)
+        self.mock_cache = patcher.start()
+        self.mock_cache.return_value = self.data
+
 
 class TestTasksTwitchIds(TestTasksTwitchBase):
     def setUp(self):
         super().setUp()
-
-        self.mock_globals.twitchId = {}
-        self.mock_globals.twitchIdName = {}
-        self.mock_globals.twitchIdCache = {}
-
-        patcher = patch('bot.utils.saveTwitchId', autospec=True)
-        self.mock_save = patcher.start()
-        self.addCleanup(patcher.stop)
 
         patcher = patch('lib.api.twitch.getTwitchIds')
         self.addCleanup(patcher.stop)
@@ -42,70 +44,52 @@ class TestTasksTwitchIds(TestTasksTwitchBase):
         self.mock_twitchid.return_value = {}
 
     async def test_empty(self):
+        self.data.twitch_has_id.return_value = False
         self.mock_globals.channels = {}
         await twitch.checkTwitchIds(self.now)
         self.assertFalse(self.mock_twitchid.called)
-        self.assertFalse(self.mock_save.called)
+        self.assertFalse(self.data.twitch_save_id.called)
 
     async def test_none(self):
+        self.data.twitch_has_id.return_value = False
         self.mock_twitchid.return_value = None
         await twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
-        self.assertFalse(self.mock_save.called)
+        self.assertFalse(self.data.twitch_save_id.called)
 
     async def test(self):
+        self.data.twitch_has_id.return_value = False
         self.mock_twitchid.return_value = {'botgotsthis': '1'}
         await twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
         self.mock_twitchid.assert_called_once_with(['botgotsthis'])
-        self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
+        self.data.twitch_save_id.assert_called_once_with('1', 'botgotsthis')
 
     async def test_multiple(self):
+        def idLambda(u):
+            return True if u == 'botgotsthis' else False
+        self.data.twitch_has_id.side_effect = idLambda
         mgtChannel = Mock(spec=Channel)
         mgtChannel.channel = 'botgotsthis'
         self.mock_globals.channels['megotsthis'] = mgtChannel
         self.mock_globals.twitchId = {'botgotsthis': '1'}
-        self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
-        self.mock_globals.twitchIdCache = {'botgotsthis': self.now}
         self.mock_twitchid.return_value = {'megotsthis': '2'}
         await twitch.checkTwitchIds(self.now)
         self.mock_twitchid.assert_called_once_with(['megotsthis'])
-        self.mock_save.assert_called_once_with('megotsthis', '2', self.now)
-
-    async def test_recent(self):
-        self.mock_globals.twitchId = {'botgotsthis': '1'}
-        self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
-        self.mock_globals.twitchIdCache = {'botgotsthis': self.now}
-        self.mock_twitchid.return_value = {'botgotsthis': '1'}
-        await twitch.checkTwitchIds(self.now)
-        self.assertFalse(self.mock_twitchid.called)
-        self.assertFalse(self.mock_save.called)
+        self.data.twitch_save_id.assert_called_once_with('2', 'megotsthis')
 
     async def test_no_id(self):
+        self.data.twitch_has_id.return_value = False
         self.mock_twitchid.return_value = {}
         await twitch.checkTwitchIds(self.now)
         self.assertTrue(self.mock_twitchid.called)
-        self.mock_save.assert_called_once_with('botgotsthis', None, self.now)
+        self.data.twitch_save_id.assert_called_once_with(None, 'botgotsthis')
 
-    async def test_cache_expired(self):
-        self.mock_globals.twitchId = {'botgotsthis': '1'}
-        self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
-        self.mock_globals.twitchIdCache = {
-            'botgotsthis': self.now - timedelta(days=1)}
-        self.mock_twitchid.return_value = {'botgotsthis': '1'}
+    async def test_has_id(self):
+        self.data.twitch_has_id.return_value = True
         await twitch.checkTwitchIds(self.now)
-        self.assertTrue(self.mock_twitchid.called)
-        self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
-
-    async def test_cache_expired_none(self):
-        self.mock_globals.twitchId = {'botgotsthis': None}
-        self.mock_globals.twitchIdName = {'1': 'botgotsthis'}
-        self.mock_globals.twitchIdCache = {
-            'botgotsthis': self.now - timedelta(hours=1)}
-        self.mock_twitchid.return_value = {'botgotsthis': '1'}
-        await twitch.checkTwitchIds(self.now)
-        self.assertTrue(self.mock_twitchid.called)
-        self.mock_save.assert_called_once_with('botgotsthis', '1', self.now)
+        self.assertFalse(self.mock_twitchid.called)
+        self.assertFalse(self.data.twitch_save_id.called)
 
 
 class TestTasksTwitchStreams(TestTasksTwitchBase):
