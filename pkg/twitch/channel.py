@@ -1,7 +1,6 @@
 ﻿from datetime import timedelta, datetime  # noqa: F401
 from typing import List, Optional  # noqa: F401
 
-import bot
 from lib.api import oauth, twitch
 from lib.data import ChatCommandArgs
 from lib.helper.chat import cooldown, permission_not_feature
@@ -96,7 +95,8 @@ async def commandCommunity(args: ChatCommandArgs) -> bool:
                 communityNames: List[str] = []
                 communityId: str
                 for communityId in result:
-                    name: str = bot.globals.twitchCommunityId[communityId]
+                    name: str = await args.data.twitch_get_community_name(
+                        communityId)
                     communityNames.append(name)
                 args.chat.send('Channel Community set as: '
                                + ', '.join(communityNames))

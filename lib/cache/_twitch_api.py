@@ -75,3 +75,62 @@ class TwitchApisMixin(AbcCacheStore):
         if value is None:
             return None
         return json.loads(value)
+
+    def _twitchCommunityIdKey(self, id: str) -> str:
+        return f'community:id:{id}'
+
+    def _twitchCommunityNameKey(self, name: str) -> str:
+        return f'community:name:{name.lower()}'
+
+    async def twitch_load_community_id(self, id: str) -> bool:
+        key: str = self._twitchCommunityIdKey(id)
+        if await self.redis.exists(key):
+            return True
+        community: Optional[twitch.TwitchCommunity]
+        community = await twitch.get_community_by_id(id)
+        if community is None:
+            return False
+        await self.twitch_save_community(community.id, community.name)
+        return True
+
+    async def twitch_load_community_name(self, name: str) -> bool:
+        key: str = self._twitchCommunityNameKey(name)
+        if await self.redis.exists(key):
+            return True
+        community: Optional[twitch.TwitchCommunity]
+        community = await twitch.get_community(name)
+        if community is None:
+            return False
+        await self.twitch_save_community(community.id, community.name)
+        return True
+
+    async def twitch_save_community(self, id: Optional[str],
+                                    name: Optional[str]) -> bool:
+        # 6 hours normally or 1 hour for non existent id
+        expire: int
+        tasks: List[Awaitable[Any]] = []
+        if id is not None:
+            expire = 21600 if name is not None else 3600
+            tasks.append(self.redis.setex(self._twitchCommunityIdKey(id),
+                                          expire, json.dumps(name)))
+        if name is not None:
+            expire = 21600 if id is not None else 3600
+            tasks.append(self.redis.setex(self._twitchCommunityNameKey(name),
+                                          expire, json.dumps(id)))
+        if tasks:
+            await asyncio.gather(*tasks)
+        return True
+
+    async def twitch_get_community_id(self, name: str) -> Optional[str]:
+        key: str = self._twitchCommunityNameKey(name)
+        value: Optional[str] = await self.redis.get(key)
+        if value is None:
+            return None
+        return json.loads(value)
+
+    async def twitch_get_community_name(self, id: str) -> Optional[str]:
+        key: str = self._twitchCommunityIdKey(id)
+        value: Optional[str] = await self.redis.get(key)
+        if value is None:
+            return None
+        return json.loads(value)

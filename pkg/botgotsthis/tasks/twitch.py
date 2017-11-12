@@ -41,25 +41,29 @@ async def checkTwitchIds(timestamp: datetime) -> None:
 async def checkStreamsAndChannel(timestamp: datetime) -> None:
     if not bot.globals.channels:
         return
-    channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
-    onlineStreams: Optional[twitch.OnlineStreams]
-    onlineStreams = await twitch.active_streams(channels.keys())
-    if onlineStreams is None:
-        return
-    channel: str
-    for channel in onlineStreams:
-        chat: data.Channel = channels[channel]
-        chat.twitchCache = timestamp
-        (chat.streamingSince, chat.twitchStatus,
-         chat.twitchGame, chat.community) = onlineStreams[channel]
-        communityId: str
-        for communityId in chat.community:
-            await bot.utils.loadTwitchCommunity(communityId)
+    dataCache: cache.CacheStore
+    async with cache.get_cache() as dataCache:
+        channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
+        onlineStreams: Optional[twitch.OnlineStreams]
+        onlineStreams = await twitch.active_streams(channels.keys(),
+                                                    data=dataCache)
+        if onlineStreams is None:
+            return
+        channel: str
+        for channel in onlineStreams:
+            chat: data.Channel = channels[channel]
+            chat.twitchCache = timestamp
+            (chat.streamingSince, chat.twitchStatus,
+             chat.twitchGame, chat.community) = onlineStreams[channel]
+            communityId: str
+            # TODO: streamline this to asyncio.gather
+            for communityId in chat.community:
+                await dataCache.twitch_load_community_id(communityId)
 
-    for channel in channels:
-        if channel in onlineStreams:
-            continue
-        channels[channel].streamingSince = None
+        for channel in channels:
+            if channel in onlineStreams:
+                continue
+            channels[channel].streamingSince = None
 
 
 async def checkOfflineChannels(timestamp: datetime) -> None:
@@ -81,22 +85,26 @@ async def checkOfflineChannels(timestamp: datetime) -> None:
         return
     chat: data.Channel = random.choice(offlineChannels)
     chat.twitchCache = timestamp
-    current: Optional[twitch.TwitchStatus]
-    current = await twitch.channel_properties(chat.channel)
-    if current is None:
-        chat.twitchCache = timestamp - cacheDuration + timedelta(seconds=60)
-        return
-    (chat.streamingSince, chat.twitchStatus,
-     chat.twitchGame, shouldBeNone) = current
-    communities: Optional[List[twitch.TwitchCommunity]]
-    communities = await twitch.channel_community(chat.channel)
-    if communities is not None:
-        community: twitch.TwitchCommunity
-        chat.community = [community.id for community in communities]
-        for community in communities:
-            bot.utils.saveTwitchCommunity(community.name, community.id,
-                                          timestamp)
-    bot.globals.globalSessionData['offlineCheck'].append(timestamp)
+    dataCache: cache.CacheStore
+    async with cache.get_cache() as dataCache:
+        current: Optional[twitch.TwitchStatus]
+        current = await twitch.channel_properties(chat.channel)
+        if current is None:
+            chat.twitchCache = (timestamp - cacheDuration
+                                + timedelta(seconds=60))
+            return
+        (chat.streamingSince, chat.twitchStatus,
+         chat.twitchGame, shouldBeNone) = current
+        communities: Optional[List[twitch.TwitchCommunity]]
+        communities = await twitch.channel_community(chat.channel)
+        if communities is not None:
+            community: twitch.TwitchCommunity
+            chat.community = [community.id for community in communities]
+            # TODO: streamline this to asyncio.gather
+            for community in communities:
+                await dataCache.twitch_save_community(community.id,
+                                                      community.name)
+        bot.globals.globalSessionData['offlineCheck'].append(timestamp)
 
 
 async def checkChatServers(timestamp: datetime) -> None:
