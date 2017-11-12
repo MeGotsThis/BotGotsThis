@@ -246,16 +246,10 @@ class TestTwitchChannel(TestChannel):
         self.assertFalse(mock_update.called)
         self.assertFalse(self.channel.send.called)
 
-    @patch('bot.globals', autospec=True)
     @patch('lib.api.oauth.token')
     @patch('lib.api.twitch.set_channel_community')
-    async def test_community(self, mock_update, mock_token, mock_globals):
-        mock_globals.twitchCommunity = {
-            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
-            }
-        mock_globals.twitchCommunityId = {
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421': 'Speedrunning'
-            }
+    async def test_community(self, mock_update, mock_token):
+        self.data.twitch_get_community_name.return_value = 'Speedrunning'
         mock_update.return_value = ['6e940c4a-c42f-47d2-af83-0a2c7e47c421']
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'
@@ -266,17 +260,10 @@ class TestTwitchChannel(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Community', 'Speedrunning'))
 
-    @patch('bot.globals', autospec=True)
     @patch('lib.api.oauth.token')
     @patch('lib.api.twitch.set_channel_community')
-    async def test_community_3(self, mock_update, mock_token, mock_globals):
-        mock_globals.twitchCommunity = {
-            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421',
-            'programming': None
-            }
-        mock_globals.twitchCommunityId = {
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421': 'Speedrunning'
-            }
+    async def test_community_3(self, mock_update, mock_token):
+        self.data.twitch_get_community_name.return_value = 'Speedrunning'
         mock_update.return_value = ['6e940c4a-c42f-47d2-af83-0a2c7e47c421']
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'
@@ -289,17 +276,10 @@ class TestTwitchChannel(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Community', 'Speedrunning'))
 
-    @patch('bot.globals', autospec=True)
     @patch('lib.api.oauth.token')
     @patch('lib.api.twitch.set_channel_community')
-    async def test_community_unset(self, mock_update, mock_token,
-                                   mock_globals):
-        mock_globals.twitchCommunity = {
-            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
-            }
-        mock_globals.twitchCommunityId = {
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421': 'Speedrunning'
-            }
+    async def test_community_unset(self, mock_update, mock_token):
+        self.data.twitch_get_community_name.return_value = 'Speedrunning'
         mock_update.return_value = True
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'
@@ -310,17 +290,10 @@ class TestTwitchChannel(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Community', 'unset'))
 
-    @patch('bot.globals', autospec=True)
     @patch('lib.api.oauth.token')
     @patch('lib.api.twitch.set_channel_community')
-    async def test_community_not_exist(self, mock_update, mock_token,
-                                       mock_globals):
-        mock_globals.twitchCommunity = {
-            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
-            }
-        mock_globals.twitchCommunityId = {
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421': 'Speedrunning'
-            }
+    async def test_community_not_exist(self, mock_update, mock_token):
+        self.data.twitch_get_community_name.return_value = 'Speedrunning'
         mock_update.return_value = []
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'
@@ -331,16 +304,10 @@ class TestTwitchChannel(TestChannel):
         self.channel.send.assert_called_once_with(
             StrContains('Communities', 'not', 'exist'))
 
-    @patch('bot.globals', autospec=True)
     @patch('lib.api.oauth.token')
     @patch('lib.api.twitch.set_channel_community')
-    async def test_community_fail(self, mock_update, mock_token, mock_globals):
-        mock_globals.twitchCommunity = {
-            'speedrunning': '6e940c4a-c42f-47d2-af83-0a2c7e47c421'
-            }
-        mock_globals.twitchCommunityId = {
-            '6e940c4a-c42f-47d2-af83-0a2c7e47c421': 'Speedrunning'
-            }
+    async def test_community_fail(self, mock_update, mock_token):
+        self.data.twitch_get_community_name.return_value = 'Speedrunning'
         mock_update.return_value = None
         self.permissionSet['broadcaster'] = True
         mock_token.return_value = 'oauth:'

@@ -412,7 +412,7 @@ async def get_community(communityName: str) -> Optional[TwitchCommunity]:
         community: Optional[Dict[str, str]]
         response, community = await get_call(None, uri)
         if response.status != 200:
-            return TwitchCommunity(None, None)
+            return TwitchCommunity(None, communityName)
         return TwitchCommunity(community['_id'], community['name'])
     return None
 
@@ -425,7 +425,7 @@ async def get_community_by_id(communityId: str) -> Optional[TwitchCommunity]:
         community: Optional[Dict[str, str]]
         response, community = await get_call(None, uri)
         if response.status != 200:
-            return TwitchCommunity(None, None)
+            return TwitchCommunity(communityId, None)
         return TwitchCommunity(community['_id'], community['name'])
     return None
 
@@ -449,12 +449,13 @@ async def set_channel_community(channel: str,
     if communities:
         communityIds: Set[str] = set()
         for communityName in communities:
-            name: str = communityName.lower()
-            if not await bot.utils.loadTwitchCommunity(communityName):
+            if not await data.twitch_load_community_name(communityName):
                 return None
-            if bot.globals.twitchCommunity[name] is None:
+            communityId: Optional[str]
+            communityId = await data.twitch_get_community_id(communityName)
+            if communityId is None:
                 continue
-            communityIds.add(bot.globals.twitchCommunity[name])
+            communityIds.add(communityId)
         if not communityIds:
             return []
         uri = f'/kraken/channels/{id}/communities'

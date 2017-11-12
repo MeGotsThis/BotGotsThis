@@ -21,9 +21,6 @@ class BotGlobals:
         self.whisperCluster: str = 'aws'
 
         self.channels: Dict[str, 'data.Channel'] = {}
-        self.twitchCommunity: Dict[str, Optional[str]] = {}
-        self.twitchCommunityId: Dict[str, str] = {}
-        self.twitchCommunityCache: Dict[str, datetime] = {}
         self.displayName: str = ''
         self.isTwitchAdmin: bool = False
         self.isTwitchStaff: bool = False

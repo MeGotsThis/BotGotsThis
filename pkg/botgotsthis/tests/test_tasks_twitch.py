@@ -147,11 +147,9 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
 
-    @patch('bot.utils.saveTwitchCommunity')
     @patch('lib.api.twitch.channel_community')
     @patch('lib.api.twitch.channel_properties')
-    async def test_offline_empty(self, mock_channel, mock_community,
-                                 mock_save):
+    async def test_offline_empty(self, mock_channel, mock_community):
         self.mock_globals.channels = {}
         await twitch.checkOfflineChannels(self.now)
         self.assertFalse(mock_channel.called)
@@ -160,13 +158,11 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
         self.assertFalse(mock_community.called)
-        self.assertFalse(mock_save.called)
+        self.assertFalse(self.data.twitch_save_community.called)
 
-    @patch('bot.utils.saveTwitchCommunity')
     @patch('lib.api.twitch.channel_community')
     @patch('lib.api.twitch.channel_properties')
-    async def test_offline_streaming(self, mock_channel, mock_community,
-                                     mock_save):
+    async def test_offline_streaming(self, mock_channel, mock_community):
         self.channel.isStreaming = True
         self.cache_property.return_value = self.now - timedelta(hours=1)
         await twitch.checkOfflineChannels(self.now)
@@ -176,13 +172,11 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
         self.assertFalse(mock_community.called)
-        self.assertFalse(mock_save.called)
+        self.assertFalse(self.data.twitch_save_community.called)
 
-    @patch('bot.utils.saveTwitchCommunity')
     @patch('lib.api.twitch.channel_community')
     @patch('lib.api.twitch.channel_properties')
-    async def test_offline_recent(self, mock_channel, mock_community,
-                                  mock_save):
+    async def test_offline_recent(self, mock_channel, mock_community):
         mock_community.return_value = None
         self.channel.isStreaming = False
         self.cache_property.return_value = self.now
@@ -193,12 +187,11 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
         self.assertFalse(mock_community.called)
-        self.assertFalse(mock_save.called)
+        self.assertFalse(self.data.twitch_save_community.called)
 
-    @patch('bot.utils.saveTwitchCommunity')
     @patch('lib.api.twitch.channel_community')
     @patch('lib.api.twitch.channel_properties')
-    async def test_offline_none(self, mock_channel, mock_community, mock_save):
+    async def test_offline_none(self, mock_channel, mock_community):
         mock_community.return_value = None
         mock_channel.return_value = None
         self.channel.isStreaming = False
@@ -212,12 +205,11 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.assertFalse(self.status_property.called)
         self.assertFalse(self.game_property.called)
         self.assertFalse(mock_community.called)
-        self.assertFalse(mock_save.called)
+        self.assertFalse(self.data.twitch_save_community.called)
 
-    @patch('bot.utils.saveTwitchCommunity')
     @patch('lib.api.twitch.channel_community')
     @patch('lib.api.twitch.channel_properties')
-    async def test_offline(self, mock_channel, mock_community, mock_save):
+    async def test_offline(self, mock_channel, mock_community):
         mock_community.return_value = None
         mock_channel.return_value = TwitchStatus(None, 'Keepo', 'Music', None)
         self.channel.isStreaming = False
@@ -229,13 +221,11 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.status_property.assert_called_once_with('Keepo')
         self.game_property.assert_called_once_with('Music')
         mock_community.assert_called_once_with('botgotsthis')
-        self.assertFalse(mock_save.called)
+        self.assertFalse(self.data.twitch_save_community.called)
 
-    @patch('bot.utils.saveTwitchCommunity')
     @patch('lib.api.twitch.channel_community')
     @patch('lib.api.twitch.channel_properties')
-    async def test_offline_community_empty(self, mock_channel, mock_community,
-                                           mock_save):
+    async def test_offline_community_empty(self, mock_channel, mock_community):
         mock_community.return_value = []
         mock_channel.return_value = TwitchStatus(None, 'Keepo', 'Music', None)
         self.channel.isStreaming = False
@@ -247,13 +237,11 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.status_property.assert_called_once_with('Keepo')
         self.game_property.assert_called_once_with('Music')
         mock_community.assert_called_once_with('botgotsthis')
-        self.assertFalse(mock_save.called)
+        self.assertFalse(self.data.twitch_save_community.called)
 
-    @patch('bot.utils.saveTwitchCommunity')
     @patch('lib.api.twitch.channel_community')
     @patch('lib.api.twitch.channel_properties')
-    async def test_offline_community(self, mock_channel, mock_community,
-                                     mock_save):
+    async def test_offline_community(self, mock_channel, mock_community):
         mock_community.return_value = [TwitchCommunity('1', 'BotGotsThis')]
         mock_channel.return_value = TwitchStatus(None, 'Keepo', 'Music', None)
         self.channel.isStreaming = False
@@ -265,7 +253,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.status_property.assert_called_once_with('Keepo')
         self.game_property.assert_called_once_with('Music')
         mock_community.assert_called_once_with('botgotsthis')
-        mock_save.assert_called_once_with('BotGotsThis', '1', self.now)
+        self.data.twitch_save_community.assert_called_once_with(
+            '1', 'BotGotsThis')
 
 
 class TestTasksTwitchChatServer(TestTasksTwitchBase):

@@ -1,9 +1,8 @@
 ﻿from . import data
 from .coroutine import connection  # noqa: F401
-from datetime import datetime, timedelta
+from datetime import datetime
 from types import TracebackType
-from typing import Any, Dict, Iterable, List, Optional, Type, Tuple, Union  # noqa: F401,E501
-from lib.api import twitch
+from typing import Any, Iterable, List, Optional, Type, Tuple, Union  # noqa: F401,E501
 import builtins
 import bot
 import bot.coroutine.logging
@@ -55,63 +54,6 @@ def whisper(nick: str, messages: Union[str, Iterable[str]]) -> None:
 def clearAllChat() -> None:
     for c in bot.globals.clusters.values():
         c.messaging.clearAllChat()
-
-
-async def loadTwitchCommunityId(id: str,
-                                timestamp: Optional[datetime]=None) -> bool:
-    if timestamp is None:
-        timestamp = now()
-    if id in bot.globals.twitchCommunityId:
-        name: str = bot.globals.twitchCommunityId[id]
-        cacheTime: datetime = bot.globals.twitchCommunityCache[name]
-        if bot.globals.twitchCommunity[name] is None:
-            if timestamp < cacheTime + timedelta(hours=1):
-                return True
-        else:
-            if timestamp < cacheTime + timedelta(days=1):
-                return True
-    community: Optional[twitch.TwitchCommunity]
-    community = await twitch.get_community_by_id(id)
-    if community is None:
-        return False
-    saveTwitchCommunity(community.name, community.id, timestamp)
-    return True
-
-
-async def loadTwitchCommunity(name: str,
-                              timestamp: Optional[datetime]=None) -> bool:
-    if timestamp is None:
-        timestamp = now()
-    lname: str = name.lower()
-    if lname in bot.globals.twitchCommunity:
-        cacheTime: datetime = bot.globals.twitchCommunityCache[lname]
-        if bot.globals.twitchCommunity[lname] is None:
-            if timestamp < cacheTime + timedelta(hours=1):
-                return True
-        else:
-            if timestamp < cacheTime + timedelta(days=1):
-                return True
-    community: Optional[twitch.TwitchCommunity]
-    community = await twitch.get_community(lname)
-    if community is None:
-        return False
-    saveTwitchCommunity(community.name or name, community.id, timestamp)
-    return True
-
-
-def saveTwitchCommunity(name: Optional[str],
-                        id: Optional[str],
-                        timestamp: Optional[datetime]=None) -> None:
-    if timestamp is None:
-        timestamp = now()
-    if name is None:
-        bot.globals.twitchCommunityId[id] = None
-        return
-    lname: str = name.lower()
-    bot.globals.twitchCommunity[lname] = id
-    if id is not None:
-        bot.globals.twitchCommunityId[id] = name
-    bot.globals.twitchCommunityCache[lname] = timestamp
 
 
 ENSURE_CLUSTER_UNKNOWN: int = -2
