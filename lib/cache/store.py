@@ -5,6 +5,7 @@ import aioredis
 
 from ._auto_repeat import AutoRepeatMixin
 from ._bot_mangers import BotManagersMixin
+from ._bttv_api import BetterTwitchTvApisMixin
 from ._chat_properties import ChatPropertiesMixin
 from ._custom_commands import CustomCommandsMixin
 from ._ffz_api import FrankerFaceZApisMixin
@@ -17,7 +18,7 @@ from ._twitch_api import TwitchApisMixin
 class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
                  BotManagersMixin, CustomCommandsMixin, AutoRepeatMixin,
                  GameAbbreviationsMixin, TwitchApisMixin,
-                 FrankerFaceZApisMixin):
+                 FrankerFaceZApisMixin, BetterTwitchTvApisMixin):
     def __init__(self,
                  pool: aioredis.ConnectionsPool) -> None:
         super().__init__()

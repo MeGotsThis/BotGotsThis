@@ -1,11 +1,10 @@
-import asynctest
 import math
 import unittest
 from bot.data import Channel, MessagingQueue
 from bot.coroutine.connection import ConnectionHandler
 from collections.abc import MutableMapping, MutableSet
 from datetime import datetime
-from asynctest.mock import Mock, patch
+from unittest.mock import Mock
 
 
 class TestChannel(unittest.TestCase):
@@ -210,47 +209,3 @@ class TestChannel(unittest.TestCase):
         self.channel.send(messages, 0)
         self.connection.messaging.sendChat.assert_called_once_with(
             self.channel, messages, 0)
-
-
-class TestChannelAsync(asynctest.TestCase):
-    def setUp(self):
-        self.connection = Mock(spec=ConnectionHandler)
-        self.connection.messaging = Mock(spec=MessagingQueue)
-        self.channel = Channel('botgotsthis', self.connection)
-
-    @patch('bot.utils.now', autospec=True)
-    @patch('lib.api.bttv.getBroadcasterEmotes')
-    async def test_updateBttvEmotes(self, mock_getBttvEmotes, mock_now):
-        now = datetime(2000, 1, 1)
-        emotes = {'': 'BetterTwitch.Tv'}
-        mock_now.return_value = now
-        mock_getBttvEmotes.return_value = emotes
-        await self.channel.updateBttvEmotes()
-        mock_getBttvEmotes.assert_called_once_with(self.channel.channel)
-        self.assertEqual(self.channel.bttvCache, now)
-        self.assertEqual(self.channel.bttvEmotes, emotes)
-
-    @patch('bot.utils.now', autospec=True)
-    @patch('lib.api.bttv.getBroadcasterEmotes')
-    async def test_updateBttvEmotes_empty(self, mock_getBttvEmotes, mock_now):
-        now = datetime(2000, 1, 1)
-        emotes = {}
-        mock_now.return_value = now
-        mock_getBttvEmotes.return_value = emotes
-        self.channel._bttvEmotes = {'': 'BetterTwitch.Tv'}
-        await self.channel.updateBttvEmotes()
-        mock_getBttvEmotes.assert_called_once_with(self.channel.channel)
-        self.assertEqual(self.channel.bttvCache, now)
-        self.assertEqual(self.channel.bttvEmotes, emotes)
-
-    @patch('bot.utils.now', autospec=True)
-    @patch('lib.api.bttv.getBroadcasterEmotes')
-    async def test_updateBttvEmotes_error(self, mock_getBttvEmotes, mock_now):
-        now = datetime(2000, 1, 1)
-        emotes = {'': 'BetterTwitch.Tv'}
-        self.channel._bttvEmotes = emotes
-        mock_now.return_value = now
-        mock_getBttvEmotes.return_value = None
-        await self.channel.updateBttvEmotes()
-        self.assertEqual(self.channel.bttvCache, datetime.min)
-        self.assertEqual(self.channel.bttvEmotes, emotes)
