@@ -1,18 +1,14 @@
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional, Set, Union
 
-from bot import utils
 from bot.coroutine import connection as connectionM
-from lib.api import bttv
 
 
 class Channel:
     __slots__ = ['_channel', '_ircChannel', '_connection', '_isMod',
                  '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
-                 '_joinPriority',
-                 '_bttvEmotes', '_bttvCache', '_twitchCache', '_bttvLock',
-                 '_streamingSince', '_twitchStatus', '_twitchGame',
-                 '_community', '_serverCheck',
+                 '_joinPriority', '_twitchCache', '_streamingSince',
+                 '_twitchStatus', '_twitchGame', '_community', '_serverCheck',
                  ]
 
     def __init__(self,
@@ -34,8 +30,6 @@ class Channel:
         self._ircOps: Set[str] = set()
         self._joinPriority: float = float(joinPriority)
         self._sessionData: Dict[Any, Any] = {}
-        self._bttvEmotes: Dict[str, str] = {}
-        self._bttvCache: datetime = datetime.min
         self._twitchCache: datetime = datetime.min
         self._streamingSince: Optional[datetime] = None
         self._twitchStatus: Optional[str] = ''
@@ -90,14 +84,6 @@ class Channel:
     @property
     def sessionData(self) -> Dict[Any, Any]:
         return self._sessionData
-
-    @property
-    def bttvCache(self) -> datetime:
-        return self._bttvCache
-
-    @property
-    def bttvEmotes(self) -> Dict[str, str]:
-        return self._bttvEmotes
 
     @property
     def streamingSince(self) -> Optional[datetime]:
@@ -178,14 +164,3 @@ class Channel:
 
     def clear(self) -> None:
         self.connection.messaging.clearChat(self)
-
-    async def updateBttvEmotes(self) -> None:
-        oldTimestamp: datetime
-        oldTimestamp, self._bttvCache = self._bttvCache, utils.now()
-        emotes: Optional[Dict[str, str]]
-        emotes = await bttv.getBroadcasterEmotes(self._channel)
-        if emotes is not None:
-            self._bttvEmotes = emotes
-            self._bttvCache = utils.now()
-        else:
-            self._bttvCache = oldTimestamp

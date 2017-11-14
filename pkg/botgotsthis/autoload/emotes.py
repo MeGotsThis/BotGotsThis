@@ -18,4 +18,4 @@ async def call_bttv(timestamp: datetime.datetime) -> None:
 
 background.add_task(call_twitch, datetime.timedelta(seconds=1))
 background.add_task(call_ffz, datetime.timedelta(milliseconds=750))
-background.add_task(call_bttv, datetime.timedelta(milliseconds=.75))
+background.add_task(call_bttv, datetime.timedelta(milliseconds=750))
