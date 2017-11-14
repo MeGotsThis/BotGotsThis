@@ -1,8 +1,12 @@
-﻿from bot import data
-from bot.twitchmessage import IrcMessageTagsReadOnly
-from typing import List, Optional  # noqa: F401
-import datetime
+﻿import asyncio
+from typing import Set, Optional
+
 import bot
+from bot import data
+from bot.twitchmessage import IrcMessageTagsReadOnly
+from lib import cache
+
+lock = asyncio.Lock()
 
 
 def parse(channel: 'data.Channel',
@@ -20,13 +24,20 @@ def parse(channel: 'data.Channel',
         channel.isMod = bool(int(tags['mod'])) or bot.globals.isGlobalMod
         channel.isSubscriber = bool(int(tags['subscriber']))
 
-    emoteset: List[int] = [int(i) for i in str(tags['emote-sets']).split(',')]
-    # This is to remove twitch turbo emotes that are shared with
-    # global emoticons
-    if 33 in emoteset:
-        emoteset.remove(33)
-    if 42 in emoteset:
-        emoteset.remove(42)
-    if bot.globals.emoteset != emoteset:
-        bot.globals.emoteset = emoteset
-        bot.globals.globalEmotesCache = datetime.datetime.min
+    if 'emote-sets' in tags:
+        emoteset: Set[int] = {int(i) for i
+                              in str(tags['emote-sets']).split(',')}
+        # This is to remove twitch turbo emotes that are shared with
+        # global emoticons
+        emoteset.discard(33)
+        emoteset.discard(42)
+        asyncio.ensure_future(handle_emote_set(emoteset))
+
+
+async def handle_emote_set(emoteSet: Set[int]) -> None:
+    if lock.locked():
+        return
+    async with lock:
+        cacheStore: cache.CacheStore
+        async with cache.get_cache() as cacheStore:
+            await cacheStore.twitch_load_emotes(emoteSet, background=True)

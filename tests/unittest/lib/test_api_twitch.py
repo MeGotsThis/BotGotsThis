@@ -605,36 +605,36 @@ class TestApiTwitch(asynctest.TestCase):
     async def test_twitch_emotes(self):
         self.mock_async_response.status = 200
         self.mock_get_call.return_value[1] = json.loads(twitchEmotes)
-        self.assertEqual(await twitch.twitch_emotes(),
-                         ({25: 'Kappa'}, {25: 0}))
+        self.assertEqual(await twitch.twitch_emotes({0}),
+                         {25: ('Kappa', 0)})
         self.mock_get_call.assert_called_once_with(
-            None, StrContains('/kraken/chat/emoticon_images?emotesets='))
+            None, StrContains('/kraken/chat/emoticon_images?emotesets=0'))
 
     async def test_twitch_emotes_special(self):
         self.mock_async_response.status = 200
         self.mock_get_call.return_value[1] = json.loads(twitchEmotesSpecial)
         self.assertEqual(
-            (await twitch.twitch_emotes())[0],
-            {7: 'B)',
-             5: ':z',
-             1: ':)',
-             2: ':(',
-             12: ':P',
-             13: ';P',
-             9: '<3',
-             11: ';)',
-             14: 'R)',
-             3: ':D',
-             8: ':o',
-             4: '>('})
+            await twitch.twitch_emotes({0}),
+            {7: ('B)', 0),
+             5: (':z', 0),
+             1: (':)', 0),
+             2: (':(', 0),
+             12: (':P', 0),
+             13: (';P', 0),
+             9: ('<3', 0),
+             11: (';)', 0),
+             14: ('R)', 0),
+             3: (':D', 0),
+             8: (':o', 0),
+             4: ('>(', 0)})
         self.mock_get_call.assert_called_once_with(
-            None, StrContains('/kraken/chat/emoticon_images?emotesets='))
+            None, StrContains('/kraken/chat/emoticon_images?emotesets=0'))
 
     async def test_twitch_emotes_except(self):
         self.mock_get_call.side_effect = asyncio.TimeoutError
-        self.assertIsNone(await twitch.twitch_emotes())
+        self.assertIsNone(await twitch.twitch_emotes({0}))
         self.mock_get_call.assert_called_once_with(
-            None, StrContains('/kraken/chat/emoticon_images?emotesets='))
+            None, StrContains('/kraken/chat/emoticon_images?emotesets=0'))
 
     async def test_num_followers(self):
         data = json.loads(numFollowers.decode())

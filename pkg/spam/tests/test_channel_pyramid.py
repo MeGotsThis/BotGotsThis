@@ -232,10 +232,9 @@ class TestChannelRandomPyramid(TestChannel):
         self.permissions.globalModerator = False
         self.permissions.chatModerator = False
 
-        patcher = patch('bot.globals', autospec=True)
-        self.addCleanup(patcher.stop)
-        self.mock_globals = patcher.start()
-        self.mock_globals.globalEmotes = {
+        self.data.twitch_get_bot_emote_set.return_value = {0}
+        self.data.twitch_load_emotes.return_value = True
+        self.data.twitch_get_emotes.return_value = {
             0: ':)',
             1: 'Kappa',
             2: 'KevinTurtle',
@@ -268,8 +267,14 @@ class TestChannelRandomPyramid(TestChannel):
         self.assertIs(await pyramid.commandRandomPyramid(self.args), False)
         self.permissionSet['moderator'] = True
         self.assertIs(await pyramid.commandRandomPyramid(self.args), False)
-        self.mock_globals.globalEmotes = {}
         self.permissionSet['broadcaster'] = True
+        self.data.twitch_get_bot_emote_set.return_value = None
+        self.assertIs(await pyramid.commandRandomPyramid(self.args), False)
+        self.data.twitch_get_bot_emote_set.return_value = {0}
+        self.data.twitch_load_emotes.return_value = False
+        self.assertIs(await pyramid.commandRandomPyramid(self.args), False)
+        self.data.twitch_load_emotes.return_value = True
+        self.data.twitch_get_emotes.return_value = None
         self.assertIs(await pyramid.commandRandomPyramid(self.args), False)
         self.assertFalse(self.mock_cooldown.called)
         self.assertFalse(self.channel.send.called)

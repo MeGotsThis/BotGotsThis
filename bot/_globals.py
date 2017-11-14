@@ -25,51 +25,6 @@ class BotGlobals:
         self.isTwitchAdmin: bool = False
         self.isTwitchStaff: bool = False
         self.isGlobalMod: bool = False
-        self.emoteset: List[int] = [0]
-        self.globalEmotes: Dict[int, str] = {
-            25: 'Kappa',
-            88: 'PogChamp',
-            1902: 'Keepo',
-            33: 'DansGame',
-            34: 'SwiftRage',
-            36: 'PJSalt',
-            356: 'OpieOP',
-            41: 'Kreygasm',
-            86: 'BibleThump',
-            1906: 'SoBayed',
-            9803: 'KAPOW',
-            245: 'ResidentSleeper',
-            65: 'FrankerZ',
-            40: 'KevinTurtle',
-            27301: 'HumbleLife',
-            881: 'BrainSlug',
-            96: 'BloodTrail',
-            22998: 'panicBasket',
-            167: 'WinWaker',
-            171: 'TriHard',
-            66: 'OneHand',
-            9805: 'NightBat',
-            28: 'MrDestructoid',
-            1901: 'Kippa',
-            1900: 'RalpherZ',
-            1: ':)',
-            2: ':(',
-            8: ':o',
-            5: ':z',
-            7: 'B)',
-            10: ':\\',
-            11: ';)',
-            13: ';P',
-            12: ':P',
-            14: 'R)',
-            6: 'o_O',
-            3: ':D',
-            4: '>(',
-            9: '<3',
-        }
-        self.globalEmoteSets: Dict[int, int] = {k: 0 for k, v in
-                                                self.globalEmotes.items()}
-        self.globalEmotesCache: datetime = datetime.min
         self.globalSessionData: Dict[Any, Any] = {}
         self.globalFfzEmotes: Dict[int, str] = {
             25927: 'CatBag',

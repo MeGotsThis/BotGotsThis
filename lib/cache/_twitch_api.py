@@ -1,6 +1,7 @@
 import asyncio
 import json
-from typing import Any, Awaitable, Dict, List, Optional, cast  # noqa: F401
+from typing import Any, Awaitable, ClassVar, Dict, List, Optional, Set, Tuple  # noqa: F401,E501
+from typing import cast
 
 from ._abc import AbcCacheStore
 from . import store
@@ -8,6 +9,8 @@ from ..api import twitch
 
 
 class TwitchApisMixin(AbcCacheStore):
+    _lastEmoteSet: ClassVar[Optional[Set[int]]] = None
+
     async def twitch_num_followers(self, user: str) -> Optional[int]:
         key: str = f'twitch:{user}:following'
         numFollowers: Optional[int]
@@ -134,3 +137,62 @@ class TwitchApisMixin(AbcCacheStore):
         if value is None:
             return None
         return json.loads(value)
+
+    def _twitchEmoteSetKey(self) -> str:
+        return f'emote:twitch:set'
+
+    def _twitchEmoteKey(self) -> str:
+        return f'emote:twitch'
+
+    async def twitch_load_emotes(self, emote_sets: Set[int], *,
+                                 background: bool=False) -> bool:
+        if not emote_sets:
+            return False
+        key: str = self._twitchEmoteKey()
+        sameSet: bool = await self.twitch_get_bot_emote_set() == emote_sets
+        await self.twitch_save_emote_set(emote_sets)
+        if sameSet:
+            ttl: int = await self.redis.ttl(key)
+            if ttl >= 30 and background:
+                return True
+            if ttl >= 0 and not background:
+                return True
+        emotes: Optional[Dict[int, Tuple[str, int]]]
+        emotes = await twitch.twitch_emotes(emote_sets)
+        if emotes is None:
+            return False
+        await self.twitch_save_emotes(emotes)
+        return True
+
+    async def twitch_save_emote_set(self, emote_sets: Set[int]) -> bool:
+        type(self)._lastEmoteSet = set(emote_sets)
+        await self.redis.setex(self._twitchEmoteSetKey(), 86400,
+                               json.dumps([s for s in emote_sets]))
+        return True
+
+    async def twitch_save_emotes(self, emotes: Dict[int, Tuple[str, int]]
+                                 ) -> bool:
+        await self.redis.setex(self._twitchEmoteKey(), 3600,
+                               json.dumps(emotes))
+        return True
+
+    async def twitch_get_bot_emote_set(self) -> Optional[Set[int]]:
+        key: str = self._twitchEmoteSetKey()
+        value: Optional[str] = await self.redis.get(key)
+        if value is None:
+            return type(self)._lastEmoteSet
+        return {i for i in json.loads(value)}
+
+    async def twitch_get_emotes(self) -> Optional[Dict[int, str]]:
+        key: str = self._twitchEmoteKey()
+        value: Optional[str] = await self.redis.get(key)
+        if value is None:
+            return None
+        return {int(i): e[0] for i, e in json.loads(value).items()}
+
+    async def twitch_get_emote_sets(self) -> Optional[Dict[int, int]]:
+        key: str = self._twitchEmoteKey()
+        value: Optional[str] = await self.redis.get(key)
+        if value is None:
+            return None
+        return {int(i): e[1] for i, e in json.loads(value).items()}

@@ -2,7 +2,7 @@
 import random
 from contextlib import suppress
 from datetime import timedelta
-from typing import Dict, Iterator, List  # noqa: F401
+from typing import Dict, Iterator, List, Optional, Set  # noqa: F401
 
 import bot
 from lib.data import ChatCommandArgs
@@ -58,9 +58,14 @@ async def process_pyramid(args: ChatCommandArgs,
 
 @permission_feature(('broadcaster', None), ('moderator', 'modpyramid'))
 async def commandRandomPyramid(args: ChatCommandArgs) -> bool:
-    if not bot.globals.globalEmotes:
+    emoteSets: Optional[Set[int]] = await args.data.twitch_get_bot_emote_set()
+    if emoteSets is None:
         return False
-    emotes: Dict[int, str] = bot.globals.globalEmotes.copy()
+    if not await args.data.twitch_load_emotes(emoteSets):
+        return False
+    emotes: Optional[Dict[int, str]] = await args.data.twitch_get_emotes()
+    if emotes is None:
+        return False
     count: int = 5 if args.permissions.broadcaster else 3
     # If below generate a ValueError or IndexError,
     # only the above line gets used

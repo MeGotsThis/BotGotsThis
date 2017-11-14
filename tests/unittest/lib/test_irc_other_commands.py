@@ -1,16 +1,20 @@
+import asyncio
 import unittest
+from datetime import datetime
+
+import asynctest
+from asynctest.mock import MagicMock, Mock, patch
+
 from bot.data import Channel
 from bot.data._error import LoginUnsuccessful
 from bot.twitchmessage import IrcMessageTags
-from datetime import datetime
+from lib.cache import CacheStore
 from lib.ircmessage import clearchat, notice, userstate
-from unittest.mock import Mock, patch
 
 
 class TestUserState(unittest.TestCase):
     def setUp(self):
-        patcher = patch('bot.globals',
-                        autospec=True)
+        patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
         self.cache = datetime(2000, 1, 1)
@@ -22,6 +26,10 @@ class TestUserState(unittest.TestCase):
         self.channel = Mock(spec=Channel)
         self.channel.isMod = False
         self.channel.isSubscriber = False
+
+        patcher = patch('lib.ircmessage.userstate.handle_emote_set')
+        self.addCleanup(patcher.stop)
+        self.mock_handle_emote = patcher.start()
 
     def test_parse(self):
         userstate.parse(self.channel, self.tags)
@@ -77,19 +85,22 @@ class TestUserState(unittest.TestCase):
     def test_parse_emote_sets(self):
         self.tags['emote-sets'] = '0'
         userstate.parse(self.channel, self.tags)
-        self.assertCountEqual(self.mock_globals.emoteset, [0])
-        self.assertEqual(self.mock_globals.globalEmotesCache, self.cache)
+        self.mock_handle_emote.assert_called_once_with({0})
 
     def test_parse_emote_sets_changed(self):
         self.tags['emote-sets'] = '0,1'
         userstate.parse(self.channel, self.tags)
-        self.assertCountEqual(self.mock_globals.emoteset, [0, 1])
-        self.assertNotEqual(self.mock_globals.globalEmotesCache, self.cache)
+        self.mock_handle_emote.assert_called_once_with({0, 1})
 
     def test_parse_emote_sets_turbo_special(self):
         self.tags['emote-sets'] = '0,33,42'
         userstate.parse(self.channel, self.tags)
-        self.assertCountEqual(self.mock_globals.emoteset, [0])
+        self.mock_handle_emote.assert_called_once_with({0})
+
+    def test_parse_emote_sets_empty(self):
+        del self.tags['emote-sets']
+        userstate.parse(self.channel, self.tags)
+        self.assertFalse(self.mock_handle_emote.called)
 
     def test_parse_channel_none(self):
         self.tags['user-type'] = 'staff'
@@ -103,6 +114,38 @@ class TestUserState(unittest.TestCase):
 
     def test_parse_tags_none(self):
         userstate.parse(self.channel, None)
+
+
+class TestUserStateHandleEmote(asynctest.TestCase):
+    def setUp(self):
+        self.data = MagicMock(spec=CacheStore)
+        self.data.__aenter__.return_value = self.data
+        self.data.__aexit__.return_value = False
+
+        patcher = patch('lib.cache.get_cache')
+        self.addCleanup(patcher.stop)
+        self.mock_data = patcher.start()
+        self.mock_data.return_value = self.data
+
+    async def test(self):
+        await userstate.handle_emote_set({0})
+        self.assertTrue(self.data.twitch_load_emotes.called)
+
+    async def test_multiple(self):
+        async def wait(*args, **kwargs):
+            await asyncio.sleep(0.2)
+            return {0}
+
+        async def call_0():
+            await userstate.handle_emote_set({0})
+
+        async def call_1():
+            await asyncio.sleep(0.1)
+            await userstate.handle_emote_set({0})
+
+        self.data.twitch_load_emotes.side_effect = wait
+        await asyncio.gather(call_0(), call_1())
+        self.assertEqual(self.data.twitch_load_emotes.call_count, 1)
 
 
 class TestClearChat(unittest.TestCase):
