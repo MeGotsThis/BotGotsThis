@@ -3,13 +3,13 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Union
 
 from bot import utils
 from bot.coroutine import connection as connectionM
-from lib.api import bttv, ffz
+from lib.api import bttv
 
 
 class Channel:
     __slots__ = ['_channel', '_ircChannel', '_connection', '_isMod',
                  '_isSubscriber', '_ircUsers', '_ircOps', '_sessionData',
-                 '_joinPriority', '_ffzEmotes', '_ffzCache', '_ffzLock',
+                 '_joinPriority',
                  '_bttvEmotes', '_bttvCache', '_twitchCache', '_bttvLock',
                  '_streamingSince', '_twitchStatus', '_twitchGame',
                  '_community', '_serverCheck',
@@ -34,8 +34,6 @@ class Channel:
         self._ircOps: Set[str] = set()
         self._joinPriority: float = float(joinPriority)
         self._sessionData: Dict[Any, Any] = {}
-        self._ffzEmotes: Dict[int, str] = {}
-        self._ffzCache: datetime = datetime.min
         self._bttvEmotes: Dict[str, str] = {}
         self._bttvCache: datetime = datetime.min
         self._twitchCache: datetime = datetime.min
@@ -92,14 +90,6 @@ class Channel:
     @property
     def sessionData(self) -> Dict[Any, Any]:
         return self._sessionData
-
-    @property
-    def ffzCache(self) -> datetime:
-        return self._ffzCache
-
-    @property
-    def ffzEmotes(self) -> Dict[int, str]:
-        return self._ffzEmotes
 
     @property
     def bttvCache(self) -> datetime:
@@ -188,17 +178,6 @@ class Channel:
 
     def clear(self) -> None:
         self.connection.messaging.clearChat(self)
-
-    async def updateFfzEmotes(self) -> None:
-        oldTimestamp: datetime
-        oldTimestamp, self._ffzCache = self._ffzCache, utils.now()
-        emotes: Optional[Dict[int, str]]
-        emotes = await ffz.getBroadcasterEmotes(self._channel)
-        if emotes is not None:
-            self._ffzEmotes = emotes
-            self._ffzCache = utils.now()
-        else:
-            self._ffzCache = oldTimestamp
 
     async def updateBttvEmotes(self) -> None:
         oldTimestamp: datetime
