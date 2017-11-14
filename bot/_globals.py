@@ -26,18 +26,6 @@ class BotGlobals:
         self.isTwitchStaff: bool = False
         self.isGlobalMod: bool = False
         self.globalSessionData: Dict[Any, Any] = {}
-        self.globalFfzEmotes: Dict[int, str] = {
-            25927: 'CatBag',
-            27081: 'ZreknarF',
-            28136: 'LilZ',
-            28138: 'ZliL',
-            9: 'ZrehplaR',
-            6: 'YooHoo',
-            5: 'YellowFever',
-            4: 'ManChicken',
-            3: 'BeanieHipster',
-        }
-        self.globalFfzEmotesCache: datetime = datetime.min
         self.globalBttvEmotes: Dict[str, str] = {}
         self.globalBttvEmotesCache: datetime = datetime.min
 
