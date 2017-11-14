@@ -1,9 +1,11 @@
+import asyncio
 from datetime import datetime, timedelta
 
 import asynctest
-from asynctest.mock import Mock, patch
+from asynctest.mock import MagicMock, Mock, patch
 
 from bot.data import Channel
+from lib.cache import CacheStore
 from ..tasks import emotes
 
 
@@ -15,47 +17,43 @@ class TestTasksEmotes(asynctest.TestCase):
 
         self.now = datetime(2000, 1, 1)
 
-    @patch('lib.api.twitch.twitch_emotes')
-    async def test_twitch(self, mock_emotes):
-        self.mock_globals.globalEmotesCache = self.now
-        self.mock_globals.globalEmotes = {}
-        self.mock_globals.globalEmoteSets = {}
-        emotes_ = {25: 'Kappa'}
-        emotesets = {25: 0}
-        mock_emotes.return_value = emotes_, emotesets
-        await emotes.refreshTwitchGlobalEmotes(self.now + timedelta(hours=1))
-        self.assertEqual(self.mock_globals.globalEmotesCache,
-                         self.now + timedelta(hours=1))
-        self.assertEqual(self.mock_globals.globalEmotes, emotes_)
-        self.assertEqual(self.mock_globals.globalEmoteSets, emotesets)
-        mock_emotes.assert_called_once_with()
+        self.data = MagicMock(spec=CacheStore)
+        self.data.__aenter__.return_value = self.data
+        self.data.__aexit__.return_value = False
 
-    @patch('lib.api.twitch.twitch_emotes')
-    async def test_twitch_recent(self, mock_emotes):
-        self.mock_globals.globalEmotesCache = self.now
-        self.mock_globals.globalEmotes = {}
-        self.mock_globals.globalEmoteSets = {}
-        emotes_ = {25: 'Kappa'}
-        emotesets = {25: 0}
-        mock_emotes.return_value = emotes_, emotesets
+        patcher = patch('lib.cache.get_cache')
+        self.addCleanup(patcher.stop)
+        self.mock_cache = patcher.start()
+        self.mock_cache.return_value = self.data
+
+    async def test_twitch(self):
+        self.data.twitch_get_bot_emote_set.return_value = {0}
         await emotes.refreshTwitchGlobalEmotes(self.now)
-        self.assertEqual(self.mock_globals.globalEmotesCache, self.now)
-        self.assertEqual(self.mock_globals.globalEmotes, {})
-        self.assertEqual(self.mock_globals.globalEmoteSets, {})
-        self.assertFalse(mock_emotes.called)
+        self.assertTrue(self.data.twitch_get_bot_emote_set.called)
+        self.assertTrue(self.data.twitch_load_emotes.called)
 
-    @patch('lib.api.twitch.twitch_emotes')
-    async def test_twitch_none(self, mock_emotes):
-        self.mock_globals.globalEmotesCache = self.now
-        self.mock_globals.globalEmotes = {}
-        self.mock_globals.globalEmoteSets = {}
-        mock_emotes.return_value = None
-        await emotes.refreshTwitchGlobalEmotes(self.now + timedelta(hours=1))
-        self.assertEqual(self.mock_globals.globalEmotesCache,
-                         self.now + timedelta(minutes=1))
-        self.assertEqual(self.mock_globals.globalEmotes, {})
-        self.assertEqual(self.mock_globals.globalEmoteSets, {})
-        mock_emotes.assert_called_once_with()
+    async def test_twitch_no_set(self):
+        self.data.twitch_get_bot_emote_set.return_value = None
+        await emotes.refreshTwitchGlobalEmotes(self.now)
+        self.assertTrue(self.data.twitch_get_bot_emote_set.called)
+        self.assertFalse(self.data.twitch_load_emotes.called)
+
+    async def test_twitch_multiple(self):
+        async def wait(*args):
+            await asyncio.sleep(0.2)
+            return {0}
+
+        async def call_0():
+            return await emotes.refreshTwitchGlobalEmotes(self.now)
+
+        async def call_1():
+            await asyncio.sleep(0.1)
+            return await emotes.refreshTwitchGlobalEmotes(self.now)
+
+        self.data.twitch_get_bot_emote_set.side_effect = wait
+        await asyncio.gather(call_0(), call_1())
+        self.assertEqual(self.data.twitch_get_bot_emote_set.call_count, 1)
+        self.assertEqual(self.data.twitch_load_emotes.call_count, 1)
 
     @patch(emotes.__name__ + '.refreshFfzGlobalEmotes')
     @patch(emotes.__name__ + '.refreshFfzRandomBroadcasterEmotes')

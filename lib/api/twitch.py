@@ -168,9 +168,10 @@ async def server_time() -> Optional[datetime]:
     return None
 
 
-async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
+async def twitch_emotes(emote_sets: Set[int]
+                        ) -> Optional[Dict[int, Tuple[str, int]]]:
     uri: str = ('/kraken/chat/emoticon_images?emotesets='
-                + ','.join(str(i) for i in bot.globals.emoteset))
+                + ','.join(str(i) for i in emote_sets))
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
         response: aiohttp.ClientResponse
@@ -180,8 +181,7 @@ async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
         if data is None:
             return None
         globalEmotes = data['emoticon_sets']
-        emotes: Dict[int, str] = {}
-        emoteSet: Dict[int, int] = {}
+        emotes: Dict[int, Tuple[str, int]] = {}
         replaceGlobal: Dict[int, str] = {
             1: ':)',
             2: ':(',
@@ -205,11 +205,10 @@ async def twitch_emotes() -> Optional[Tuple[Dict[int, str], Dict[int, int]]]:
                 assert isinstance(emote['id'], int)
                 id: int = int(emote['id'])
                 if id in replaceGlobal:
-                    emotes[id] = replaceGlobal[id]
+                    emotes[id] = replaceGlobal[id], int(emoteSetId)
                 else:
-                    emotes[id] = str(emote['code'])
-                emoteSet[id] = int(emoteSetId)
-        return emotes, emoteSet
+                    emotes[id] = str(emote['code']), int(emoteSetId)
+        return emotes
     return None
 
 

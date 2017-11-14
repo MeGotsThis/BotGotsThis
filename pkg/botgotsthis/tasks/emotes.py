@@ -4,24 +4,24 @@ import copy
 import random
 from bot import data  # noqa: F401
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple  # noqa: F401
+from typing import Dict, List, Optional, Tuple, Set  # noqa: F401
 from lib.api import bttv
 from lib.api import ffz
-from lib.api import twitch
+from lib import cache
+
+twitchLock = asyncio.Lock()
 
 
 async def refreshTwitchGlobalEmotes(timestamp: datetime) -> None:
-    if timestamp - bot.globals.globalEmotesCache >= timedelta(hours=1):
-        bot.globals.globalEmotesCache = timestamp
-        emote_data: Optional[Tuple[Dict[int, str], Dict[int, int]]]
-        emote_data = await twitch.twitch_emotes()
-        if emote_data:
-            emotes, emoteSets = emote_data
-            bot.globals.globalEmotes = emotes
-            bot.globals.globalEmoteSets = emoteSets
-        elif not bot.globals.globalEmotes:
-            cache = timestamp - timedelta(hours=1) + timedelta(minutes=1)
-            bot.globals.globalEmotesCache = cache
+    if twitchLock.locked():
+        return
+    async with twitchLock:
+        cacheStore: cache.CacheStore
+        async with cache.get_cache() as cacheStore:
+            emoteSet: Set[int] = await cacheStore.twitch_get_bot_emote_set()
+            if emoteSet is None:
+                return
+            await cacheStore.twitch_load_emotes(emoteSet, background=True)
 
 
 async def refreshFrankerFaceZEmotes(timestamp: datetime) -> None:

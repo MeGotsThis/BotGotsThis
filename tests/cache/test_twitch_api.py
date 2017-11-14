@@ -3,6 +3,7 @@ from asynctest import patch
 import bot  # noqa: F401
 
 from .base_cache_store import TestCacheStore
+from lib.cache import CacheStore
 from lib.api.twitch import TwitchCommunity
 
 
@@ -238,3 +239,91 @@ class TestCacheTwitchApiCommunity(TestCacheStore):
 
     async def test_get_user_empty(self):
         self.assertIsNone(await self.data.twitch_get_community_name('0'))
+
+
+class TestCacheTwitchApiEmotes(TestCacheStore):
+    async def setUp(self):
+        await super().setUp()
+
+        patcher = patch('lib.api.twitch.twitch_emotes')
+        self.addCleanup(patcher.stop)
+        self.mock_emotes = patcher.start()
+        self.mock_emotes.return_value = {25: ('Kappa', 0)}
+
+        CacheStore._lastEmoteSet = None
+
+    async def test_load(self):
+        self.assertIs(await self.data.twitch_load_emotes({0}), True)
+        self.assertTrue(self.mock_emotes.called)
+        self.mock_emotes.reset_mock()
+        self.assertIs(await self.data.twitch_load_emotes({0}), True)
+        self.assertFalse(self.mock_emotes.called)
+        self.assertIsNotNone(await self.redis.get(self.data._twitchEmoteKey()))
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchEmoteSetKey()))
+
+    async def test_load_background(self):
+        self.assertIs(await self.data.twitch_load_emotes({0}, background=True),
+                      True)
+        self.assertTrue(self.mock_emotes.called)
+        self.data.redis.expire(self.data._twitchEmoteKey(), 5)
+        self.mock_emotes.reset_mock()
+        self.assertIs(await self.data.twitch_load_emotes({0}, background=True),
+                      True)
+        self.assertTrue(self.mock_emotes.called)
+        self.assertIsNotNone(await self.redis.get(self.data._twitchEmoteKey()))
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchEmoteSetKey()))
+
+    async def test_load_none(self):
+        self.assertIs(await self.data.twitch_load_emotes(set()), False)
+        self.assertFalse(self.mock_emotes.called)
+        self.assertIsNone(await self.redis.get(self.data._twitchEmoteKey()))
+        self.assertIsNone(await self.redis.get(self.data._twitchEmoteSetKey()))
+        self.mock_emotes.return_value = None
+        self.assertIs(await self.data.twitch_load_emotes({0}), False)
+        self.assertTrue(self.mock_emotes.called)
+        self.mock_emotes.reset_mock()
+        self.assertIs(await self.data.twitch_load_emotes({0}), False)
+        self.assertTrue(self.mock_emotes.called)
+        self.assertIsNone(await self.redis.get(self.data._twitchEmoteKey()))
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchEmoteSetKey()))
+
+    async def test_save_set(self):
+        self.assertIs(
+            await self.data.twitch_save_emote_set({0}), True)
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchEmoteSetKey()))
+
+    async def test_save_emotes(self):
+        self.assertIs(
+            await self.data.twitch_save_emotes({25: ('Kappa', 0)}), True)
+        self.assertIsNotNone(await self.redis.get(self.data._twitchEmoteKey()))
+
+    async def test_get_set(self):
+        await self.data.twitch_save_emote_set({0})
+        self.assertEqual(await self.data.twitch_get_bot_emote_set(), {0})
+
+    async def test_get_set_none(self):
+        self.assertIsNone(await self.data.twitch_get_bot_emote_set())
+
+    async def test_get_set_expired(self):
+        await self.data.twitch_save_emote_set({0})
+        self.assertEqual(await self.data.twitch_get_bot_emote_set(), {0})
+        self.redis.flushdb()
+        self.assertEqual(await self.data.twitch_get_bot_emote_set(), {0})
+
+    async def test_get_emotes(self):
+        await self.data.twitch_save_emotes({25: ('Kappa', 0)})
+        self.assertEqual(await self.data.twitch_get_emotes(), {25: 'Kappa'})
+
+    async def test_get_emotes_empty(self):
+        self.assertEqual(await self.data.twitch_get_emotes(), None)
+
+    async def test_get_emotes_sets(self):
+        await self.data.twitch_save_emotes({25: ('Kappa', 0)})
+        self.assertEqual(await self.data.twitch_get_emote_sets(), {25: 0})
+
+    async def test_get_emotes_sets_empty(self):
+        self.assertEqual(await self.data.twitch_get_emote_sets(), None)
