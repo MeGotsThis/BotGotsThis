@@ -17,6 +17,7 @@ def commands() -> Mapping[str, Optional[data.WhisperCommand]]:
             '!reload': reload.commandReload,
             '!reloadcommands': reload.commandReloadCommands,
             '!reloadconfig': reload.commandReloadConfig,
+            '!refreshcache': reload.commandRefreshCache,
             '!empty': chat.commandEmpty,
             })
     return getattr(commands, 'commands')

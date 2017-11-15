@@ -18,6 +18,7 @@ def commands() -> Mapping[str, Optional[data.ChatCommand]]:
             '!reload': reload.commandReload,
             '!reloadcommands': reload.commandReloadCommands,
             '!reloadconfig': reload.commandReloadConfig,
+            '!refreshcache': reload.commandRefreshCache,
             '!join': owner.commandJoin,
             '!part': owner.commandPart,
             '!emptychat': owner.commandEmpty,
