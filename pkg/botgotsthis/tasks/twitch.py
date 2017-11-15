@@ -52,13 +52,19 @@ async def checkStreamsAndChannel(timestamp: datetime) -> None:
 
 
 async def checkOfflineChannels(timestamp: datetime) -> None:
-    if not bot.globals.channels:
+    channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
+    if not channels:
         return
+    channel: data.Channel
+    for channel in channels.values():
+        if 'offlineLock' not in channel.sessionData:
+            channel.sessionData['offlineLock'] = asyncio.Lock()
     cacheDuration: timedelta = timedelta(seconds=300)
     offlineChannels: List[data.Channel]
-    offlineChannels = [ch for ch in bot.globals.channels.values()
+    offlineChannels = [ch for ch in channels.values()
                        if (not ch.isStreaming
-                           and timestamp - ch.twitchCache >= cacheDuration)]
+                           and timestamp - ch.twitchCache >= cacheDuration
+                           and not ch.sessionData['offlineLock'].locked())]
     if not offlineChannels:
         return
     if 'offlineCheck' not in bot.globals.globalSessionData:
@@ -71,7 +77,7 @@ async def checkOfflineChannels(timestamp: datetime) -> None:
     chat: data.Channel = random.choice(offlineChannels)
     chat.twitchCache = timestamp
     dataCache: cache.CacheStore
-    async with cache.get_cache() as dataCache:
+    async with chat.sessionData['offlineLock'], cache.get_cache() as dataCache:
         current: Optional[twitch.TwitchStatus]
         current = await twitch.channel_properties(chat.channel)
         if current is None:

@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta
 
 import asynctest
@@ -55,6 +56,8 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
 
         self.game_property = PropertyMock(return_value=None)
         type(self.channel).twitchGame = self.game_property
+
+        self.channel.sessionData = {}
 
     @patch('lib.api.twitch.active_streams')
     async def test_streams_empty(self, mock_active):
@@ -163,6 +166,33 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         self.channel.isStreaming = False
         self.cache_property.return_value = self.now - timedelta(hours=1)
         await twitch.checkOfflineChannels(self.now)
+        mock_channel.assert_called_once_with('botgotsthis')
+        self.cache_property.assert_has_calls([call(), call(self.now)])
+        self.streaming_property.assert_called_once_with(None)
+        self.status_property.assert_called_once_with('Keepo')
+        self.game_property.assert_called_once_with('Music')
+        mock_community.assert_called_once_with('botgotsthis')
+        self.assertFalse(self.data.twitch_save_community.called)
+
+    @patch('lib.api.twitch.channel_community')
+    @patch('lib.api.twitch.channel_properties')
+    async def test_offline_multiple(self, mock_channel, mock_community):
+        async def wait(*args):
+            await asyncio.sleep(0.2)
+            return TwitchStatus(None, 'Keepo', 'Music', None)
+
+        async def call_0():
+            await twitch.checkOfflineChannels(self.now)
+
+        async def call_1():
+            await asyncio.sleep(0.1)
+            await twitch.checkOfflineChannels(self.now)
+
+        mock_community.return_value = None
+        mock_channel.side_effect = wait
+        self.channel.isStreaming = False
+        self.cache_property.return_value = self.now - timedelta(hours=1)
+        await asyncio.gather(call_0(), call_1())
         mock_channel.assert_called_once_with('botgotsthis')
         self.cache_property.assert_has_calls([call(), call(self.now)])
         self.streaming_property.assert_called_once_with(None)
