@@ -45,9 +45,8 @@ async def refreshFfzRandomBroadcasterEmotes(timestamp: datetime) -> None:
             channel.sessionData['ffzLock'] = asyncio.Lock()
     dataCache: cache.CacheStore
     async with cache.get_cache() as dataCache:
-        ttlChannels: Dict[str, int] = {
-            b: t async for b, t in dataCache.ffz_get_cached_broadcasters()
-        }
+        ttlChannels: Dict[str, int]
+        ttlChannels = await dataCache.ffz_get_cached_broadcasters()
         toUpdate: List[data.Channel]
         toUpdate = [chan for chan in channels.values()
                     if (chan.channel not in ttlChannels
@@ -88,9 +87,8 @@ async def refreshBttvRandomBroadcasterEmotes(timestamp: datetime) -> None:
             channel.sessionData['bttvLock'] = asyncio.Lock()
     dataCache: cache.CacheStore
     async with cache.get_cache() as dataCache:
-        ttlChannels: Dict[str, int] = {
-            b: t async for b, t in dataCache.bttv_get_cached_broadcasters()
-        }
+        ttlChannels: Dict[str, int]
+        ttlChannels = await dataCache.bttv_get_cached_broadcasters()
         toUpdate: List[data.Channel]
         toUpdate = [chan for chan in channels.values()
                     if (chan.channel not in ttlChannels

@@ -6,7 +6,6 @@ from asynctest.mock import MagicMock, Mock, patch
 
 from bot.data import Channel
 from lib.cache import CacheStore
-from tests.unittest.mock_class import AsyncIterator
 from ..tasks import emotes
 
 
@@ -83,7 +82,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.data.ffz_load_global_emotes.call_count, 1)
 
     async def test_ffz_broadcaster(self):
-        self.data.ffz_get_cached_broadcasters.return_value = AsyncIterator([])
+        self.data.ffz_get_cached_broadcasters.return_value = {}
         channel = Mock(spec=Channel)
         channel.channel = 'botgotsthis'
         channel.isStreaming = False
@@ -94,9 +93,9 @@ class TestTasksEmotes(asynctest.TestCase):
             'botgotsthis', background=True)
 
     async def test_ffz_broadcaster_recent(self):
-        self.data.ffz_get_cached_broadcasters.return_value = AsyncIterator([
-            ('botgotsthis', 3600),
-        ])
+        self.data.ffz_get_cached_broadcasters.return_value = {
+            'botgotsthis': 3600,
+        }
         channel = Mock(spec=Channel)
         channel.channel = 'botgotsthis'
         channel.isStreaming = False
@@ -106,7 +105,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertFalse(self.data.ffz_load_broadcaster_emotes.called)
 
     async def test_ffz_broadcaster_priority(self):
-        self.data.ffz_get_cached_broadcasters.return_value = AsyncIterator([])
+        self.data.ffz_get_cached_broadcasters.return_value = {}
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
         bgtchannel.isStreaming = False
@@ -123,7 +122,7 @@ class TestTasksEmotes(asynctest.TestCase):
 
     @patch('random.choice', autospec=True)
     async def test_ffz_broadcaster_onlyone(self, mock_choice):
-        self.data.ffz_get_cached_broadcasters.return_value = AsyncIterator([])
+        self.data.ffz_get_cached_broadcasters.return_value = {}
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
         bgtchannel.isStreaming = False
@@ -141,7 +140,7 @@ class TestTasksEmotes(asynctest.TestCase):
 
     @patch('random.choice', autospec=True)
     async def test_ffz_broadcaster_empty(self, mock_choice):
-        self.data.ffz_get_cached_broadcasters.return_value = AsyncIterator([])
+        self.data.ffz_get_cached_broadcasters.return_value = {}
         self.mock_globals.channels = {}
         await emotes.refreshFfzRandomBroadcasterEmotes(self.now)
         self.assertFalse(mock_choice.called)
@@ -174,7 +173,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertEqual(self.data.bttv_load_global_emotes.call_count, 1)
 
     async def test_bttv_broadcaster(self):
-        self.data.bttv_get_cached_broadcasters.return_value = AsyncIterator([])
+        self.data.bttv_get_cached_broadcasters.return_value = {}
         channel = Mock(spec=Channel)
         channel.channel = 'botgotsthis'
         channel.isStreaming = False
@@ -185,9 +184,9 @@ class TestTasksEmotes(asynctest.TestCase):
             'botgotsthis', background=True)
 
     async def test_bttv_broadcaster_recent(self):
-        self.data.bttv_get_cached_broadcasters.return_value = AsyncIterator([
-            ('botgotsthis', 3600),
-        ])
+        self.data.bttv_get_cached_broadcasters.return_value = {
+            'botgotsthis': 3600,
+        }
         channel = Mock(spec=Channel)
         channel.channel = 'botgotsthis'
         channel.isStreaming = False
@@ -197,7 +196,7 @@ class TestTasksEmotes(asynctest.TestCase):
         self.assertFalse(self.data.bttv_load_broadcaster_emotes.called)
 
     async def test_bttv_broadcaster_priority(self):
-        self.data.bttv_get_cached_broadcasters.return_value = AsyncIterator([])
+        self.data.bttv_get_cached_broadcasters.return_value = {}
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
         bgtchannel.isStreaming = False
@@ -214,7 +213,7 @@ class TestTasksEmotes(asynctest.TestCase):
 
     @patch('random.choice', autospec=True)
     async def test_bttv_broadcaster_onlyone(self, mock_choice):
-        self.data.bttv_get_cached_broadcasters.return_value = AsyncIterator([])
+        self.data.bttv_get_cached_broadcasters.return_value = {}
         bgtchannel = Mock(spec=Channel)
         bgtchannel.channel = 'botgotsthis'
         bgtchannel.isStreaming = False
@@ -232,7 +231,7 @@ class TestTasksEmotes(asynctest.TestCase):
 
     @patch('random.choice', autospec=True)
     async def test_bttv_broadcaster_empty(self, mock_choice):
-        self.data.bttv_get_cached_broadcasters.return_value = AsyncIterator([])
+        self.data.bttv_get_cached_broadcasters.return_value = {}
         self.mock_globals.channels = {}
         await emotes.refreshBttvRandomBroadcasterEmotes(self.now)
         self.assertFalse(mock_choice.called)
