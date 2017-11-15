@@ -546,6 +546,7 @@ class TestApiTwitch(asynctest.TestCase):
         self.data.__aenter__.return_value = self.data
         self.data.__aexit__.return_value = True
         self.data.twitch_load_id.return_value = True
+        self.data.twitch_load_ids.return_value = True
         self.data.twitch_get_id.side_effect = lambda u: {
             'botgotsthis': '0',
             'megotsthis': None,
@@ -712,9 +713,9 @@ class TestApiTwitch(asynctest.TestCase):
 
     @patch('lib.api.twitch._handle_streams')
     async def test_active_streams_no_load(self, mock_handle):
-        self.data.twitch_load_id.return_value = False
-        self.assertEqual(await twitch.active_streams(['botgotsthis']), {})
-        self.data.twitch_load_id.assert_called_once_with('botgotsthis')
+        self.data.twitch_load_ids.return_value = False
+        self.assertIsNone(await twitch.active_streams(['botgotsthis']))
+        self.data.twitch_load_ids.assert_called_once_with(['botgotsthis'])
         self.assertFalse(self.data.twitch_get_id.called)
         self.assertFalse(self.mock_get_call.called)
         self.assertEqual(mock_handle.call_count, 0)
@@ -722,7 +723,7 @@ class TestApiTwitch(asynctest.TestCase):
     @patch('lib.api.twitch._handle_streams')
     async def test_active_streams_no_user(self, mock_handle):
         self.assertEqual(await twitch.active_streams(['megotsthis']), {})
-        self.data.twitch_load_id.assert_called_once_with('megotsthis')
+        self.data.twitch_load_ids.assert_called_once_with(['megotsthis'])
         self.data.twitch_get_id.assert_called_once_with('megotsthis')
         self.assertFalse(self.mock_get_call.called)
         self.assertEqual(mock_handle.call_count, 0)
@@ -731,7 +732,7 @@ class TestApiTwitch(asynctest.TestCase):
     async def test_active_streams_404(self, mock_handle):
         self.mock_async_response.status = 404
         self.assertIsNone(await twitch.active_streams(['botgotsthis']))
-        self.data.twitch_load_id.assert_called_once_with('botgotsthis')
+        self.data.twitch_load_ids.assert_called_once_with(['botgotsthis'])
         self.data.twitch_get_id.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 0)
 
@@ -740,7 +741,7 @@ class TestApiTwitch(asynctest.TestCase):
         self.mock_async_response.status = 200
         self.mock_get_call.return_value[1] = json.loads(noStreams.decode())
         self.assertEqual(await twitch.active_streams(['botgotsthis']), {})
-        self.data.twitch_load_id.assert_called_once_with('botgotsthis')
+        self.data.twitch_load_ids.assert_called_once_with(['botgotsthis'])
         self.data.twitch_get_id.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 1)
 
@@ -752,7 +753,7 @@ class TestApiTwitch(asynctest.TestCase):
             [self.mock_async_response, json.loads(noStreams.decode())]
         ]
         self.assertEqual(await twitch.active_streams(['botgotsthis']), {})
-        self.data.twitch_load_id.assert_called_once_with('botgotsthis')
+        self.data.twitch_load_ids.assert_called_once_with(['botgotsthis'])
         self.data.twitch_get_id.assert_called_once_with('botgotsthis')
         self.assertEqual(mock_handle.call_count, 2)
 

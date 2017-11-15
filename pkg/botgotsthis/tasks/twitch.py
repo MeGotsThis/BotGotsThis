@@ -1,10 +1,9 @@
-﻿import asyncio
-import bot
+﻿import bot
 import copy
 import random
 from bot import data, utils  # noqa: F401
 from datetime import datetime, timedelta
-from typing import Awaitable, Dict, List, Optional, Union  # noqa: F401
+from typing import Dict, List, Optional, Union  # noqa: F401
 from lib import cache
 from lib.api import twitch
 from lib.database import DatabaseMain
@@ -16,26 +15,7 @@ async def checkTwitchIds(timestamp: datetime) -> None:
     dataCache: cache.CacheStore
     async with cache.get_cache() as dataCache:
         channels: List[str] = list(bot.globals.channels.keys())
-        hasCache: List[bool] = await asyncio.gather(
-            *map(dataCache.twitch_has_id, channels)
-        )
-        channels = [c for c, b in zip(channels, hasCache) if not b]
-        if not channels:
-            return
-
-        ids: Optional[Dict[str, str]] = await twitch.getTwitchIds(channels)
-        if ids is None:
-            return
-        tasks: List[Awaitable[bool]] = []
-        channel: str
-        id: str
-        for channel, id in ids.items():
-            tasks.append(dataCache.twitch_save_id(id, channel))
-        for channel in channels:
-            if channel in ids:
-                continue
-            tasks.append(dataCache.twitch_save_id(None, channel))
-        await asyncio.gather(*tasks)
+        await dataCache.twitch_load_ids(channels)
 
 
 async def checkStreamsAndChannel(timestamp: datetime) -> None:
