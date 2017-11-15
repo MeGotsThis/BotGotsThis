@@ -7,6 +7,10 @@ import asynctest
 from asynctest.mock import CoroutineMock, Mock, patch
 
 from pkg.botgotsthis.library import reload
+from tests.cache.base_cache_store import TestCacheStore
+
+import encodings
+encodings.search_function('idna')
 
 
 def send(messages):
@@ -228,3 +232,37 @@ class TestLibraryReload(asynctest.TestCase):
         mock_bot._config.BotConfig.assert_called_once_with()
         mock_read.assert_called_once_with()
         self.assertNotEqual(mock_bot.config, originalConfig)
+
+
+class TestRefreshingCache(TestCacheStore):
+    async def setUp(self):
+        await super().setUp()
+        self.send = Mock(spec=send)
+
+        self.redis.set('botgotsthis', 'Kappa')
+        self.redis.set('megotsthis', 'FrankerZ')
+
+    async def test(self):
+        await reload.refresh_cache(self.send, self.data, None)
+        self.assertIsNone(await self.redis.get('botgotsthis'))
+        self.assertIsNone(await self.redis.get('megotsthis'))
+
+    async def test_keys(self):
+        await reload.refresh_cache(self.send, self.data, 'megotsthis')
+        self.assertIsNotNone(await self.redis.get('botgotsthis'))
+        self.assertIsNone(await self.redis.get('megotsthis'))
+
+    async def test_keys_2(self):
+        await reload.refresh_cache(self.send, self.data, '*gotsthis')
+        self.assertIsNone(await self.redis.get('botgotsthis'))
+        self.assertIsNone(await self.redis.get('megotsthis'))
+
+    async def test_keys_3(self):
+        await reload.refresh_cache(self.send, self.data, '*')
+        self.assertIsNone(await self.redis.get('botgotsthis'))
+        self.assertIsNone(await self.redis.get('megotsthis'))
+
+    async def test_keys_4(self):
+        await reload.refresh_cache(self.send, self.data, 'mebotsthis')
+        self.assertIsNotNone(await self.redis.get('botgotsthis'))
+        self.assertIsNotNone(await self.redis.get('megotsthis'))

@@ -1,10 +1,12 @@
 ﻿import asyncio
-import bot
-import bot._config
+import importlib
 import re
 import sys
-import importlib
 from typing import Iterator, List, Match, Optional, Tuple  # noqa: F401
+
+import bot
+import bot._config
+from lib.cache import CacheStore
 from lib.data import Send, timezones
 
 _reload_lock: asyncio.Lock = asyncio.Lock()
@@ -89,7 +91,7 @@ async def full_reload(send: Send) -> bool:
     if _reload_lock.locked():
         return True
 
-    with await _reload_lock:
+    async with _reload_lock:
         send('Reloading')
 
         await reload_config(send)
@@ -103,7 +105,7 @@ async def reload_commands(send: Send) -> bool:
     if _reload_lock.locked():
         return True
 
-    with await _reload_lock:
+    async with _reload_lock:
         send('Reloading Commands')
 
         modules: Iterator[str]
@@ -121,7 +123,7 @@ async def reload_config(send: Send) -> bool:
     if _reload_lock.locked():
         return True
 
-    with await _reload_lock:
+    async with _reload_lock:
         send('Reloading Config')
 
         importlib.reload(sys.modules['bot._config'])
@@ -131,3 +133,17 @@ async def reload_config(send: Send) -> bool:
 
         send('Complete Reloading')
         return True
+
+
+async def refresh_cache(send: Send,
+                        data: CacheStore,
+                        keys: Optional[str]) -> bool:
+    send('Refreshing Redis Cache')
+    if keys is not None:
+        keysFound: List[bytes] = await data.redis.keys(keys)
+        if keysFound:
+            await data.redis.delete(*keysFound)
+    else:
+        await data.redis.flushdb()
+    send('Complete Refreshing')
+    return True
