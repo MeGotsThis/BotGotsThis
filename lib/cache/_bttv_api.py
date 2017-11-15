@@ -61,7 +61,7 @@ class BetterTwitchTvApisMixin(AbcCacheStore):
         return True
 
     async def bttv_get_broadcaster_emotes(self, broadcaster: str
-                                          ) -> Optional[Dict[int, str]]:
+                                          ) -> Optional[Dict[str, str]]:
         key: str = self._bttvBroadcasterEmoteKey(broadcaster)
         value: Optional[str] = await self.redis.get(key)
         if value is None:
