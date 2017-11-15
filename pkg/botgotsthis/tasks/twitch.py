@@ -1,9 +1,11 @@
-﻿import bot
+﻿import asyncio
 import copy
 import random
-from bot import data, utils  # noqa: F401
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Union  # noqa: F401
+from typing import Dict, List, Optional, Set, Union  # noqa: F401
+
+import bot
+from bot import data, utils  # noqa: F401
 from lib import cache
 from lib.api import twitch
 from lib.database import DatabaseMain
@@ -29,6 +31,7 @@ async def checkStreamsAndChannel(timestamp: datetime) -> None:
                                                     data=dataCache)
         if onlineStreams is None:
             return
+        communityIds: Set[str] = set()
         channel: str
         for channel in onlineStreams:
             chat: data.Channel = channels[channel]
@@ -36,14 +39,16 @@ async def checkStreamsAndChannel(timestamp: datetime) -> None:
             (chat.streamingSince, chat.twitchStatus,
              chat.twitchGame, chat.community) = onlineStreams[channel]
             communityId: str
-            # TODO: streamline this to asyncio.gather
             for communityId in chat.community:
-                await dataCache.twitch_load_community_id(communityId)
+                communityIds.add(communityId)
 
         for channel in channels:
             if channel in onlineStreams:
                 continue
             channels[channel].streamingSince = None
+
+        await asyncio.gather(*[dataCache.twitch_load_community_id(id)
+                               for id in communityIds])
 
 
 async def checkOfflineChannels(timestamp: datetime) -> None:
@@ -80,10 +85,10 @@ async def checkOfflineChannels(timestamp: datetime) -> None:
         if communities is not None:
             community: twitch.TwitchCommunity
             chat.community = [community.id for community in communities]
-            # TODO: streamline this to asyncio.gather
-            for community in communities:
-                await dataCache.twitch_save_community(community.id,
-                                                      community.name)
+            await asyncio.gather(
+                *[dataCache.twitch_save_community(comm.id, comm.name)
+                  for comm in communities]
+            )
         bot.globals.globalSessionData['offlineCheck'].append(timestamp)
 
 
