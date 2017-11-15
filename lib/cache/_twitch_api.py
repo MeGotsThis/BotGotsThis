@@ -1,7 +1,7 @@
 import asyncio
 import json
-from typing import Any, Awaitable, ClassVar, Dict, List, Optional, Set, Tuple  # noqa: F401,E501
-from typing import cast
+from typing import Any, Awaitable, ClassVar, Dict, Iterable, List, Optional  # noqa: F401,E501
+from typing import Set, Tuple, cast
 
 from ._abc import AbcCacheStore
 from . import store
@@ -41,6 +41,28 @@ class TwitchApisMixin(AbcCacheStore):
             await self.twitch_save_id(ids[user], user)
         else:
             await self.twitch_save_id(None, user)
+        return True
+
+    async def twitch_load_ids(self, users: Iterable[str]) -> bool:
+        users = list(users)
+        existed: Tuple[bool, ...] = await asyncio.gather(
+            *[self.redis.exists(self._twitchIdUserKey(user))
+              for user in users]
+        )
+        users = [user for user, exists in zip(users, existed) if not exists]
+        if not users:
+            return True
+        ids: Optional[Dict[str, str]] = await twitch.getTwitchIds(users)
+        if ids is None:
+            return False
+
+        # Save all the new ids and non-existent ids
+        await asyncio.gather(
+            *[self.twitch_save_id(id, user)
+              for user, id in ids.items()],
+            *[self.twitch_save_id(None, user)
+              for user in users if user not in ids]
+        )
         return True
 
     async def twitch_save_id(self, id: Optional[str], user: str) -> bool:

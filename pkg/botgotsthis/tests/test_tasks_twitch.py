@@ -35,61 +35,9 @@ class TestTasksTwitchBase(asynctest.TestCase):
 
 
 class TestTasksTwitchIds(TestTasksTwitchBase):
-    def setUp(self):
-        super().setUp()
-
-        patcher = patch('lib.api.twitch.getTwitchIds')
-        self.addCleanup(patcher.stop)
-        self.mock_twitchid = patcher.start()
-        self.mock_twitchid.return_value = {}
-
-    async def test_empty(self):
-        self.data.twitch_has_id.return_value = False
-        self.mock_globals.channels = {}
-        await twitch.checkTwitchIds(self.now)
-        self.assertFalse(self.mock_twitchid.called)
-        self.assertFalse(self.data.twitch_save_id.called)
-
-    async def test_none(self):
-        self.data.twitch_has_id.return_value = False
-        self.mock_twitchid.return_value = None
-        await twitch.checkTwitchIds(self.now)
-        self.assertTrue(self.mock_twitchid.called)
-        self.assertFalse(self.data.twitch_save_id.called)
-
     async def test(self):
-        self.data.twitch_has_id.return_value = False
-        self.mock_twitchid.return_value = {'botgotsthis': '1'}
         await twitch.checkTwitchIds(self.now)
-        self.assertTrue(self.mock_twitchid.called)
-        self.mock_twitchid.assert_called_once_with(['botgotsthis'])
-        self.data.twitch_save_id.assert_called_once_with('1', 'botgotsthis')
-
-    async def test_multiple(self):
-        def idLambda(u):
-            return True if u == 'botgotsthis' else False
-        self.data.twitch_has_id.side_effect = idLambda
-        mgtChannel = Mock(spec=Channel)
-        mgtChannel.channel = 'botgotsthis'
-        self.mock_globals.channels['megotsthis'] = mgtChannel
-        self.mock_globals.twitchId = {'botgotsthis': '1'}
-        self.mock_twitchid.return_value = {'megotsthis': '2'}
-        await twitch.checkTwitchIds(self.now)
-        self.mock_twitchid.assert_called_once_with(['megotsthis'])
-        self.data.twitch_save_id.assert_called_once_with('2', 'megotsthis')
-
-    async def test_no_id(self):
-        self.data.twitch_has_id.return_value = False
-        self.mock_twitchid.return_value = {}
-        await twitch.checkTwitchIds(self.now)
-        self.assertTrue(self.mock_twitchid.called)
-        self.data.twitch_save_id.assert_called_once_with(None, 'botgotsthis')
-
-    async def test_has_id(self):
-        self.data.twitch_has_id.return_value = True
-        await twitch.checkTwitchIds(self.now)
-        self.assertFalse(self.mock_twitchid.called)
-        self.assertFalse(self.data.twitch_save_id.called)
+        self.data.twitch_load_ids.assert_called_once_with(['botgotsthis'])
 
 
 class TestTasksTwitchStreams(TestTasksTwitchBase):

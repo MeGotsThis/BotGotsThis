@@ -306,12 +306,13 @@ async def active_streams(channels: Iterable[str], *,
 
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):
-        # TODO: refactor this to use asyncio.gather
-        allChannels: List[str] = [
-            cId for cId
-            in [await data.twitch_get_id(c) for c in channels
-                if await data.twitch_load_id(c)]
-            if cId is not None]
+        channels = list(channels)
+        if not await data.twitch_load_ids(channels):
+            return None
+        ids: Tuple[Optional[str], ...] = await asyncio.gather(
+            *[data.twitch_get_id(c) for c in channels]
+        )
+        allChannels: List[str] = [id for id in ids if id is not None]
         if not allChannels:
             return {}
         uri: str = '/kraken/streams?limit=100&channel=' + ','.join(allChannels)

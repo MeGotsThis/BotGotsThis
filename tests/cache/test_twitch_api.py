@@ -59,6 +59,54 @@ class TestCacheTwitchApiId(TestCacheStore):
         self.assertIsNone(
             await self.redis.get(self.data._twitchIdUserKey('botgotsthis')))
 
+    async def test_load_id_no_id(self):
+        self.mock_ids.return_value = {}
+        self.assertIs(await self.data.twitch_load_id('botgotsthis'), True)
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchIdUserKey('botgotsthis')))
+
+    async def test_load_ids(self):
+        self.mock_ids.return_value = {'botgotsthis': '0'}
+        self.assertIs(await self.data.twitch_load_ids(['botgotsthis']),
+                      True)
+        self.assertTrue(self.mock_ids.called)
+        self.mock_ids.reset_mock()
+        self.assertIs(await self.data.twitch_load_ids(['botgotsthis']),
+                      True)
+        self.assertFalse(self.mock_ids.called)
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchIdUserKey('botgotsthis')))
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchIdIdKey('0')))
+
+    async def test_load_ids_no_load(self):
+        self.mock_ids.return_value = None
+        self.assertIs(await self.data.twitch_load_ids(['botgotsthis']), False)
+        self.assertTrue(self.mock_ids.called)
+        self.mock_ids.reset_mock()
+        self.assertIs(await self.data.twitch_load_ids(['botgotsthis']), False)
+        self.assertTrue(self.mock_ids.called)
+        self.assertIsNone(
+            await self.redis.get(self.data._twitchIdUserKey('botgotsthis')))
+
+    async def test_load_ids_no_id(self):
+        self.mock_ids.return_value = {}
+        self.assertIs(await self.data.twitch_load_ids(['botgotsthis']), True)
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchIdUserKey('botgotsthis')))
+
+    async def test_load_ids_multiple(self):
+        self.mock_ids.return_value = {'botgotsthis': '0'}
+        self.assertIs(
+            await self.data.twitch_load_ids(['botgotsthis', 'megotsthis']),
+            True)
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchIdUserKey('botgotsthis')))
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchIdUserKey('megotsthis')))
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchIdIdKey('0')))
+
     async def test_save_id(self):
         self.assertIs(await self.data.twitch_save_id('0', 'botgotsthis'),
                       True)
