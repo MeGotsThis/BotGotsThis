@@ -13,9 +13,7 @@ class BotGlobals:
 
         self.groupChannel: 'data.Channel' = None
 
-        self.clusters: Dict[str, 'connection.ConnectionHandler'] = {
-            'aws': None,
-        }
+        self.cluster: 'connection.ConnectionHandler' = None
         self.whisperCluster: str = 'aws'
 
         self.channels: Dict[str, 'data.Channel'] = {}

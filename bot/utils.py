@@ -20,21 +20,19 @@ def now() -> datetime:
 
 
 def joinChannel(broadcaster: str,
-                priority: Union[int, float, str]=float('inf'),
-                cluster: str='aws') -> Optional[bool]:
+                priority: Union[int, float, str]=float('inf')
+                ) -> bool:
     if not isinstance(broadcaster, str):
         raise TypeError()
-    if cluster is None or cluster not in bot.globals.clusters:
-        return None
     broadcaster = broadcaster.lower()
     if broadcaster in bot.globals.channels:
         t = min(bot.globals.channels[broadcaster].joinPriority, priority)
         bot.globals.channels[broadcaster].joinPriority = float(t)
         return False
-    cluster_: connection.ConnectionHandler = bot.globals.clusters[cluster]
-    channel: data.Channel = data.Channel(broadcaster, cluster_, priority)
+    channel: data.Channel
+    channel = data.Channel(broadcaster, bot.globals.cluster, priority)
     bot.globals.channels[broadcaster] = channel
-    cluster_.join_channel(channel)
+    bot.globals.cluster.join_channel(channel)
     return True
 
 
@@ -47,44 +45,11 @@ def partChannel(channel: str) -> None:
 
 
 def whisper(nick: str, messages: Union[str, Iterable[str]]) -> None:
-    cluster = bot.globals.clusters[bot.globals.whisperCluster]
-    cluster.messaging.sendWhisper(nick, messages)
+    bot.globals.cluster.messaging.sendWhisper(nick, messages)
 
 
 def clearAllChat() -> None:
-    for c in bot.globals.clusters.values():
-        c.messaging.clearAllChat()
-
-
-ENSURE_CLUSTER_UNKNOWN: int = -2
-ENSURE_REJOIN: int = -1
-ENSURE_CORRECT: int = 0
-ENSURE_NOT_JOINED: int = 1
-
-
-def ensureServer(channel: str,
-                 priority: Union[int, float, str, None]=None,
-                 cluster: str='aws') -> int:
-    if not isinstance(channel, str):
-        raise TypeError()
-    if cluster is None:
-        raise TypeError()
-    if channel not in bot.globals.channels:
-        return ENSURE_NOT_JOINED
-    if cluster not in bot.globals.clusters:
-        partChannel(channel)
-        return ENSURE_CLUSTER_UNKNOWN
-    cluster_: connection.ConnectionHandler = bot.globals.clusters[cluster]
-    if cluster_ is bot.globals.channels[channel].connection:
-        if priority is not None:
-            bot.globals.channels[channel].joinPriority = float(min(
-                bot.globals.channels[channel].joinPriority, priority))
-        return ENSURE_CORRECT
-    if priority is None:
-        priority = bot.globals.channels[channel].joinPriority
-    partChannel(channel)
-    joinChannel(channel, priority, cluster)
-    return ENSURE_REJOIN
+    bot.globals.cluster.messaging.clearAllChat()
 
 
 def print(*args: Any,

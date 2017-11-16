@@ -75,17 +75,9 @@ def _can_process() -> bool:
 
 
 def _connected_channels() -> Dict[str, 'data.Channel']:
-    channels: Dict[str, data.Channel] = {}
-    connection_: connection.ConnectionHandler
-    chans: Dict[str, data.Channel]
-    chan: str
-    for connection_ in bot.globals.clusters.values():
-        if not connection_.isConnected:
-            continue
-        chans = connection_.channels
-        for chan in chans:
-            channels[chan] = chans[chan]
-    return channels
+    if not bot.globals.cluster.isConnected:
+        return {}
+    return bot.globals.cluster.channels
 
 
 def _get_join_with_lowest_priority(

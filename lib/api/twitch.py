@@ -212,18 +212,6 @@ async def twitch_emotes(emote_sets: Set[int]
     return None
 
 
-async def chat_server(chat: str) -> Optional[str]:
-    session: aiohttp.ClientSession
-    response: aiohttp.ClientResponse
-    async with aiohttp.ClientSession() as session, \
-            session.get('https://tmi.twitch.tv/servers?channel=' + chat,
-                        timeout=bot.config.httpTimeout) as response:
-        with suppress(ValueError, aiohttp.ClientResponseError):
-            jData: Dict[str, Any] = await response.json()
-            return str(jData['cluster'])
-    return None
-
-
 async def getTwitchIds(channels: Iterable[str]) -> Optional[Dict[str, str]]:
     with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
                   asyncio.TimeoutError):

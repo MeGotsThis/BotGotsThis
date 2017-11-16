@@ -2,7 +2,6 @@
 
 import bot
 from bot import utils
-from lib.api import twitch
 from lib.data import Send
 from lib.database import DatabaseMain
 from lib.helper import timeout
@@ -16,23 +15,14 @@ async def join(channel: str,
         bannedWithReason: Optional[str]
         bannedWithReason = await db.isChannelBannedReason(channel)
         if bannedWithReason is not None:
-            send('Chat ' + channel + ' is banned from joining')
+            send(f'Chat {channel} is banned from joining')
             return True
         priority = await db.getAutoJoinsPriority(channel)
 
-    cluster: Optional[str] = await twitch.chat_server(channel)
-    if cluster not in bot.globals.clusters:
-        send('Unknown chat server for ' + channel)
-    elif utils.joinChannel(channel, priority, cluster):
-        send('Joining ' + channel)
+    if utils.joinChannel(channel, priority):
+        send(f'Joining {channel}')
     else:
-        result: int = utils.ensureServer(channel, priority, cluster)
-        if result == utils.ENSURE_CORRECT:
-            send('Already joined ' + channel)
-        elif result == utils.ENSURE_REJOIN:
-            send('Moved ' + channel + ' to correct chat server')
-        else:
-            send('Unknown error joining ' + channel)
+        send(f'Already joined {channel}')
     return True
 
 
@@ -41,7 +31,7 @@ def part(channel: str,
     if channel == bot.config.botnick:
         return False
     utils.partChannel(channel)
-    send('Leaving ' + channel)
+    send(f'Leaving {channel}')
     return True
 
 
@@ -65,8 +55,7 @@ def empty_all(send: Send) -> bool:
 def empty(channel: str,
           send: Send) -> bool:
     if channel in bot.globals.channels:
-        chan = bot.globals.channels[channel]
-        chan.clear()
-        send('Cleared all queued messages for ' + channel)
+        bot.globals.channels[channel].clear()
+        send(f'Cleared all queued messages for {channel}')
         return True
     return False

@@ -520,22 +520,6 @@ class TestApiTwitchApiCalls(asynctest.TestCase):
         self.assertTrue(self.mock_response.json.called)
         self.mock_headers.assert_called_once_with({}, 'botgotsthis')
 
-    async def test_chat_server(self):
-        self.mock_session.get.return_value = self.mock_response
-        self.mock_response.json.return_value = json.loads(chatServers.decode())
-        self.assertEqual(await twitch.chat_server('botgotsthis'), 'aws')
-        self.assertTrue(self.mock_clientsession.called)
-        self.assertTrue(self.mock_session.get.called)
-        self.assertTrue(self.mock_response.json.called)
-
-    async def test_chat_server_except(self):
-        self.mock_session.get.return_value = self.mock_response
-        self.mock_response.json.side_effect = ValueError
-        self.assertIsNone(await twitch.chat_server('botgotsthis'))
-        self.assertTrue(self.mock_clientsession.called)
-        self.assertTrue(self.mock_session.get.called)
-        self.assertTrue(self.mock_response.json.called)
-
 
 class TestApiTwitch(asynctest.TestCase):
     def setUp(self):

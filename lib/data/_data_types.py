@@ -5,7 +5,6 @@ from typing import NamedTuple, Optional, Union
 class AutoJoinChannel(NamedTuple):
     broadcaster: str
     priority: Union[int, float]
-    cluster: str
 
 
 class AutoRepeatMessage(NamedTuple):
