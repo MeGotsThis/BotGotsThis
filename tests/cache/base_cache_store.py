@@ -3,6 +3,7 @@ import asynctest
 from asynctest import MagicMock, patch
 
 import bot  # noqa: F401
+import tests.unittest.asynctest_fix  # noqa: F401
 
 from lib.cache import CacheStore
 from lib.database import DatabaseMain

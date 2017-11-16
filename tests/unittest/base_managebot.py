@@ -3,6 +3,7 @@ from datetime import datetime
 import asynctest
 from asynctest.mock import MagicMock, Mock, patch
 
+import tests.unittest.asynctest_fix  # noqa: F401
 from lib.cache import CacheStore
 from lib.data import ManageBotArgs
 from lib.data.message import Message

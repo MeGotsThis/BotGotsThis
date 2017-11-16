@@ -9,9 +9,6 @@ from asynctest.mock import CoroutineMock, Mock, patch
 from pkg.botgotsthis.library import reload
 from tests.cache.base_cache_store import TestCacheStore
 
-import encodings
-encodings.search_function('idna')
-
 
 def send(messages):
     pass
