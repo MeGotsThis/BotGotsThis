@@ -7,6 +7,7 @@ import bot  # noqa: F401
 
 from collections.abc import Sequence
 
+import tests.unittest.asynctest_fix  # noqa: F401
 from lib.database import DatabaseMain
 
 

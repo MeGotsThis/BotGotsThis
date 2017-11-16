@@ -4,6 +4,7 @@ from datetime import datetime
 
 from asynctest.mock import MagicMock, Mock, patch
 
+import tests.unittest.asynctest_fix  # noqa: F401
 from bot.data import Channel
 from lib.cache import CacheStore
 from lib.data import WhisperCommandArgs
