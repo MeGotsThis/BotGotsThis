@@ -2,13 +2,12 @@
 import copy
 import random
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set, Union  # noqa: F401
+from typing import Dict, List, Optional, Set  # noqa: F401
 
 import bot
-from bot import data, utils  # noqa: F401
+from bot import data  # noqa: F401
 from lib import cache
 from lib.api import twitch
-from lib.database import DatabaseMain
 
 
 async def checkTwitchIds(timestamp: datetime) -> None:
@@ -96,26 +95,3 @@ async def checkOfflineChannels(timestamp: datetime) -> None:
                   for comm in communities]
             )
         bot.globals.globalSessionData['offlineCheck'].append(timestamp)
-
-
-async def checkChatServers(timestamp: datetime) -> None:
-    cooldown: timedelta = timedelta(seconds=3600)
-    channels: Dict[str, data.Channel] = copy.copy(bot.globals.channels)
-    toCheck: List[str] = [c for c, ch in channels.items()
-                          if (timestamp - ch.serverCheck >= cooldown)]
-    if not toCheck:
-        return
-    channel: str = random.choice(toCheck)
-    channels[channel].serverCheck = timestamp
-    cluster: Optional[str] = await twitch.chat_server(channel)
-    if cluster is None:
-        return
-    if (cluster in bot.globals.clusters
-            and bot.globals.clusters[cluster] is channels[channel].connection):
-        return
-    db: DatabaseMain
-    async with DatabaseMain.acquire() as db:
-        priority: Union[int, float]
-        priority = await db.getAutoJoinsPriority(channel)
-        utils.ensureServer(channel, priority, cluster)
-        await db.setAutoJoinServer(channel, cluster)

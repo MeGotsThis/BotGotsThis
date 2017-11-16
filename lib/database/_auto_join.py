@@ -10,7 +10,7 @@ from .. import data
 class AutoJoinMixin(Database):
     async def getAutoJoinsChats(self) -> 'AsyncIterator[data.AutoJoinChannel]':
         query: str = '''
-SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
+SELECT broadcaster, priority FROM auto_join ORDER BY priority ASC
 '''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
@@ -32,15 +32,14 @@ SELECT broadcaster, priority, cluster FROM auto_join ORDER BY priority ASC
 
     async def saveAutoJoin(self,
                            broadcaster: str,
-                           priority: Union[int, float] = 0,
-                           cluster: str = 'aws') -> bool:
+                           priority: Union[int, float]=0) -> bool:
         query: str = '''
-INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
+INSERT INTO auto_join (broadcaster, priority) VALUES (?, ?)
 '''
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             try:
-                await cursor.execute(query, (broadcaster, priority, cluster))
+                await cursor.execute(query, (broadcaster, priority))
                 await self.commit()
                 return True
             except pyodbc.Error:
@@ -61,15 +60,5 @@ INSERT INTO auto_join (broadcaster, priority, cluster) VALUES (?, ?, ?)
         cursor: aioodbc.cursor.Cursor
         async with await self.cursor() as cursor:
             await cursor.execute(query, (priority, broadcaster))
-            await self.commit()
-            return cursor.rowcount != 0
-
-    async def setAutoJoinServer(self,
-                                broadcaster: str,
-                                cluster: str = 'aws') -> bool:
-        query: str = '''UPDATE auto_join SET cluster=? WHERE broadcaster=?'''
-        cursor: aioodbc.cursor.Cursor
-        async with await self.cursor() as cursor:
-            await cursor.execute(query, (cluster, broadcaster))
             await self.commit()
             return cursor.rowcount != 0

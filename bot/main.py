@@ -25,7 +25,7 @@ async def initializer() -> None:
 
     bot.globals.running = True
 
-    bot.globals.clusters['aws'] = connection.ConnectionHandler(
+    bot.globals.cluster = connection.ConnectionHandler(
         'AWS Chat', bot.config.awsServer, bot.config.awsPort)
 
     bot.globals.redisPool = await aioredis.create_pool(
@@ -62,17 +62,16 @@ async def initializer() -> None:
         except ModuleNotFoundError:
             pass
 
-    utils.joinChannel(bot.config.botnick, float('-inf'), 'aws')
+    utils.joinChannel(bot.config.botnick, float('-inf'))
     bot.globals.groupChannel = bot.globals.channels[bot.config.botnick]
     if bot.config.owner:
-        utils.joinChannel(bot.config.owner, float('-inf'), 'aws')
+        utils.joinChannel(bot.config.owner, float('-inf'))
 
     db: database.DatabaseMain
     async with database.DatabaseMain.acquire() as db:
         autojoin: AutoJoinChannel
         async for autoJoin in db.getAutoJoinsChats():
-            utils.joinChannel(autoJoin.broadcaster, autoJoin.priority,
-                              autoJoin.cluster)
+            utils.joinChannel(autoJoin.broadcaster, autoJoin.priority)
 
 
 async def finalizer() -> None:
@@ -87,12 +86,13 @@ def main(argv: Optional[List[str]]=None) -> int:
     try:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(initializer())
-        coro: Awaitable[List[Any]] = asyncio.gather(
+        coro: Awaitable[Tuple[None, ...]] = asyncio.gather(
             timezones.load_timezones(),
             background.background_tasks(),
             logging.record_logs(),
             join.join_manager(),
-            *[c.run_connection() for c in bot.globals.clusters.values()])
+            bot.globals.cluster.run_connection(),
+        )
         loop.run_until_complete(coro)
         if asyncio.Task.all_tasks():
             asyncio.wait_for(asyncio.gather(*asyncio.Task.all_tasks()), 10)

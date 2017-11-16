@@ -1,7 +1,6 @@
 CREATE TABLE auto_join (
     broadcaster VARCHAR NOT NULL PRIMARY KEY,
-    priority INT NOT NULL DEFAULT 0,
-    cluster VARCHAR NOT NULL DEFAULT 'main'
+    priority INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE game_abbreviations (

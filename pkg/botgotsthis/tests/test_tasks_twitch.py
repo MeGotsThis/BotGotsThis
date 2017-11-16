@@ -4,10 +4,8 @@ from datetime import datetime, timedelta
 import asynctest
 from asynctest.mock import MagicMock, Mock, PropertyMock, call, patch
 
-from bot.coroutine.connection import ConnectionHandler
 from bot.data import Channel
 from lib.cache import CacheStore
-from lib.database import DatabaseMain
 from lib.api.twitch import TwitchCommunity, TwitchStatus
 from ..tasks import twitch
 
@@ -233,90 +231,3 @@ class TestTasksTwitchStreams(TestTasksTwitchBase):
         mock_community.assert_called_once_with('botgotsthis')
         self.data.twitch_save_community.assert_called_once_with(
             '1', 'BotGotsThis')
-
-
-class TestTasksTwitchChatServer(TestTasksTwitchBase):
-    def setUp(self):
-        super().setUp()
-
-        self.connection1 = Mock(spec=ConnectionHandler)
-        self.connection2 = Mock(spec=ConnectionHandler)
-
-        self.check_property = PropertyMock(return_value=self.now)
-        type(self.channel).serverCheck = self.check_property
-
-        self.socket_property = PropertyMock(return_value=self.connection1)
-        type(self.channel).connection = self.socket_property
-
-        patcher = patch.object(DatabaseMain, 'acquire')
-        self.addCleanup(patcher.stop)
-        self.mock_database = patcher.start()
-
-        self.database = MagicMock(spec=DatabaseMain)
-        self.mock_database.return_value = self.database
-        self.database.__aenter__.return_value = self.database
-
-        patcher = patch('lib.api.twitch.chat_server')
-        self.addCleanup(patcher.stop)
-        self.mock_chatserver = patcher.start()
-
-        patcher = patch('bot.utils.ensureServer')
-        self.addCleanup(patcher.stop)
-        self.mock_ensureserver = patcher.start()
-
-        self.mock_globals.clusters = {'twitch': self.connection1,
-                                      'aws': self.connection2
-                                      }
-
-    async def test_empty(self):
-        self.mock_globals.channels = {}
-        await twitch.checkChatServers(self.now + timedelta(hours=1))
-        self.assertFalse(self.mock_chatserver.called)
-        self.assertFalse(self.mock_database.called)
-        self.assertFalse(self.mock_ensureserver.called)
-
-    async def test_recent(self):
-        await twitch.checkChatServers(self.now)
-        self.assertFalse(self.mock_chatserver.called)
-        self.assertFalse(self.mock_database.called)
-        self.assertFalse(self.mock_ensureserver.called)
-
-    async def test_none(self):
-        self.mock_chatserver.return_value = None
-        await twitch.checkChatServers(self.now + timedelta(hours=1))
-        self.check_property.assert_has_calls(
-            [call(), call(self.now + timedelta(hours=1))])
-        self.mock_chatserver.assert_called_once_with('botgotsthis')
-        self.assertFalse(self.mock_database.called)
-        self.assertFalse(self.mock_ensureserver.called)
-
-    async def test_same_cluster(self):
-        self.mock_chatserver.return_value = 'twitch'
-        await twitch.checkChatServers(self.now + timedelta(hours=1))
-        self.check_property.assert_has_calls(
-            [call(), call(self.now + timedelta(hours=1))])
-        self.mock_chatserver.assert_called_once_with('botgotsthis')
-        self.assertFalse(self.mock_database.called)
-        self.assertFalse(self.mock_ensureserver.called)
-
-    async def test_unknown_cluster(self):
-        self.mock_chatserver.return_value = 'where is this'
-        await twitch.checkChatServers(self.now + timedelta(hours=1))
-        self.check_property.assert_has_calls(
-            [call(), call(self.now + timedelta(hours=1))])
-        self.mock_chatserver.assert_called_once_with('botgotsthis')
-        self.assertTrue(self.mock_database.called)
-        self.assertTrue(self.database.getAutoJoinsPriority.called)
-        self.assertTrue(self.database.setAutoJoinServer.called)
-        self.assertTrue(self.mock_ensureserver.called)
-
-    async def test_different_cluster(self):
-        self.mock_chatserver.return_value = 'aws'
-        await twitch.checkChatServers(self.now + timedelta(hours=1))
-        self.check_property.assert_has_calls(
-            [call(), call(self.now + timedelta(hours=1))])
-        self.mock_chatserver.assert_called_once_with('botgotsthis')
-        self.assertTrue(self.mock_database.called)
-        self.assertTrue(self.database.getAutoJoinsPriority.called)
-        self.assertTrue(self.database.setAutoJoinServer.called)
-        self.assertTrue(self.mock_ensureserver.called)

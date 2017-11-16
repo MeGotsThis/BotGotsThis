@@ -6,7 +6,7 @@ import bot.coroutine.join
 from collections import deque
 from datetime import datetime, timedelta
 
-from unittest.mock import Mock, PropertyMock, patch
+from unittest.mock import PropertyMock, patch
 
 from bot.data import Channel
 from bot.coroutine.connection import ConnectionHandler
@@ -21,7 +21,7 @@ class TestJoinManager(unittest.TestCase):
         patcher = patch('bot.globals', autospec=True)
         self.addCleanup(patcher.stop)
         self.mock_globals = patcher.start()
-        self.mock_globals.clusters = {'Twitch': self.connection}
+        self.mock_globals.cluster = self.connection
 
         patcher = patch('bot.coroutine.join._joinTimes')
         self.addCleanup(patcher.stop)
@@ -72,18 +72,6 @@ class TestJoinManager(unittest.TestCase):
     def test_connected_channels_not_connected(self, mock_isConnected):
         mock_isConnected.return_value = False
         self.assertFalse(bot.coroutine.join._connected_channels())
-
-    @patch.object(ConnectionHandler, 'isConnected', new_callable=PropertyMock)
-    def test_connected_channels_multi_sockets(self, mock_isConnected):
-        s = Mock(spec=ConnectionHandler)
-        p = PropertyMock(return_value=False)
-        type(s).isConnected = p
-        c = Channel('megotsthis', self.connection)
-        s.channels = {'megotsthis': c}
-        self.mock_globals.clusters['mock'] = s
-        mock_isConnected.return_value = True
-        self.assertEqual(bot.coroutine.join._connected_channels(),
-                         {'botgotsthis': self.channel})
 
     @patch('bot.utils.now', autospec=True)
     def test_connected(self, mock_now):
