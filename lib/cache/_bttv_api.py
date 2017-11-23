@@ -69,8 +69,12 @@ class BetterTwitchTvApisMixin(AbcCacheStore):
         return json.loads(value)
 
     async def bttv_get_cached_broadcasters(self) -> Dict[str, int]:
-        keys: List[str] = [key.decode() for key
-                           in await self.redis.keys('emote:bttv:*')]
+        keys: List[str] = []
+        cur: bytes = b'0'
+        ckeys: List[bytes]
+        while cur:
+            cur, ckeys = await self.redis.scan(cur, match='emote:bttv:*')
+            keys.extend(k.decode() for k in ckeys)
         ttlValues: Tuple[int, ...] = await asyncio.gather(
             *[self.redis.ttl(key) for key in keys]
         )

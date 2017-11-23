@@ -140,7 +140,12 @@ async def refresh_cache(send: Send,
                         keys: Optional[str]) -> bool:
     send('Refreshing Redis Cache')
     if keys is not None:
-        keysFound: List[bytes] = await data.redis.keys(keys)
+        cur: bytes = b'0'
+        ckeys: List[bytes]
+        keysFound: List[bytes] = []
+        while cur:
+            cur, ckeys = await data.redis.scan(cur, match=keys)
+            keysFound.extend(ckeys)
         if keysFound:
             await data.redis.delete(*keysFound)
     else:
