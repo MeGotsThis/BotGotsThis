@@ -1,5 +1,4 @@
 ﻿from . import data
-from .coroutine import connection  # noqa: F401
 from datetime import datetime
 from types import TracebackType
 from typing import Any, Iterable, List, Optional, Type, Tuple, Union  # noqa: F401,E501
