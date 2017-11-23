@@ -1,15 +1,19 @@
-﻿from datetime import datetime
-from typing import Tuple, cast  # noqa: F401
+﻿import asyncio
+
+from datetime import datetime
+from typing import Tuple  # noqa: F401
 
 import bot
 from bot import data  # noqa: F401
 from lib import cache
 from lib.helper import timeout
 
+lock: asyncio.Lock = asyncio.Lock()
+
 
 async def autoRepeatMessage(timestamp: datetime) -> None:
     dataCache: cache.CacheStore
-    async with cache.get_cache() as dataCache:
+    async with lock, cache.get_cache() as dataCache:
         row: Tuple[str, str, str]
         async for row in dataCache.getAutoRepeatToSend():
             broadcaster: str
