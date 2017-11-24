@@ -4,6 +4,7 @@ from typing import Optional, Type
 
 import aioredis
 
+import bot
 from ._auto_repeat import AutoRepeatMixin
 from ._bot_mangers import BotManagersMixin
 from ._bttv_api import BetterTwitchTvApisMixin
@@ -44,8 +45,12 @@ class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
             self._redis = None
 
     async def __aenter__(self) -> 'CacheStore':
-        await self.open()
-        return self
+        try:
+            await self.open()
+            return self
+        except OSError:
+            bot.globals.running = False
+            raise
 
     async def __aexit__(self,
                         type: Optional[Type[BaseException]],

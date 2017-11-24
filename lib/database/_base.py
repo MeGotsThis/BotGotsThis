@@ -1,9 +1,11 @@
+from typing import Optional, Type
+from types import TracebackType  # noqa: F401
+
 import aioodbc
 import aioodbc.cursor
 import pyodbc
 
-from typing import Optional, Type
-from types import TracebackType  # noqa: F401
+import bot
 
 
 class Database:
@@ -20,14 +22,19 @@ class Database:
         return self._connection
 
     async def connect(self) -> None:
-        self._connection = await self._pool.acquire()
-        driver: str = await self._connection.getinfo(pyodbc.SQL_DRIVER_NAME)
-        self._driver = driver.lower()
-        if self.isPostgres:
-            cursor: aioodbc.cursor.Cursor
-            await self.connection.rollback()
-            async with await self.cursor() as cursor:
-                await cursor.execute("SET TIME ZONE 'UTC'")
+        try:
+            self._connection = await self._pool.acquire()
+            driver: str
+            driver = await self._connection.getinfo(pyodbc.SQL_DRIVER_NAME)
+            self._driver = driver.lower()
+            if self.isPostgres:
+                cursor: aioodbc.cursor.Cursor
+                await self.connection.rollback()
+                async with await self.cursor() as cursor:
+                    await cursor.execute("SET TIME ZONE 'UTC'")
+        except pyodbc.Error:
+            bot.globals.running = False
+            raise
 
     async def close(self) -> None:
         if self.connection is not None:
