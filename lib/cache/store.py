@@ -35,8 +35,12 @@ class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
         return self._redis
 
     async def open(self) -> None:
-        self._connection = await self._pool.acquire()
-        self._redis = aioredis.Redis(self._connection)
+        try:
+            self._connection = await self._pool.acquire()
+            self._redis = aioredis.Redis(self._connection)
+        except OSError:
+            bot.globals.running = False
+            raise
 
     async def close(self) -> None:
         if self._connection is not None:
@@ -45,12 +49,8 @@ class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
             self._redis = None
 
     async def __aenter__(self) -> 'CacheStore':
-        try:
-            await self.open()
-            return self
-        except OSError:
-            bot.globals.running = False
-            raise
+        await self.open()
+        return self
 
     async def __aexit__(self,
                         type: Optional[Type[BaseException]],
