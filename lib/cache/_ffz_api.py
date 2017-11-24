@@ -70,11 +70,11 @@ class FrankerFaceZApisMixin(AbcCacheStore):
 
     async def ffz_get_cached_broadcasters(self) -> Dict[str, int]:
         keys: List[str] = []
-        cur: bytes = b'0'
-        ckeys: List[bytes]
+        cur: str = '0'
+        ckeys: List[str]
         while cur:
             cur, ckeys = await self.redis.scan(cur, match='emote:ffz:*')
-            keys.extend(k.decode() for k in ckeys)
+            keys.extend(ckeys)
         ttlValues: Tuple[int, ...] = await asyncio.gather(
             *[self.redis.ttl(key) for key in keys]
         )

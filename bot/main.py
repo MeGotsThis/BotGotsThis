@@ -31,6 +31,7 @@ async def initializer() -> None:
     bot.globals.redisPool = await aioredis.create_pool(
         (bot.config.redis['host'], bot.config.redis['port']),
         db=bot.config.redis['db'], password=bot.config.redis['password'],
+        encoding='utf-8',
         minsize=bot.config.redis['connections'],
         maxsize=bot.config.redis['connections'],
     )
