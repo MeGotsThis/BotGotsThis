@@ -1,3 +1,4 @@
+from datetime import datetime
 from types import TracebackType  # noqa: F401
 from typing import Optional, Type
 
@@ -51,3 +52,20 @@ class CacheStore(FeaturesMixin, ChatPropertiesMixin, PermittedUsersMixin,
                         value: Optional[BaseException],
                         traceback: Optional[TracebackType]) -> None:
         await self.close()
+
+    @staticmethod
+    def datetimeToStr(dt: datetime) -> str:
+        return f'{dt.isoformat()}Z'
+
+    @staticmethod
+    def strToDatetime(dt: Optional[str]) -> Optional[datetime]:
+        if dt is None:
+            return None
+        isoFormat: str
+        try:
+            isoFormat = '%Y-%m-%dT%H:%M:%S.%fZ'
+            return datetime.strptime(dt, isoFormat)
+        except ValueError:
+            pass
+        isoFormat = '%Y-%m-%dT%H:%M:%SZ'
+        return datetime.strptime(dt, isoFormat)

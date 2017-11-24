@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import aioredis
 
 
@@ -8,3 +10,9 @@ class AbcCacheStore:
     async def open(self) -> None: ...
 
     async def close(self) -> None: ...
+
+    @staticmethod
+    def datetimeToStr(dt: datetime) -> str: ...
+
+    @staticmethod
+    def strToDatetime(dt: str) -> datetime: ...

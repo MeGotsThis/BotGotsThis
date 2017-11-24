@@ -16,7 +16,7 @@ class AutoRepeatMixin(AbcCacheStore):
             repeats = [r async for r in db.getAutoRepeats()]
         await self.redis.setex(
             'autorepeat', 600,
-            json.dumps([repeat[:-1] + (repeat.last.isoformat() + 'Z',)
+            json.dumps([repeat[:-1] + (self.datetimeToStr(repeat.last),)
                         for repeat in repeats]))
         return repeats
 
@@ -25,11 +25,10 @@ class AutoRepeatMixin(AbcCacheStore):
         if value is None:
             return await self.loadAutoRepeats()
         else:
-            isoFormat: str = '%Y-%m-%dT%H:%M:%S.%fZ'
             return [
                 data.RepeatData(
                     repeat[0], repeat[1], repeat[2], repeat[3], repeat[4],
-                    datetime.strptime(repeat[5], isoFormat))
+                    self.strToDatetime(repeat[5]))
                 for repeat in json.loads(value)]
 
     async def getAutoRepeatToSend(self, timestamp: Optional[datetime]=None
