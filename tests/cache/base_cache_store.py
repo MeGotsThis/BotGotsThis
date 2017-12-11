@@ -21,7 +21,9 @@ class TestCacheStore(asynctest.TestCase):
         self.mock_dbmain.return_value = self.dbmain
 
         self.pool = await aioredis.create_pool(
-            ('localhost', 6379), minsize=1, maxsize=1)
+            ('localhost', 6379),
+            encoding='utf-8',
+            minsize=1, maxsize=1)
         self.data = CacheStore(self.pool)
         await self.data.open()
 

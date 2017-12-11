@@ -46,8 +46,7 @@ async def checkStreamsAndChannel(timestamp: datetime) -> None:
                 continue
             channels[channel].streamingSince = None
 
-        await asyncio.gather(*[dataCache.twitch_load_community_id(id)
-                               for id in communityIds])
+        await dataCache.twitch_load_community_ids(communityIds)
 
 
 async def checkOfflineChannels(timestamp: datetime) -> None:

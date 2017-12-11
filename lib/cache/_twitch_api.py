@@ -45,10 +45,8 @@ class TwitchApisMixin(AbcCacheStore):
 
     async def twitch_load_ids(self, users: Iterable[str]) -> bool:
         users = list(users)
-        existed: Tuple[bool, ...] = await asyncio.gather(
-            *[self.redis.exists(self._twitchIdUserKey(user))
-              for user in users]
-        )
+        existed: Tuple[Optional[str], ...] = await self.redis.mget(
+            *(self._twitchIdUserKey(user) for user in users))
         users = [user for user, exists in zip(users, existed) if not exists]
         if not users:
             return True
@@ -94,6 +92,15 @@ class TwitchApisMixin(AbcCacheStore):
             return None
         return json.loads(value)
 
+    async def twitch_get_ids(self, users: Set[str]
+                             ) -> Dict[str, Optional[str]]:
+        values: Tuple[Optional[str], ...] = await self.redis.mget(
+            *(self._twitchIdUserKey(user) for user in users)
+        )
+        return dict(zip(users,
+                        (json.loads(v) if v is not None else None
+                         for v in values)))
+
     async def twitch_get_user(self, id: str) -> Optional[str]:
         key: str = self._twitchIdIdKey(id)
         value: Optional[str] = await self.redis.get(key)
@@ -116,6 +123,27 @@ class TwitchApisMixin(AbcCacheStore):
         if community is None:
             return False
         await self.twitch_save_community(community.id, community.name)
+        return True
+
+    async def twitch_load_community_ids(self, ids: Set[str]) -> bool:
+        if not ids:
+            return True
+        values: Tuple[Optional[str], ...] = await self.redis.mget(
+            *(self._twitchCommunityIdKey(id) for id in ids)
+        )
+        loadIds: List[str]
+        loadIds = [id for id, value in zip(ids, values) if not value]
+        if not loadIds:
+            return True
+
+        async def load(id: str) -> None:
+            community: Optional[twitch.TwitchCommunity]
+            community = await twitch.get_community_by_id(id)
+            if community is None:
+                return
+            await self.twitch_save_community(community.id, community.name)
+
+        await asyncio.gather(*(load(id) for id in loadIds))
         return True
 
     async def twitch_load_community_name(self, name: str) -> bool:

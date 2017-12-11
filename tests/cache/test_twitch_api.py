@@ -160,6 +160,20 @@ class TestCacheTwitchApiId(TestCacheStore):
     async def test_get_id_empty(self):
         self.assertIsNone(await self.data.twitch_get_id('botgotsthis'))
 
+    async def test_get_ids(self):
+        await self.data.twitch_save_id('0', 'botgotsthis')
+        self.assertEqual(await self.data.twitch_get_ids({'botgotsthis'}),
+                         {'botgotsthis': '0'})
+
+    async def test_get_ids_none(self):
+        await self.data.twitch_save_id(None, 'botgotsthis')
+        self.assertEqual(await self.data.twitch_get_ids({'botgotsthis'}),
+                         {'botgotsthis': None})
+
+    async def test_get_ids_empty(self):
+        self.assertEqual(await self.data.twitch_get_ids({'botgotsthis'}),
+                         {'botgotsthis': None})
+
     async def test_get_user(self):
         await self.data.twitch_save_id('0', 'botgotsthis')
         self.assertEqual(await self.data.twitch_get_user('0'), 'botgotsthis')
@@ -202,6 +216,36 @@ class TestCacheTwitchApiCommunity(TestCacheStore):
         self.mock_community_id.reset_mock()
         self.assertIs(await self.data.twitch_load_community_id('0'),
                       False)
+        self.assertTrue(self.mock_community_id.called)
+        self.assertIsNone(
+            await self.redis.get(self.data._twitchCommunityNameKey(
+                'botgotsthis')))
+        self.assertIsNone(
+            await self.redis.get(self.data._twitchCommunityIdKey('0')))
+
+    async def test_load_ids(self):
+        self.mock_community_id.return_value = TwitchCommunity(
+            '0', 'botgotsthis')
+        self.assertIs(await self.data.twitch_load_community_ids({'0'}), True)
+        self.assertTrue(self.mock_community_id.called)
+        self.mock_community_id.reset_mock()
+        self.assertIs(await self.data.twitch_load_community_ids({'0'}), True)
+        self.assertFalse(self.mock_community_id.called)
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchCommunityNameKey(
+                'botgotsthis')))
+        self.assertIsNotNone(
+            await self.redis.get(self.data._twitchCommunityIdKey('0')))
+
+    async def test_load_ids_no_load(self):
+        self.assertIs(await self.data.twitch_load_community_ids(set()), True)
+        self.mock_community_id.return_value = None
+        self.assertIs(await self.data.twitch_load_community_ids({'0'}),
+                      True)
+        self.assertTrue(self.mock_community_id.called)
+        self.mock_community_id.reset_mock()
+        self.assertIs(await self.data.twitch_load_community_ids({'0'}),
+                      True)
         self.assertTrue(self.mock_community_id.called)
         self.assertIsNone(
             await self.redis.get(self.data._twitchCommunityNameKey(
