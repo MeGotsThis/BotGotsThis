@@ -1,3 +1,5 @@
+import tests.unittest.asynctest_fix  # noqa: F401
+
 import unittest
 from datetime import datetime
 
@@ -5,7 +7,6 @@ import aiohttp
 import asynctest
 from asynctest.mock import MagicMock, Mock, call, patch
 
-import tests.unittest.asynctest_fix  # noqa: F401
 from lib.cache import CacheStore
 from bot.data import Channel
 from lib.data.message import Message
