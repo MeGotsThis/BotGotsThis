@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import asyncio
 import json
 from typing import Any, Awaitable, ClassVar, Dict, Iterable, List, Optional  # noqa: F401,E501
@@ -10,6 +12,20 @@ from ..api import twitch
 
 class TwitchApisMixin(AbcCacheStore):
     _lastEmoteSet: ClassVar[Optional[Set[int]]] = None
+
+    async def twitch_created_date(self, user: str) -> Optional[datetime]:
+        key: str = f'twitch:{user}:created'
+        createdDate: Optional[datetime]
+        value: Optional[str] = await self.redis.get(key)
+        if value is None:
+            data: store.CacheStore = cast(store.CacheStore, self)
+            createdDate = await twitch.created_date(user, data=data)
+            expire: int = 3600
+            await self.redis.setex(key, expire,
+                                   self.datetimeToStr(createdDate))
+        else:
+            createdDate = self.strToDatetime(value)
+        return createdDate
 
     async def twitch_num_followers(self, user: str) -> Optional[int]:
         key: str = f'twitch:{user}:following'

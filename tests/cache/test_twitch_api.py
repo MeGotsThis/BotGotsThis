@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from asynctest import patch
 
 import bot  # noqa: F401
@@ -5,6 +7,27 @@ import bot  # noqa: F401
 from .base_cache_store import TestCacheStore
 from lib.cache import CacheStore
 from lib.api.twitch import TwitchCommunity
+
+
+class TestCacheTwitchApiCreatedDate(TestCacheStore):
+    async def setUp(self):
+        await super().setUp()
+
+        patcher = patch('lib.api.twitch.created_date')
+        self.addCleanup(patcher.stop)
+        self.mock_created = patcher.start()
+
+    async def test(self,):
+        user = 'megotsthis'
+        key = f'twitch:{user}:created'
+        dt = datetime(2000, 1, 1)
+        self.mock_created.return_value = dt
+        self.assertEqual(await self.data.twitch_created_date('megotsthis'), dt)
+        self.assertTrue(self.mock_created.called)
+        self.mock_created.reset_mock()
+        self.assertEqual(await self.data.twitch_created_date('megotsthis'), dt)
+        self.assertFalse(self.mock_created.called)
+        self.assertIsNotNone(await self.redis.get(key))
 
 
 class TestCacheTwitchApiNumFollowers(TestCacheStore):

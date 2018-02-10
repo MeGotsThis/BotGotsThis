@@ -89,6 +89,17 @@ twitchEmotesSpecial = br'''{
     }
 }'''
 
+userData = b'''{
+    "display_name":"MeGotsThis",
+    "_id":"42553092",
+    "name":"megotsthis",
+    "type":"user",
+    "bio":"Pokemon \u0026 Survival Kids Speedrunner, Martial Artist, Software Programmer. Casual Gamer",
+    "created_at":"2013-04-17T04:50:31.901444Z",
+    "updated_at":"2018-02-09T09:31:32.526292Z",
+    "logo":"https://static-cdn.jtvnw.net/jtv_user_pictures/megotsthis-profile_image-971df9db0988b5be-300x300.png"
+}'''  # noqa: E501
+
 numFollowers = b'''{
     "follows": [
         {
@@ -622,6 +633,35 @@ class TestApiTwitch(asynctest.TestCase):
         self.assertIsNone(await twitch.twitch_emotes({0}))
         self.mock_get_call.assert_called_once_with(
             None, StrContains('/kraken/chat/emoticon_images?emotesets=0'))
+
+    async def test_created_date(self):
+        data = json.loads(userData.decode())
+        self.mock_get_call.return_value[1] = data
+        self.assertEqual(await twitch.created_date('botgotsthis'),
+                         datetime(2013, 4, 17, 4, 50, 31, 901444))
+        self.data.twitch_load_id.assert_called_once_with('botgotsthis')
+        self.data.twitch_get_id.assert_called_once_with('botgotsthis')
+        self.assertTrue(self.mock_get_call.called)
+
+    async def test_created_date_no_load(self):
+        self.data.twitch_load_id.return_value = False
+        self.assertIsNone(await twitch.created_date('botgotsthis'))
+        self.data.twitch_load_id.assert_called_once_with('botgotsthis')
+        self.assertFalse(self.data.twitch_get_id.called)
+        self.assertFalse(self.mock_get_call.called)
+
+    async def test_created_date_no_user(self):
+        self.assertIsNone(await twitch.created_date('megotsthis'))
+        self.data.twitch_load_id.assert_called_once_with('megotsthis')
+        self.data.twitch_get_id.assert_called_once_with('megotsthis')
+        self.assertFalse(self.mock_get_call.called)
+
+    async def test_created_date_except(self):
+        self.mock_get_call.side_effect = asyncio.TimeoutError
+        self.assertIsNone(await twitch.created_date('botgotsthis'))
+        self.data.twitch_load_id.assert_called_once_with('botgotsthis')
+        self.data.twitch_get_id.assert_called_once_with('botgotsthis')
+        self.assertTrue(self.mock_get_call.called)
 
     async def test_num_followers(self):
         data = json.loads(numFollowers.decode())

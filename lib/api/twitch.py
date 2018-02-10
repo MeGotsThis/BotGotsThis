@@ -232,6 +232,34 @@ async def getTwitchIds(channels: Iterable[str]) -> Optional[Dict[str, str]]:
     return None
 
 
+async def created_date(user: str, *,
+                       data: 'cache.CacheStore'=None) -> Optional[datetime]:
+    if data is None:
+        async with cache.get_cache() as data:
+            return await created_date(user, data=data)
+
+    if not await data.twitch_load_id(user):
+        return None
+    id: Optional[str] = await data.twitch_get_id(user)
+    if id is None:
+        return None
+    with suppress(aiohttp.ClientConnectionError, aiohttp.ClientResponseError,
+                  asyncio.TimeoutError):
+        response: aiohttp.ClientResponse
+        userData: Dict[str, Any]
+        uri: str = f'/kraken/users/{id}'
+        response, userData = await get_call(None, uri)
+        createdDate: datetime
+        try:
+            createdDate = datetime.strptime(userData['created_at'],
+                                            '%Y-%m-%dT%H:%M:%S.%fZ')
+        except ValueError:
+            createdDate = datetime.strptime(userData['created_at'],
+                                            '%Y-%m-%dT%H:%M:%SZ')
+        return createdDate
+    return None
+
+
 async def num_followers(user: str, *,
                         data: 'cache.CacheStore'=None) -> Optional[int]:
     if data is None:
