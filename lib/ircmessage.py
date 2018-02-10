@@ -242,6 +242,14 @@ def irc_userstate(
         userstate.parse(channels[where[1:]], message.tags)
 
 
+@registerIrc('RECONNECT')
+def irc_reconnect(
+        connection: 'connectionM.ConnectionHandler',
+        message: IrcMessage,
+        timestamp: datetime) -> None:
+    raise data.ConnectionReset()
+
+
 def log_channel_message(message: IrcMessage,
                         timestamp: datetime) -> None:
     if message.command in _logCommandPerChannel:

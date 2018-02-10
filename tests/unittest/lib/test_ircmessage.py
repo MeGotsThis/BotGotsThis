@@ -1,6 +1,6 @@
 import unittest
 from bot.coroutine.connection import ConnectionHandler
-from bot.data import Channel
+from bot.data import Channel, ConnectionReset
 from bot.twitchmessage import IrcMessage, IrcMessageParams
 from datetime import datetime
 from lib import ircmessage
@@ -207,3 +207,9 @@ class PublicTestIrcMessage(unittest.TestCase):
         ircmessage.irc_userstate(self.connection, message, self.now)
         self.assertTrue(mock_parse.called)
         self.assertTrue(self.mock_log.called)
+
+    def test_log_irc_reconnect(self, mock_parse):
+        message = IrcMessage.fromMessage(
+            ':tmi.twitch.tv RECONNECT')
+        with self.assertRaises(ConnectionReset):
+            ircmessage.irc_reconnect(self.connection, message, self.now)
