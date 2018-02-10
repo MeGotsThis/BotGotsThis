@@ -7,6 +7,7 @@ from typing import Awaitable, Callable, List
 from bot import utils
 
 _tasks: List['Task'] = []
+_defaultInterval: timedelta = timedelta(seconds=60)
 
 
 class Task:
@@ -67,5 +68,5 @@ async def _run_task(task: Callable[[datetime], Awaitable[None]],
 
 
 def add_task(task: Callable[[datetime], Awaitable[None]],
-             interval: timedelta=timedelta(seconds=60)) -> None:
+             interval: timedelta=_defaultInterval) -> None:
     _tasks.append(Task(task, interval))

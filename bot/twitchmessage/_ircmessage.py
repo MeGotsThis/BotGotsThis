@@ -7,6 +7,8 @@ import string
 
 Command = Union[str, int]
 
+defaultParams: IrcMessageParams = IrcMessageParams()
+
 
 class ParsedMessage(NamedTuple):
     tags: Optional[IrcMessageTagsReadOnly]
@@ -22,7 +24,7 @@ class IrcMessage:
                  tags: Optional[IrcMessageTagsReadOnly]=None,
                  prefix: Optional[IrcMessagePrefix]=None,
                  command: Command=0,
-                 params: IrcMessageParams=IrcMessageParams()) -> None:
+                 params: IrcMessageParams=defaultParams) -> None:
         if isinstance(tags, IrcMessageTagsReadOnly):
             tags = IrcMessageTagsReadOnly(tags)
         elif tags is not None:

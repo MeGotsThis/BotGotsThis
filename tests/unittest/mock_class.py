@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 
 sentinal = object()
+defaultEpsilon = timedelta(seconds=1)
 
 
 class TypeMatch:
@@ -106,7 +107,7 @@ class AsyncIterator:
 
 
 class DateTimeNear:
-    def __init__(self, dt, epsilon=timedelta(seconds=1)):
+    def __init__(self, dt, epsilon=defaultEpsilon):
         self.dt = dt
         self.epsilon = epsilon
 

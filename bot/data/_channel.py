@@ -1,3 +1,4 @@
+import math
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Optional, Set, Union
 
@@ -14,7 +15,7 @@ class Channel:
     def __init__(self,
                  channel: str,
                  connection: 'connectionM.ConnectionHandler',
-                 joinPriority: Union[int, float, str]=float('inf')) -> None:
+                 joinPriority: Union[int, float, str]=math.inf) -> None:
         if not isinstance(channel, str):
             raise TypeError()
         if not isinstance(connection, connectionM.ConnectionHandler):

@@ -12,8 +12,11 @@ _AnyDecorator = Callable[..., _AnyCallable]
 _ArgsKey = Tuple[Tuple[Any, ...], Tuple[Tuple[str, Any], ...]]
 
 
+_defaultDuration: timedelta = timedelta(seconds=60)
+
+
 def cache(key: str,
-          duration: timedelta=timedelta(seconds=60), *,
+          duration: timedelta=_defaultDuration, *,
           excepts: Sequence[Type[BaseException]]=(ConnectionError,
                                                   ClientResponseError),
           default: Any=None) -> _AnyDecorator:

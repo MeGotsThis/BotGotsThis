@@ -5,6 +5,7 @@ from typing import Any, Iterable, List, Optional, Type, Tuple, Union  # noqa: F4
 import builtins
 import bot
 import bot.coroutine.logging
+import math
 import os.path
 import sys
 import threading
@@ -19,7 +20,7 @@ def now() -> datetime:
 
 
 def joinChannel(broadcaster: str,
-                priority: Union[int, float, str]=float('inf')
+                priority: Union[int, float, str]=math.inf
                 ) -> bool:
     if not isinstance(broadcaster, str):
         raise TypeError()
