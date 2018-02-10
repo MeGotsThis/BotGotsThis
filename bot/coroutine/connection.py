@@ -79,7 +79,8 @@ class ConnectionHandler:
                     await asyncio.wait_for(self.read(), 0.01)
                 except asyncio.TimeoutError:
                     pass
-            except (ConnectionError, data.ConnectionReset):
+            except (ConnectionError, data.ConnectionReset,
+                    asyncio.IncompleteReadError):
                 if self._transport is not None:
                     self.disconnect()
             except data.LoginUnsuccessful:
