@@ -208,7 +208,7 @@ class PublicTestIrcMessage(unittest.TestCase):
         self.assertTrue(mock_parse.called)
         self.assertTrue(self.mock_log.called)
 
-    def test_log_irc_reconnect(self, mock_parse):
+    def test_log_irc_reconnect(self):
         message = IrcMessage.fromMessage(
             ':tmi.twitch.tv RECONNECT')
         with self.assertRaises(ConnectionReset):
