@@ -3,9 +3,9 @@ from datetime import datetime
 
 import aiohttp
 import asynctest
-import yarl
 from asynctest.mock import MagicMock, Mock, call, patch
 
+import tests.unittest.asynctest_fix  # noqa: F401
 from lib.cache import CacheStore
 from bot.data import Channel
 from lib.data.message import Message
@@ -13,6 +13,8 @@ from tests.unittest.base_channel import TestChannel
 from tests.unittest.mock_class import StrContains, TypeMatch
 
 # Needs to be imported last
+import yarl
+
 from ..channel import block_url
 
 
