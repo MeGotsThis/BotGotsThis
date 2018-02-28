@@ -1,3 +1,4 @@
+import asyncio
 import re
 
 import aiohttp
@@ -73,6 +74,14 @@ class TestCustomCommandCustomUrl(TestCustomField):
 
     async def test_exception(self):
         self.mock_session.get.side_effect = aiohttp.ClientError
+        self.assertEqual(await url.fieldUrl(self.args), '')
+        self.assertTrue(self.mock_clientsession.called)
+        self.mock_session.get.assert_called_once_with(
+            'http://localhost/', timeout=1)
+        self.assertTrue(self.mock_session.get.called)
+
+    async def test_exception_timeout(self):
+        self.mock_session.get.side_effect = asyncio.TimeoutError
         self.assertEqual(await url.fieldUrl(self.args), '')
         self.assertTrue(self.mock_clientsession.called)
         self.mock_session.get.assert_called_once_with(

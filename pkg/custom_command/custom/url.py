@@ -1,4 +1,5 @@
-﻿import re
+﻿import asyncio
+import re
 from contextlib import suppress
 from typing import Iterator, Match, List, Optional  # noqa: F401
 
@@ -23,7 +24,7 @@ async def fieldUrl(args: CustomFieldArgs) -> Optional[str]:
         urlTimeout: float = bot.config.customMessageUrlTimeout
         session: aiohttp.ClientSession
         response: aiohttp.ClientResponse
-        with suppress(aiohttp.ClientError):
+        with suppress(aiohttp.ClientError, asyncio.TimeoutError):
             async with aiohttp.ClientSession(
                     raise_for_status=True) as session,\
                     session.get(url, timeout=urlTimeout) as response:
